@@ -4,7 +4,7 @@ from backend import *
 
 # Application
 app = Flask(__name__)
-app.config["DEBUG"] = True
+# app.config["DEBUG"] = True
 app.config["APPLICATION_ROOT"] = "/"
 
 
@@ -27,10 +27,10 @@ def main():
         #Plot bar diagramm of emission, we remove plane because the geometry is just an illustrattion and not the real distance
         plot_div = plotly_chart(gdf[gdf.NAME != 'Plane'], dep, arr)
         #print(plot_div)
-        response = {'gdf' : gdf[['ISO2', 'NAME', 'geometry','mix_conso_2022', 'FE_elec', 'colors']].to_json(), 
+        response = {'gdf' : gdf[['ISO2', 'NAME', 'geometry','mix_conso_2022', 'FE_elec', 'colors']].to_json(),
                     'plot_div':plot_div}
         return response
     return render_template('input.html')
 
-if __name__ == '__main__':
-    app.run(host="localhost", port=200, debug=True)
+# if __name__ == '__main__':
+#     app.run(host="localhost", port=200, debug=True)

@@ -11,12 +11,10 @@ from pyproj import Geod
 #Plotting
 import plotly.express as px
 import plotly.graph_objects as go
-from plotly.offline import plot
 from plotly.io import to_json
 
 #Web
 import requests
-import json
 
 #Colors
 charte_mollow = ['590D22',
