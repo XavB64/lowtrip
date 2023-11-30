@@ -171,7 +171,7 @@
     legend.onAdd = function () {
       var div = L.DomUtil.create("div", "legend");
 
-      div.innerHTML += `<form id="location-form" method="post" action=".">
+      div.innerHTML += `<form id="location-form" method="post" action="." data-netlify="true">
     <div>
     <label for="departure">Departure:</label>
     <input type="text" id="departure" name="departure" placeholder="Enter Departure Point" />
