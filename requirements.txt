@@ -4,5 +4,5 @@ geopandas == 0.13
 plotly == 5.9.0
 pandas == 2.0
 numpy == 1.23.0
-pyproj == 3.6.1
+pyproj == 3.5
 requests == 2.28.1
