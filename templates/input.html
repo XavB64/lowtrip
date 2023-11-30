@@ -1,0 +1,418 @@
+<!-- Main page-->
+<!DOCTYPE html>
+<meta charset="utf-8" />
+
+<!-- Load Leaflet -->
+<link
+  rel="stylesheet"
+  href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+  crossorigin=""
+/>
+
+<!-- Make sure you put this AFTER Leaflet's CSS -->
+<script
+  src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+  integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+  crossorigin=""
+></script>
+
+<!-- jquery and ajax, maybe I do not need all of it ? -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<link
+  rel="stylesheet"
+  href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css"
+/>
+
+<!-- Include Plotly from CDN -->
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+
+<!-- Create an element where the map will take place -->
+<div id="map"></div>
+
+<style>
+  /* Define the styles for the map and form container */
+  #map {
+    float: left;
+    width: 100%; /* Adjust the width as needed */
+    height: 700px; /* Adjust the height as needed */
+    z-index: 1;
+  }
+  #map-container {
+    width: 20%;
+  }
+
+  /* For the pink color of the arrival marker */
+  img.huechange {
+    filter: hue-rotate(120deg);
+  }
+
+  /* Legend style */
+  .legend {
+    padding: 6px 8px;
+    font: 14px Arial, Helvetica, sans-serif;
+    background: white;
+    background: rgba(255, 255, 255, 0.8);
+    /*box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);*/
+    /*border-radius: 5px;*/
+    line-height: 24px;
+    color: #555;
+  }
+  .legend h4 {
+    text-align: center;
+    font-size: 16px;
+    margin: 2px 12px 8px;
+    color: #777;
+  }
+  .pie {
+    padding: 0px 0px;
+    margin: 0px 0px 0px;
+    /* width:200px ;
+    height:350px;
+    z-index: 100; */
+  }
+
+  .legend iframe {
+    margin: 0px 0px 0px;
+  }
+
+  .legend span {
+    position: relative;
+    bottom: 3px;
+  }
+
+  .legend i {
+    width: 18px;
+    height: 18px;
+    float: left;
+    margin: 0 8px 0 0;
+    opacity: 0.7;
+  }
+
+  .legend i.icon {
+    background-size: 18px;
+    background-color: rgba(255, 255, 255, 1);
+  }
+
+  /* For the user form to enter departure and arrival */
+  #location-form {
+    max-width: 400px;
+    margin: 0 auto;
+    padding: 10px;
+    background-color: #f8f8f8;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+  }
+
+  #location-form div {
+    width: calc(50% - 10px);
+    box-sizing: border-box;
+  }
+
+  #location-form label {
+    display: block;
+    margin-bottom: 2px;
+    font-size: 14px;
+  }
+
+  #location-form input[type="text"],
+  #location-form input[type="submit"] {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 2px;
+    box-sizing: border-box;
+  }
+
+  #location-form input::placeholder {
+    font-size: 10px; /* Adjust the font size of the placeholder text */
+  }
+
+  #location-form input[type="submit"] {
+    background-color: #4caf50;
+    color: white;
+    cursor: pointer;
+  }
+
+  #location-form input[type="submit"]:hover {
+    background-color: #45a049;
+  }
+</style>
+
+<script>
+  // Initialize the map - layers :
+  //'https://a.basemaps.cartocdn.com/light_all/{z}/{x}/{y}@2x.png'
+  //'https://tile.openstreetmap.org/{z}/{x}/{y}.png'
+
+  //Create the map
+  var map = L.map("map").setView([48, 20], 5);
+
+  // Add a layer
+  L.tileLayer("https://a.basemaps.cartocdn.com/light_all/{z}/{x}/{y}@2x.png", {
+    maxZoom: 19,
+    attribution:
+      '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+  }).addTo(map);
+
+  // INitialize markers for dpearture and arrival and put them in south pole
+  var departureMarker = L.marker([-90, -180]).addTo(map);
+  var arrivalMarker = L.marker([-90, -180]).addTo(map);
+  //Change the color
+  arrivalMarker._icon.classList.add("huechange");
+
+  //Add the user form to set departure and arrival information
+  function addForm(map) {
+    var legend = L.control({ position: "topright" });
+
+    legend.onAdd = function () {
+      var div = L.DomUtil.create("div", "legend");
+
+      div.innerHTML += `<form id="location-form" method="post" action=".">
+    <div>
+    <label for="departure">Departure:</label>
+    <input type="text" id="departure" name="departure" placeholder="Enter Departure Point" />
+
+    <input type="text" id="departure_coord" name="departure_coord" placeholder="Coordinates" />
+
+    </div>
+
+    <div>
+    <label for="arrival">Arrival:</label>
+    <input type="text" id="arrival" name="arrival" placeholder="Enter Arrival Point" />
+
+    <input type="text" id="arrival_coord" name="arrival_coord" placeholder="Coordinates" />
+    </div>
+    <input type="submit" value="Emissions computation" id="button">
+</form>`;
+      // Prevent map click when interacting with the form
+      L.DomEvent.disableClickPropagation(div);
+
+      return div;
+    };
+
+    legend.addTo(map);
+  }
+
+  // Add it to the map
+  addForm(map);
+
+  var activeField; // Variable to store the active text field
+
+  // Set the active field when a text field gains focus
+  $("#departure_coord, #arrival_coord").focus(function () {
+    activeField = $(this).attr("id");
+  });
+
+  //Adapt latitude and longitude coordinates when the user clicks on the map
+  map.on("click", function (e) {
+    var latlng = e.latlng; // Latitude and longitude coordinates
+    var roundedLat = latlng.lat.toFixed(5);
+    var roundedLng = latlng.lng.toFixed(5);
+
+    // Check the active field and update the corresponding input text
+    if (activeField === "departure_coord") {
+      $("#departure_coord").val(roundedLat + ", " + roundedLng);
+      // Update
+      departureMarker.setLatLng(latlng);
+    } else if (activeField === "arrival_coord") {
+      $("#arrival_coord").val(roundedLat + ", " + roundedLng);
+      arrivalMarker.setLatLng(latlng);
+    }
+  });
+</script>
+
+<!-- Load the names of train stations from europe -->
+<!-- https://stackoverflow.com/questions/56609133/how-to-load-data-from-csv-file-into-form-field -->
+<!-- https://jsfiddle.net/Twisty/rnuudsap/ -->
+
+<script>
+  // Begin jQuery Code
+
+  function processData(allText) {
+    // Create variables to store the data
+    var allTextLines = allText.split(/\r\n|\n/);
+    var lines = [];
+    var headings = allTextLines.shift().split(";");
+
+    while (allTextLines.length > 0) {
+      var tobj = {},
+        entry;
+      // Read the csv
+      entry = allTextLines.shift().split(";");
+      // Store the useful information
+      tobj["label"] = entry[1];
+      tobj["value"] = entry[0];
+      tobj["lat"] = entry[2];
+      tobj["lon"] = entry[3];
+
+      lines.push(tobj);
+    }
+    //window.alert(lines)
+    return lines;
+  }
+
+  // To have an autocomplete when the user is typing
+  function enableAutocomplete(lists) {
+    $("#departure").autocomplete({
+      minLength: 2,
+      source: lists,
+      focus: function (event, ui) {
+        $("#departure").val(ui.item.label);
+        return false;
+      },
+      select: function (event, ui) {
+        $("#departure").val(ui.item.label);
+        //   $("#identifiant").val(ui.item.value);
+        $("#departure_coord").val(
+          parseFloat(ui.item.lat).toFixed(5) +
+            ", " +
+            parseFloat(ui.item.lon).toFixed(5)
+        );
+        //other way to do it : document.getElementById('departure_coord').value = `${ui.item.lat}, ${ui.item.lon}` ;
+        departureMarker.setLatLng([ui.item.lat, ui.item.lon]);
+        return false;
+      },
+    });
+    // Same thing for arrival
+    $("#arrival").autocomplete({
+      minLength: 2,
+      source: lists,
+      focus: function (event, ui) {
+        $("#arrival").val(ui.item.label);
+        return false;
+      },
+      select: function (event, ui) {
+        $("#arrival").val(ui.item.label);
+        $("#arrival_coord").val(
+          parseFloat(ui.item.lat).toFixed(5) +
+            ", " +
+            parseFloat(ui.item.lon).toFixed(5)
+        );
+        //document.getElementById('arrival_coord').value = `${ui.item.lat}, ${ui.item.lon}` ;
+        arrivalMarker.setLatLng([ui.item.lat, ui.item.lon]);
+        // $("#rounded").val(ui.item.value);
+        return false;
+        // now for arrival
+      },
+    });
+  }
+
+  var lists;
+
+  $.get("static/stations_vf.csv", function (data) {
+    //Read the data
+    lists = processData(data);
+    //Do the autocomplete
+    enableAutocomplete(lists);
+  });
+</script>
+
+<!-- Results -->
+<script>
+  //Style for the pathways
+  function style(feature) {
+    const colorName = feature.properties.colors;
+
+    return {
+      fillColor: colorName, // Use the color name with "#" symbol
+      weight: 4,
+      opacity: 1,
+      color: colorName, // Use the color name with "#" symbol
+      fillOpacity: 1,
+    };
+  }
+
+  // Function to handle form submission and update the map
+  function handleSubmit() {
+    // Use AJAX to submit the form data to the Flask backend
+    // Clear the existing GeoJSON layer on the map
+
+    var ajax = $.ajax({
+      type: "POST",
+      url: "/",
+      data: $("#location-form").serialize(),
+      success: function (response) {
+        if (typeof featuresLayer !== "undefined") {
+          // Remove existing results before displaying new ones
+          map.removeLayer(featuresLayer);
+          //map.removeControl(legend);
+          map.removeControl(pie);
+        }
+
+        geoJsonData = JSON.parse(response.gdf);
+        // Add Bar chart and legend to the layer
+        
+        pie = addImage(map, response.plot_div);
+        // I chose to remove legend with emissions factors as it is not so intersting
+        //legend = addLegend(map, geoJsonData);
+        // Add the GeoJSON data to the layer
+        featuresLayer = L.geoJson(geoJsonData, { style: style }); //style
+        featuresLayer.addTo(map);
+      },
+      error: function (error) {
+        console.log("Error:", error);
+      },
+    });
+
+    // Prevent the form from submitting in the traditional way
+    return false;
+  }
+
+  // Attach the handleSubmit function to the form's submit event
+  $("#location-form").submit(handleSubmit);
+
+  // Function to create the emission factors legend
+  function addLegend(map, geoJsonData) {
+    var legend = L.control({ position: "bottomright" });
+
+    legend.onAdd = function () {
+      var div = L.DomUtil.create("div", "legend");
+      div.innerHTML += "<h4>Emission Factor (gCO2eq/km)</h4>";
+      // Loop through the GeoJSON features to create legend items
+      for (var i = 0; i < geoJsonData.features.length; i++) {
+        const color = geoJsonData.features[i].properties.colors;
+        const name = geoJsonData.features[i].properties.NAME;
+        const feElec = geoJsonData.features[i].properties.FE_elec;
+
+        // Create a legend item with a colored circle
+        const legendItem = `
+                    <i style="background: ${color}"></i>
+                    <span>${name}: ${feElec}</span><br>
+            `;
+
+        div.innerHTML += legendItem;
+      }
+      return div;
+    };
+
+    legend.addTo(map);
+    return legend;
+  }
+
+  //Function to create the bar chart of total emissions
+  function addImage(map, plot_div) {
+    var pie = L.control({ position: "bottomright" });
+    
+    pie.onAdd = function () {
+     var div = L.DomUtil.create("div", "pie");
+      // window.alert(plot_div);
+      var layout = {
+  height: 350,  // specify the height in pixels
+  width: 100    // specify the width in pixels
+};
+
+      Plotly.newPlot(div, JSON.parse(plot_div), layout);
+      //div.innerHTML += plot_div;
+        // '<iframe src="static/test_chart.html" width="200" height="350" id="pie" frameborder="0"></iframe>';
+
+      return div;
+    };
+
+    pie.addTo(map);
+    return pie;
+  }
+</script>
