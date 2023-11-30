@@ -4,7 +4,7 @@ from backend import *
 
 # Application
 app = Flask(__name__)
-app.config["DEBUG"] = True
+#app.config["DEBUG"] = True
 app.config["APPLICATION_ROOT"] = "/"
 
 
@@ -32,5 +32,6 @@ def main():
         return response
     return render_template('input.html')
 
-if __name__ == '__main__':
-    app.run(host="localhost", port=200, debug=True)
+# if __name__ == '__main__':
+#     app.run(host="localhost", port=200, debug=True)
+
