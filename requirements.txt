@@ -1,6 +1,6 @@
 flask == 2.2.2
 shapely == 2.0.1
-geopandas == 0.14.0
+geopandas == 0.14
 plotly == 5.9.0
 pandas == 2.1.1
 numpy == 1.23.0
