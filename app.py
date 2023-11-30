@@ -36,6 +36,6 @@ def main():
         return response
     return render_template('input.html')
 
-if __name__ == '__main__':
-    app.run(host="localhost", port=200, debug=True)
+# if __name__ == '__main__':
+#     app.run(host="localhost", port=200, debug=True)
 
