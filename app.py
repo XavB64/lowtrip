@@ -1,5 +1,9 @@
 #Librairies
 from flask import Flask, request, render_template
+
+import sys
+sys.path.append("static")
+
 from backend import *
 
 # Application
