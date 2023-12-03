@@ -15,6 +15,7 @@ from plotly.io import to_json
 
 #Web
 import requests
+from openrouteservice import convert
 
 #Colors
 charte_mollow = ['590D22',
@@ -37,14 +38,11 @@ for k in charte_mollow :
     rgb.append(hext_to_rgb(k, 0))
 
 # Request data to get the pathway from lat lon of departure and arrival
-def query_ntag(tag1, tag2, id_based):
+def query_ntag(tag1, tag2):
     #Format lon , lat
-    if id_based :
-        #We should use the ids of the train stations
-        url = f"https://trainmap.ntag.fr/api/route?dep={id1}&arr={id2}&simplify=1"
-    else :
-        #We should use geogrphical coordinates
-        url = f"https://trainmap.ntag.fr/api/route?dep={tag1[0]},{tag1[1]}&arr={tag2[0]},{tag2[1]}&simplify=1"
+
+    #We should use geogrphical coordinates
+    url = f"https://trainmap.ntag.fr/api/route?dep={tag1[0]},{tag1[1]}&arr={tag2[0]},{tag2[1]}&simplify=1"
     # Send the GET request
     response = requests.get(url)
 
@@ -60,7 +58,14 @@ def query_ntag(tag1, tag2, id_based):
     #Store data in a geodataserie
     gdf = gpd.GeoSeries(LineString(response.json()['geometry']['coordinates'][0]), crs='epsg:4326')
 
-    return gdf
+    ### Route
+    url = 'http://router.project-osrm.org/route/v1/driving/'+str(tag1[0])+','+str(tag1[1])+';'+str(tag2[0])+','+str(tag2[1])+'?overview=simplified'
+    response = requests.get(url)
+    geom = response.json()['routes'][0]['geometry']
+    geom_route = LineString(convert.decode_polyline(geom)['coordinates'])
+    route_dist = response.json()['routes'][0]['distance'] / 1e3 # In km
+
+    return gdf, geom_route, route_dist
 
 # def filter_countries(gdf):
 #     #Load europe / or world
@@ -128,7 +133,7 @@ def create_plane(a, nb, tag1, tag2):
 
     return h
 
-def compute_ef(gdf, geom_plane):
+def compute_ef(gdf, geom_plane, geom_route):
     #Load electric mixed
     mix = pd.read_csv('static/mix_2022_conso.csv', delimiter=';')
     # Join with data
@@ -146,12 +151,14 @@ def compute_ef(gdf, geom_plane):
     jf['colors'] = ['#'+k for k in pd.Series(charte_mollow[::-1])[[int(k) for k in np.linspace(0, 9, jf.shape[0])]]]
     # Add plane emission factor and geometry
     gdf_plane = pd.DataFrame(pd.Series({ 'FE_elec':255, 'colors':'#00008B', 'NAME':'Plane', 'geometry':geom_plane})).transpose()
-    jf = pd.concat([jf, gdf_plane], axis=0).reset_index(drop=True)
+    gdf_car = pd.DataFrame(pd.Series({ 'FE_elec':150, 'colors':'#00FF00', 'NAME':'Car', 'geometry':geom_route})).transpose()
+    jf = pd.concat([jf, gdf_plane, gdf_car], axis=0).reset_index(drop=True)[::-1]
+    jf.to_csv('just_to_see.csv')
     return jf
 
 
 
-def plotly_chart(gdf, tag1, tag2):
+def plotly_chart(gdf, tag1, tag2, dist_route):
     #For trains
     l_length = []
     # Compute the true distance
@@ -172,8 +179,10 @@ def plotly_chart(gdf, tag1, tag2):
     plane_co2 = pd.Series({'Mean of Transport':'Plane', 'kgCO2eq':bird*.085, 'colors':'#00008B', 'NAME':'CO2'})
     # Non-CO2 contributions to radiative forcings
     plane_other = pd.Series({'Mean of Transport':'Plane', 'kgCO2eq':bird*2*.085, 'colors':'#00004B', 'NAME':'non-CO2 radiative forcing effects (contrails, NOx)'})
+    bus = pd.Series({'Mean of Transport':'Bus', 'kgCO2eq':dist_route*.03, 'colors':'#00FF00', 'NAME':'Thermal autocar'})
+    car = pd.Series({'Mean of Transport':'Car', 'kgCO2eq':dist_route*.15, 'colors':'#00FF00', 'NAME':'Thermal car'})
     # Concatenate everything
-    gdf = pd.concat([pd.DataFrame(plane_co2).transpose(), pd.DataFrame(plane_other).transpose(), gdf], axis=0).reset_index(drop=True)
+    gdf = pd.concat([pd.DataFrame(plane_co2).transpose(), pd.DataFrame(plane_other).transpose(), pd.DataFrame(car).transpose(), pd.DataFrame(bus).transpose(), gdf], axis=0).reset_index(drop=True)
     # Plotting
     # For totals
     d = dict([(gdf.NAME[idx], gdf.colors[idx]) for idx in gdf.index])
