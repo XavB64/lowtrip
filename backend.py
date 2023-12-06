@@ -153,7 +153,6 @@ def compute_ef(gdf, geom_plane, geom_route):
     gdf_plane = pd.DataFrame(pd.Series({ 'FE_elec':255, 'colors':'#00008B', 'NAME':'Plane', 'geometry':geom_plane})).transpose()
     gdf_car = pd.DataFrame(pd.Series({ 'FE_elec':150, 'colors':'#00FF00', 'NAME':'Car', 'geometry':geom_route})).transpose()
     jf = pd.concat([jf, gdf_plane, gdf_car], axis=0).reset_index(drop=True)[::-1]
-    jf.to_csv('just_to_see.csv')
     return jf
 
 
@@ -217,5 +216,3 @@ def plotly_chart(gdf, tag1, tag2, dist_route):
     graph_json = to_json(fig)
 
     return graph_json
-#plot(fig, include_plotlyjs="cdn", output_type='div').replace('<div>', '<div id="pie">') # image_height=350, image_width = 200
-
