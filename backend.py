@@ -204,6 +204,7 @@ def compute_ef(gdf, geom_plane, geom_route):
     gdf_plane = pd.DataFrame(pd.Series({ 'FE_elec':255, 'colors':'#00008B', 'NAME':'Plane', 'geometry':geom_plane})).transpose()
     gdf_car = pd.DataFrame(pd.Series({ 'FE_elec':150, 'colors':'#00FF00', 'NAME':'Car', 'geometry':geom_route})).transpose()
     jf = pd.concat([jf, gdf_plane, gdf_car], axis=0).reset_index(drop=True)[::-1]
+
     return jf
 
 def compute_ef_world(gdf, geom_plane, geom_route, train, route):
@@ -225,15 +226,7 @@ def compute_ef_world(gdf, geom_plane, geom_route, train, route):
         gdf_car = None
 
     jf = pd.concat([jf, gdf_plane, gdf_car], axis=0).reset_index(drop=True)[::-1]
-    # if train & route == True:
-    #     jf = pd.concat([jf, gdf_plane, gdf_car], axis=0).reset_index(drop=True)[::-1]
-    # elif train == True:
-    #     jf = pd.concat([jf, gdf_plane], axis=0).reset_index(drop=True)[::-1]
-    # elif route == True :
-    #     jf = pd.concat([gdf_plane, gdf_car], axis=0).reset_index(drop=True)[::-1]
-    #     jf.to_csv('just_to_see.csv', index=False)
-    # else :
-    #     jf = gdf_plane
+
     return jf
 
 
