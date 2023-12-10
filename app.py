@@ -2,16 +2,17 @@ import warnings
 warnings.filterwarnings('ignore')
 
 #Librairies
-from flask import Flask, request, render_template
+from flask import Flask, request, render_template, send_from_directory, json
 from backend import *
+from flask_cors import CORS, cross_origin #comment this on deployment
 
 print(pd.__version__)
 
 # Application
-app = Flask(__name__)
+app = Flask(__name__, static_url_path='', static_folder='frontend/build')
+CORS(app) #comment this on deployment
 # app.config["DEBUG"] = True
 app.config["APPLICATION_ROOT"] = "/"
-
 
 @app.route('/', methods=["GET", "POST"])
 def main():
@@ -44,7 +45,7 @@ def main():
         response = {'gdf' : gdf[['colors', 'geometry']].to_json(),
                     'plot_div':plot_div}
         return response
-    return render_template('input.html')
+    return send_from_directory(app.static_folder, 'index.html')
 
 # if __name__ == '__main__':
 #     app.run(host="localhost", port=200, debug=True)
