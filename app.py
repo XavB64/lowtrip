@@ -1,5 +1,5 @@
-import warnings
-warnings.filterwarnings('ignore')
+#import warnings
+#warnings.filterwarnings('ignore')
 
 #Librairies
 from flask import Flask, request, render_template
