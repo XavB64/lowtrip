@@ -17,6 +17,11 @@
   crossorigin=""
 ></script>
 
+<!-- Make sure you put this AFTER leaflet.js -->
+<script src="https://cdn.jsdelivr.net/npm/leaflet.geodesic">
+  integrity="see-release-page-for-current-checksum" 
+  crossorigin=""></script>
+
 <!-- jquery and ajax, maybe I do not need all of it ? -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -352,6 +357,9 @@
         // Add the GeoJSON data to the layer
         featuresLayer = L.geoJson(geoJsonData, { style: style }); //style
         featuresLayer.addTo(map);
+        // const Berlin = [52.5, 13.35];
+        // const LosAngeles = [33.82, -118.38];
+        // const geodesic = new L.Geodesic([Berlin, LosAngeles]).addTo(map);
       },
       error: function (error) {
         console.log("Error:", error);
@@ -376,7 +384,7 @@
       for (var i = 0; i < geoJsonData.features.length; i++) {
         const color = geoJsonData.features[i].properties.colors;
         const name = geoJsonData.features[i].properties.NAME;
-        const feElec = geoJsonData.features[i].properties.FE_elec;
+        const feElec = geoJsonData.features[i].properties.EF_tot;
 
         // Create a legend item with a colored circle
         const legendItem = `

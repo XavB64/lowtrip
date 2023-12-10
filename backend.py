@@ -42,7 +42,10 @@ def query_ntag(tag1, tag2):
     #Format lon , lat
 
     #We should use geogrphical coordinates
-    url = f"https://trainmap.ntag.fr/api/route?dep={tag1[0]},{tag1[1]}&arr={tag2[0]},{tag2[1]}&simplify=1"
+    #trainmap
+    url = f"https://trainmap.ntag.fr/api/route?dep={tag1[0]},{tag1[1]}&arr={tag2[0]},{tag2[1]}&simplify=0"
+    #signal
+    # url = f'https://signal.eu.org/osm/eu/route/v1/train/{tag1[0]},{tag1[1]};{tag2[0]},{tag2[1]}?overview=full'
     # Send the GET request
     response = requests.get(url)
 
@@ -51,21 +54,38 @@ def query_ntag(tag1, tag2):
         # Parse the response content as needed
         data = response.text
         print("Path retrieved!")
-    else:
+
+        # Store data - signal
+        # geom = LineString(convert.decode_polyline(requests.get(url).json()['routes'][0]['geometry'])['coordinates'])
+        # #geometry = resp.json()['waypoints'][0]['hint']
+        # gdf = gpd.GeoSeries(geom, crs='epsg:4326')
+        # geod = Geod(ellps="WGS84")
+        # print('Train intial', geod.geometry_length(geom) / 1e3)
+
+        # Store data in a geodataserie - trainmap
+        gdf = gpd.GeoSeries(LineString(response.json()['geometry']['coordinates'][0]), crs='epsg:4326')
+        # geom = LineString(response.json()['geometry']['coordinates'][0])
+        # geod = Geod(ellps="WGS84")
+        # print('Train intial', geod.geometry_length(geom) / 1e3)
+        train = True
+    else :
         # Error message
         print(f"Failed to retrieve data. Status code: {response.status_code}")
+        gdf, train = None, False
 
-    #Store data in a geodataserie
-    gdf = gpd.GeoSeries(LineString(response.json()['geometry']['coordinates'][0]), crs='epsg:4326')
 
-    ### Route
-    url = 'http://router.project-osrm.org/route/v1/driving/'+str(tag1[0])+','+str(tag1[1])+';'+str(tag2[0])+','+str(tag2[1])+'?overview=simplified'
+    ### Route OSRM
+    url = 'http://router.project-osrm.org/route/v1/driving/'+str(tag1[0])+','+str(tag1[1])+';'+str(tag2[0])+','+str(tag2[1])+'?overview=full'
     response = requests.get(url)
-    geom = response.json()['routes'][0]['geometry']
-    geom_route = LineString(convert.decode_polyline(geom)['coordinates'])
-    route_dist = response.json()['routes'][0]['distance'] / 1e3 # In km
+    if response.status_code == 200:
+        geom = response.json()['routes'][0]['geometry']
+        geom_route = LineString(convert.decode_polyline(geom)['coordinates'])
+        route_dist = response.json()['routes'][0]['distance'] / 1e3 # In km
+        route = True
+    else :
+        geom_route, route_dist, route = None, None, False
 
-    return gdf, geom_route, route_dist
+    return gdf, geom_route, route_dist, route, train
 
 # def filter_countries(gdf):
 #     #Load europe / or world
@@ -106,6 +126,37 @@ def filter_countries(gdf):
  geometry = ('geometry', lambda x : ops.linemerge(MultiLineString(x.values))))
     else:
         u = res.explode().groupby('ISO2').agg(NAME = ('NAME', lambda x : x.iloc[0]),
+ geometry = ('geometry', lambda x : ops.linemerge(MultiLineString(x.values))))
+    # Rendering result, potentiellement possible de le faire sauter
+    res = gpd.GeoDataFrame(u, geometry='geometry', crs='epsg:4326').reset_index()
+    return res
+
+def filter_countries_world(gdf):
+    #Load europe / or world
+    europe = gpd.read_file('static/world.geojson')
+    #Make the split by geometry
+    gdf.name = 'geometry'
+    res = gpd.overlay(gpd.GeoDataFrame(gdf, geometry = 'geometry', crs='epsg:4326'), europe, how='intersection')
+    diff = gpd.overlay(gpd.GeoDataFrame(gdf, geometry = 'geometry', crs='epsg:4326'), europe, how='difference')
+    if diff.shape[0] > 0:
+        print('Sea detected')
+    # In case we have bridges / tunnels across sea: 
+    # Distinction depending on linestring / multilinestring
+        if diff.geometry[0].geom_type == 'MultiLineString':
+            print('MultiLinestring')
+            diff_2 = gpd.GeoDataFrame(list(diff.geometry.values[0].geoms))
+        else :
+            print('Linestring')
+            diff_2 = gpd.GeoDataFrame(list(diff.geometry.values))
+        diff_2.columns = ['geometry']
+        diff_2 = diff_2.set_geometry('geometry', crs='epsg:4326')
+        # Filter depending is the gap is long enough to be taken into account and join with nearest country
+        test = diff_2[diff_2.length > kilometer_to_degree(5)].sjoin_nearest(europe, how='left')
+        # Aggregation per country and combining geometries
+        u = pd.concat([res.explode(), test.explode()]).groupby('ISO2').agg(NAME = ('NAME', lambda x : x.iloc[0]),EF_tot = ('EF_tot', lambda x : x.iloc[0]),
+ geometry = ('geometry', lambda x : ops.linemerge(MultiLineString(x.values))))
+    else:
+        u = res.explode().groupby('ISO2').agg(NAME = ('NAME', lambda x : x.iloc[0]), EF_tot = ('EF_tot', lambda x : x.iloc[0]),
  geometry = ('geometry', lambda x : ops.linemerge(MultiLineString(x.values))))
     # Rendering result
     res = gpd.GeoDataFrame(u, geometry='geometry', crs='epsg:4326').reset_index()
@@ -153,24 +204,55 @@ def compute_ef(gdf, geom_plane, geom_route):
     gdf_plane = pd.DataFrame(pd.Series({ 'FE_elec':255, 'colors':'#00008B', 'NAME':'Plane', 'geometry':geom_plane})).transpose()
     gdf_car = pd.DataFrame(pd.Series({ 'FE_elec':150, 'colors':'#00FF00', 'NAME':'Car', 'geometry':geom_route})).transpose()
     jf = pd.concat([jf, gdf_plane, gdf_car], axis=0).reset_index(drop=True)[::-1]
-    jf.to_csv('just_to_see.csv')
+    return jf
+
+def compute_ef_world(gdf, geom_plane, geom_route, train, route):
+     # Add plane emission factor and geometry
+    gdf_plane = pd.DataFrame(pd.Series({ 'EF_tot':255, 'colors':'#00008B', 'NAME':'Plane', 'geometry':geom_plane})).transpose()
+    gdf_plane.geometry = gdf_plane.geometry.astype('geometry')
+    if train :
+        # Sort values
+        jf = gdf.sort_values('EF_tot')
+        # Add colors
+        jf['colors'] = ['#'+k for k in pd.Series(charte_mollow[::-1])[[int(k) for k in np.linspace(0, 9, jf.shape[0])]]]
+        print(jf.colors.dtype)
+    else :
+        jf = gdf
+    if route:
+        gdf_car = pd.DataFrame(pd.Series({ 'EF_tot':150, 'colors':'#00FF00', 'NAME':'Car', 'geometry':geom_route})).transpose()
+        # gdf_car.geometry = gdf_car.geometry.astype('geometry')
+    else :
+        gdf_car = None
+
+    jf = pd.concat([jf, gdf_plane, gdf_car], axis=0).reset_index(drop=True)[::-1]
+    # if train & route == True:
+    #     jf = pd.concat([jf, gdf_plane, gdf_car], axis=0).reset_index(drop=True)[::-1]
+    # elif train == True:
+    #     jf = pd.concat([jf, gdf_plane], axis=0).reset_index(drop=True)[::-1]
+    # elif route == True :
+    #     jf = pd.concat([gdf_plane, gdf_car], axis=0).reset_index(drop=True)[::-1]
+    #     jf.to_csv('just_to_see.csv', index=False)
+    # else :
+    #     jf = gdf_plane
     return jf
 
 
 
-def plotly_chart(gdf, tag1, tag2, dist_route):
-    #For trains
-    l_length = []
+def plotly_chart(gdf, tag1, tag2, dist_route, train, route):
     # Compute the true distance
     geod = Geod(ellps="WGS84")
-    for geom in gdf.geometry.values :
-        l_length.append(geod.geometry_length(geom) / 1e3)
-    # Add the distance to the dataframe
-    gdf['path_length'] = l_length
-    print('Train : ', gdf.path_length.sum(), ' km')
-    # Compute emissions : EF * length
-    gdf['kgCO2eq'] = gdf['path_length'] * gdf['FE_elec'] / 1e3
-    gdf['Mean of Transport'] = 'Train'
+    if train :
+        #For trains
+        l_length = []
+        
+        for geom in gdf.geometry.values :
+            l_length.append(geod.geometry_length(geom) / 1e3)
+        # Add the distance to the dataframe
+        gdf['path_length'] = l_length
+        print('Train : ', gdf.path_length.sum(), ' km')
+        # Compute emissions : EF * length
+        gdf['kgCO2eq'] = gdf['path_length'] * gdf['EF_tot'] / 1e3
+        gdf['Mean of Transport'] = 'Train'
     #For planes
     # Distance (straight line)
     bird = geod.geometry_length(LineString([tag1, tag2]))/1e3
@@ -179,10 +261,14 @@ def plotly_chart(gdf, tag1, tag2, dist_route):
     plane_co2 = pd.Series({'Mean of Transport':'Plane', 'kgCO2eq':bird*.085, 'colors':'#00008B', 'NAME':'CO2'})
     # Non-CO2 contributions to radiative forcings
     plane_other = pd.Series({'Mean of Transport':'Plane', 'kgCO2eq':bird*2*.085, 'colors':'#00004B', 'NAME':'non-CO2 radiative forcing effects (contrails, NOx)'})
-    bus = pd.Series({'Mean of Transport':'Bus', 'kgCO2eq':dist_route*.03, 'colors':'#00FF00', 'NAME':'Thermal autocar'})
-    car = pd.Series({'Mean of Transport':'Car', 'kgCO2eq':dist_route*.15, 'colors':'#00FF00', 'NAME':'Thermal car'})
-    # Concatenate everything
-    gdf = pd.concat([pd.DataFrame(plane_co2).transpose(), pd.DataFrame(plane_other).transpose(), pd.DataFrame(car).transpose(), pd.DataFrame(bus).transpose(), gdf], axis=0).reset_index(drop=True)
+    # Cars
+    if route :
+        bus = pd.Series({'Mean of Transport':'Bus', 'kgCO2eq':dist_route*.03, 'colors':'#00FF00', 'NAME':'Thermal autocar'})
+        car = pd.Series({'Mean of Transport':'Car', 'kgCO2eq':dist_route*.15, 'colors':'#00FF00', 'NAME':'Thermal car'})
+        # Concatenate everything
+        gdf = pd.concat([pd.DataFrame(plane_co2).transpose(), pd.DataFrame(plane_other).transpose(), pd.DataFrame(car).transpose(), pd.DataFrame(bus).transpose(), gdf], axis=0).reset_index(drop=True)
+    else :
+        gdf = pd.concat([pd.DataFrame(plane_co2).transpose(), pd.DataFrame(plane_other).transpose(), gdf], axis=0).reset_index(drop=True)
     # Plotting
     # For totals
     d = dict([(gdf.NAME[idx], gdf.colors[idx]) for idx in gdf.index])
@@ -217,5 +303,3 @@ def plotly_chart(gdf, tag1, tag2, dist_route):
     graph_json = to_json(fig)
 
     return graph_json
-#plot(fig, include_plotlyjs="cdn", output_type='div').replace('<div>', '<div id="pie">') # image_height=350, image_width = 200
-
