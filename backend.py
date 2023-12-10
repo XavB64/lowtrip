@@ -43,9 +43,9 @@ def query_ntag(tag1, tag2):
 
     #We should use geogrphical coordinates
     #trainmap
-    url = f"https://trainmap.ntag.fr/api/route?dep={tag1[0]},{tag1[1]}&arr={tag2[0]},{tag2[1]}&simplify=0"
+    url = f"https://trainmap.ntag.fr/api/route?dep={tag1[0]},{tag1[1]}&arr={tag2[0]},{tag2[1]}&simplify=1" #0 if not simplified
     #signal
-    # url = f'https://signal.eu.org/osm/eu/route/v1/train/{tag1[0]},{tag1[1]};{tag2[0]},{tag2[1]}?overview=full'
+    # url = f'https://signal.eu.org/osm/eu/route/v1/train/{tag1[0]},{tag1[1]};{tag2[0]},{tag2[1]}?overview=full' #or simplified
     # Send the GET request
     response = requests.get(url)
 
@@ -75,7 +75,7 @@ def query_ntag(tag1, tag2):
 
 
     ### Route OSRM
-    url = 'http://router.project-osrm.org/route/v1/driving/'+str(tag1[0])+','+str(tag1[1])+';'+str(tag2[0])+','+str(tag2[1])+'?overview=full'
+    url = 'http://router.project-osrm.org/route/v1/driving/'+str(tag1[0])+','+str(tag1[1])+';'+str(tag2[0])+','+str(tag2[1])+'?overview=simplified' #or full
     response = requests.get(url)
     if response.status_code == 200:
         geom = response.json()['routes'][0]['geometry']
