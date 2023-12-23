@@ -2,6 +2,7 @@ import axios from "axios";
 import { useState } from "react";
 import { Autocomplete, Box, Button, Grid, TextField } from "@mui/material";
 import { useStationData } from "../hooks";
+import { API_URL } from "../config";
 
 export function Form({
   setResponse,
@@ -16,13 +17,14 @@ export function Form({
   const { stationsData: arrivalStations } = useStationData(arrivalInput);
 
   if (!departureStations || !arrivalStations) return null;
+  console.log(API_URL);
 
   const handleSubmit = () => {
     const formData = new FormData();
     formData.append("departure_coord", departure);
     formData.append("arrival_coord", arrival);
     axios
-      .post("http://localhost:8000", formData, {
+      .post(API_URL, formData, {
         headers: { "Access-Contol-Allow-Origin": "*" },
       })
       .then((response) => {
