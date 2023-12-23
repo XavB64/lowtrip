@@ -1,6 +1,6 @@
 import axios from "axios";
 import { useState } from "react";
-import { Autocomplete, Button, Card, Grid, TextField } from "@mui/material";
+import { Autocomplete, Box, Button, Grid, TextField } from "@mui/material";
 import { useStationData } from "../hooks";
 
 export function Form({
@@ -26,25 +26,15 @@ export function Form({
         headers: { "Access-Contol-Allow-Origin": "*" },
       })
       .then((response) => {
-        console.log("SUCCESS", response);
         setResponse(response);
       })
-      .catch((error) => {
-        console.log(error);
+      .catch((err) => {
+        console.log(err);
       });
   };
 
   return (
-    <Card
-      sx={{
-        position: "fixed",
-        right: 10,
-        top: 10,
-        zIndex: 1,
-        padding: 2,
-        maxWidth: "30%",
-      }}
-    >
+    <Box>
       <Grid container spacing={2}>
         <Grid item xs={6}>
           <Autocomplete
@@ -87,14 +77,14 @@ export function Form({
         <Grid item xs={6}>
           <TextField
             value={departure}
-            onChange={(_, value) => setDeparture(value)}
+            onChange={(event) => setDeparture(event.target.value)}
             fullWidth
           />
         </Grid>
         <Grid item xs={6}>
           <TextField
             value={arrival}
-            onChange={(_, value) => setArrival(value)}
+            onChange={(event) => setArrival(event.target.value)}
             fullWidth
           />
         </Grid>
@@ -104,6 +94,6 @@ export function Form({
           </Button>
         </Grid>
       </Grid>
-    </Card>
+    </Box>
   );
 }

@@ -1,4 +1,4 @@
-import { Card } from "@mui/material";
+import { Box } from "@mui/material";
 import { BarChart } from "@mui/x-charts";
 
 export function Chart({ response }) {
@@ -7,7 +7,7 @@ export function Chart({ response }) {
   const titles = uniq(data.map((details) => details.x[0]));
 
   return (
-    <Card style={{ position: "fixed", bottom: 10, right: 10, zIndex: 1 }}>
+    <Box height="100%">
       <BarChart
         xAxis={[
           {
@@ -25,11 +25,9 @@ export function Chart({ response }) {
           label: details.hovertemplate,
           color: details.marker.color,
         }))}
-        width={500}
-        height={300}
         slotProps={{ legend: { hidden: true } }}
       />
-    </Card>
+    </Box>
   );
 }
 

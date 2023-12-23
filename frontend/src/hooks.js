@@ -4,7 +4,6 @@ export function useStationData(inputValues) {
   const [stationsData, setStationsData] = useState([]);
 
   useEffect(() => {
-    console.log("useEffect");
     const fetchData = async () => {
       try {
         const response = await fetch("/assets/stations_vf.csv");
@@ -15,6 +14,7 @@ export function useStationData(inputValues) {
     };
 
     if (inputValues) fetchData();
+    else setStationsData([]);
   }, [inputValues]);
 
   return { stationsData };

@@ -1,6 +1,13 @@
-import { MapContainer, Marker, Polyline, TileLayer } from "react-leaflet";
+import {
+  MapContainer,
+  Marker,
+  Polyline,
+  TileLayer,
+  useMap,
+} from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
+import { useEffect } from "react";
 
 export function Map({ response, departure, arrival }) {
   delete L.Icon.Default.prototype._getIconUrl;
@@ -13,6 +20,20 @@ export function Map({ response, departure, arrival }) {
 
   return (
     <MapContainer center={[48, 20]} zoom={5} scrollWheelZoom={true}>
+      <MapContent response={response} departure={departure} arrival={arrival} />
+    </MapContainer>
+  );
+}
+
+function MapContent({ response, departure, arrival }) {
+  const map = useMap();
+  useEffect(() => {
+    if (departure && arrival)
+      map.flyToBounds([departure.split(", "), arrival.split(", ")]);
+  }, [map, departure, arrival]);
+
+  return (
+    <>
       <TileLayer url="https://a.basemaps.cartocdn.com/light_all/{z}/{x}/{y}@2x.png" />
       {response &&
         JSON.parse(response.data.gdf).features.map((feature) => (
@@ -27,6 +48,6 @@ export function Map({ response, departure, arrival }) {
         ))}
       {departure && <Marker position={departure.split(", ")} />}
       {arrival && <Marker position={arrival.split(", ")} />}
-    </MapContainer>
+    </>
   );
 }
