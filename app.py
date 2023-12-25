@@ -1,5 +1,5 @@
-#import warnings
-#warnings.filterwarnings('ignore')
+import warnings
+warnings.filterwarnings('ignore')
 
 #Librairies
 from flask import Flask, request, render_template
@@ -20,7 +20,7 @@ def main():
         dep, arr = [float(k) for k in request.form["departure_coord"].split(',')[::-1]], [float(k) for k in request.form["arrival_coord"].split(',')[::-1]]
         print(dep, arr)
         # Request the pathway between dep and arr with coordinates
-        gdf, geom_route, dist_route, route, train = query_ntag(dep, arr)
+        gdf, geom_route, dist_route, route, train = query_path(dep, arr)
         print('Train ', train)
         print('Route', route)
         if train :
@@ -28,7 +28,7 @@ def main():
             gdf = filter_countries_world(gdf)
             print(gdf.NAME)
         # Create plane path geometry (straight line tilted a bit)
-        geom_plane = create_plane(.3, 20, dep, arr)
+        geom_plane = create_plane( 20, dep, arr)
         # Compute emissions factors
         gdf = compute_ef_world(gdf, geom_plane, geom_route, train, route)
         # print(gdf[['EF_tot', 'NAME', 'colors']])
