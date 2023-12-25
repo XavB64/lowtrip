@@ -114,7 +114,7 @@ def find_train(tag1, tag2) :
     # format lon, lat
     # Build the request url
     #trainmap
-    url = f"https://trainmap.ntag.fr/api/route?dep={tag1[0]},{tag1[1]}&arr={tag2[0]},{tag2[1]}&simplify=0" #1 to simplify it
+    url = f"https://trainmap.ntag.fr/api/route?dep={tag1[0]},{tag1[1]}&arr={tag2[0]},{tag2[1]}&simplify=1" #0 or 1 to simplify it
     #signal
     # url = f'https://signal.eu.org/osm/eu/route/v1/train/{tag1[0]},{tag1[1]};{tag2[0]},{tag2[1]}?overview=full' #or simplified
     # Send the GET request
@@ -157,7 +157,7 @@ def find_route(tag1, tag2):
         - route : boolean
     '''
     ### Route OSRM - create a separate function
-    url = 'http://router.project-osrm.org/route/v1/driving/'+str(tag1[0])+','+str(tag1[1])+';'+str(tag2[0])+','+str(tag2[1])+'?overview=full&geometries=geojson'
+    url = 'http://router.project-osrm.org/route/v1/driving/'+str(tag1[0])+','+str(tag1[1])+';'+str(tag2[0])+','+str(tag2[1])+'?overview=simplified&geometries=geojson'
     response = requests.get(url)
     if response.status_code == 200:
         geom = response.json()['routes'][0]['geometry']
