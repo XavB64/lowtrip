@@ -42,7 +42,7 @@ def main():
         plot_div = plotly_chart(gdf[~gdf.NAME.isin(['Plane', 'Car'])], dep, arr, dist_route, train, route)
         #print(plot_div)
          #default_handler = str
-        response = {'gdf' : gdf[['colors', 'geometry']].to_json(),
+        response = {'gdf' : gdf[['colors', 'geometry']].explode().to_json(),
                     'plot_div':plot_div}
         return response
     return send_from_directory(app.static_folder, 'index.html')
