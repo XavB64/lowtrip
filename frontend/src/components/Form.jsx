@@ -1,6 +1,7 @@
 import axios from "axios";
 import { Box, Button, FormLabel, Grid } from "@mui/material";
 import { API_URL } from "../config";
+import { LocationInput } from "./LocationInput";
 
 export function Form({ setResponse, departure, arrival }) {
   const handleSubmit = async () => {
@@ -32,11 +33,11 @@ export function Form({ setResponse, departure, arrival }) {
       <Grid container spacing={2}>
         <Grid item xs={6}>
           <FormLabel>Departure</FormLabel>
-          <input ref={departure.inputRef} />
+          <LocationInput inputRef={departure.inputRef} placeholder="From..." />
         </Grid>
         <Grid item xs={6}>
           <FormLabel>Arrival</FormLabel>
-          <input ref={arrival.inputRef} />
+          <LocationInput inputRef={arrival.inputRef} placeholder="To..." />
         </Grid>
         <Grid item xs={12}>
           <Button fullWidth type="submit" onClick={handleSubmit}>

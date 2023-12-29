@@ -12,7 +12,12 @@ function App() {
 
   return (
     <Stack direction="row" className="App" style={{ height: "100vh" }}>
-      <Stack padding={3} maxWidth="25%" justifyContent="space-between">
+      <Stack
+        padding={3}
+        maxWidth="25%"
+        justifyContent="space-between"
+        style={{ backgroundColor: "#EEEEEE" }}
+      >
         <Form
           setResponse={setResponse}
           departure={departure}
