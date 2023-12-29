@@ -1,40 +1,22 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
-export function useStationData(inputValues) {
-  const [stationsData, setStationsData] = useState([]);
+export function useAddress() {
+  const [addressCoords, setAddressCoords] = useState("");
+  const autoCompleteRef = useRef();
+  const inputRef = useRef();
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await fetch("/assets/stations_vf.csv");
-        const text = await response.text();
+    autoCompleteRef.current = new window.google.maps.places.Autocomplete(
+      inputRef.current,
+      { options: { fields: ["geometry", "name"] } }
+    );
+    autoCompleteRef.current.addListener("place_changed", async function () {
+      const place = await autoCompleteRef.current.getPlace();
+      setAddressCoords(
+        `${place.geometry.location.lat()}, ${place.geometry.location.lng()}`
+      );
+    });
+  }, [inputRef]);
 
-        setStationsData(parseCSV(text));
-      } catch (error) {}
-    };
-
-    if (inputValues) fetchData();
-    else setStationsData([]);
-  }, [inputValues]);
-
-  return { stationsData };
-}
-
-function parseCSV(csv) {
-  const [headerRow, ...rows] = csv.split("\n");
-  const headers = headerRow.split(";");
-  const data = [];
-
-  rows.forEach((row) => {
-    const values = row.split(";");
-    if (values.length === headers.length) {
-      const rowData = {};
-      headers.forEach((header, index) => {
-        rowData[header] = values[index];
-      });
-      data.push(rowData);
-    }
-  });
-
-  return data;
+  return { inputRef, autoCompleteRef, addressCoords, setAddressCoords };
 }

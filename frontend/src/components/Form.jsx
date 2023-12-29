@@ -1,28 +1,20 @@
 import axios from "axios";
-import { useState } from "react";
-import { Autocomplete, Box, Button, Grid, TextField } from "@mui/material";
-import { useStationData } from "../hooks";
+import { Box, Button, FormLabel, Grid } from "@mui/material";
 import { API_URL } from "../config";
 
-export function Form({
-  setResponse,
-  departure,
-  setDeparture,
-  arrival,
-  setArrival,
-}) {
-  const [departureInput, setDepartureInput] = useState("");
-  const [arrivalInput, setArrivalInput] = useState("");
-  const { stationsData: departureStations } = useStationData(departureInput);
-  const { stationsData: arrivalStations } = useStationData(arrivalInput);
-
-  if (!departureStations || !arrivalStations) return null;
-  console.log(API_URL);
-
-  const handleSubmit = () => {
+export function Form({ setResponse, departure, arrival }) {
+  const handleSubmit = async () => {
+    const departurePlace = await departure.autoCompleteRef.current.getPlace();
+    const arrivalPlace = await arrival.autoCompleteRef.current.getPlace();
     const formData = new FormData();
-    formData.append("departure_coord", departure);
-    formData.append("arrival_coord", arrival);
+    formData.append(
+      "departure_coord",
+      `${departurePlace.geometry.location.lat()}, ${departurePlace.geometry.location.lng()}`
+    );
+    formData.append(
+      "arrival_coord",
+      `${arrivalPlace.geometry.location.lat()}, ${arrivalPlace.geometry.location.lng()}`
+    );
     axios
       .post(API_URL, formData, {
         headers: { "Access-Contol-Allow-Origin": "*" },
@@ -39,56 +31,12 @@ export function Form({
     <Box>
       <Grid container spacing={2}>
         <Grid item xs={6}>
-          <Autocomplete
-            disablePortal
-            options={departureStations}
-            getOptionLabel={(option) => option.name}
-            renderInput={(params) => (
-              <TextField {...params} label="Departure" />
-            )}
-            onChange={(_, value) => {
-              if (value) setDeparture(`${value.latitude}, ${value.longitude}`);
-            }}
-            filterOptions={(options) =>
-              options.filter((option) =>
-                option.name.toLowerCase().includes(departureInput.toLowerCase())
-              )
-            }
-            inputValue={departureInput}
-            onInputChange={(_, inputValue) => setDepartureInput(inputValue)}
-          />
+          <FormLabel>Departure</FormLabel>
+          <input ref={departure.inputRef} />
         </Grid>
         <Grid item xs={6}>
-          <Autocomplete
-            disablePortal
-            options={arrivalStations}
-            getOptionLabel={(option) => option.name}
-            renderInput={(params) => <TextField {...params} label="Arrival" />}
-            onChange={(_, value) => {
-              if (value) setArrival(`${value.latitude}, ${value.longitude}`);
-            }}
-            filterOptions={(options) =>
-              options.filter((option) =>
-                option.name.toLowerCase().includes(arrivalInput.toLowerCase())
-              )
-            }
-            inputValue={arrivalInput}
-            onInputChange={(_, inputValue) => setArrivalInput(inputValue)}
-          />
-        </Grid>
-        <Grid item xs={6}>
-          <TextField
-            value={departure}
-            onChange={(event) => setDeparture(event.target.value)}
-            fullWidth
-          />
-        </Grid>
-        <Grid item xs={6}>
-          <TextField
-            value={arrival}
-            onChange={(event) => setArrival(event.target.value)}
-            fullWidth
-          />
+          <FormLabel>Arrival</FormLabel>
+          <input ref={arrival.inputRef} />
         </Grid>
         <Grid item xs={12}>
           <Button fullWidth type="submit" onClick={handleSubmit}>
