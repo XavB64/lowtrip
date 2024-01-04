@@ -1,9 +1,17 @@
 import { Box } from "@mui/material";
 import { BarChart } from "@mui/x-charts";
+import { ApiResponse, ChartData } from "../types";
 
-export function Chart({ response }) {
+interface ChartProps {
+  response?: ApiResponse;
+}
+
+export function Chart({ response }: ChartProps) {
   if (!response) return null;
-  const data = JSON.parse(response.data.plot_div).data.slice(0, -1);
+  const data: ChartData[] = JSON.parse(response.data.plot_div).data.slice(
+    0,
+    -1
+  );
   const titles = uniq(data.map((details) => details.x[0]));
 
   return (
@@ -19,7 +27,7 @@ export function Chart({ response }) {
         yAxis={[{ label: "kgCO2eq" }]}
         series={data.map((details) => ({
           data: titles.map((title) =>
-            title === details.x[0] ? details.y[0] : null
+            title === details.x[0] ? details.y[0] : 0
           ),
           stack: "total",
           label: details.hovertemplate,
@@ -31,8 +39,8 @@ export function Chart({ response }) {
   );
 }
 
-function uniq(array) {
-  const onlyUnique = (value, index, array) => {
+function uniq(array: any[]) {
+  const onlyUnique = (value: any, index: number) => {
     return array.indexOf(value) === index;
   };
 
