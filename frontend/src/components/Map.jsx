@@ -9,7 +9,7 @@ import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import { useEffect } from "react";
 
-export function Map({ response, departure, arrival }) {
+export function Map({ response, departureCoords, arrivalCoords }) {
   delete L.Icon.Default.prototype._getIconUrl;
 
   L.Icon.Default.mergeOptions({
@@ -20,17 +20,21 @@ export function Map({ response, departure, arrival }) {
 
   return (
     <MapContainer center={[48, 20]} zoom={5} scrollWheelZoom={true}>
-      <MapContent response={response} departure={departure} arrival={arrival} />
+      <MapContent
+        response={response}
+        departureCoords={departureCoords}
+        arrivalCoords={arrivalCoords}
+      />
     </MapContainer>
   );
 }
 
-function MapContent({ response, departure, arrival }) {
+function MapContent({ response, departureCoords, arrivalCoords }) {
   const map = useMap();
   useEffect(() => {
-    if (departure && arrival)
-      map.flyToBounds([departure.split(", "), arrival.split(", ")]);
-  }, [map, departure, arrival]);
+    if (departureCoords && arrivalCoords)
+      map.flyToBounds([departureCoords.split(", "), arrivalCoords.split(", ")]);
+  }, [map, departureCoords, arrivalCoords]);
 
   return (
     <>
@@ -46,8 +50,8 @@ function MapContent({ response, departure, arrival }) {
             ])}
           />
         ))}
-      {departure && <Marker position={departure.split(", ")} />}
-      {arrival && <Marker position={arrival.split(", ")} />}
+      {departureCoords && <Marker position={departureCoords.split(", ")} />}
+      {arrivalCoords && <Marker position={arrivalCoords.split(", ")} />}
     </>
   );
 }

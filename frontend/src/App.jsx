@@ -3,26 +3,34 @@ import { Form } from "./components/Form.jsx";
 import { Map } from "./components/Map.jsx";
 import { Chart } from "./components/Chart.jsx";
 import { Container, Stack } from "@mui/material";
+import { useAddress } from "./hooks.js";
 
 function App() {
   const [response, setResponse] = useState();
-  const [departure, setDeparture] = useState("");
-  const [arrival, setArrival] = useState("");
+  const departure = useAddress();
+  const arrival = useAddress();
 
   return (
     <Stack direction="row" className="App" style={{ height: "100vh" }}>
-      <Stack padding={3} maxWidth="25%" justifyContent="space-between">
+      <Stack
+        padding={3}
+        maxWidth="25%"
+        justifyContent="space-between"
+        style={{ backgroundColor: "#EEEEEE" }}
+      >
         <Form
           setResponse={setResponse}
           departure={departure}
-          setDeparture={setDeparture}
           arrival={arrival}
-          setArrival={setArrival}
         />
         <Chart response={response} />
       </Stack>
       <Container style={{ padding: 0 }}>
-        <Map response={response} departure={departure} arrival={arrival} />
+        <Map
+          response={response}
+          departureCoords={departure.addressCoords}
+          arrivalCoords={arrival.addressCoords}
+        />
       </Container>
     </Stack>
   );
