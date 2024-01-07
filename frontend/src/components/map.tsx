@@ -12,15 +12,10 @@ import { ApiResponse, Gdf } from "../types";
 
 interface MapProps {
   response?: ApiResponse;
-  departureCoords?: [number, number];
-  destinationsCoords: ([number, number] | undefined)[];
+  stepsCoords?: ([number, number] | undefined)[];
 }
 
-export function Map({
-  response,
-  departureCoords,
-  destinationsCoords,
-}: MapProps) {
+export function Map({ response, stepsCoords }: MapProps) {
   // @ts-ignore
   delete L.Icon.Default.prototype._getIconUrl;
 
@@ -32,21 +27,16 @@ export function Map({
 
   return (
     <MapContainer center={[48, 20]} zoom={5} scrollWheelZoom={true}>
-      <MapContent
-        response={response}
-        departureCoords={departureCoords}
-        destinationsCoords={destinationsCoords}
-      />
+      <MapContent response={response} stepsCoords={stepsCoords} />
     </MapContainer>
   );
 }
 
-function MapContent({
-  response,
-  departureCoords,
-  destinationsCoords,
-}: MapProps) {
-  const arrivalCoords = destinationsCoords[0];
+function MapContent({ response, stepsCoords }: MapProps) {
+  const departureCoords =
+    stepsCoords && stepsCoords.length > 0 ? stepsCoords[0] : undefined;
+  const arrivalCoords =
+    stepsCoords && stepsCoords.length > 1 ? stepsCoords[1] : undefined;
   const map = useMap();
   useEffect(() => {
     if (departureCoords && arrivalCoords)

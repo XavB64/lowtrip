@@ -1,40 +1,36 @@
 import { Box, Button, Tab, Tabs } from "@mui/material";
 
-import StationField from "./station-field";
-import { DestinationField } from "./destination-field";
 import { Step } from "../types";
 import axios from "axios";
 import { API_URL } from "../config";
 import { ApiResponse } from "../types";
+import { StepField } from "./step-field";
 
 interface FormProps {
   setResponse: (response: ApiResponse) => void;
-  departure: Step;
-  destinations: Step[];
-  setDestinations: (destinations: Step[]) => void;
+  steps: {
+    values: Step[];
+    addStep: () => void;
+    updateStep: (index: number, data: Partial<Step>) => void;
+  };
 }
 
-export function Form({
-  setResponse,
-  departure,
-  destinations,
-  setDestinations,
-}: FormProps) {
+export function Form({ setResponse, steps }: FormProps) {
   const handleSubmit = async () => {
     if (
-      destinations.length === 0 ||
-      !departure.locationCoords ||
-      !destinations[0].locationCoords
+      steps.values.length < 2 ||
+      !steps.values[0].locationCoords ||
+      !steps.values[1].locationCoords
     )
       throw new Error("At least one step required");
     const formData = new FormData();
     formData.append(
       "departure_coord",
-      `${departure.locationCoords[0]}, ${departure.locationCoords[1]}`
+      `${steps.values[0].locationCoords[0]}, ${steps.values[0].locationCoords[1]}`
     );
     formData.append(
       "arrival_coord",
-      `${destinations[0].locationCoords[0]}, ${destinations[0].locationCoords[1]}`
+      `${steps.values[1].locationCoords[0]}, ${steps.values[1].locationCoords[1]}`
     );
     axios
       .post(API_URL, formData, {
@@ -77,12 +73,18 @@ export function Form({
           borderRadius: "0 12px 12px 12px",
         }}
       >
-        <StationField isDeparture inputRef={departure.inputRef} />
-        {destinations.map((destination, index) => (
-          <DestinationField
-            key={index}
-            destination={destination}
-            updateDestinations={() => {}}
+        <StepField
+          isDeparture
+          steps={steps.values}
+          updateStep={steps.updateStep}
+          index={1}
+        />
+        {steps.values.slice(1).map((step) => (
+          <StepField
+            key={step.index}
+            steps={steps.values}
+            updateStep={steps.updateStep}
+            index={step.index}
           />
         ))}
         <Button
@@ -95,6 +97,7 @@ export function Form({
             fontWeight: 700,
             fontSize: "16px",
           }}
+          onClick={steps.addStep}
         >
           <p>Add step</p>
         </Button>
