@@ -1,10 +1,6 @@
-import { Ref } from "react";
-
 export interface Step {
-  inputRef: Ref<HTMLInputElement>;
-  autoCompleteRef: Ref<HTMLInputElement>;
+  index: number;
   locationCoords?: [number, number];
-  setLocationCoords: (coords: [number, number]) => void;
   transportMean?: Transport;
 }
 

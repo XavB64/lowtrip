@@ -1,35 +1,24 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useState } from "react";
+import { Step } from "./types";
 
-export function useDestination() {
-  const [locationCoords, setLocationCoords] = useState<[number, number]>();
-  const autoCompleteRef = useRef(null);
-  const inputRef = useRef(null);
+export function useSteps() {
+  const [steps, setSteps] = useState<Step[]>([{ index: 1 }, { index: 2 }]);
 
-  useEffect(() => {
-    if (inputRef.current) {
-      // @ts-ignore
-      autoCompleteRef.current = new window.google.maps.places.Autocomplete(
-        inputRef.current,
-        { fields: ["geometry", "name"] }
+  const addStep = useCallback(
+    () => setSteps([...steps, { index: steps.length + 1 }]),
+    [steps, setSteps]
+  );
+
+  const updateStep = useCallback(
+    (index: number, data: Partial<Step>) => {
+      setSteps(
+        steps.map((step) =>
+          step.index === index ? { ...step, ...data } : step
+        )
       );
-    }
-    if (autoCompleteRef.current) {
-      // @ts-ignore
-      autoCompleteRef.current.addListener("place_changed", async function () {
-        // @ts-ignore
-        const place = await autoCompleteRef.current.getPlace();
-        setLocationCoords([
-          place.geometry.location.lat(),
-          place.geometry.location.lng(),
-        ]);
-      });
-    }
-  }, [inputRef]);
+    },
+    [steps, setSteps]
+  );
 
-  return {
-    inputRef,
-    autoCompleteRef,
-    locationCoords,
-    setLocationCoords,
-  };
+  return { values: steps, addStep, updateStep };
 }
