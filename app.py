@@ -45,7 +45,39 @@ def main():
         response = {'gdf' : gdf[['colors', 'geometry']].explode().to_json(),
                     'plot_div':plot_div}
         return response
+    
+        # #### NEW FORM ####
+        
+        # if form == 1 : # My trip vs direct trips
+        #     # Convert json into pandas 
+        #     # df = form.to_pandas
+
+        #     #My trip data and geo data
+        #     data_mytrip, geo_mytrip = compute_emissions_custom(df)
+        #     #Direct data and geo data
+        #     data_direct, geo_direct = compute_emissions_all(df)
+        #     #Possible to generate a plotly json, maybe better to plot from the data directly in javascript
+        #     graph_json, figure = bchart_1(data_mytrip, data_direct)
+        #     response = {'gdf' : pd.concat([geo_mytrip, geo_direct])[['colors', 'geometry']].explode().to_json(),
+        #                 'plot_div' : graph_json}
+            
+        # if form == 2 : # My trip vs custom trip
+        #     # Convert json into pandas 
+        #     # df = form1.to_pandas 
+        #     # df2 = form2.to_pandas
+
+        #     #My trip data and geo data
+        #     data_mytrip, geo_mytrip = compute_emissions_custom(df)
+        #     #Direct data and geo data
+        #     data_alternative, geo_alternative = compute_emissions_custom(df2)
+        #     #Possible to generate a plotly json
+        #     graph_json, figure = bchart_2(data_mytrip, data_alternative)
+        #     response = {'gdf' : pd.concat([geo_mytrip, geo_alternative])[['colors', 'geometry']].explode().to_json(),
+        #                 'plot_div' : graph_json}
+            
+        # return response
+    
     return send_from_directory(app.static_folder, 'index.html')
 
-# if __name__ == '__main__':
-#     app.run(host="localhost", port=200, debug=True)
+if __name__ == '__main__':
+    app.run(host="localhost", port=8000, debug=False)

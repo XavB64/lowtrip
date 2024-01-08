@@ -23,6 +23,7 @@ from plotly.io import to_json
 import requests
 
 
+
 ###################
 ###### Utils ######
 ###################
@@ -76,7 +77,7 @@ def find_nearest(lon, lat, perim):
     '''
    #Extend the area around the point
     buff = list(Point(lon, lat).buffer(kilometer_to_degree(perim)).exterior.coords)
-    print(len(buff))
+    #print(len(buff))
     #Request Overpass API turbo data :
     l = flatten_list_of_tuples(buff)
 
@@ -114,7 +115,7 @@ def find_train(tag1, tag2) :
     # format lon, lat
     # Build the request url
     #trainmap
-    url = f"https://trainmap.ntag.fr/api/route?dep={tag1[0]},{tag1[1]}&arr={tag2[0]},{tag2[1]}&simplify=1" #0 or 1 to simplify it
+    url = f"https://trainmap.ntag.fr/api/route?dep={tag1[0]},{tag1[1]}&arr={tag2[0]},{tag2[1]}&simplify=0" #1 to simplify it
     #signal
     # url = f'https://signal.eu.org/osm/eu/route/v1/train/{tag1[0]},{tag1[1]};{tag2[0]},{tag2[1]}?overview=full' #or simplified
     # Send the GET request
@@ -157,7 +158,7 @@ def find_route(tag1, tag2):
         - route : boolean
     '''
     ### Route OSRM - create a separate function
-    url = 'http://router.project-osrm.org/route/v1/driving/'+str(tag1[0])+','+str(tag1[1])+';'+str(tag2[0])+','+str(tag2[1])+'?overview=simplified&geometries=geojson'
+    url = 'http://router.project-osrm.org/route/v1/driving/'+str(tag1[0])+','+str(tag1[1])+';'+str(tag2[0])+','+str(tag2[1])+'?overview=full&geometries=geojson'
     response = requests.get(url)
     if response.status_code == 200:
         geom = response.json()['routes'][0]['geometry']
@@ -209,9 +210,9 @@ def extend_search(tag1, tag2, perims):
             if (tag1_new != False) & (tag2_new != False) :
                 gdf, train = find_train(tag1_new, tag2_new)
                # return gdf, train
-            else :
+            #else :
                 #No need to retry the API
-                print(tag1_new, tag2_new)
+              #  print(tag1_new, tag2_new)
 
     return gdf, train
     
@@ -263,7 +264,7 @@ def query_path(tag1, tag2, perims=[.2, 10], validate=500): #Should change name
     #If failure then we try to find a better spot nearby - Put in another function
     if train == False :
         # We try to search nearby the coordinates and request again
-        print( extend_search(tag1, tag2, perims) )
+        #print( extend_search(tag1, tag2, perims) )
         gdf, train = extend_search(tag1, tag2, perims) 
 
     # Validation part for train
@@ -282,6 +283,189 @@ def query_path(tag1, tag2, perims=[.2, 10], validate=500): #Should change name
     return gdf, geom_route, route_dist, route, train
 
 
+def train_to_gdf(tag1, tag2, perims=[.2, 10], validate=500, colormap=charte_mollow):
+    '''
+    parameters:
+        - tag1, tag2
+        - perims
+        - validate
+        - colormap, list of colors
+    return:
+        - full dataframe for trains
+    '''
+    #First try with coordinates supplied by the user 
+    gdf, train = find_train(tag1, tag2)
+
+    #If failure then we try to find a better spot nearby - Put in another function
+    if train == False :
+        # We try to search nearby the coordinates and request again
+        #print( extend_search(tag1, tag2, perims) )
+        gdf, train = extend_search(tag1, tag2, perims) 
+
+    # Validation part for train
+    if train : #We have a geometry
+        if not validate_geom(tag1, tag2, gdf.values[0], validate):
+            gdf, train = None, False
+
+    if train : #We need to filter by country and add length / Emission factors
+        gdf = filter_countries_world(gdf)
+         # Sort values
+        gdf = gdf.sort_values('EF_tot')
+        # Add colors, here discretise the colormap
+        gdf['colors'] = ['#'+k for k in pd.Series(colormap[::-1])[[int(k) for k in np.linspace(0, len(colormap)-1, gdf.shape[0])]]]
+        # Adding and computing emissions
+        #For trains
+        l_length = []
+        # Compute the true distance
+        geod = Geod(ellps="WGS84")
+        for geom in gdf.geometry.values :
+            l_length.append(geod.geometry_length(geom) / 1e3)
+        # Add the distance to the dataframe
+        gdf['path_length'] = l_length
+        # print('Train : ', gdf.path_length.sum(), ' km')
+        # Compute emissions : EF * length
+        gdf['EF_tot'] = gdf['EF_tot'] / 1e3 #Conversion in in kg
+        gdf['kgCO2eq'] = gdf['path_length'] * gdf['EF_tot'] 
+        gdf['Mean of Transport'] = 'Train'
+    #Returning the result
+    return gdf, train
+
+EF_car = .2176
+EF_bus = .02942
+EF_plane = {'short': .126, 'medium': .0977, 'long': .08306}
+
+def car_bus_to_gdf(tag1, tag2, EF_car=EF_car, EF_bus=EF_bus, color = '#00FF00', validate = 500):
+    '''
+    ONLY FOR FIRST FORM (optimization)
+    parameters:
+        - tag1, tag2
+        - EF_car, float emission factor for one car by km
+        - EF_bus, float emission factor for bus by pkm
+        - color, color in hex of path and bar chart
+        - validate
+        - nb, number of passenger in the car (used only for custom trip)
+    return:
+        - full dataframe for car and bus, geometry only on car
+    '''
+    ### Route OSRM - create a separate function
+    geom_route, route_dist, route = find_route(tag1, tag2)
+    
+       # Validation part for route
+    if route : #We have a geometry
+        if not validate_geom(tag1, tag2, geom_route, validate):
+            geom_route, route_dist, route = None, None, False
+    
+    if route :
+        gdf_car = pd.DataFrame(pd.Series({ 'kgCO2eq':route_dist*EF_car, 'EF_tot':EF_car,'path_length':route_dist, 'colors':color, 'NAME':'Car', 'Mean of Transport':'Car', 'geometry':geom_route})).transpose() #'EF_tot':EF_car / nb,
+        gdf_bus = pd.DataFrame(pd.Series({ 'kgCO2eq':route_dist*EF_bus, 'EF_tot':EF_bus, 'path_length':route_dist, 'colors':color, 'NAME':'Bus',  'Mean of Transport':'Bus', })).transpose() #'EF_tot':EF_bus, enlever geometry
+
+    return gdf_car, gdf_bus, route
+
+def bus_to_gdf(tag1, tag2, EF_bus=EF_bus, color = '#00FF00', validate = 500, nb = 1):
+    '''
+    parameters:
+        - tag1, tag2
+        - EF_bus, float emission factor for bus by pkm
+        - color, color in hex of path and bar chart
+        - validate
+        - nb, number of passenger in the car (used only for custom trip)
+    return:
+        - full dataframe for bus
+    '''
+    ### Route OSRM - create a separate function
+    geom_route, route_dist, route = find_route(tag1, tag2)
+    
+       # Validation part for route
+    if route : #We have a geometry
+        if not validate_geom(tag1, tag2, geom_route, validate):
+            geom_route, route_dist, route = None, None, False
+    
+    if route :
+        gdf_bus = pd.DataFrame(pd.Series({ 'kgCO2eq':route_dist*EF_bus, 'EF_tot':EF_bus, 'path_length':route_dist, 'colors':color, 'NAME':'Bus',  'Mean of Transport':'Bus', 'geometry':geom_route })).transpose() #'EF_tot':EF_bus, enlever geometry
+
+    return gdf_bus, route
+
+def car_to_gdf(tag1, tag2, EF_car=EF_car, color = '#00FF00', validate = 500, nb = 1):
+    '''
+    parameters:
+        - tag1, tag2
+        - EF_car, float emission factor for one car by km
+        - color, color in hex of path and bar chart
+        - validate
+        - nb, number of passenger in the car (used only for custom trip)
+    return:
+        - full dataframe for car
+    '''
+    ### Route OSRM - create a separate function
+    geom_route, route_dist, route = find_route(tag1, tag2)
+    
+       # Validation part for route
+    if route : #We have a geometry
+        if not validate_geom(tag1, tag2, geom_route, validate):
+            geom_route, route_dist, route = None, None, False
+    
+    if route :
+        gdf_car = pd.DataFrame(pd.Series({ 'kgCO2eq':route_dist*EF_car / nb, 'EF_tot' : EF_car/nb, 'path_length':route_dist, 'colors':color, 'NAME':'Car', 'Mean of Transport':'Car', 'geometry':geom_route})).transpose() #'EF_tot':EF_car / nb,
+       
+    return gdf_car, route
+
+def plane_to_gdf(tag1, tag2, EF_plane=EF_plane, contrails=2, holding=3.81, color = '#00008B', color_contrails='#00004B'):
+    '''
+    parameters:
+        - tag1, tag2
+        - EF : emission factor in gCO2/pkm for plane depending on journey length
+        - contrails : coefficient to apply to take into account non-CO2 effects
+        - holding : additional CO2 emissions (kg) due to holding patterns 
+        - color : color for path and bar chart
+        - color_contrails : color for non CO2-effects in bar chart
+    return:
+        - full dataframe for plane, geometry for CO2 only (optimization)
+    '''
+    #Compute geometry and distance (geodesic)
+    geom_plane, bird = great_circle_geometry(tag1, tag2)
+
+    ## OLD
+    #geom_plane = create_plane( 20, tag1, tag2)
+    # Compute the true distance
+    # geod = Geod(ellps="WGS84")
+    # bird = geod.geometry_length(LineString([tag1, tag2])) / 1e3 #in km
+    
+    # Detour coefficient :
+    if bird < 1000 :
+        bird = 4.1588 * bird**(-.212)
+    # Different emission factors depending on the trip length
+    if bird < 1000 :
+        EF = EF_plane['short']
+    elif bird < 3500 :
+        EF = EF_plane['medium']
+    else : #It's > 3500
+        EF = EF_plane['long']
+    # Compute geodataframe and dataframe
+    gdf_plane = pd.DataFrame(pd.Series({ 'kgCO2eq':EF*bird + holding, 'EF_tot':EF, 'path_length':bird, 'colors':color, 'NAME':'Plane CO2',  'Mean of Transport':'Plane', 'geometry':geom_plane})).transpose()
+    #gdf_plane.geometry = gdf_plane.geometry.astype('geometry')
+    gdf_non_co2 = pd.DataFrame(pd.Series({ 'kgCO2eq':EF*contrails*bird, 'colors':color_contrails, 'NAME':'Plane contrails',  'Mean of Transport':'Plane', })).transpose()
+    return gdf_plane, gdf_non_co2
+
+def ferry_to_gdf(tag1, tag2, EF=.3, color = '#FF0000'):
+    '''
+    parameters:
+        - tag1, tag2
+        - EF : emission factor in gCO2/pkm for ferry
+        - color : color for path and bar chart
+    return:
+        - full dataframe for ferry
+    '''
+    #Compute geometry
+    geom = LineString([tag1, tag2])
+    # Compute the true distance
+    geod = Geod(ellps="WGS84")
+    bird = geod.geometry_length(geom)/1e3
+    # Compute geodataframe and dataframe
+    gdf_ferry = pd.DataFrame(pd.Series({ 'kgCO2eq':EF*bird, 'EF_tot':EF, 'path_length':bird, 'colors':color, 'NAME':'Ferry',  'Mean of Transport':'Ferry', 'geometry':geom})).transpose()
+   # gdf_ferry.geometry = gdf_ferry.geometry.astype('geometry')
+   
+    return gdf_ferry
+
 
 def filter_countries_world(gdf, th = 5):
     '''
@@ -293,7 +477,7 @@ def filter_countries_world(gdf, th = 5):
         - Geodataframe of train path by countries
     '''
     #Load europe / or world
-    europe = gpd.read_file('static/world.geojson')
+    europe = gpd.read_file('world.geojson')
     #Make the split by geometry
     gdf.name = 'geometry'
     res = gpd.overlay(gpd.GeoDataFrame(gdf, geometry = 'geometry', crs='epsg:4326'), europe, how='intersection')
@@ -303,7 +487,7 @@ def filter_countries_world(gdf, th = 5):
     # In case we have bridges / tunnels across sea: 
     # Distinction depending on linestring / multilinestring
         if diff.geometry[0].geom_type == 'MultiLineString':
-            print('MultiLinestring')
+          #  print('MultiLinestring')
             diff_2 = gpd.GeoDataFrame(list(diff.geometry.values[0].geoms))
         else :
             print('Linestring')
@@ -323,7 +507,7 @@ def filter_countries_world(gdf, th = 5):
     return res
 
 
-#Create a Linestring that looks like a plane path
+#Create a Linestring that looks like a plane path, but inaccurate
 def create_plane( nb, tag1, tag2):
     '''
     Create a custom curved line for plane path
@@ -352,6 +536,32 @@ def create_plane( nb, tag1, tag2):
 
     return h
 
+def great_circle_geometry(dep, arr, nb = 20):
+    '''
+    Create the great circle geometry with pyproj
+    parameters:
+        - nb : number of points
+        - dep, arr : departure and arrival
+    return:
+        - shapely geometry (Linestring)
+        - Geodesic distance in km
+    '''
+    # projection
+    geod = Geod(ellps="WGS84")
+    # returns a list of longitude/latitude pairs describing npts equally spaced 
+    # intermediate points along the geodesic between the initial and terminus points.
+    r = geod.inv_intermediate(lon1= dep[0], lat1= dep[1], lon2= arr[0], lat2= arr[1], npts= nb, initial_idx = 0, terminus_idx = 0)
+    
+    # Create the geometry
+    #Displaying results over the antimeridian
+    if abs(min(r.lons) - max(r.lons)) > 180 :
+        #Then the other way is faster, we add 360° to the destination with neg lons
+        l = [[lon, lat] for lon, lat in zip([lon + 360 if lon < 0 else lon for lon in r.lons], r.lats)]
+    else : 
+        l = [[lon, lat] for lon, lat in zip(r.lons, r.lats)]
+    
+    # Return geometry and distance
+    return LineString(l), r.dist / 1e3 #in km
 
 def compute_ef_world(gdf, geom_plane, geom_route, train, route):
     '''
@@ -362,7 +572,7 @@ def compute_ef_world(gdf, geom_plane, geom_route, train, route):
         - geom_route : shapely geometry of route path
         - train, route : booleans. Plane is always displayed. 
     returns:
-        Geodataframe with colors & geometries to plot, and emission factors for results
+        - Geodataframe with colors & geometries to plot, and emission factors for results
     '''
      # Add plane emission factor and geometry
     gdf_plane = pd.DataFrame(pd.Series({ 'EF_tot':255, 'colors':'#00008B', 'NAME':'Plane', 'geometry':geom_plane})).transpose()
@@ -375,7 +585,7 @@ def compute_ef_world(gdf, geom_plane, geom_route, train, route):
     else :
         jf = gdf
     if route:
-        gdf_car = pd.DataFrame(pd.Series({ 'EF_tot':150, 'colors':'#00FF00', 'NAME':'Car', 'geometry':geom_route})).transpose()
+        gdf_car = pd.DataFrame(pd.Series({'EF_tot':150, 'colors':'#00FF00', 'NAME':'Car', 'geometry':geom_route})).transpose()
     else :
         gdf_car = None
 
@@ -467,3 +677,192 @@ def plotly_chart(gdf, tag1, tag2, dist_route, train, route):
     graph_json = to_json(fig)
 
     return graph_json
+
+
+def plotly_v2(gdf):
+        # For totals
+    d = dict([(gdf.NAME[idx], gdf.colors[idx]) for idx in gdf.index])
+    dfs = gdf[['Mean of Transport', 'kgCO2eq']].groupby('Mean of Transport').sum()
+    # Plot bars
+    fig = px.bar(gdf, x='Mean of Transport', y="kgCO2eq", color='NAME', color_discrete_map=d, width=200, height=350)
+    fig.update_layout(showlegend=False)
+    fig.update_layout(
+    margin=dict(l=20, r=20, t=10, b=20),
+    font = dict(size=10),
+    hoverlabel=dict(
+        bgcolor="white",
+        font_size=8,
+        )#font_family="Rockwell"
+)
+    # Plot Total
+    fig.add_trace(go.Scatter(
+    x=dfs.index,
+    y=dfs['kgCO2eq'],
+    text=dfs['kgCO2eq'].apply(lambda x : round(x, 1)),
+    mode='text',
+    textposition='top center',
+    textfont=dict(
+        size=10,
+    ),
+    showlegend=False
+))
+    fig.update_yaxes(range=[0,dfs.max().values[0]*1.2])
+    # Save the figure
+    #fig.write_html("static/test_chart.html")
+    # Convert the figure to a JSON-compatible dictionary
+    graph_json = to_json(fig)
+
+    return graph_json, fig
+
+
+def compute_emissions_custom(data):
+    '''
+    parameters:
+        - data, pandas dataframe format (will be json)
+    return:
+        - full dataframe for emissions
+        - geodataframe for path
+    '''
+    #Loop
+    l= []
+    geo = []
+    for idx in data.index[:-1] : # We loop until last departure
+        # Mean of transport
+        mean = data.loc[idx].transp
+        # Departure coordinates
+        lon = data.loc[idx].lon
+        lat = data.loc[idx].lat
+        tag1 = (lon , lat)
+        # Arrival coordinates
+        lon = data.loc[idx+1].lon
+        lat = data.loc[idx+1].lat
+        tag2 = (lon , lat)
+
+        # Compute depending on the mean of transport
+        if mean == 'Train': 
+            gdf, train = train_to_gdf(tag1, tag2)
+            l.append(gdf)
+            geo.append(gdf)
+
+        elif mean == 'Bus' :
+            gdf_bus, route = bus_to_gdf(tag1, tag2)
+            l.append(gdf_bus)
+            geo.append(gdf_bus)
+
+        elif mean == 'Car':
+            # We get the number of passenger
+            nb = data.loc[idx].nb
+            gdf_car, route = car_to_gdf(tag1, tag2, nb=nb)
+            l.append(gdf_car)
+            geo.append(gdf_car)
+            
+        elif mean == 'Plane':
+            gdf_plane, gdf_cont = plane_to_gdf(tag1, tag2)
+            l.append(gdf_plane)
+            l.append(gdf_cont)
+            geo.append(gdf_plane)
+
+        elif mean == 'Ferry':
+            gdf_ferry = ferry_to_gdf(tag1, tag2)
+            l.append(gdf_ferry)
+            geo.append(gdf_ferry)
+
+    # Data for bar chart
+    data = pd.concat(l).reset_index(drop=True).drop('geometry', axis=1)
+
+    # Geodataframe for map
+    geodata = gpd.GeoDataFrame(pd.concat(geo), geometry='geometry', crs='epsg:4326')
+        
+    return data, geodata
+
+
+
+def compute_emissions_all(data):
+    '''
+    parameters:
+        - data, pandas dataframe format (will be json)
+    return:
+        - full dataframe for emissions
+        - geodataframe for path
+    '''
+    # Departure coordinates
+    lon = data.loc[0].lon
+    lat = data.loc[0].lat
+    tag1 = (lon , lat)
+    # Arrival coordinates
+    lon = data.loc[data.shape[0] - 1].lon
+    lat = data.loc[data.shape[0] - 1].lat
+    tag2 = (lon , lat)
+
+    #Loop
+    l= []
+    geo = []
+    
+    # Train
+    gdf, train = train_to_gdf(tag1, tag2)
+    l.append(gdf)
+    geo.append(gdf)
+
+    # Car & Bus 
+    gdf_car, gdf_bus, route = car_bus_to_gdf(tag1, tag2)
+    l.append(gdf_bus)
+    l.append(gdf_car)
+    geo.append(gdf_car)
+
+    # Plane
+    gdf_plane, gdf_cont = plane_to_gdf(tag1, tag2)
+    l.append(gdf_plane)
+    l.append(gdf_cont)
+    geo.append(gdf_plane)
+
+    # We do not add the ferry in the general case
+
+    # Data for bar chart
+    data = pd.concat(l).reset_index(drop=True).drop('geometry', axis=1)
+
+    # Geodataframe for map
+    geodata = gpd.GeoDataFrame(pd.concat(geo), geometry='geometry', crs='epsg:4326')
+        
+    return data, geodata
+
+def bchart_1(mytrip, direct):
+    '''
+    parameters:
+        - mytrip, dataframe of custom trip
+        - direct, dataframe of direct trip
+    return:
+        - json
+        - plotly figure
+    '''
+    # Treatment for number of passengers in car for direct
+    all_car = pd.concat(5 * [direct[direct['NAME']=='Car']], ignore_index=True)
+    all_car['kgCO2eq'] /= 5
+
+    direct = pd.concat([direct[~direct['Mean of Transport'].isin(['Car'])], all_car])
+    # Merging means of transport for custom trip
+    mytrip['NAME'] = mytrip['Mean of Transport'] + '_' + mytrip['NAME']
+    # Separtating bars
+    mytrip['Mean of Transport'] = 'My_trip'
+    direct['Type'] = 'Direct'
+    # Combine
+    l_tot = pd.concat([mytrip, direct]).reset_index(drop=True)
+    return plotly_v2(l_tot)
+
+def bchart_2(mytrip, alternative):
+    '''
+    parameters:
+        - mytrip, dataframe of custom trip
+        - alternative, dataframe of alternative trip
+    return:
+        - json
+        - plotly figure
+    '''
+    # Merging means of transport for custom trips
+    mytrip['NAME'] = mytrip['Mean of Transport'] + '_' + mytrip['NAME']
+    alternative['NAME'] = alternative['Mean of Transport'] + '_' + alternative['NAME']
+    # Separtating bars
+    mytrip['Mean of Transport'] = 'My_trip'
+    alternative['Mean of Transport'] = 'Alternative'
+    # Combine
+    l_tot = pd.concat([mytrip, alternative]).reset_index(drop=True)
+    return plotly_v2(l_tot)
