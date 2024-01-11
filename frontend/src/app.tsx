@@ -18,20 +18,26 @@ function App() {
         justifyContent="space-between"
         height="100%"
         overflow="auto"
+        flexShrink={1}
       >
-        <Stack padding={3}>
+        <Stack padding={3} height="100%">
           <Stack padding={3} justifyItems="center">
             <h1 className="title">Compare the emissions from your travels</h1>
           </Stack>
-          {/* <NewForm /> */}
-          <Form setResponse={setResponse} steps={steps} />
+          <Form setResponse={setResponse} stepsProps={steps} />
           <Chart response={response} />
         </Stack>
       </Stack>
-      <Container style={{ padding: 0 }}>
+      <Container
+        style={{ padding: 0, margin: 0, maxWidth: "100%", flexShrink: 3 }}
+      >
         <Map
           response={response}
-          stepsCoords={steps.values.map((step) => step.locationCoords)}
+          stepsCoords={
+            steps.values
+              .filter((step) => !!step.locationCoords)
+              .map((step) => step.locationCoords) as [number, number][]
+          }
         />
       </Container>
     </Stack>

@@ -1,20 +1,14 @@
-import { Button, Stack } from "@mui/material";
+import { Box, Button, Stack } from "@mui/material";
 import {
   BiSolidPlaneAlt,
   BiSolidCar,
   BiSolidTrain,
   BiSolidBus,
+  BiTrash,
 } from "react-icons/bi";
 import { FaFerry } from "react-icons/fa6";
 import { Step, Transport } from "../types";
 import { useEffect, useRef } from "react";
-
-interface StepFieldProps {
-  isDeparture?: boolean;
-  updateStep: (index: number, data: Partial<Step>) => void;
-  steps: Step[];
-  index: number;
-}
 
 const TRANSPORTS = [
   {
@@ -39,12 +33,21 @@ const TRANSPORTS = [
   },
 ];
 
-export function StepField({
+interface StepFieldProps {
+  isDeparture?: boolean;
+  removeStep: (index: number) => void;
+  updateStep: (index: number, data: Partial<Step>) => void;
+  steps: Step[];
+  index: number;
+}
+
+export const StepField = ({
   isDeparture,
+  removeStep,
   updateStep,
   steps,
   index,
-}: StepFieldProps) {
+}: StepFieldProps) => {
   const autoCompleteRef = useRef(null);
   const inputRef = useRef(null);
 
@@ -61,12 +64,14 @@ export function StepField({
       autoCompleteRef.current.addListener("place_changed", async function () {
         // @ts-ignore
         const place = await autoCompleteRef.current.getPlace();
-        updateStep(index, {
-          locationCoords: [
-            place.geometry.location.lat(),
-            place.geometry.location.lng(),
-          ],
-        });
+        if (place) {
+          updateStep(index, {
+            locationCoords: [
+              place.geometry.location.lat(),
+              place.geometry.location.lng(),
+            ],
+          });
+        }
       });
     }
   }, [inputRef, updateStep, index]);
@@ -74,30 +79,48 @@ export function StepField({
   return (
     <>
       {!isDeparture && (
-        <Stack direction={"row"} alignItems="center" marginBottom={1}>
-          <p style={{ paddingRight: 5, textAlign: "end" }}>by</p>
-          {TRANSPORTS.map((item) => (
+        <Stack
+          direction="row"
+          justifyContent="space-between"
+          marginBottom={2}
+          marginTop={2}
+        >
+          <Box>
+            <span style={{ paddingRight: 5, textAlign: "end" }}>by</span>
+            {TRANSPORTS.map((item) => (
+              <Button
+                key={item.value}
+                onClick={() => updateStep(index, { transportMean: item.value })}
+                style={{
+                  padding: 0,
+                  width: "40px",
+                  minWidth: "40px",
+                  height: "40px",
+                  borderRadius: "100px",
+                  backgroundColor:
+                    item.value ===
+                    steps.find((step) => step.index === index)?.transportMean
+                      ? "#474747"
+                      : "#b7b7b7",
+                  color: "white",
+                  marginLeft: 5,
+                }}
+              >
+                {item.icon}
+              </Button>
+            ))}
+          </Box>
+          {index !== 2 && (
             <Button
-              key={item.value}
-              onClick={() => updateStep(index, { transportMean: item.value })}
               style={{
-                padding: 0,
-                width: "40px",
-                minWidth: "40px",
-                height: "40px",
-                borderRadius: "100px",
-                backgroundColor:
-                  item.value ===
-                  steps.find((step) => step.index === index)?.transportMean
-                    ? "#474747"
-                    : "#b7b7b7",
-                color: "white",
+                color: "black",
                 marginLeft: 5,
               }}
+              onClick={() => removeStep(index)}
             >
-              {item.icon}
+              <BiTrash size={20} />
             </Button>
-          ))}
+          )}
         </Stack>
       )}
       <input
@@ -116,4 +139,4 @@ export function StepField({
       />
     </>
   );
-}
+};

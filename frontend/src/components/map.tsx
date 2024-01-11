@@ -12,10 +12,10 @@ import { ApiResponse, Gdf } from "../types";
 
 interface MapProps {
   response?: ApiResponse;
-  stepsCoords?: ([number, number] | undefined)[];
+  stepsCoords: [number, number][];
 }
 
-export function Map({ response, stepsCoords }: MapProps) {
+export const Map = ({ response, stepsCoords }: MapProps) => {
   // @ts-ignore
   delete L.Icon.Default.prototype._getIconUrl;
 
@@ -30,14 +30,16 @@ export function Map({ response, stepsCoords }: MapProps) {
       <MapContent response={response} stepsCoords={stepsCoords} />
     </MapContainer>
   );
-}
+};
 
-function MapContent({ response, stepsCoords }: MapProps) {
-  const departureCoords =
-    stepsCoords && stepsCoords.length > 0 ? stepsCoords[0] : undefined;
+const MapContent = ({ response, stepsCoords }: MapProps) => {
+  // TODO: find the farthest points from each other
+  const departureCoords = stepsCoords.length > 0 ? stepsCoords[0] : undefined;
   const arrivalCoords =
-    stepsCoords && stepsCoords.length > 1 ? stepsCoords[1] : undefined;
+    stepsCoords.length > 1 ? stepsCoords[stepsCoords.length - 1] : undefined;
+
   const map = useMap();
+
   useEffect(() => {
     if (departureCoords && arrivalCoords)
       map.flyToBounds([departureCoords, arrivalCoords]);
@@ -57,8 +59,9 @@ function MapContent({ response, stepsCoords }: MapProps) {
             ])}
           />
         ))}
-      {departureCoords && <Marker position={departureCoords} />}
-      {arrivalCoords && <Marker position={arrivalCoords} />}
+      {stepsCoords.map((coords, index) => (
+        <Marker key={index} position={coords} />
+      ))}
     </>
   );
-}
+};

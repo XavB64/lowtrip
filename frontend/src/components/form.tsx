@@ -1,36 +1,42 @@
-import { Box, Button, Tab, Tabs } from "@mui/material";
+import { Box, Button, CircularProgress, Tab, Tabs, Stack } from "@mui/material";
+import axios from "axios";
+import { useState } from "react";
 
 import { Step } from "../types";
-import axios from "axios";
 import { API_URL } from "../config";
 import { ApiResponse } from "../types";
 import { StepField } from "./step-field";
 
 interface FormProps {
   setResponse: (response: ApiResponse) => void;
-  steps: {
+  stepsProps: {
     values: Step[];
     addStep: () => void;
+    removeStep: (index: number) => void;
     updateStep: (index: number, data: Partial<Step>) => void;
   };
 }
 
-export function Form({ setResponse, steps }: FormProps) {
+export const Form = ({ setResponse, stepsProps }: FormProps) => {
+  const { values: steps, addStep, removeStep, updateStep } = stepsProps;
+  const [isLoading, setIsLoading] = useState(false);
+
   const handleSubmit = async () => {
     if (
-      steps.values.length < 2 ||
-      !steps.values[0].locationCoords ||
-      !steps.values[1].locationCoords
+      steps.length < 2 ||
+      !steps[0].locationCoords ||
+      !steps[1].locationCoords
     )
       throw new Error("At least one step required");
+    setIsLoading(true);
     const formData = new FormData();
     formData.append(
       "departure_coord",
-      `${steps.values[0].locationCoords[0]}, ${steps.values[0].locationCoords[1]}`
+      `${steps[0].locationCoords[0]}, ${steps[0].locationCoords[1]}`
     );
     formData.append(
       "arrival_coord",
-      `${steps.values[1].locationCoords[0]}, ${steps.values[1].locationCoords[1]}`
+      `${steps[1].locationCoords[0]}, ${steps[1].locationCoords[1]}`
     );
     axios
       .post(API_URL, formData, {
@@ -41,8 +47,12 @@ export function Form({ setResponse, steps }: FormProps) {
       })
       .catch((err) => {
         console.log(err);
+      })
+      .finally(() => {
+        setIsLoading(false);
       });
   };
+
   return (
     <>
       <Box>
@@ -66,24 +76,27 @@ export function Form({ setResponse, steps }: FormProps) {
           />
         </Tabs>
       </Box>
-      <Box
+      <Stack
         sx={{
           padding: 3,
           backgroundColor: "#efefef",
           borderRadius: "0 12px 12px 12px",
+          justifyContent: "right",
         }}
       >
         <StepField
           isDeparture
-          steps={steps.values}
-          updateStep={steps.updateStep}
+          steps={steps}
+          updateStep={updateStep}
+          removeStep={removeStep}
           index={1}
         />
-        {steps.values.slice(1).map((step) => (
+        {steps.slice(1).map((step) => (
           <StepField
             key={step.index}
-            steps={steps.values}
-            updateStep={steps.updateStep}
+            steps={steps}
+            removeStep={removeStep}
+            updateStep={updateStep}
             index={step.index}
           />
         ))}
@@ -91,19 +104,22 @@ export function Form({ setResponse, steps }: FormProps) {
           style={{
             padding: 0,
             color: "#b7b7b7",
-            marginBottom: 5,
+            marginBottom: 10,
+            marginTop: 10,
             textTransform: "none",
             fontFamily: "Montserrat",
             fontWeight: 700,
             fontSize: "16px",
+            width: "fit-content",
           }}
-          onClick={steps.addStep}
+          onClick={addStep}
         >
           <p>Add step</p>
         </Button>
 
         <Button
           onClick={handleSubmit}
+          disabled={isLoading}
           style={{
             borderRadius: "20px",
             padding: 0,
@@ -115,11 +131,16 @@ export function Form({ setResponse, steps }: FormProps) {
             fontWeight: 700,
             fontSize: "16px",
             width: "100%",
+            height: "60px",
           }}
         >
-          <p>Compute emissions</p>
+          {isLoading ? (
+            <CircularProgress style={{ color: "white" }} />
+          ) : (
+            <p>Compute emissions</p>
+          )}
         </Button>
-      </Box>
+      </Stack>
     </>
   );
-}
+};

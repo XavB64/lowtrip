@@ -9,6 +9,13 @@ export function useSteps() {
     [steps, setSteps]
   );
 
+  const removeStep = useCallback(
+    (index: number) => {
+      setSteps(steps.filter((step) => step.index !== index));
+    },
+    [steps, setSteps]
+  );
+
   const updateStep = useCallback(
     (index: number, data: Partial<Step>) => {
       setSteps(
@@ -20,5 +27,5 @@ export function useSteps() {
     [steps, setSteps]
   );
 
-  return { values: steps, addStep, updateStep };
+  return { values: steps, addStep, removeStep, updateStep };
 }
