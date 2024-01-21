@@ -8,8 +8,15 @@ import {
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import { useEffect } from "react";
+import { ApiResponse, Gdf } from "../types";
 
-export function Map({ response, departureCoords, arrivalCoords }) {
+interface MapProps {
+  response?: ApiResponse;
+  stepsCoords: [number, number][];
+}
+
+export const Map = ({ response, stepsCoords }: MapProps) => {
+  // @ts-ignore
   delete L.Icon.Default.prototype._getIconUrl;
 
   L.Icon.Default.mergeOptions({
@@ -20,27 +27,29 @@ export function Map({ response, departureCoords, arrivalCoords }) {
 
   return (
     <MapContainer center={[48, 20]} zoom={5} scrollWheelZoom={true}>
-      <MapContent
-        response={response}
-        departureCoords={departureCoords}
-        arrivalCoords={arrivalCoords}
-      />
+      <MapContent response={response} stepsCoords={stepsCoords} />
     </MapContainer>
   );
-}
+};
 
-function MapContent({ response, departureCoords, arrivalCoords }) {
+const MapContent = ({ response, stepsCoords }: MapProps) => {
+  // TODO: find the farthest points from each other
+  const departureCoords = stepsCoords.length > 0 ? stepsCoords[0] : undefined;
+  const arrivalCoords =
+    stepsCoords.length > 1 ? stepsCoords[stepsCoords.length - 1] : undefined;
+
   const map = useMap();
+
   useEffect(() => {
     if (departureCoords && arrivalCoords)
-      map.flyToBounds([departureCoords.split(", "), arrivalCoords.split(", ")]);
+      map.flyToBounds([departureCoords, arrivalCoords]);
   }, [map, departureCoords, arrivalCoords]);
 
   return (
     <>
       <TileLayer url="https://a.basemaps.cartocdn.com/light_all/{z}/{x}/{y}@2x.png" />
       {response &&
-        JSON.parse(response.data.gdf).features.map((feature) => (
+        (JSON.parse(response.data.gdf) as Gdf).features.map((feature) => (
           <Polyline
             key={feature.id}
             pathOptions={{ color: feature.properties.colors }}
@@ -50,8 +59,9 @@ function MapContent({ response, departureCoords, arrivalCoords }) {
             ])}
           />
         ))}
-      {departureCoords && <Marker position={departureCoords.split(", ")} />}
-      {arrivalCoords && <Marker position={arrivalCoords.split(", ")} />}
+      {stepsCoords.map((coords, index) => (
+        <Marker key={index} position={coords} />
+      ))}
     </>
   );
-}
+};

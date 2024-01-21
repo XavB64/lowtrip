@@ -1,0 +1,10 @@
+.App {
+  font-family: "Montserrat" !important;
+}
+
+.title {
+  color: #595959;
+  font-size: x-large;
+  font-weight: 900;
+  text-align: center;
+}
