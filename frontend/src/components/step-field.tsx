@@ -1,4 +1,4 @@
-import { Box, Button, Stack } from "@mui/material";
+import { Box, Button, IconButton, Stack } from "@mui/material";
 import {
   BiSolidPlaneAlt,
   BiSolidCar,
@@ -78,7 +78,32 @@ export const StepField = ({
 
   return (
     <>
-      {!isDeparture && (
+      <Stack direction="row" spacing={1}>
+        <input
+          ref={inputRef}
+          placeholder={isDeparture ? "From..." : "To..."}
+          style={{
+            width: "-webkit-fill-available",
+            height: "30px",
+            padding: "9px",
+            border: "1px solid lightgrey",
+            borderRadius: "20px",
+            backgroundColor: "white",
+            marginBottom: 1,
+            fontSize: "16px",
+          }}
+        />
+        {index > 2 && (
+          <IconButton
+            onClick={() => removeStep(index)}
+            aria-label="delete"
+            style={{ borderRadius: "20px" }}
+          >
+            <BiTrash size={20} />
+          </IconButton>
+        )}
+      </Stack>
+      {index !== steps.length && (
         <Stack
           direction="row"
           justifyContent="space-between"
@@ -93,9 +118,9 @@ export const StepField = ({
                 onClick={() => updateStep(index, { transportMean: item.value })}
                 style={{
                   padding: 0,
-                  width: "40px",
-                  minWidth: "40px",
-                  height: "40px",
+                  width: "30px",
+                  minWidth: "30px",
+                  height: "30px",
                   borderRadius: "100px",
                   backgroundColor:
                     item.value ===
@@ -110,33 +135,8 @@ export const StepField = ({
               </Button>
             ))}
           </Box>
-          {index !== 2 && (
-            <Button
-              style={{
-                color: "black",
-                marginLeft: 5,
-              }}
-              onClick={() => removeStep(index)}
-            >
-              <BiTrash size={20} />
-            </Button>
-          )}
         </Stack>
       )}
-      <input
-        ref={inputRef}
-        placeholder={isDeparture ? "From..." : "To..."}
-        style={{
-          width: "-webkit-fill-available",
-          height: "40px",
-          padding: "9px",
-          border: "1px solid lightgrey",
-          borderRadius: "20px",
-          backgroundColor: "white",
-          marginBottom: 1,
-          fontSize: "16px",
-        }}
-      />
     </>
   );
 };

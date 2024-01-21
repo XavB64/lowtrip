@@ -16,6 +16,16 @@ export function Chart({ response }: ChartProps) {
 
   return (
     <Box height="100%">
+      <h2
+        style={{
+          color: "#595959",
+          fontSize: "large",
+          fontWeight: 900,
+          textAlign: "center",
+        }}
+      >
+        Emissions of your trip compared to other means of transportation
+      </h2>
       <BarChart
         xAxis={[
           {
@@ -34,6 +44,7 @@ export function Chart({ response }: ChartProps) {
           color: details.marker.color,
         }))}
         slotProps={{ legend: { hidden: true } }}
+        height={400}
       />
     </Box>
   );

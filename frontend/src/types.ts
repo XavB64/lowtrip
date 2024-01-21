@@ -5,11 +5,11 @@ export interface Step {
 }
 
 export enum Transport {
-  plane = "plane",
-  car = "car",
-  bus = "bus",
-  train = "train",
-  ferry = "ferry",
+  plane = "Plane",
+  car = "Car",
+  bus = "Bus",
+  train = "Train",
+  ferry = "Ferry",
 }
 
 export interface ApiResponse {
