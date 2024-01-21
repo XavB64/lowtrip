@@ -22,22 +22,28 @@ export const Form = ({ setResponse, stepsProps }: FormProps) => {
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async () => {
-    if (
-      steps.length < 2 ||
-      !steps[0].locationCoords ||
-      !steps[1].locationCoords
-    )
+    if (steps.length < 2 || steps.some((step) => !step.locationCoords))
       throw new Error("At least one step required");
     setIsLoading(true);
     const formData = new FormData();
-    formData.append(
-      "departure_coord",
-      `${steps[0].locationCoords[0]}, ${steps[0].locationCoords[1]}`
-    );
-    formData.append(
-      "arrival_coord",
-      `${steps[1].locationCoords[0]}, ${steps[1].locationCoords[1]}`
-    );
+    const lon = steps.reduce((jsonResult, step, index) => {
+      jsonResult[index.toString()] = step.locationCoords![1].toString();
+      return jsonResult;
+    }, {} as { [key: string]: string });
+    const lat = steps.reduce((jsonResult, step, index) => {
+      jsonResult[index.toString()] = step.locationCoords![0].toString();
+      return jsonResult;
+    }, {} as { [key: string]: string });
+    const transp = steps.reduce((jsonResult, step, index) => {
+      jsonResult[index.toString()] = step.transportMean ?? "";
+      return jsonResult;
+    }, {} as { [key: string]: string });
+    const nb = steps.reduce((jsonResult, step, index) => {
+      jsonResult[index.toString()] = "1";
+      return jsonResult;
+    }, {} as { [key: string]: string });
+    formData.append("mode", "1");
+    formData.append("my-trip", JSON.stringify({ lon, lat, transp, nb }));
     axios
       .post(API_URL, formData, {
         headers: { "Access-Contol-Allow-Origin": "*" },

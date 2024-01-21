@@ -33,17 +33,20 @@ export const Map = ({ response, stepsCoords }: MapProps) => {
 };
 
 const MapContent = ({ response, stepsCoords }: MapProps) => {
-  // TODO: find the farthest points from each other
-  const departureCoords = stepsCoords.length > 0 ? stepsCoords[0] : undefined;
-  const arrivalCoords =
-    stepsCoords.length > 1 ? stepsCoords[stepsCoords.length - 1] : undefined;
-
   const map = useMap();
 
   useEffect(() => {
-    if (departureCoords && arrivalCoords)
-      map.flyToBounds([departureCoords, arrivalCoords]);
-  }, [map, departureCoords, arrivalCoords]);
+    if (stepsCoords.length > 1) {
+      const maxLat = Math.max(...stepsCoords.map((stepCoord) => stepCoord[0]));
+      const minLat = Math.min(...stepsCoords.map((stepCoord) => stepCoord[0]));
+      const maxLng = Math.max(...stepsCoords.map((stepCoord) => stepCoord[1]));
+      const minLng = Math.min(...stepsCoords.map((stepCoord) => stepCoord[1]));
+      map.flyToBounds([
+        [minLat, minLng],
+        [maxLat, maxLng],
+      ]);
+    }
+  }, [map, stepsCoords]);
 
   return (
     <>

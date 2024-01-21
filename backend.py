@@ -477,7 +477,7 @@ def filter_countries_world(gdf, th = 5):
         - Geodataframe of train path by countries
     '''
     #Load europe / or world
-    europe = gpd.read_file('world.geojson')
+    europe = gpd.read_file('static/world.geojson')
     #Make the split by geometry
     gdf.name = 'geometry'
     res = gpd.overlay(gpd.GeoDataFrame(gdf, geometry = 'geometry', crs='epsg:4326'), europe, how='intersection')
@@ -550,7 +550,7 @@ def great_circle_geometry(dep, arr, nb = 20):
     geod = Geod(ellps="WGS84")
     # returns a list of longitude/latitude pairs describing npts equally spaced 
     # intermediate points along the geodesic between the initial and terminus points.
-    r = geod.inv_intermediate(lon1= dep[0], lat1= dep[1], lon2= arr[0], lat2= arr[1], npts= nb, initial_idx = 0, terminus_idx = 0)
+    r = geod.inv_intermediate(lon1= float(dep[0]), lat1= float(dep[1]), lon2= float(arr[0]), lat2= float(arr[1]), npts= nb, initial_idx = 0, terminus_idx = 0)
     
     # Create the geometry
     #Displaying results over the antimeridian
@@ -734,8 +734,8 @@ def compute_emissions_custom(data):
         lat = data.loc[idx].lat
         tag1 = (lon , lat)
         # Arrival coordinates
-        lon = data.loc[idx+1].lon
-        lat = data.loc[idx+1].lat
+        lon = data.loc[str(int(idx)+1)].lon
+        lat = data.loc[str(int(idx)+1)].lat
         tag2 = (lon , lat)
 
         # Compute depending on the mean of transport
@@ -751,7 +751,7 @@ def compute_emissions_custom(data):
 
         elif mean == 'Car':
             # We get the number of passenger
-            nb = data.loc[idx].nb
+            nb = int(data.loc[idx].nb)
             gdf_car, route = car_to_gdf(tag1, tag2, nb=nb)
             l.append(gdf_car)
             geo.append(gdf_car)
@@ -786,12 +786,12 @@ def compute_emissions_all(data):
         - geodataframe for path
     '''
     # Departure coordinates
-    lon = data.loc[0].lon
-    lat = data.loc[0].lat
+    lon = data.loc['0'].lon
+    lat = data.loc['0'].lat
     tag1 = (lon , lat)
     # Arrival coordinates
-    lon = data.loc[data.shape[0] - 1].lon
-    lat = data.loc[data.shape[0] - 1].lat
+    lon = data.loc[str(data.shape[0] - 1)].lon
+    lat = data.loc[str(data.shape[0] - 1)].lat
     tag2 = (lon , lat)
 
     #Loop

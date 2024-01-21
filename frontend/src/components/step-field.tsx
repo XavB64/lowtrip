@@ -78,7 +78,21 @@ export const StepField = ({
 
   return (
     <>
-      {!isDeparture && (
+      <input
+        ref={inputRef}
+        placeholder={isDeparture ? "From..." : "To..."}
+        style={{
+          width: "-webkit-fill-available",
+          height: "40px",
+          padding: "9px",
+          border: "1px solid lightgrey",
+          borderRadius: "20px",
+          backgroundColor: "white",
+          marginBottom: 1,
+          fontSize: "16px",
+        }}
+      />
+      {index !== steps.length && (
         <Stack
           direction="row"
           justifyContent="space-between"
@@ -93,9 +107,9 @@ export const StepField = ({
                 onClick={() => updateStep(index, { transportMean: item.value })}
                 style={{
                   padding: 0,
-                  width: "40px",
-                  minWidth: "40px",
-                  height: "40px",
+                  width: "30px",
+                  minWidth: "30px",
+                  height: "30px",
                   borderRadius: "100px",
                   backgroundColor:
                     item.value ===
@@ -123,20 +137,6 @@ export const StepField = ({
           )}
         </Stack>
       )}
-      <input
-        ref={inputRef}
-        placeholder={isDeparture ? "From..." : "To..."}
-        style={{
-          width: "-webkit-fill-available",
-          height: "40px",
-          padding: "9px",
-          border: "1px solid lightgrey",
-          borderRadius: "20px",
-          backgroundColor: "white",
-          marginBottom: 1,
-          fontSize: "16px",
-        }}
-      />
     </>
   );
 };

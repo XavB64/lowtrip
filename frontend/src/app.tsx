@@ -14,7 +14,7 @@ function App() {
   return (
     <Stack direction="row" className="App" style={{ height: "100vh" }}>
       <Stack
-        maxWidth="40%"
+        maxWidth="30%"
         justifyContent="space-between"
         height="100%"
         overflow="auto"
