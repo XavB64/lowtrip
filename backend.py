@@ -837,8 +837,9 @@ def bchart_1(mytrip, direct):
     # Treatment for number of passengers in car for direct
     all_car = pd.concat(5 * [direct[direct['NAME']=='Car']], ignore_index=True)
     all_car['kgCO2eq'] /= 5
-
-    direct = pd.concat([direct[~direct['Mean of Transport'].isin(['Car'])], all_car])
+# Only one passenger for now
+    # direct = pd.concat([direct[~direct['Mean of Transport'].isin(['Car'])], all_car])
+            
     # Merging means of transport for custom trip
     mytrip['NAME'] = mytrip['Mean of Transport'] + '_' + mytrip['NAME']
     # Separtating bars
