@@ -432,7 +432,7 @@ def plane_to_gdf(tag1, tag2, EF_plane=EF_plane, contrails=2, holding=3.81, color
     
     # Detour coefficient :
     if bird < 1000 :
-        bird = 4.1588 * bird**(-.212)
+        bird = (4.1588 * bird**(-.212)) * bird
     # Different emission factors depending on the trip length
     if bird < 1000 :
         EF = EF_plane['short']
