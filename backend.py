@@ -305,7 +305,7 @@ def train_to_gdf(tag1, tag2, perims=[.2, 10], validate=500, colormap=charte_moll
     # Validation part for train
     if train : #We have a geometry
         if not validate_geom(tag1, tag2, gdf.values[0], validate):
-            gdf, train = None, False
+            gdf, train = pd.DataFrame(), False
 
     if train : #We need to filter by country and add length / Emission factors
         gdf = filter_countries_world(gdf)
@@ -358,7 +358,8 @@ def car_bus_to_gdf(tag1, tag2, EF_car=EF_car, EF_bus=EF_bus, color = '#00FF00', 
     if route :
         gdf_car = pd.DataFrame(pd.Series({ 'kgCO2eq':route_dist*EF_car, 'EF_tot':EF_car,'path_length':route_dist, 'colors':color, 'NAME':'Car', 'Mean of Transport':'Car', 'geometry':geom_route})).transpose() #'EF_tot':EF_car / nb,
         gdf_bus = pd.DataFrame(pd.Series({ 'kgCO2eq':route_dist*EF_bus, 'EF_tot':EF_bus, 'path_length':route_dist, 'colors':color, 'NAME':'Bus',  'Mean of Transport':'Bus', })).transpose() #'EF_tot':EF_bus, enlever geometry
-
+    else:
+        gdf_car, gdf_bus = pd.DataFrame(), pd.DataFrame()
     return gdf_car, gdf_bus, route
 
 def bus_to_gdf(tag1, tag2, EF_bus=EF_bus, color = '#00FF00', validate = 500, nb = 1):
@@ -382,7 +383,8 @@ def bus_to_gdf(tag1, tag2, EF_bus=EF_bus, color = '#00FF00', validate = 500, nb 
     
     if route :
         gdf_bus = pd.DataFrame(pd.Series({ 'kgCO2eq':route_dist*EF_bus, 'EF_tot':EF_bus, 'path_length':route_dist, 'colors':color, 'NAME':'Bus',  'Mean of Transport':'Bus', 'geometry':geom_route })).transpose() #'EF_tot':EF_bus, enlever geometry
-
+    else:
+        gdf_bus = pd.DataFrame()
     return gdf_bus, route
 
 def car_to_gdf(tag1, tag2, EF_car=EF_car, color = '#00FF00', validate = 500, nb = 1):
@@ -406,6 +408,8 @@ def car_to_gdf(tag1, tag2, EF_car=EF_car, color = '#00FF00', validate = 500, nb 
     
     if route :
         gdf_car = pd.DataFrame(pd.Series({ 'kgCO2eq':route_dist*EF_car / nb, 'EF_tot' : EF_car/nb, 'path_length':route_dist, 'colors':color, 'NAME':'Car', 'Mean of Transport':'Car', 'geometry':geom_route})).transpose() #'EF_tot':EF_car / nb,
+    else:
+        gdf_car = pd.DataFrame()
        
     return gdf_car, route
 
@@ -423,6 +427,7 @@ def plane_to_gdf(tag1, tag2, EF_plane=EF_plane, contrails=2, holding=3.81, color
     '''
     #Compute geometry and distance (geodesic)
     geom_plane, bird = great_circle_geometry(tag1, tag2)
+    #print(bird)
 
     ## OLD
     #geom_plane = create_plane( 20, tag1, tag2)
@@ -432,7 +437,7 @@ def plane_to_gdf(tag1, tag2, EF_plane=EF_plane, contrails=2, holding=3.81, color
     
     # Detour coefficient :
     if bird < 1000 :
-        bird = 4.1588 * bird**(-.212)
+        bird = (4.1588 * bird**(-.212))*bird
     # Different emission factors depending on the trip length
     if bird < 1000 :
         EF = EF_plane['short']
@@ -767,12 +772,23 @@ def compute_emissions_custom(data):
             l.append(gdf_ferry)
             geo.append(gdf_ferry)
 
-    # Data for bar chart
-    data = pd.concat(l).reset_index(drop=True).drop('geometry', axis=1)
-
-    # Geodataframe for map
-    geodata = gpd.GeoDataFrame(pd.concat(geo), geometry='geometry', crs='epsg:4326')
+    # if np.isin(None, l) :# type(l[0]) == 'pandas.core.frame.DataFrame': 
+    #     #No data retrieved, at least one
+    #     data, geodata = None, None
+   
         
+    # else :
+    
+            # Data for bar chart
+    data = pd.concat(l)
+    if data.shape[0] != 0:
+        data = data.reset_index(drop=True).drop('geometry', axis=1)
+        # Geodataframe for map
+        geodata = gpd.GeoDataFrame(pd.concat(geo), geometry='geometry', crs='epsg:4326')
+    else : 
+        geodata = pd.DataFrame()
+
+
     return data, geodata
 
 
@@ -835,15 +851,16 @@ def bchart_1(mytrip, direct):
         - plotly figure
     '''
     # Treatment for number of passengers in car for direct
-    all_car = pd.concat(5 * [direct[direct['NAME']=='Car']], ignore_index=True)
-    all_car['kgCO2eq'] /= 5
+    # all_car = pd.concat(5 * [direct[direct['NAME']=='Car']], ignore_index=True)
+    # all_car['kgCO2eq'] /= 5
 
-    direct = pd.concat([direct[~direct['Mean of Transport'].isin(['Car'])], all_car])
-    # Merging means of transport for custom trip
-    mytrip['NAME'] = mytrip['Mean of Transport'] + '_' + mytrip['NAME']
-    # Separtating bars
-    mytrip['Mean of Transport'] = 'My_trip'
-    direct['Type'] = 'Direct'
+    # direct = pd.concat([direct[~direct['Mean of Transport'].isin(['Car'])], all_car])
+    if mytrip.shape[0] != 0: # Faire de même pour bchart2
+        # Merging means of transport for custom trip
+        mytrip['NAME'] = mytrip['Mean of Transport'] + '_' + mytrip['NAME']
+        # Separtating bars
+        mytrip['Mean of Transport'] = 'My_trip'
+        direct['Type'] = 'Direct'
     # Combine
     l_tot = pd.concat([mytrip, direct]).reset_index(drop=True)
     return plotly_v2(l_tot)
