@@ -142,7 +142,7 @@ def find_train(tag1, tag2) :
     else :
         # Error message
         print(f"Failed to retrieve data. Status code: {response.status_code}")
-        gdf, train = None, False
+        gdf, train = pd.DataFrame(), False
         #We will try to request again with overpass
     return gdf, train
 
@@ -192,7 +192,7 @@ def extend_search(tag1, tag2, perims):
     #Maybe here try to check if the API is not already working
     if tag1_new == False :
         #Then we will find nothing
-        gdf = None
+        gdf = pd.DataFrame()
         train = False
        # return None, False
     else :
