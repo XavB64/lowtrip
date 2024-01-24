@@ -852,11 +852,14 @@ def compute_emissions_all(data):
 
     # We do not add the ferry in the general case
 
-    # Data for bar chart
-    data = pd.concat(l).reset_index(drop=True).drop('geometry', axis=1)
-
-    # Geodataframe for map
-    geodata = gpd.GeoDataFrame(pd.concat(geo), geometry='geometry', crs='epsg:4326')
+    if (route == False) & (train==False) & (plane==False):
+        #Only happens when plane was asked and the API failed
+        data, geodata = pd.DataFrame(), pd.DataFrame()
+    else :
+        # Data for bar chart
+        data = pd.concat(l).reset_index(drop=True).drop('geometry', axis=1)
+        # Geodataframe for map
+        geodata = gpd.GeoDataFrame(pd.concat(geo), geometry='geometry', crs='epsg:4326')
         
     return data, geodata
 
