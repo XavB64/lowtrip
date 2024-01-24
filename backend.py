@@ -795,6 +795,8 @@ def compute_emissions_custom(data):
 
 def compute_emissions_all(data):
     '''
+    If data is only one step then we do not compute this mean of transport as it will
+    appear in "my_trip"
     parameters:
         - data, pandas dataframe format (will be json)
     return:
@@ -810,26 +812,43 @@ def compute_emissions_all(data):
     lat = data.loc[str(data.shape[0] - 1)].lat
     tag2 = (lon , lat)
 
+    # Check if we should compute it or not
+    train, plane, car, bus = True, True, True, True
+    if data.shape[0]==2: #Then it's only one step
+        #Retrieve the mean of transport: Car/Bus/Train/Plane
+        transp = data.loc['0'].transp
+        if transp == 'Train':
+            train = False
+        elif transp == 'Plane':
+            plane = False
+        elif transp == 'Car':
+            car = False
+        elif transp == 'Bus':
+            bus = False
     #Loop
     l= []
     geo = []
     
     # Train
-    gdf, train = train_to_gdf(tag1, tag2)
-    l.append(gdf)
-    geo.append(gdf)
+    if train :
+        gdf, train = train_to_gdf(tag1, tag2)
+        l.append(gdf)
+        geo.append(gdf)
 
     # Car & Bus 
     gdf_car, gdf_bus, route = car_bus_to_gdf(tag1, tag2)
-    l.append(gdf_bus)
-    l.append(gdf_car)
+    if bus :
+        l.append(gdf_bus)
+    if car :
+        l.append(gdf_car)
     geo.append(gdf_car)
 
     # Plane
-    gdf_plane, gdf_cont = plane_to_gdf(tag1, tag2)
-    l.append(gdf_plane)
-    l.append(gdf_cont)
-    geo.append(gdf_plane)
+    if plane :
+        gdf_plane, gdf_cont = plane_to_gdf(tag1, tag2)
+        l.append(gdf_plane)
+        l.append(gdf_cont)
+        geo.append(gdf_plane)
 
     # We do not add the ferry in the general case
 
