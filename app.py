@@ -51,13 +51,15 @@ def main():
         if request.form['mode'] == '1' : # My trip vs direct trips
             # Convert json into pandas 
             df = pd.DataFrame.from_dict(json.loads(request.form['my-trip']))
-
+          #  df.to_csv('query.csv')
             #My trip data and geo data
             data_mytrip, geo_mytrip = compute_emissions_custom(df)
+           # print(data_mytrip)
             #Direct data and geo data
             data_direct, geo_direct = compute_emissions_all(df)
             #Possible to generate a plotly json, maybe better to plot from the data directly in javascript
             graph_json, figure = bchart_1(data_mytrip, data_direct)
+           # pd.concat([data_mytrip, data_direct]).to_csv('see_res.csv')
             response = {'gdf' : pd.concat([geo_mytrip, geo_direct])[['colors', 'geometry']].explode().to_json(),
                         'plot_div' : graph_json}
             
