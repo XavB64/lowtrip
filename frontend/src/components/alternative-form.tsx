@@ -8,7 +8,7 @@ import { ApiResponse } from "../types";
 import { StepField } from "./step-field";
 import { formatStepsForApi } from "../utils";
 
-interface FormProps {
+interface AlternativeFormProps {
   isActive: boolean;
   setResponse: (response: ApiResponse) => void;
   stepsProps: {
@@ -17,9 +17,15 @@ interface FormProps {
     removeStep: (index: number) => void;
     updateStep: (index: number, data: Partial<Step>) => void;
   };
+  stepsToCompare: Step[];
 }
 
-export const Form = ({ isActive, setResponse, stepsProps }: FormProps) => {
+export const AlternativeForm = ({
+  isActive,
+  setResponse,
+  stepsProps,
+  stepsToCompare,
+}: AlternativeFormProps) => {
   const { values: steps, addStep, removeStep, updateStep } = stepsProps;
   const [isLoading, setIsLoading] = useState(false);
 
@@ -30,8 +36,15 @@ export const Form = ({ isActive, setResponse, stepsProps }: FormProps) => {
       throw new Error("At least one step required");
     setIsLoading(true);
     const formData = new FormData();
-    formData.append("mode", "1");
-    formData.append("my-trip", JSON.stringify(formatStepsForApi(steps)));
+    formData.append("mode", "2");
+    formData.append(
+      "my-trip",
+      JSON.stringify(formatStepsForApi(stepsToCompare))
+    );
+    formData.append(
+      "alternative-trip",
+      JSON.stringify(formatStepsForApi(steps))
+    );
     axios
       .post(API_URL, formData, {
         headers: { "Access-Contol-Allow-Origin": "*" },
