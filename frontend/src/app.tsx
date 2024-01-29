@@ -73,6 +73,11 @@ function App() {
               .filter((step) => !!step.locationCoords)
               .map((step) => step.locationCoords) as [number, number][]
           }
+          alternativeStepsCoords={
+            alternativeTripSteps.values
+              .filter((step) => !!step.locationCoords)
+              .map((step) => step.locationCoords) as [number, number][]
+          }
         />
       </Container>
     </Stack>
