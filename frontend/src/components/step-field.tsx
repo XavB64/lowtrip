@@ -6,7 +6,7 @@ import {
   BiSolidBus,
   BiTrash,
 } from "react-icons/bi";
-import { FaFerry } from "react-icons/fa6";
+import { FaFerry, FaGlasses } from "react-icons/fa6";
 import { Step, Transport } from "../types";
 import { useEffect, useRef, useState } from "react";
 
@@ -50,6 +50,7 @@ export const StepField = ({
   const inputRef = useRef(null);
 
   const [value, setValue] = useState(step.locationName || "");
+  const [shoudlReset, setShouldReset] = useState(false);
 
   const isDeparture = step.index === 1;
 
@@ -67,6 +68,7 @@ export const StepField = ({
         // @ts-ignore
         const place = await autoCompleteRef.current.getPlace();
         if (place) {
+          setShouldReset(false);
           updateStep(step.index, {
             locationCoords: [
               place.geometry.location.lat(),
@@ -79,6 +81,16 @@ export const StepField = ({
       });
     }
   }, [inputRef, updateStep, step.index]);
+
+  useEffect(() => {
+    if (shoudlReset && step.locationCoords) {
+      updateStep(step.index, {
+        locationCoords: undefined,
+        locationName: undefined,
+      });
+    }
+    if (!shoudlReset) setShouldReset(true);
+  }, [value]);
 
   return (
     <>

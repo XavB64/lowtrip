@@ -9,7 +9,6 @@ import { StepField } from "./step-field";
 import { formatStepsForApi } from "../utils";
 
 interface AlternativeFormProps {
-  isActive: boolean;
   setResponse: (response: ApiResponse) => void;
   stepsProps: {
     values: Step[];
@@ -21,15 +20,12 @@ interface AlternativeFormProps {
 }
 
 export const AlternativeForm = ({
-  isActive,
   setResponse,
   stepsProps,
   stepsToCompare,
 }: AlternativeFormProps) => {
   const { values: steps, addStep, removeStep, updateStep } = stepsProps;
   const [isLoading, setIsLoading] = useState(false);
-
-  if (!isActive) return null;
 
   const handleSubmit = async () => {
     if (steps.length < 2 || steps.some((step) => !step.locationCoords))

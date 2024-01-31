@@ -9,7 +9,6 @@ import { StepField } from "./step-field";
 import { formatStepsForApi } from "../utils";
 
 interface FormProps {
-  isActive: boolean;
   setResponse: (response: ApiResponse) => void;
   stepsProps: {
     values: Step[];
@@ -19,14 +18,17 @@ interface FormProps {
   };
 }
 
-export const Form = ({ isActive, setResponse, stepsProps }: FormProps) => {
+export const Form = ({ setResponse, stepsProps }: FormProps) => {
   const { values: steps, addStep, removeStep, updateStep } = stepsProps;
   const [isLoading, setIsLoading] = useState(false);
 
-  if (!isActive) return null;
+  const formIsNotValid = steps.some((step) => {
+    const isLastStep = step.index === steps.length;
+    return !step.locationCoords || (!isLastStep && !step.transportMean);
+  });
 
   const handleSubmit = async () => {
-    if (steps.length < 2 || steps.some((step) => !step.locationCoords))
+    if (steps.length < 1 || steps.some((step) => !step.locationCoords))
       throw new Error("At least one step required");
     setIsLoading(true);
     const formData = new FormData();
@@ -85,7 +87,7 @@ export const Form = ({ isActive, setResponse, stepsProps }: FormProps) => {
 
       <Button
         onClick={handleSubmit}
-        disabled={isLoading}
+        disabled={isLoading || formIsNotValid}
         style={{
           borderRadius: "20px",
           padding: 0,
@@ -98,6 +100,7 @@ export const Form = ({ isActive, setResponse, stepsProps }: FormProps) => {
           fontSize: "16px",
           width: "100%",
           height: "50px",
+          ...(formIsNotValid && { cursor: "not-allowed", opacity: 0.5 }),
         }}
       >
         {isLoading ? (

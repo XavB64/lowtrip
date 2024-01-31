@@ -49,17 +49,15 @@ function App() {
               }}
             />
           </Tabs>
-          <Form
-            setResponse={setResponse}
-            stepsProps={myTripSteps}
-            isActive={activeTab === 0}
-          />
-          <AlternativeForm
-            setResponse={setResponse}
-            stepsProps={alternativeTripSteps}
-            stepsToCompare={myTripSteps.values}
-            isActive={activeTab === 1}
-          />
+          {activeTab === 0 ? (
+            <Form setResponse={setResponse} stepsProps={myTripSteps} />
+          ) : (
+            <AlternativeForm
+              setResponse={setResponse}
+              stepsProps={alternativeTripSteps}
+              stepsToCompare={myTripSteps.values}
+            />
+          )}
           <Chart response={response} />
         </Stack>
       </Stack>
