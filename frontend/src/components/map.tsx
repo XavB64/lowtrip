@@ -59,16 +59,18 @@ const MapContent = ({
     <>
       <TileLayer url="https://a.basemaps.cartocdn.com/light_all/{z}/{x}/{y}@2x.png" />
       {response &&
-        (JSON.parse(response.data.gdf) as Gdf).features.map((feature) => (
-          <Polyline
-            key={feature.id}
-            pathOptions={{ color: feature.properties.colors }}
-            positions={feature.geometry.coordinates.map((coordinate) => [
-              coordinate[1],
-              coordinate[0],
-            ])}
-          />
-        ))}
+        (JSON.parse(response.data.gdf) as Gdf).features.map((feature) => {
+          return (
+            <Polyline
+              key={JSON.stringify(feature.geometry.coordinates)}
+              pathOptions={{ color: feature.properties.colors }}
+              positions={feature.geometry.coordinates.map((coordinate) => [
+                coordinate[1],
+                coordinate[0],
+              ])}
+            />
+          );
+        })}
       {stepsCoords.map((coords, index) => (
         <Marker
           key={index}
