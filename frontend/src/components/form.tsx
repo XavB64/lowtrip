@@ -56,22 +56,16 @@ export const Form = ({ isActive, setResponse, stepsProps }: FormProps) => {
         justifyContent: "right",
       }}
     >
-      <StepField
-        isDeparture
-        steps={steps}
-        updateStep={updateStep}
-        removeStep={removeStep}
-        index={1}
-      />
-      {steps.slice(1).map((step) => (
+      {steps.map((step, index) => (
         <StepField
-          key={step.index}
-          steps={steps}
-          removeStep={removeStep}
+          key={`main-form-${index}`}
+          isLastStep={index === steps.length - 1}
+          step={step}
           updateStep={updateStep}
-          index={step.index}
+          removeStep={removeStep}
         />
       ))}
+
       <Button
         style={{
           padding: 0,
