@@ -40,17 +40,20 @@ const MapContent = ({
   const map = useMap();
 
   useEffect(() => {
-    if (stepsCoords.length > 1) {
-      const maxLat = Math.max(...stepsCoords.map((stepCoord) => stepCoord[0]));
-      const minLat = Math.min(...stepsCoords.map((stepCoord) => stepCoord[0]));
-      const maxLng = Math.max(...stepsCoords.map((stepCoord) => stepCoord[1]));
-      const minLng = Math.min(...stepsCoords.map((stepCoord) => stepCoord[1]));
+    const allCoords = [...stepsCoords, ...alternativeStepsCoords];
+    if (allCoords.length > 1) {
+      const lats = allCoords.map((coords) => coords[0]);
+      const lons = allCoords.map((coords) => coords[1]);
+      const maxLat = Math.max(...lats);
+      const minLat = Math.min(...lats);
+      const maxLng = Math.max(...lons);
+      const minLng = Math.min(...lons);
       map.flyToBounds([
         [minLat, minLng],
         [maxLat, maxLng],
       ]);
     }
-  }, [map, stepsCoords]);
+  }, [map, stepsCoords, alternativeStepsCoords]);
 
   return (
     <>
@@ -71,10 +74,8 @@ const MapContent = ({
           key={index}
           position={coords}
           icon={getMarkerIcon(
-            index === 0
+            index === 0 || index === stepsCoords.length - 1
               ? "#0097A7"
-              : index === stepsCoords.length - 1
-              ? "#FF758F"
               : "#93D3DB"
           )}
         />
@@ -84,11 +85,9 @@ const MapContent = ({
           key={index}
           position={coords}
           icon={getMarkerIcon(
-            index === 0
-              ? "#94CBD3"
-              : index === stepsCoords.length - 1
-              ? "#FFBBC7"
-              : "#CAE9ED"
+            index === 0 || index === alternativeStepsCoords.length - 1
+              ? "#FF758F"
+              : "#FFBBC7"
           )}
         />
       ))}
