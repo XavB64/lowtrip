@@ -6,7 +6,6 @@ import { Chart } from "./components/chart";
 import { Map } from "./components/map";
 import { ApiResponse } from "./types";
 import { useSteps } from "./hooks";
-import { AlternativeForm } from "./components/alternative-form";
 
 function App() {
   const [response, setResponse] = useState<ApiResponse>();
@@ -50,9 +49,14 @@ function App() {
             />
           </Tabs>
           {activeTab === 0 ? (
-            <Form setResponse={setResponse} stepsProps={myTripSteps} />
+            <Form
+              key="main-form"
+              setResponse={setResponse}
+              stepsProps={myTripSteps}
+            />
           ) : (
-            <AlternativeForm
+            <Form
+              key="alternative-form"
               setResponse={setResponse}
               stepsProps={alternativeTripSteps}
               stepsToCompare={myTripSteps.values}

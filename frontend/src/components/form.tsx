@@ -8,6 +8,25 @@ import { ApiResponse } from "../types";
 import { StepField } from "./step-field";
 import { formatStepsForApi } from "../utils";
 
+const getPayload = (steps: Step[], stepsToCompare?: Step[]) => {
+  const formData = new FormData();
+  if (!!stepsToCompare) {
+    formData.append("mode", "2");
+    formData.append(
+      "my-trip",
+      JSON.stringify(formatStepsForApi(stepsToCompare))
+    );
+    formData.append(
+      "alternative-trip",
+      JSON.stringify(formatStepsForApi(steps))
+    );
+  } else {
+    formData.append("mode", "1");
+    formData.append("my-trip", JSON.stringify(formatStepsForApi(steps)));
+  }
+  return formData;
+};
+
 interface FormProps {
   setResponse: (response: ApiResponse) => void;
   stepsProps: {
@@ -16,9 +35,14 @@ interface FormProps {
     removeStep: (index: number) => void;
     updateStep: (index: number, data: Partial<Step>) => void;
   };
+  stepsToCompare?: Step[];
 }
 
-export const Form = ({ setResponse, stepsProps }: FormProps) => {
+export const Form = ({
+  setResponse,
+  stepsProps,
+  stepsToCompare,
+}: FormProps) => {
   const { values: steps, addStep, removeStep, updateStep } = stepsProps;
   const [isLoading, setIsLoading] = useState(false);
 
@@ -31,11 +55,10 @@ export const Form = ({ setResponse, stepsProps }: FormProps) => {
     if (steps.length < 1 || steps.some((step) => !step.locationCoords))
       throw new Error("At least one step required");
     setIsLoading(true);
-    const formData = new FormData();
-    formData.append("mode", "1");
-    formData.append("my-trip", JSON.stringify(formatStepsForApi(steps)));
+
+    const payload = getPayload(steps, stepsToCompare);
     axios
-      .post(API_URL, formData, {
+      .post(API_URL, payload, {
         headers: { "Access-Contol-Allow-Origin": "*" },
       })
       .then((response: ApiResponse) => {
