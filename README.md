@@ -10,6 +10,12 @@ Have python & node installed
 
 ### Launch the backend
 
+Go in backend folder :
+
+```bash
+cd backend
+```
+
 Install the dependencies :
 
 ```bash
