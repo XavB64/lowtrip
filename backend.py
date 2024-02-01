@@ -71,7 +71,7 @@ def find_nearest(lon, lat, perim):
     This function find the nearest node for train raiway in the OSM network using Overpass API
     parameters:
         - lon, lat : coordinates in degree of the point
-        - perim : perimeters (m) to look around 
+        - perim : perimeters (m) to look around
     return:
         - new coordinates(lat, lon)
     '''
@@ -90,7 +90,7 @@ def find_nearest(lon, lat, perim):
     url = "http://overpass-api.de/api/interpreter"  #To avoid the natural space at the end
     query = '[out:json][timeout:300];(way(poly : "'+st[:-1]+'")["railway"="rail"];);out geom;' #;convert item ::=::,::geom=geom(),_osm_type=type()
 
-    #Make request 
+    #Make request
     response = requests.get(url, params={'data': query})
 
     #if response.status_code == 200: not working, looking at size of elements also
@@ -105,7 +105,7 @@ def find_nearest(lon, lat, perim):
 
 def find_train(tag1, tag2) :
     '''
-    Find train path between 2 points. Can use ntag API or signal. 
+    Find train path between 2 points. Can use ntag API or signal.
     parameters:
         - tag1, tag2 : list or tuple like (lon, lat)
     return:
@@ -154,7 +154,7 @@ def find_route(tag1, tag2):
         - tag1, tag2 : list or tuple like ; (lon, lat)
     return:
         - geom_route : shapely geometry linestring
-        - route_dist : float, distance in km 
+        - route_dist : float, distance in km
         - route : boolean
     '''
     ### Route OSRM - create a separate function
@@ -173,8 +173,8 @@ def find_route(tag1, tag2):
 
 def extend_search(tag1, tag2, perims):
     '''
-    Function to use when the train path is not found directly by the API. 
-    We search for nearby coordinates and request it again. 
+    Function to use when the train path is not found directly by the API.
+    We search for nearby coordinates and request it again.
     parameters:
         - tag1, tag2 : list or tuple like with coordinates (lon, lat)
         - perims : list-like ; perimeters to search for with overpass API
@@ -183,7 +183,7 @@ def extend_search(tag1, tag2, perims):
         - train (bool)
     '''
     #We extend the search progressively
-    for perim in perims : 
+    for perim in perims :
         #Departure
         tag1_new = find_nearest(tag1[0], tag1[1], perim)
         if tag1_new != False :
@@ -205,7 +205,7 @@ def extend_search(tag1, tag2, perims):
                 tag2_new = find_nearest(tag2[0], tag2[1], perim)
                 if tag2_new != False :
                     break
-            
+
             #Verify than we wan try to request the API again
             if (tag1_new != False) & (tag2_new != False) :
                 gdf, train = find_train(tag1_new, tag2_new)
@@ -215,7 +215,7 @@ def extend_search(tag1, tag2, perims):
               #  print(tag1_new, tag2_new)
 
     return gdf, train
-    
+
 
 def validate_geom(tag1, tag2, geom, th):
     '''
@@ -247,25 +247,25 @@ def validate_geom(tag1, tag2, geom, th):
 # Request data to get the pathway from lat lon of departure and arrival
 def query_path(tag1, tag2, perims=[.2, 10], validate=500): #Should change name
     '''
-    This function return the path geometries for train and road (car, bus). 
+    This function return the path geometries for train and road (car, bus).
     parameters:
         - tag1, tag2 : departure and arrival (lon, lat) list or tuple like
-        - perims : list-like. Perimeters(km) to look around if the train API fails. 
+        - perims : list-like. Perimeters(km) to look around if the train API fails.
     return:
         - gdf : geoseries from train path
         - geom_route : shapely geometry for road path
         - route_dist : road path length (km)
-        - route, train : boolean. False if the API did not return anything. 
+        - route, train : boolean. False if the API did not return anything.
     '''
     #Format lon , lat
-    #First try with coordinates supplied by the user 
+    #First try with coordinates supplied by the user
     gdf, train = find_train(tag1, tag2)
 
     #If failure then we try to find a better spot nearby - Put in another function
     if train == False :
         # We try to search nearby the coordinates and request again
         #print( extend_search(tag1, tag2, perims) )
-        gdf, train = extend_search(tag1, tag2, perims) 
+        gdf, train = extend_search(tag1, tag2, perims)
 
     # Validation part for train
     if train : #We have a geometry
@@ -274,7 +274,7 @@ def query_path(tag1, tag2, perims=[.2, 10], validate=500): #Should change name
 
     ### Route OSRM - create a separate function
     geom_route, route_dist, route = find_route(tag1, tag2)
-    
+
        # Validation part for route
     if route : #We have a geometry
         if not validate_geom(tag1, tag2, geom_route, validate):
@@ -293,14 +293,14 @@ def train_to_gdf(tag1, tag2, perims=[.2, 10], validate=500, colormap=charte_moll
     return:
         - full dataframe for trains
     '''
-    #First try with coordinates supplied by the user 
+    #First try with coordinates supplied by the user
     gdf, train = find_train(tag1, tag2)
 
     #If failure then we try to find a better spot nearby - Put in another function
     if train == False :
         # We try to search nearby the coordinates and request again
         #print( extend_search(tag1, tag2, perims) )
-        gdf, train = extend_search(tag1, tag2, perims) 
+        gdf, train = extend_search(tag1, tag2, perims)
 
     # Validation part for train
     if train : #We have a geometry
@@ -325,7 +325,7 @@ def train_to_gdf(tag1, tag2, perims=[.2, 10], validate=500, colormap=charte_moll
         # print('Train : ', gdf.path_length.sum(), ' km')
         # Compute emissions : EF * length
         gdf['EF_tot'] = gdf['EF_tot'] / 1e3 #Conversion in in kg
-        gdf['kgCO2eq'] = gdf['path_length'] * gdf['EF_tot'] 
+        gdf['kgCO2eq'] = gdf['path_length'] * gdf['EF_tot']
         gdf['Mean of Transport'] = 'Train'
     #Returning the result
     return gdf, train
@@ -349,12 +349,12 @@ def car_bus_to_gdf(tag1, tag2, EF_car=EF_car, EF_bus=EF_bus, color = '#00FF00', 
     '''
     ### Route OSRM - create a separate function
     geom_route, route_dist, route = find_route(tag1, tag2)
-    
+
        # Validation part for route
     if route : #We have a geometry
         if not validate_geom(tag1, tag2, geom_route, validate):
             geom_route, route_dist, route = None, None, False
-    
+
     if route :
         gdf_car = pd.DataFrame(pd.Series({ 'kgCO2eq':route_dist*EF_car, 'EF_tot':EF_car,'path_length':route_dist, 'colors':color, 'NAME':'Car', 'Mean of Transport':'Car', 'geometry':geom_route})).transpose() #'EF_tot':EF_car / nb,
         gdf_bus = pd.DataFrame(pd.Series({ 'kgCO2eq':route_dist*EF_bus, 'EF_tot':EF_bus, 'path_length':route_dist, 'colors':color, 'NAME':'Bus',  'Mean of Transport':'Bus', })).transpose() #'EF_tot':EF_bus, enlever geometry
@@ -375,12 +375,12 @@ def bus_to_gdf(tag1, tag2, EF_bus=EF_bus, color = '#00FF00', validate = 500, nb 
     '''
     ### Route OSRM - create a separate function
     geom_route, route_dist, route = find_route(tag1, tag2)
-    
+
        # Validation part for route
     if route : #We have a geometry
         if not validate_geom(tag1, tag2, geom_route, validate):
             geom_route, route_dist, route = None, None, False
-    
+
     if route :
         gdf_bus = pd.DataFrame(pd.Series({ 'kgCO2eq':route_dist*EF_bus, 'EF_tot':EF_bus, 'path_length':route_dist, 'colors':color, 'NAME':'Bus',  'Mean of Transport':'Bus', 'geometry':geom_route })).transpose() #'EF_tot':EF_bus, enlever geometry
     else:
@@ -400,17 +400,17 @@ def car_to_gdf(tag1, tag2, EF_car=EF_car, color = '#00FF00', validate = 500, nb 
     '''
     ### Route OSRM - create a separate function
     geom_route, route_dist, route = find_route(tag1, tag2)
-    
+
        # Validation part for route
     if route : #We have a geometry
         if not validate_geom(tag1, tag2, geom_route, validate):
             geom_route, route_dist, route = None, None, False
-    
+
     if route :
         gdf_car = pd.DataFrame(pd.Series({ 'kgCO2eq':route_dist*EF_car / nb, 'EF_tot' : EF_car/nb, 'path_length':route_dist, 'colors':color, 'NAME':'Car', 'Mean of Transport':'Car', 'geometry':geom_route})).transpose() #'EF_tot':EF_car / nb,
     else:
         gdf_car = pd.DataFrame()
-       
+
     return gdf_car, route
 
 def plane_to_gdf(tag1, tag2, EF_plane=EF_plane, contrails=2, holding=3.81, color = '#00008B', color_contrails='#00004B'):
@@ -419,7 +419,7 @@ def plane_to_gdf(tag1, tag2, EF_plane=EF_plane, contrails=2, holding=3.81, color
         - tag1, tag2
         - EF : emission factor in gCO2/pkm for plane depending on journey length
         - contrails : coefficient to apply to take into account non-CO2 effects
-        - holding : additional CO2 emissions (kg) due to holding patterns 
+        - holding : additional CO2 emissions (kg) due to holding patterns
         - color : color for path and bar chart
         - color_contrails : color for non CO2-effects in bar chart
     return:
@@ -434,7 +434,7 @@ def plane_to_gdf(tag1, tag2, EF_plane=EF_plane, contrails=2, holding=3.81, color
     # Compute the true distance
     # geod = Geod(ellps="WGS84")
     # bird = geod.geometry_length(LineString([tag1, tag2])) / 1e3 #in km
-    
+
     # Detour coefficient :
     if bird < 1000 :
         bird = (4.1588 * bird**(-.212)) * bird
@@ -468,7 +468,7 @@ def ferry_to_gdf(tag1, tag2, EF=.3, color = '#FF0000'):
     # Compute geodataframe and dataframe
     gdf_ferry = pd.DataFrame(pd.Series({ 'kgCO2eq':EF*bird, 'EF_tot':EF, 'path_length':bird, 'colors':color, 'NAME':'Ferry',  'Mean of Transport':'Ferry', 'geometry':geom})).transpose()
    # gdf_ferry.geometry = gdf_ferry.geometry.astype('geometry')
-   
+
     return gdf_ferry
 
 
@@ -489,7 +489,7 @@ def filter_countries_world(gdf, th = 5):
     diff = gpd.overlay(gpd.GeoDataFrame(gdf, geometry = 'geometry', crs='epsg:4326'), europe, how='difference')
     if diff.shape[0] > 0:
         print('Sea detected')
-    # In case we have bridges / tunnels across sea: 
+    # In case we have bridges / tunnels across sea:
     # Distinction depending on linestring / multilinestring
         if diff.geometry[0].geom_type == 'MultiLineString':
           #  print('MultiLinestring')
@@ -553,18 +553,18 @@ def great_circle_geometry(dep, arr, nb = 20):
     '''
     # projection
     geod = Geod(ellps="WGS84")
-    # returns a list of longitude/latitude pairs describing npts equally spaced 
+    # returns a list of longitude/latitude pairs describing npts equally spaced
     # intermediate points along the geodesic between the initial and terminus points.
     r = geod.inv_intermediate(lon1= float(dep[0]), lat1= float(dep[1]), lon2= float(arr[0]), lat2= float(arr[1]), npts= nb, initial_idx = 0, terminus_idx = 0)
-    
+
     # Create the geometry
     #Displaying results over the antimeridian
     if abs(min(r.lons) - max(r.lons)) > 180 :
         #Then the other way is faster, we add 360° to the destination with neg lons
         l = [[lon, lat] for lon, lat in zip([lon + 360 if lon < 0 else lon for lon in r.lons], r.lats)]
-    else : 
+    else :
         l = [[lon, lat] for lon, lat in zip(r.lons, r.lats)]
-    
+
     # Return geometry and distance
     return LineString(l), r.dist / 1e3 #in km
 
@@ -575,7 +575,7 @@ def compute_ef_world(gdf, geom_plane, geom_route, train, route):
         - gdf : geodataframe of train paths by countries
         - geom_plane : shapely geometry of plane path
         - geom_route : shapely geometry of route path
-        - train, route : booleans. Plane is always displayed. 
+        - train, route : booleans. Plane is always displayed.
     returns:
         - Geodataframe with colors & geometries to plot, and emission factors for results
     '''
@@ -612,7 +612,7 @@ def plotly_chart(gdf, tag1, tag2, dist_route, train, route):
     Create a plotly bar chart to visualise results in terms of emissions
     parameters:
         - gdf : geodataframe with geometries, mean of transport and emission factors
-        - tag1, tag2 : departure and arrival coordinates 
+        - tag1, tag2 : departure and arrival coordinates
         - dist_route : total distance of road
         - train, route : booleans
     return:
@@ -623,7 +623,7 @@ def plotly_chart(gdf, tag1, tag2, dist_route, train, route):
     if train :
         #For trains
         l_length = []
-        
+
         for geom in gdf.geometry.values :
             l_length.append(geod.geometry_length(geom) / 1e3)
         # Add the distance to the dataframe
@@ -744,7 +744,7 @@ def compute_emissions_custom(data):
         tag2 = (lon , lat)
 
         # Compute depending on the mean of transport
-        if mean == 'Train': 
+        if mean == 'Train':
             gdf, train = train_to_gdf(tag1, tag2)
             l.append(gdf)
             geo.append(gdf)
@@ -760,7 +760,7 @@ def compute_emissions_custom(data):
             gdf_car, route = car_to_gdf(tag1, tag2, nb=nb)
             l.append(gdf_car)
             geo.append(gdf_car)
-            
+
         elif mean == 'Plane':
             gdf_plane, gdf_cont = plane_to_gdf(tag1, tag2)
             l.append(gdf_plane)
@@ -772,20 +772,20 @@ def compute_emissions_custom(data):
             l.append(gdf_ferry)
             geo.append(gdf_ferry)
 
-    # if np.isin(None, l) :# type(l[0]) == 'pandas.core.frame.DataFrame': 
+    # if np.isin(None, l) :# type(l[0]) == 'pandas.core.frame.DataFrame':
     #     #No data retrieved, at least one
     #     data, geodata = None, None
-   
-        
+
+
     # else :
-    
+
             # Data for bar chart
     data = pd.concat(l)
     if data.shape[0] != 0:
         data = data.reset_index(drop=True).drop('geometry', axis=1)
         # Geodataframe for map
         geodata = gpd.GeoDataFrame(pd.concat(geo), geometry='geometry', crs='epsg:4326')
-    else : 
+    else :
         geodata = pd.DataFrame()
 
 
@@ -828,14 +828,14 @@ def compute_emissions_all(data):
     #Loop
     l= []
     geo = []
-    
+
     # Train
     if train :
         gdf, train = train_to_gdf(tag1, tag2)
         l.append(gdf)
         geo.append(gdf)
 
-    # Car & Bus 
+    # Car & Bus
     gdf_car, gdf_bus, route = car_bus_to_gdf(tag1, tag2)
     if bus :
         l.append(gdf_bus)
@@ -860,7 +860,7 @@ def compute_emissions_all(data):
         data = pd.concat(l).reset_index(drop=True).drop('geometry', axis=1)
         # Geodataframe for map
         geodata = gpd.GeoDataFrame(pd.concat(geo), geometry='geometry', crs='epsg:4326')
-        
+
     return data, geodata
 
 def bchart_1(mytrip, direct):

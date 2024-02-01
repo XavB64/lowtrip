@@ -45,11 +45,11 @@ def main():
         # response = {'gdf' : gdf[['colors', 'geometry']].explode().to_json(),
         #             'plot_div':plot_div}
         # return response
-    
+
         #### NEW FORM ####
-        
+
         if request.form['mode'] == '1' : # My trip vs direct trips
-            # Convert json into pandas 
+            # Convert json into pandas
             df = pd.DataFrame.from_dict(json.loads(request.form['my-trip']))
           #  df.to_csv('query.csv')
             #My trip data and geo data
@@ -62,9 +62,9 @@ def main():
            # pd.concat([data_mytrip, data_direct]).to_csv('see_res.csv')
             response = {'gdf' : pd.concat([geo_mytrip, geo_direct])[['colors', 'geometry']].explode().to_json(),
                         'plot_div' : graph_json}
-            
+
         if request.form['mode'] == '2' : # My trip vs custom trip
-            # Convert json into pandas 
+            # Convert json into pandas
             df = pd.DataFrame.from_dict(json.loads(request.form['my-trip']))
             df2 = pd.DataFrame.from_dict(json.loads(request.form['alternative-trip']))
 
@@ -76,9 +76,9 @@ def main():
             graph_json, figure = bchart_2(data_mytrip, data_alternative)
             response = {'gdf' : pd.concat([geo_mytrip, geo_alternative])[['colors', 'geometry']].explode().to_json(),
                         'plot_div' : graph_json}
-            
+
         return response
-    
+
     return send_from_directory(app.static_folder, 'index.html')
 
 if __name__ == '__main__':
