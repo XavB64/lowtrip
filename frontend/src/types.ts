@@ -1,7 +1,11 @@
+import React from "react";
+
 export interface Step {
   index: number;
+  locationName?: string;
   locationCoords?: [number, number];
   transportMean?: Transport;
+  currentInputRef?: React.MutableRefObject<any>;
 }
 
 export enum Transport {

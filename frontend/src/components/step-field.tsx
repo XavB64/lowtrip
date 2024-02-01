@@ -6,9 +6,9 @@ import {
   BiSolidBus,
   BiTrash,
 } from "react-icons/bi";
-import { FaFerry } from "react-icons/fa6";
+import { FaFerry, FaGlasses } from "react-icons/fa6";
 import { Step, Transport } from "../types";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const TRANSPORTS = [
   {
@@ -34,29 +34,32 @@ const TRANSPORTS = [
 ];
 
 interface StepFieldProps {
-  isDeparture?: boolean;
+  isLastStep?: boolean;
   removeStep: (index: number) => void;
   updateStep: (index: number, data: Partial<Step>) => void;
-  steps: Step[];
-  index: number;
+  step: Step;
 }
 
 export const StepField = ({
-  isDeparture,
   removeStep,
   updateStep,
-  steps,
-  index,
+  step,
+  isLastStep,
 }: StepFieldProps) => {
   const autoCompleteRef = useRef(null);
   const inputRef = useRef(null);
+
+  const [value, setValue] = useState(step.locationName || "");
+  const [shoudlReset, setShouldReset] = useState(false);
+
+  const isDeparture = step.index === 1;
 
   useEffect(() => {
     if (inputRef.current) {
       // @ts-ignore
       autoCompleteRef.current = new window.google.maps.places.Autocomplete(
         inputRef.current,
-        { fields: ["geometry", "name"] }
+        { fields: ["geometry", "formatted_address"] }
       );
     }
     if (autoCompleteRef.current) {
@@ -65,22 +68,39 @@ export const StepField = ({
         // @ts-ignore
         const place = await autoCompleteRef.current.getPlace();
         if (place) {
-          updateStep(index, {
+          setShouldReset(false);
+          updateStep(step.index, {
             locationCoords: [
               place.geometry.location.lat(),
               place.geometry.location.lng(),
             ],
+            locationName: place.formatted_address,
           });
+          setValue(place.formatted_address);
         }
       });
     }
-  }, [inputRef, updateStep, index]);
+  }, [inputRef, updateStep, step.index]);
+
+  useEffect(() => {
+    if (shoudlReset && step.locationCoords) {
+      updateStep(step.index, {
+        locationCoords: undefined,
+        locationName: undefined,
+      });
+    }
+    if (!shoudlReset) setShouldReset(true);
+  }, [value]);
 
   return (
     <>
       <Stack direction="row" spacing={1}>
         <input
           ref={inputRef}
+          value={value}
+          onChange={(e) => {
+            setValue(e.target.value);
+          }}
           placeholder={isDeparture ? "From..." : "To..."}
           style={{
             width: "-webkit-fill-available",
@@ -93,9 +113,9 @@ export const StepField = ({
             fontSize: "16px",
           }}
         />
-        {index > 2 && (
+        {step.index > 2 && (
           <IconButton
-            onClick={() => removeStep(index)}
+            onClick={() => removeStep(step.index)}
             aria-label="delete"
             style={{ borderRadius: "20px" }}
           >
@@ -103,7 +123,7 @@ export const StepField = ({
           </IconButton>
         )}
       </Stack>
-      {index !== steps.length && (
+      {!isLastStep && (
         <Stack
           direction="row"
           justifyContent="space-between"
@@ -115,7 +135,9 @@ export const StepField = ({
             {TRANSPORTS.map((item) => (
               <Button
                 key={item.value}
-                onClick={() => updateStep(index, { transportMean: item.value })}
+                onClick={() =>
+                  updateStep(step.index, { transportMean: item.value })
+                }
                 style={{
                   padding: 0,
                   width: "30px",
@@ -123,10 +145,7 @@ export const StepField = ({
                   height: "30px",
                   borderRadius: "100px",
                   backgroundColor:
-                    item.value ===
-                    steps.find((step) => step.index === index)?.transportMean
-                      ? "#474747"
-                      : "#b7b7b7",
+                    item.value === step.transportMean ? "#474747" : "#b7b7b7",
                   color: "white",
                   marginLeft: 5,
                 }}
