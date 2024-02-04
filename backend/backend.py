@@ -446,9 +446,9 @@ def plane_to_gdf(tag1, tag2, EF_plane=EF_plane, contrails=2, holding=3.81, color
     else : #It's > 3500
         EF = EF_plane['long']
     # Compute geodataframe and dataframe
-    gdf_plane = pd.DataFrame(pd.Series({ 'kgCO2eq':EF*bird + holding, 'EF_tot':EF, 'path_length':bird, 'colors':color, 'NAME':'Plane CO2',  'Mean of Transport':'Plane', 'geometry':geom_plane})).transpose()
+    gdf_plane = pd.DataFrame(pd.Series({ 'kgCO2eq':EF*bird + holding, 'EF_tot':EF, 'path_length':bird, 'colors':color, 'NAME':'CO2',  'Mean of Transport':'Plane', 'geometry':geom_plane})).transpose()
     #gdf_plane.geometry = gdf_plane.geometry.astype('geometry')
-    gdf_non_co2 = pd.DataFrame(pd.Series({ 'kgCO2eq':EF*contrails*bird, 'colors':color_contrails, 'NAME':'Plane contrails',  'Mean of Transport':'Plane', })).transpose()
+    gdf_non_co2 = pd.DataFrame(pd.Series({ 'kgCO2eq':EF*contrails*bird, 'colors':color_contrails, 'NAME':'Contrails',  'Mean of Transport':'Plane', })).transpose()
     return gdf_plane, gdf_non_co2
 
 def ferry_to_gdf(tag1, tag2, EF=.3, color = '#FF0000'):
@@ -879,9 +879,9 @@ def bchart_1(mytrip, direct):
     # direct = pd.concat([direct[~direct['Mean of Transport'].isin(['Car'])], all_car])
     if mytrip.shape[0] != 0: # Faire de même pour bchart2
         # Merging means of transport for custom trip
-        mytrip['NAME'] = mytrip['Mean of Transport'] + '_' + mytrip['NAME']
+        mytrip['NAME'] = mytrip['Mean of Transport'] + ' - ' + mytrip['NAME']
         # Separtating bars
-        mytrip['Mean of Transport'] = 'My_trip'
+        mytrip['Mean of Transport'] = 'My trip'
         direct['Type'] = 'Direct'
     # Combine
     l_tot = pd.concat([mytrip, direct]).reset_index(drop=True)
@@ -897,10 +897,10 @@ def bchart_2(mytrip, alternative):
         - plotly figure
     '''
     # Merging means of transport for custom trips
-    mytrip['NAME'] = mytrip['Mean of Transport'] + '_' + mytrip['NAME']
-    alternative['NAME'] = alternative['Mean of Transport'] + '_' + alternative['NAME']
+    mytrip['NAME'] = mytrip['Mean of Transport'] + ' - ' + mytrip['NAME']
+    alternative['NAME'] = alternative['Mean of Transport'] + ' - ' + alternative['NAME']
     # Separtating bars
-    mytrip['Mean of Transport'] = 'My_trip'
+    mytrip['Mean of Transport'] = 'My trip'
     alternative['Mean of Transport'] = 'Alternative'
     # Combine
     l_tot = pd.concat([mytrip, alternative]).reset_index(drop=True)
