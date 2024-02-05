@@ -22,11 +22,13 @@ from plotly.io import to_json
 #Web
 import requests
 
+#####################
+## Global variables ##
+#####################
 
 
-###################
-###### Utils ######
-###################
+#Load  world
+world = gpd.read_file('static/world.geojson')
 
 #Colors
 charte_mollow = ['590D22',
@@ -40,13 +42,40 @@ charte_mollow = ['590D22',
             'FFCCD5',
             'FFD6DD']
 
+# Geometries from API
+simplified = False
+if simplified :
+    train_s, route_s = '1', 'simplified'
+else :
+    train_s, route_s = '0', 'full'
+
+# Validation perimeter 
+val_perimeter = 500 #km
+
+# Search areas
+search_perimeter = [.2, 10] #km
+
+#Threshold for unmatched train geometries (sea)
+sea_threshold = 5 #km
+
+#Emission factors g/pkm
+EF_car = .2176
+EF_bus = .02942
+EF_plane = {'short': .126, 'medium': .0977, 'long': .08306}
+
+# Useless
 # Hexadecimal code to RGB code
 def hext_to_rgb(h, alpha):
     return list(int(h[i:i+2], 16)/255 for i in (0, 2, 4))
-# List of rgb colors
-rgb = []
-for k in charte_mollow :
-    rgb.append(hext_to_rgb(k, 0))
+# # List of rgb colors
+# rgb = []
+# for k in charte_mollow :
+#     rgb.append(hext_to_rgb(k, 0))
+
+
+###################
+###### Utils ######
+###################
 
 
 def flatten_list_of_tuples(lst):
@@ -115,7 +144,7 @@ def find_train(tag1, tag2) :
     # format lon, lat
     # Build the request url
     #trainmap
-    url = f"https://trainmap.ntag.fr/api/route?dep={tag1[0]},{tag1[1]}&arr={tag2[0]},{tag2[1]}&simplify=0" #1 to simplify it
+    url = f"https://trainmap.ntag.fr/api/route?dep={tag1[0]},{tag1[1]}&arr={tag2[0]},{tag2[1]}&simplify="+train_s #1 to simplify it
     #signal
     # url = f'https://signal.eu.org/osm/eu/route/v1/train/{tag1[0]},{tag1[1]};{tag2[0]},{tag2[1]}?overview=full' #or simplified
     # Send the GET request
@@ -158,7 +187,7 @@ def find_route(tag1, tag2):
         - route : boolean
     '''
     ### Route OSRM - create a separate function
-    url = 'http://router.project-osrm.org/route/v1/driving/'+str(tag1[0])+','+str(tag1[1])+';'+str(tag2[0])+','+str(tag2[1])+'?overview=full&geometries=geojson'
+    url = 'http://router.project-osrm.org/route/v1/driving/'+str(tag1[0])+','+str(tag1[1])+';'+str(tag2[0])+','+str(tag2[1])+'?overview='+route_s+'&geometries=geojson'
     response = requests.get(url)
     if response.status_code == 200:
         geom = response.json()['routes'][0]['geometry']
@@ -244,46 +273,8 @@ def validate_geom(tag1, tag2, geom, th):
     #If we arrive here both dep and arr where validated
     return True
 
-# Request data to get the pathway from lat lon of departure and arrival
-def query_path(tag1, tag2, perims=[.2, 10], validate=500): #Should change name
-    '''
-    This function return the path geometries for train and road (car, bus).
-    parameters:
-        - tag1, tag2 : departure and arrival (lon, lat) list or tuple like
-        - perims : list-like. Perimeters(km) to look around if the train API fails.
-    return:
-        - gdf : geoseries from train path
-        - geom_route : shapely geometry for road path
-        - route_dist : road path length (km)
-        - route, train : boolean. False if the API did not return anything.
-    '''
-    #Format lon , lat
-    #First try with coordinates supplied by the user
-    gdf, train = find_train(tag1, tag2)
 
-    #If failure then we try to find a better spot nearby - Put in another function
-    if train == False :
-        # We try to search nearby the coordinates and request again
-        #print( extend_search(tag1, tag2, perims) )
-        gdf, train = extend_search(tag1, tag2, perims)
-
-    # Validation part for train
-    if train : #We have a geometry
-        if not validate_geom(tag1, tag2, gdf.values[0], validate):
-            gdf, train = None, False
-
-    ### Route OSRM - create a separate function
-    geom_route, route_dist, route = find_route(tag1, tag2)
-
-       # Validation part for route
-    if route : #We have a geometry
-        if not validate_geom(tag1, tag2, geom_route, validate):
-            geom_route, route_dist, route = None, None, False
-
-    return gdf, geom_route, route_dist, route, train
-
-
-def train_to_gdf(tag1, tag2, perims=[.2, 10], validate=500, colormap=charte_mollow):
+def train_to_gdf(tag1, tag2, perims=search_perimeter, validate=val_perimeter, colormap=charte_mollow):
     '''
     parameters:
         - tag1, tag2
@@ -330,11 +321,8 @@ def train_to_gdf(tag1, tag2, perims=[.2, 10], validate=500, colormap=charte_moll
     #Returning the result
     return gdf, train
 
-EF_car = .2176
-EF_bus = .02942
-EF_plane = {'short': .126, 'medium': .0977, 'long': .08306}
 
-def car_bus_to_gdf(tag1, tag2, EF_car=EF_car, EF_bus=EF_bus, color = '#00FF00', validate = 500):
+def car_bus_to_gdf(tag1, tag2, EF_car=EF_car, EF_bus=EF_bus, color = '#00FF00', validate = val_perimeter):
     '''
     ONLY FOR FIRST FORM (optimization)
     parameters:
@@ -362,7 +350,7 @@ def car_bus_to_gdf(tag1, tag2, EF_car=EF_car, EF_bus=EF_bus, color = '#00FF00', 
         gdf_car, gdf_bus = pd.DataFrame(), pd.DataFrame()
     return gdf_car, gdf_bus, route
 
-def bus_to_gdf(tag1, tag2, EF_bus=EF_bus, color = '#00FF00', validate = 500, nb = 1):
+def bus_to_gdf(tag1, tag2, EF_bus=EF_bus, color = '#00FF00', validate = val_perimeter, nb = 1):
     '''
     parameters:
         - tag1, tag2
@@ -387,7 +375,7 @@ def bus_to_gdf(tag1, tag2, EF_bus=EF_bus, color = '#00FF00', validate = 500, nb 
         gdf_bus = pd.DataFrame()
     return gdf_bus, route
 
-def car_to_gdf(tag1, tag2, EF_car=EF_car, color = '#00FF00', validate = 500, nb = 1):
+def car_to_gdf(tag1, tag2, EF_car=EF_car, color = '#00FF00', validate = val_perimeter, nb = 1):
     '''
     parameters:
         - tag1, tag2
@@ -429,12 +417,6 @@ def plane_to_gdf(tag1, tag2, EF_plane=EF_plane, contrails=2, holding=3.81, color
     geom_plane, bird = great_circle_geometry(tag1, tag2)
     #print(bird)
 
-    ## OLD
-    #geom_plane = create_plane( 20, tag1, tag2)
-    # Compute the true distance
-    # geod = Geod(ellps="WGS84")
-    # bird = geod.geometry_length(LineString([tag1, tag2])) / 1e3 #in km
-
     # Detour coefficient :
     if bird < 1000 :
         bird = (4.1588 * bird**(-.212)) * bird
@@ -472,7 +454,7 @@ def ferry_to_gdf(tag1, tag2, EF=.3, color = '#FF0000'):
     return gdf_ferry
 
 
-def filter_countries_world(gdf, th = 5):
+def filter_countries_world(gdf, th = sea_threshold):
     '''
     Filter train path by countries (world.geojson)
     parameters:
@@ -481,13 +463,12 @@ def filter_countries_world(gdf, th = 5):
     return:
         - Geodataframe of train path by countries
     '''
-    #Load europe / or world
-    europe = gpd.read_file('static/world.geojson')
     #Make the split by geometry
     gdf.name = 'geometry'
-    res = gpd.overlay(gpd.GeoDataFrame(gdf, geometry = 'geometry', crs='epsg:4326'), europe, how='intersection')
-    diff = gpd.overlay(gpd.GeoDataFrame(gdf, geometry = 'geometry', crs='epsg:4326'), europe, how='difference')
-    if diff.shape[0] > 0:
+    res = gpd.overlay(gpd.GeoDataFrame(gdf, geometry = 'geometry', crs='epsg:4326'), world, how='intersection')
+    diff = gpd.overlay(gpd.GeoDataFrame(gdf, geometry = 'geometry', crs='epsg:4326'), world, how='difference')
+    # Check if the unmatched data is significant
+    if diff.length.sum() > kilometer_to_degree(th) :
         print('Sea detected')
     # In case we have bridges / tunnels across sea:
     # Distinction depending on linestring / multilinestring
@@ -500,7 +481,7 @@ def filter_countries_world(gdf, th = 5):
         diff_2.columns = ['geometry']
         diff_2 = diff_2.set_geometry('geometry', crs='epsg:4326')
         # Filter depending is the gap is long enough to be taken into account and join with nearest country
-        test = diff_2[diff_2.length > kilometer_to_degree(th)].sjoin_nearest(europe, how='left')
+        test = diff_2[diff_2.length > kilometer_to_degree(th)].sjoin_nearest(world, how='left')
         # Aggregation per country and combining geometries
         u = pd.concat([res.explode(), test.explode()]).groupby('ISO2').agg(NAME = ('NAME', lambda x : x.iloc[0]),EF_tot = ('EF_tot', lambda x : x.iloc[0]),
  geometry = ('geometry', lambda x : ops.linemerge(MultiLineString(x.values))))
@@ -511,35 +492,6 @@ def filter_countries_world(gdf, th = 5):
     res = gpd.GeoDataFrame(u, geometry='geometry', crs='epsg:4326').reset_index()
     return res
 
-
-#Create a Linestring that looks like a plane path, but inaccurate
-def create_plane( nb, tag1, tag2):
-    '''
-    Create a custom curved line for plane path
-    parameters:
-        - nb : number of points
-        - tag1, tag2 : departure and arrival
-    return:
-        - shapely geometry (Linestring)
-    '''
-    #We fit a 2nd degree plynom to make a curve line
-    x1, y1 = tag1[0], tag1[1]
-    x2, y2 = tag2[0], tag2[1]
-    distance = np.sqrt((x2 - x1)**2 + (y2 - y1)**2)
-    # The "a" parameter value depends on the distance between dep / arr
-    a = 1 / distance
-    # Compute the other parameters of the polynom
-    c = (y2 - a*x2**2 - (x2/x1)*(y1 - a*x1**2))/(1 - x2/x1)
-    b = (y1 - a*x1**2 - c)/x1
-    l_y = []
-    # Compute latitudes based on longitudes list
-    l_x = np.linspace(min(x1, x2), max(x1, x2), nb)
-    for k in l_x:
-        l_y.append(a*k**2+b*k+c)
-    # Create the linestring
-    h = LineString([[l_x[i], l_y[i]] for i in range(nb)])
-
-    return h
 
 def great_circle_geometry(dep, arr, nb = 20):
     '''
@@ -567,121 +519,6 @@ def great_circle_geometry(dep, arr, nb = 20):
 
     # Return geometry and distance
     return LineString(l), r.dist / 1e3 #in km
-
-def compute_ef_world(gdf, geom_plane, geom_route, train, route):
-    '''
-    Create geodataframe for plotting on the map (with plane, car, and train)
-    parameters:
-        - gdf : geodataframe of train paths by countries
-        - geom_plane : shapely geometry of plane path
-        - geom_route : shapely geometry of route path
-        - train, route : booleans. Plane is always displayed.
-    returns:
-        - Geodataframe with colors & geometries to plot, and emission factors for results
-    '''
-     # Add plane emission factor and geometry
-    gdf_plane = pd.DataFrame(pd.Series({ 'EF_tot':255, 'colors':'#00008B', 'NAME':'Plane', 'geometry':geom_plane})).transpose()
-    gdf_plane.geometry = gdf_plane.geometry.astype('geometry')
-    if train :
-        # Sort values
-        jf = gdf.sort_values('EF_tot')
-        # Add colors
-        jf['colors'] = ['#'+k for k in pd.Series(charte_mollow[::-1])[[int(k) for k in np.linspace(0, 9, jf.shape[0])]]]
-    else :
-        jf = gdf
-    if route:
-        gdf_car = pd.DataFrame(pd.Series({'EF_tot':150, 'colors':'#00FF00', 'NAME':'Car', 'geometry':geom_route})).transpose()
-    else :
-        gdf_car = None
-
-    jf = pd.concat([jf, gdf_plane, gdf_car], axis=0).reset_index(drop=True)[::-1]
-    # if train & route == True:
-    #     jf = pd.concat([jf, gdf_plane, gdf_car], axis=0).reset_index(drop=True)[::-1]
-    # elif train == True:
-    #     jf = pd.concat([jf, gdf_plane], axis=0).reset_index(drop=True)[::-1]
-    # elif route == True :
-    #     jf = pd.concat([gdf_plane, gdf_car], axis=0).reset_index(drop=True)[::-1]
-    #     jf.to_csv('just_to_see.csv', index=False)
-    # else :
-    #     jf = gdf_plane
-    return jf
-
-
-def plotly_chart(gdf, tag1, tag2, dist_route, train, route):
-    '''
-    Create a plotly bar chart to visualise results in terms of emissions
-    parameters:
-        - gdf : geodataframe with geometries, mean of transport and emission factors
-        - tag1, tag2 : departure and arrival coordinates
-        - dist_route : total distance of road
-        - train, route : booleans
-    return:
-        - JSON Plotly bar chart
-    '''
-    # Compute the true distance
-    geod = Geod(ellps="WGS84")
-    if train :
-        #For trains
-        l_length = []
-
-        for geom in gdf.geometry.values :
-            l_length.append(geod.geometry_length(geom) / 1e3)
-        # Add the distance to the dataframe
-        gdf['path_length'] = l_length
-        print('Train : ', gdf.path_length.sum(), ' km')
-        # Compute emissions : EF * length
-        gdf['kgCO2eq'] = gdf['path_length'] * gdf['EF_tot'] / 1e3
-        gdf['Mean of Transport'] = 'Train'
-    #For planes
-    # Distance (straight line)
-    bird = geod.geometry_length(LineString([tag1, tag2]))/1e3
-    print('plane : ', bird, ' km')
-    # Direct CO2 emissions
-    plane_co2 = pd.Series({'Mean of Transport':'Plane', 'kgCO2eq':bird*.085, 'colors':'#00008B', 'NAME':'CO2'})
-    # Non-CO2 contributions to radiative forcings
-    plane_other = pd.Series({'Mean of Transport':'Plane', 'kgCO2eq':bird*2*.085, 'colors':'#00004B', 'NAME':'non-CO2 radiative forcing effects (contrails, NOx)'})
-    # Cars
-    if route :
-        bus = pd.Series({'Mean of Transport':'Bus', 'kgCO2eq':dist_route*.03, 'colors':'#00FF00', 'NAME':'Thermal autocar'})
-        car = pd.Series({'Mean of Transport':'Car', 'kgCO2eq':dist_route*.15, 'colors':'#00FF00', 'NAME':'Thermal car'})
-        # Concatenate everything
-        gdf = pd.concat([pd.DataFrame(plane_co2).transpose(), pd.DataFrame(plane_other).transpose(), pd.DataFrame(car).transpose(), pd.DataFrame(bus).transpose(), gdf], axis=0).reset_index(drop=True)
-    else :
-        gdf = pd.concat([pd.DataFrame(plane_co2).transpose(), pd.DataFrame(plane_other).transpose(), gdf], axis=0).reset_index(drop=True)
-    # Plotting
-    # For totals
-    d = dict([(gdf.NAME[idx], gdf.colors[idx]) for idx in gdf.index])
-    dfs = gdf[['Mean of Transport', 'kgCO2eq']].groupby('Mean of Transport').sum()
-    # Plot bars
-    fig = px.bar(gdf, x='Mean of Transport', y="kgCO2eq", color='NAME', color_discrete_map=d, width=200, height=350)
-    fig.update_layout(showlegend=False)
-    fig.update_layout(
-    margin=dict(l=20, r=20, t=10, b=20),
-    font = dict(size=10),
-    hoverlabel=dict(
-        bgcolor="white",
-        font_size=8,
-        )#font_family="Rockwell"
-)
-    # Plot Total
-    fig.add_trace(go.Scatter(
-    x=dfs.index,
-    y=dfs['kgCO2eq'],
-    text=dfs['kgCO2eq'].apply(lambda x : round(x, 1)),
-    mode='text',
-    textposition='top center',
-    textfont=dict(
-        size=10,
-    ),
-    showlegend=False
-))
-    fig.update_yaxes(range=[0,dfs.max().values[0]*1.2])
-    # Save the figure
-    #fig.write_html("static/test_chart.html")
-    # Convert the figure to a JSON-compatible dictionary
-    graph_json = to_json(fig)
-
-    return graph_json
 
 
 def plotly_v2(gdf):
