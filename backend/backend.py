@@ -8,6 +8,7 @@
 import geopandas as gpd
 import pandas as pd
 import numpy as np
+import matplotlib
 
 #Geometry
 from shapely.geometry import  LineString, MultiLineString, Point
@@ -22,9 +23,9 @@ from plotly.io import to_json
 #Web
 import requests
 
-#####################
+######################
 ## Global variables ##
-#####################
+######################
 
 
 #Load  world
@@ -42,8 +43,12 @@ charte_mollow = ['590D22',
             'FFCCD5',
             'FFD6DD']
 
+#Select main colors
+cmap_custom = 'Blues' #default
+cmap_direct = 'Oranges'
+
 # Geometries from API
-simplified = False
+simplified = True
 if simplified :
     train_s, route_s = '1', 'simplified'
 else :
@@ -62,15 +67,15 @@ sea_threshold = 5 #km
 EF_car = .2176
 EF_bus = .02942
 EF_plane = {'short': .126, 'medium': .0977, 'long': .08306}
+EF_ferry = .3
 
-# Useless
-# Hexadecimal code to RGB code
-def hext_to_rgb(h, alpha):
-    return list(int(h[i:i+2], 16)/255 for i in (0, 2, 4))
-# # List of rgb colors
-# rgb = []
-# for k in charte_mollow :
-#     rgb.append(hext_to_rgb(k, 0))
+# Number of points in plane geometry
+nb_pts = 100
+
+#Additional emissions from plane
+cont_coeff = 2
+hold = 3.81 #kg/p
+
 
 
 ###################
@@ -83,9 +88,9 @@ def flatten_list_of_tuples(lst):
         return [item for tup in lst for item in tup[::-1]]
 
 
-#Create a circle around (roughly), not really accurate but good enough and fast
+#Not really accurate but good enough and fast for some purposes
 def kilometer_to_degree(km):
-    c = 180/(np.pi * 6371)
+    c = 180 / (np.pi * 6371) #Earth radius (km)
     return c*km
 
 
@@ -274,7 +279,7 @@ def validate_geom(tag1, tag2, geom, th):
     return True
 
 
-def train_to_gdf(tag1, tag2, perims=search_perimeter, validate=val_perimeter, colormap=charte_mollow):
+def train_to_gdf(tag1, tag2, perims=search_perimeter, validate=val_perimeter, colormap=charte_mollow): #charte_mollow
     '''
     parameters:
         - tag1, tag2
@@ -303,7 +308,8 @@ def train_to_gdf(tag1, tag2, perims=search_perimeter, validate=val_perimeter, co
          # Sort values
         gdf = gdf.sort_values('EF_tot')
         # Add colors, here discretise the colormap
-        gdf['colors'] = ['#'+k for k in pd.Series(colormap[::-1])[[int(k) for k in np.linspace(0, len(colormap)-1, gdf.shape[0])]]]
+        gdf['colors'] = colormap
+        #gdf['colors'] = ['#'+k for k in pd.Series(colormap[::-1])[[int(k) for k in np.linspace(0, len(colormap)-1, gdf.shape[0])]]]
         # Adding and computing emissions
         #For trains
         l_length = []
@@ -401,7 +407,7 @@ def car_to_gdf(tag1, tag2, EF_car=EF_car, color = '#00FF00', validate = val_peri
 
     return gdf_car, route
 
-def plane_to_gdf(tag1, tag2, EF_plane=EF_plane, contrails=2, holding=3.81, color = '#00008B', color_contrails='#00004B'):
+def plane_to_gdf(tag1, tag2, EF_plane=EF_plane, contrails=cont_coeff, holding=hold, color = '#00008B', color_contrails='#00004B'):
     '''
     parameters:
         - tag1, tag2
@@ -419,7 +425,7 @@ def plane_to_gdf(tag1, tag2, EF_plane=EF_plane, contrails=2, holding=3.81, color
 
     # Detour coefficient :
     if bird < 1000 :
-        bird = (4.1588 * bird**(-.212)) * bird
+        bird = (4.1584 * bird**(-.212)) * bird
     # Different emission factors depending on the trip length
     if bird < 1000 :
         EF = EF_plane['short']
@@ -433,7 +439,7 @@ def plane_to_gdf(tag1, tag2, EF_plane=EF_plane, contrails=2, holding=3.81, color
     gdf_non_co2 = pd.DataFrame(pd.Series({ 'kgCO2eq':EF*contrails*bird, 'colors':color_contrails, 'NAME':'Plane contrails',  'Mean of Transport':'Plane', })).transpose()
     return gdf_plane, gdf_non_co2
 
-def ferry_to_gdf(tag1, tag2, EF=.3, color = '#FF0000'):
+def ferry_to_gdf(tag1, tag2, EF=EF_ferry, color = '#FF0000'):
     '''
     parameters:
         - tag1, tag2
@@ -493,7 +499,7 @@ def filter_countries_world(gdf, th = sea_threshold):
     return res
 
 
-def great_circle_geometry(dep, arr, nb = 20):
+def great_circle_geometry(dep, arr, nb = nb_pts):
     '''
     Create the great circle geometry with pyproj
     parameters:
@@ -557,7 +563,7 @@ def plotly_v2(gdf):
     return graph_json, fig
 
 
-def compute_emissions_custom(data):
+def compute_emissions_custom(data, cmap = cmap_custom):
     '''
     parameters:
         - data, pandas dataframe format (will be json)
@@ -565,6 +571,12 @@ def compute_emissions_custom(data):
         - full dataframe for emissions
         - geodataframe for path
     '''
+    #Colors
+    #Custom trip
+    list_items = ['Train', 'Bus', 'Car', 'Plane_contrails', 'Plane', 'Ferry']
+    cmap = matplotlib.cm.get_cmap(cmap_custom)
+    colors = [matplotlib.colors.to_hex(cmap(x)) for x in np.linspace(0.2, 1, len(list_items))]
+    color_custom = dict(zip(list_items, colors))
     #Loop
     l= []
     geo = []
@@ -582,55 +594,47 @@ def compute_emissions_custom(data):
 
         # Compute depending on the mean of transport
         if mean == 'Train':
-            gdf, train = train_to_gdf(tag1, tag2)
+            gdf, train = train_to_gdf(tag1, tag2, colormap = color_custom['Train'])
             l.append(gdf)
             geo.append(gdf)
 
         elif mean == 'Bus' :
-            gdf_bus, route = bus_to_gdf(tag1, tag2)
+            gdf_bus, route = bus_to_gdf(tag1, tag2, color=color_custom['Bus'])
             l.append(gdf_bus)
             geo.append(gdf_bus)
 
         elif mean == 'Car':
             # We get the number of passenger
             nb = int(data.loc[idx].nb)
-            gdf_car, route = car_to_gdf(tag1, tag2, nb=nb)
+            gdf_car, route = car_to_gdf(tag1, tag2, nb=nb,  color=color_custom['Car'])
             l.append(gdf_car)
             geo.append(gdf_car)
 
         elif mean == 'Plane':
-            gdf_plane, gdf_cont = plane_to_gdf(tag1, tag2)
+            gdf_plane, gdf_cont = plane_to_gdf(tag1, tag2,  color=color_custom['Plane'], color_contrails=color_custom['Plane_contrails'])
             l.append(gdf_plane)
             l.append(gdf_cont)
             geo.append(gdf_plane)
 
         elif mean == 'Ferry':
-            gdf_ferry = ferry_to_gdf(tag1, tag2)
+            gdf_ferry = ferry_to_gdf(tag1, tag2,  color=color_custom['Ferry'])
             l.append(gdf_ferry)
             geo.append(gdf_ferry)
 
-    # if np.isin(None, l) :# type(l[0]) == 'pandas.core.frame.DataFrame':
-    #     #No data retrieved, at least one
-    #     data, geodata = None, None
-
-
-    # else :
-
-            # Data for bar chart
+     # Data for bar chart
     data = pd.concat(l)
-    if data.shape[0] != 0:
+    if data.shape[0] != 0: # We can go on
         data = data.reset_index(drop=True).drop('geometry', axis=1)
         # Geodataframe for map
         geodata = gpd.GeoDataFrame(pd.concat(geo), geometry='geometry', crs='epsg:4326')
-    else :
+    else : #My trip failed, we return nothing
         geodata = pd.DataFrame()
-
 
     return data, geodata
 
 
 
-def compute_emissions_all(data):
+def compute_emissions_all(data, cmap = cmap_direct):
     '''
     If data is only one step then we do not compute this mean of transport as it will
     appear in "my_trip"
@@ -640,6 +644,12 @@ def compute_emissions_all(data):
         - full dataframe for emissions
         - geodataframe for path
     '''
+    #colors
+    #Direct trip
+    list_items = ['Train', 'Car&Bus',  'Plane_contrails', 'Plane']
+    cmap = matplotlib.cm.get_cmap(cmap_direct)
+    colors = [matplotlib.colors.to_hex(cmap(x)) for x in np.linspace(0.2, 1, len(list_items))]
+    color_direct = dict(zip(list_items, colors))
     # Departure coordinates
     lon = data.loc['0'].lon
     lat = data.loc['0'].lat
@@ -651,7 +661,7 @@ def compute_emissions_all(data):
 
     # Check if we should compute it or not
     train, plane, car, bus = True, True, True, True
-    if data.shape[0]==2: #Then it's only one step
+    if data.shape[0] == 2: #Then it's only one step, we will not add it to direct trip calulations
         #Retrieve the mean of transport: Car/Bus/Train/Plane
         transp = data.loc['0'].transp
         if transp == 'Train':
@@ -668,12 +678,12 @@ def compute_emissions_all(data):
 
     # Train
     if train :
-        gdf, train = train_to_gdf(tag1, tag2)
+        gdf, train = train_to_gdf(tag1, tag2, colormap=color_direct['Train'])
         l.append(gdf)
         geo.append(gdf)
 
     # Car & Bus
-    gdf_car, gdf_bus, route = car_bus_to_gdf(tag1, tag2)
+    gdf_car, gdf_bus, route = car_bus_to_gdf(tag1, tag2, color=color_direct['Car&Bus'])
     if bus :
         l.append(gdf_bus)
     if car :
@@ -682,7 +692,7 @@ def compute_emissions_all(data):
 
     # Plane
     if plane :
-        gdf_plane, gdf_cont = plane_to_gdf(tag1, tag2)
+        gdf_plane, gdf_cont = plane_to_gdf(tag1, tag2, color=color_direct['Plane'], color_contrails=color_direct['Plane_contrails'])
         l.append(gdf_plane)
         l.append(gdf_cont)
         geo.append(gdf_plane)

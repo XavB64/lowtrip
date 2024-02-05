@@ -43,7 +43,8 @@ def main():
             #My trip data and geo data
             data_mytrip, geo_mytrip = compute_emissions_custom(df)
             #Direct data and geo data
-            data_alternative, geo_alternative = compute_emissions_custom(df2)
+            #We change the color to pink
+            data_alternative, geo_alternative = compute_emissions_custom(df2, cmap = 'RdPu')
             #Possible to generate a plotly json
             graph_json, figure = bchart_2(data_mytrip, data_alternative)
             response = {'gdf' : pd.concat([geo_mytrip, geo_alternative])[['colors', 'geometry']].explode().to_json(),
