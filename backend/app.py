@@ -33,8 +33,8 @@ def main():
             graph_json, figure = bchart_1(data_mytrip, data_direct)
            # pd.concat([data_mytrip, data_direct]).to_csv('see_res.csv')
             response = {'gdf' : pd.concat([geo_mytrip, geo_direct])[['colors', 'geometry']].explode().to_json(),
-                        'plot_div' : graph_json}
-
+                        'my_trip' : data_mytrip.to_json(orient='records'), 'direct_trip': data_direct.to_json(orient='records')}
+            
         if request.form['mode'] == '2' : # My trip vs custom trip
             # Convert json into pandas
             df = pd.DataFrame.from_dict(json.loads(request.form['my-trip']))
@@ -48,7 +48,7 @@ def main():
             #Possible to generate a plotly json
             graph_json, figure = bchart_2(data_mytrip, data_alternative)
             response = {'gdf' : pd.concat([geo_mytrip, geo_alternative])[['colors', 'geometry']].explode().to_json(),
-                        'plot_div' : graph_json}
+                        'my_trip' : data_mytrip.to_json(orient='records'), 'alternative_trip': data_alternative.to_json(orient='records')}
 
         return response
 
