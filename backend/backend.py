@@ -401,10 +401,10 @@ def bus_to_gdf(departure_coordinates, arrival_coordinates, EF_bus=EF_bus, color 
     }
     return gdf_bus
 
-def car_to_gdf(tag1, tag2, EF_car=EF_car, color = '#00FF00', validate = val_perimeter, nb = 1):
+def car_to_gdf(departure_coordinates, arrival_coordinates, EF_car=EF_car, color = '#00FF00', validate = val_perimeter, nb = 1):
     '''
     parameters:
-        - tag1, tag2
+        - departure_coordinates, arrival_coordinates
         - EF_car, float emission factor for one car by km
         - color, color in hex of path and bar chart
         - validate
@@ -413,19 +413,25 @@ def car_to_gdf(tag1, tag2, EF_car=EF_car, color = '#00FF00', validate = val_peri
         - full dataframe for car
     '''
     ### Route OSRM - create a separate function
-    geom_route, route_dist, route = find_route(tag1, tag2)
+    geom_route, route_dist, success = find_route(departure_coordinates, arrival_coordinates)
 
-       # Validation part for route
-    if route : #We have a geometry
-        if not validate_geom(tag1, tag2, geom_route, validate):
-            geom_route, route_dist, route = None, None, False
+    if not success:
+        return pd.DataFrame()
 
-    if route :
-        gdf_car = pd.DataFrame(pd.Series({ 'kgCO2eq':route_dist*EF_car / nb, 'EF_tot' : EF_car/nb, 'path_length':route_dist, 'colors':color, 'NAME':'Car', 'Mean of Transport':'Car', 'geometry':geom_route})).transpose() #'EF_tot':EF_car / nb,
-    else:
-        gdf_car = pd.DataFrame()
+    # Validation part for route
+    if not validate_geom(departure_coordinates, arrival_coordinates, geom_route, validate):
+        return pd.DataFrame()
 
-    return gdf_car, route
+    gdf_car = pd.DataFrame(pd.Series({ 'kgCO2eq':route_dist*EF_car / nb, 'EF_tot' : EF_car/nb, 'path_length':route_dist, 'colors':color, 'NAME':'Car', 'Mean of Transport':'Car', 'geometry':geom_route})).transpose() #'EF_tot':EF_car / nb,
+
+    car_trip = {
+        'transport_means': 'Car',
+        'color': color,
+        'geometry': extract_coordinates(geom_route),
+        'total_emissions': route_dist * EF_car / nb,
+    }
+
+    return gdf_car
 
 def plane_to_gdf(tag1, tag2, EF_plane=EF_plane, contrails=cont_coeff, holding=hold, color = '#00008B', color_contrails='#00004B'):
     '''
@@ -625,7 +631,7 @@ def compute_emissions_custom(trip_steps, cmap = cmap_custom):
         elif transport_means == 'Car':
             # We get the number of passenger
             nb = int(current_step.nb)
-            gdf_car, _ = car_to_gdf(depature_coords, arrival_coords, nb=nb,  color=color_custom['Car'])
+            gdf_car = car_to_gdf(depature_coords, arrival_coords, nb=nb,  color=color_custom['Car'])
             l.append(gdf_car)
             geo.append(gdf_car)
 
