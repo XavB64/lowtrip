@@ -23,7 +23,7 @@ from plotly.io import to_json
 #Web
 import requests
 
-from utils import convert_gdf_to_train_trip
+from utils import convert_gdf_to_train_trip, extract_coordinates
 
 ######################
 ## Global variables ##
@@ -370,10 +370,10 @@ def car_bus_to_gdf(tag1, tag2, EF_car=EF_car, EF_bus=EF_bus, color = '#00FF00', 
         gdf_car, gdf_bus = pd.DataFrame(), pd.DataFrame()
     return gdf_car, gdf_bus, route
 
-def bus_to_gdf(tag1, tag2, EF_bus=EF_bus, color = '#00FF00', validate = val_perimeter, nb = 1):
+def bus_to_gdf(departure_coordinates, arrival_coordinates, EF_bus=EF_bus, color = '#00FF00', validate = val_perimeter, nb = 1):
     '''
     parameters:
-        - tag1, tag2
+        - departure_coordinates, arrival_coordinates
         - EF_bus, float emission factor for bus by pkm
         - color, color in hex of path and bar chart
         - validate
@@ -382,18 +382,24 @@ def bus_to_gdf(tag1, tag2, EF_bus=EF_bus, color = '#00FF00', validate = val_peri
         - full dataframe for bus
     '''
     ### Route OSRM - create a separate function
-    geom_route, route_dist, route = find_route(tag1, tag2)
+    geom_route, route_dist, success = find_route(departure_coordinates, arrival_coordinates)
 
-       # Validation part for route
-    if route : #We have a geometry
-        if not validate_geom(tag1, tag2, geom_route, validate):
-            geom_route, route_dist, route = None, None, False
+    if not success:
+        return pd.DataFrame()
 
-    if route :
-        gdf_bus = pd.DataFrame(pd.Series({ 'kgCO2eq':route_dist*EF_bus, 'EF_tot':EF_bus, 'path_length':route_dist, 'colors':color, 'NAME':'Bus',  'Mean of Transport':'Bus', 'geometry':geom_route })).transpose() #'EF_tot':EF_bus, enlever geometry
-    else:
-        gdf_bus = pd.DataFrame()
-    return gdf_bus, route
+    # Validation part for route
+    if not validate_geom(departure_coordinates, arrival_coordinates, geom_route, validate):
+        return pd.DataFrame()
+
+    gdf_bus = pd.DataFrame(pd.Series({ 'kgCO2eq':route_dist*EF_bus, 'EF_tot':EF_bus, 'path_length':route_dist, 'colors':color, 'NAME':'Bus',  'Mean of Transport':'Bus', 'geometry':geom_route })).transpose() #'EF_tot':EF_bus, enlever geometry
+
+    bus_trip = {
+        'transport_means': 'Bus',
+        'color': color,
+        'geometry': extract_coordinates(geom_route),
+        'total_emissions': route_dist*EF_bus
+    }
+    return gdf_bus
 
 def car_to_gdf(tag1, tag2, EF_car=EF_car, color = '#00FF00', validate = val_perimeter, nb = 1):
     '''
@@ -612,7 +618,7 @@ def compute_emissions_custom(trip_steps, cmap = cmap_custom):
             geo.append(gdf)
 
         elif transport_means == 'Bus' :
-            gdf_bus, _ = bus_to_gdf(depature_coords, arrival_coords, color=color_custom['Bus'])
+            gdf_bus = bus_to_gdf(depature_coords, arrival_coords, color=color_custom['Bus'])
             l.append(gdf_bus)
             geo.append(gdf_bus)
 
