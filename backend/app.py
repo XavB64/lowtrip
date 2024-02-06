@@ -3,8 +3,9 @@ warnings.filterwarnings('ignore')
 
 #Librairies
 from flask import Flask, request, render_template, send_from_directory, json
-from backend import *
+from backend import compute_emissions_custom, compute_emissions_all, bchart_1, bchart_2
 from flask_cors import CORS, cross_origin #comment this on deployment
+import pandas as pd
 
 print(pd.__version__)
 
@@ -34,7 +35,7 @@ def main():
            # pd.concat([data_mytrip, data_direct]).to_csv('see_res.csv')
             response = {'gdf' : pd.concat([geo_mytrip, geo_direct])[['colors', 'geometry']].explode().to_json(),
                         'my_trip' : data_mytrip.to_json(orient='records'), 'direct_trip': data_direct.to_json(orient='records')}
-            
+
         if request.form['mode'] == '2' : # My trip vs custom trip
             # Convert json into pandas
             df = pd.DataFrame.from_dict(json.loads(request.form['my-trip']))
@@ -52,7 +53,7 @@ def main():
 
         return response
 
-    return send_from_directory(app.static_folder, 'index.html')
+    return { 'message': 'ok'}
 
 if __name__ == '__main__':
     app.run(host="localhost", port=8000, debug=False)
