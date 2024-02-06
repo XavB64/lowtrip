@@ -23,6 +23,8 @@ from plotly.io import to_json
 #Web
 import requests
 
+from utils import convert_gdf_to_train_trip
+
 ######################
 ## Global variables ##
 ######################
@@ -279,10 +281,10 @@ def validate_geom(tag1, tag2, geom, th):
     return True
 
 
-def train_to_gdf(tag1, tag2, perims=search_perimeter, validate=val_perimeter, colormap=charte_mollow): #charte_mollow
+def train_to_gdf(depature_coordinates, arrival_coordinates, perims=search_perimeter, validate=val_perimeter, colormap=charte_mollow): #charte_mollow
     '''
     parameters:
-        - tag1, tag2
+        - depature_coordinates, arrival_coordinates
         - perims
         - validate
         - colormap, list of colors
@@ -290,41 +292,53 @@ def train_to_gdf(tag1, tag2, perims=search_perimeter, validate=val_perimeter, co
         - full dataframe for trains
     '''
     #First try with coordinates supplied by the user
-    gdf, train = find_train(tag1, tag2)
+    gdf, train = find_train(depature_coordinates, arrival_coordinates)
 
-    #If failure then we try to find a better spot nearby - Put in another function
+    # If failure then we try to find a better spot nearby - Put in another function
     if train == False :
         # We try to search nearby the coordinates and request again
-        #print( extend_search(tag1, tag2, perims) )
-        gdf, train = extend_search(tag1, tag2, perims)
+        gdf, train = extend_search(depature_coordinates, arrival_coordinates, perims)
+
+    if train == False : # we did not succeed to find a train
+        return pd.DataFrame(), False
 
     # Validation part for train
-    if train : #We have a geometry
-        if not validate_geom(tag1, tag2, gdf.values[0], validate):
-            gdf, train = pd.DataFrame(), False
+    if not validate_geom(depature_coordinates, arrival_coordinates, gdf.values[0], validate):
+        return pd.DataFrame(), False
 
-    if train : #We need to filter by country and add length / Emission factors
-        gdf = filter_countries_world(gdf)
-         # Sort values
-        gdf = gdf.sort_values('EF_tot')
-        # Add colors, here discretise the colormap
-        gdf['colors'] = colormap
-        #gdf['colors'] = ['#'+k for k in pd.Series(colormap[::-1])[[int(k) for k in np.linspace(0, len(colormap)-1, gdf.shape[0])]]]
-        # Adding and computing emissions
-        #For trains
-        l_length = []
-        # Compute the true distance
-        geod = Geod(ellps="WGS84")
-        for geom in gdf.geometry.values :
-            l_length.append(geod.geometry_length(geom) / 1e3)
-        # Add the distance to the dataframe
-        gdf['path_length'] = l_length
-        # print('Train : ', gdf.path_length.sum(), ' km')
-        # Compute emissions : EF * length
-        gdf['EF_tot'] = gdf['EF_tot'] / 1e3 #Conversion in in kg
-        gdf['kgCO2eq'] = gdf['path_length'] * gdf['EF_tot']
-        gdf['Mean of Transport'] = 'Train'
-    #Returning the result
+    # We need to filter by country and add length / Emission factors
+    gdf = filter_countries_world(gdf)
+    gdf = gdf.sort_values('EF_tot')
+
+    # Add colors, here discretise the colormap
+    gdf['colors'] = colormap
+    #gdf['colors'] = ['#'+k for k in pd.Series(colormap[::-1])[[int(k) for k in np.linspace(0, len(colormap)-1, gdf.shape[0])]]]
+
+    # Adding and computing emissions
+    l_length = []
+
+    # Compute the true distance
+    geod = Geod(ellps="WGS84")
+    for geom in gdf.geometry.values :
+        l_length.append(geod.geometry_length(geom) / 1e3)
+
+    # Add the distance to the dataframe
+    gdf['path_length'] = l_length
+
+    # Compute emissions : EF * length
+    gdf['EF_tot'] = gdf['EF_tot'] / 1e3 # Conversion in in kg
+    gdf['kgCO2eq'] = gdf['path_length'] * gdf['EF_tot']
+    gdf['Mean of Transport'] = 'Train'
+
+    geometry, steps = convert_gdf_to_train_trip(gdf)
+
+    train_trip = {
+        'transport_means': 'Train',
+        'color': colormap,
+        'geometry': geometry,
+        'steps': steps
+        # total_emissions ?
+    }
     return gdf, train
 
 
@@ -571,8 +585,8 @@ def compute_emissions_custom(trip_steps, cmap = cmap_custom):
         - full dataframe for emissions
         - geodataframe for path
     '''
-    #Colors
-    #Custom trip
+    # Colors
+    # Custom trip
     list_items = ['Train', 'Bus', 'Car', 'Plane_contrails', 'Plane', 'Ferry']
     cmap = matplotlib.cm.get_cmap(cmap_custom)
     colors = [matplotlib.colors.to_hex(cmap(x)) for x in np.linspace(0.2, 1, len(list_items))]
@@ -610,7 +624,7 @@ def compute_emissions_custom(trip_steps, cmap = cmap_custom):
             geo.append(gdf_car)
 
         elif transport_means == 'Plane':
-            gdf_plane, gdf_cont = plane_to_gdf(depature_coords, arrival_coords,  color=color_custom['Plane'], color_contrails=color_custom['Plane_contrails'])
+            gdf_plane, gdf_cont = plane_to_gdf(depature_coords, arrival_coords, color=color_custom['Plane'], color_contrails=color_custom['Plane_contrails'])
             l.append(gdf_plane)
             l.append(gdf_cont)
             geo.append(gdf_plane)
