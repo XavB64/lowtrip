@@ -54,7 +54,7 @@ if simplified :
 else :
     train_s, route_s = '0', 'full'
 
-# Validation perimeter 
+# Validation perimeter
 val_perimeter = 500 #km
 
 # Search areas
@@ -563,7 +563,7 @@ def plotly_v2(gdf):
     return graph_json, fig
 
 
-def compute_emissions_custom(data, cmap = cmap_custom):
+def compute_emissions_custom(trip_steps, cmap = cmap_custom):
     '''
     parameters:
         - data, pandas dataframe format (will be json)
@@ -577,60 +577,59 @@ def compute_emissions_custom(data, cmap = cmap_custom):
     cmap = matplotlib.cm.get_cmap(cmap_custom)
     colors = [matplotlib.colors.to_hex(cmap(x)) for x in np.linspace(0.2, 1, len(list_items))]
     color_custom = dict(zip(list_items, colors))
-    #Loop
+
     l= []
     geo = []
-    for idx in data.index[:-1] : # We loop until last departure
+    for idx in trip_steps.index[:-1] : # We loop until last departure
+        current_step = trip_steps.loc[idx]
+
         # Mean of transport
-        mean = data.loc[idx].transp
+        transport_means = current_step.transp
         # Departure coordinates
-        lon = data.loc[idx].lon
-        lat = data.loc[idx].lat
-        tag1 = (lon , lat)
+        depature_coords = (current_step.lon , current_step.lat)
         # Arrival coordinates
-        lon = data.loc[str(int(idx)+1)].lon
-        lat = data.loc[str(int(idx)+1)].lat
-        tag2 = (lon , lat)
+        next_step = trip_steps.loc[str(int(idx)+1)]
+        arrival_coords = (next_step.lon , next_step.lat)
 
         # Compute depending on the mean of transport
-        if mean == 'Train':
-            gdf, train = train_to_gdf(tag1, tag2, colormap = color_custom['Train'])
+        if transport_means == 'Train':
+            gdf, _ = train_to_gdf(depature_coords, arrival_coords, colormap = color_custom['Train'])
             l.append(gdf)
             geo.append(gdf)
 
-        elif mean == 'Bus' :
-            gdf_bus, route = bus_to_gdf(tag1, tag2, color=color_custom['Bus'])
+        elif transport_means == 'Bus' :
+            gdf_bus, _ = bus_to_gdf(depature_coords, arrival_coords, color=color_custom['Bus'])
             l.append(gdf_bus)
             geo.append(gdf_bus)
 
-        elif mean == 'Car':
+        elif transport_means == 'Car':
             # We get the number of passenger
-            nb = int(data.loc[idx].nb)
-            gdf_car, route = car_to_gdf(tag1, tag2, nb=nb,  color=color_custom['Car'])
+            nb = int(current_step.nb)
+            gdf_car, _ = car_to_gdf(depature_coords, arrival_coords, nb=nb,  color=color_custom['Car'])
             l.append(gdf_car)
             geo.append(gdf_car)
 
-        elif mean == 'Plane':
-            gdf_plane, gdf_cont = plane_to_gdf(tag1, tag2,  color=color_custom['Plane'], color_contrails=color_custom['Plane_contrails'])
+        elif transport_means == 'Plane':
+            gdf_plane, gdf_cont = plane_to_gdf(depature_coords, arrival_coords,  color=color_custom['Plane'], color_contrails=color_custom['Plane_contrails'])
             l.append(gdf_plane)
             l.append(gdf_cont)
             geo.append(gdf_plane)
 
-        elif mean == 'Ferry':
-            gdf_ferry = ferry_to_gdf(tag1, tag2,  color=color_custom['Ferry'])
+        elif transport_means == 'Ferry':
+            gdf_ferry = ferry_to_gdf(depature_coords, arrival_coords,  color=color_custom['Ferry'])
             l.append(gdf_ferry)
             geo.append(gdf_ferry)
 
      # Data for bar chart
-    data = pd.concat(l)
-    if data.shape[0] != 0: # We can go on
-        data = data.reset_index(drop=True).drop('geometry', axis=1)
+    trip_steps = pd.concat(l)
+    if trip_steps.shape[0] != 0: # We can go on
+        trip_steps = trip_steps.reset_index(drop=True).drop('geometry', axis=1)
         # Geodataframe for map
         geodata = gpd.GeoDataFrame(pd.concat(geo), geometry='geometry', crs='epsg:4326')
     else : #My trip failed, we return nothing
         geodata = pd.DataFrame()
 
-    return data, geodata
+    return trip_steps, geodata
 
 
 
