@@ -22,8 +22,6 @@ from plotly.io import to_json
 # Web
 import requests
 
-from utils import convert_gdf_to_train_trip, extract_coordinates
-
 ######################
 ## Global variables ##
 ######################
@@ -361,15 +359,6 @@ def train_to_gdf(
     gdf["kgCO2eq"] = gdf["path_length"] * gdf["EF_tot"]
     gdf["Mean of Transport"] = "Train"
 
-    geometry, steps = convert_gdf_to_train_trip(gdf)
-
-    train_trip = {
-        "transport_means": "Train",
-        "color": colormap,
-        "geometry": geometry,
-        "steps": steps,
-        # total_emissions ?
-    }
     return gdf, train
 
 
@@ -473,12 +462,6 @@ def bus_to_gdf(
         )
     ).transpose()  #'EF_tot':EF_bus, enlever geometry
 
-    bus_trip = {
-        "transport_means": "Bus",
-        "color": color,
-        "geometry": extract_coordinates(geom_route),
-        "total_emissions": route_dist * EF_bus,
-    }
     return gdf_bus
 
 
@@ -528,19 +511,12 @@ def car_to_gdf(
         )
     ).transpose()  #'EF_tot':EF_car / nb,
 
-    car_trip = {
-        "transport_means": "Car",
-        "color": color,
-        "geometry": extract_coordinates(geom_route),
-        "total_emissions": route_dist * EF_car / nb,
-    }
-
     return gdf_car
 
 
 def plane_to_gdf(
-    tag1,
-    tag2,
+    departure_coordinates,
+    arrival_coordinates,
     EF_plane=EF_plane,
     contrails=cont_coeff,
     holding=hold,
@@ -559,12 +535,12 @@ def plane_to_gdf(
         - full dataframe for plane, geometry for CO2 only (optimization)
     """
     # Compute geometry and distance (geodesic)
-    geom_plane, bird = great_circle_geometry(tag1, tag2)
-    # print(bird)
+    geom_plane, bird = great_circle_geometry(departure_coordinates, arrival_coordinates)
 
     # Detour coefficient :
     if bird < 1000:
         bird = (4.1584 * bird ** (-0.212)) * bird
+
     # Different emission factors depending on the trip length
     if bird < 1000:
         EF = EF_plane["short"]
@@ -572,6 +548,7 @@ def plane_to_gdf(
         EF = EF_plane["medium"]
     else:  # It's > 3500
         EF = EF_plane["long"]
+
     # Compute geodataframe and dataframe
     gdf_plane = pd.DataFrame(
         pd.Series(
@@ -586,7 +563,6 @@ def plane_to_gdf(
             }
         )
     ).transpose()
-    # gdf_plane.geometry = gdf_plane.geometry.astype('geometry')
     gdf_non_co2 = pd.DataFrame(
         pd.Series(
             {
@@ -600,7 +576,9 @@ def plane_to_gdf(
     return gdf_plane, gdf_non_co2
 
 
-def ferry_to_gdf(tag1, tag2, EF=EF_ferry, color="#FF0000"):
+def ferry_to_gdf(
+    departure_coordinates, arrival_coordinates, EF=EF_ferry, color="#FF0000"
+):
     """
     parameters:
         - tag1, tag2
@@ -610,10 +588,12 @@ def ferry_to_gdf(tag1, tag2, EF=EF_ferry, color="#FF0000"):
         - full dataframe for ferry
     """
     # Compute geometry
-    geom = LineString([tag1, tag2])
+    geom = LineString([departure_coordinates, arrival_coordinates])
+
     # Compute the true distance
     geod = Geod(ellps="WGS84")
     bird = geod.geometry_length(geom) / 1e3
+
     # Compute geodataframe and dataframe
     gdf_ferry = pd.DataFrame(
         pd.Series(
@@ -628,7 +608,6 @@ def ferry_to_gdf(tag1, tag2, EF=EF_ferry, color="#FF0000"):
             }
         )
     ).transpose()
-    # gdf_ferry.geometry = gdf_ferry.geometry.astype('geometry')
 
     return gdf_ferry
 
@@ -654,23 +633,26 @@ def filter_countries_world(gdf, th=sea_threshold):
         world,
         how="difference",
     )
+
     # Check if the unmatched data is significant
     if diff.length.sum() > kilometer_to_degree(th):
         print("Sea detected")
+
         # In case we have bridges / tunnels across sea:
         # Distinction depending on linestring / multilinestring
         if diff.geometry[0].geom_type == "MultiLineString":
-            #  print('MultiLinestring')
             diff_2 = gpd.GeoDataFrame(list(diff.geometry.values[0].geoms))
         else:
-            print("Linestring")
             diff_2 = gpd.GeoDataFrame(list(diff.geometry.values))
+
         diff_2.columns = ["geometry"]
         diff_2 = diff_2.set_geometry("geometry", crs="epsg:4326")
+
         # Filter depending is the gap is long enough to be taken into account and join with nearest country
         test = diff_2[diff_2.length > kilometer_to_degree(th)].sjoin_nearest(
             world, how="left"
         )
+
         # Aggregation per country and combining geometries
         u = (
             pd.concat([res.explode(), test.explode()])
@@ -697,9 +679,10 @@ def filter_countries_world(gdf, th=sea_threshold):
                 ),
             )
         )
+
     # Rendering result
-    res = gpd.GeoDataFrame(u, geometry="geometry", crs="epsg:4326").reset_index()
-    return res
+    result = gpd.GeoDataFrame(u, geometry="geometry", crs="epsg:4326").reset_index()
+    return result
 
 
 def great_circle_geometry(dep, arr, nb=nb_pts):
@@ -867,7 +850,7 @@ def compute_emissions_custom(trip_steps, cmap=cmap_custom):
         trip_steps = trip_steps.reset_index(drop=True).drop("geometry", axis=1)
         # Geodataframe for map
         geodata = gpd.GeoDataFrame(pd.concat(geo), geometry="geometry", crs="epsg:4326")
-    else:  # My trip failed, we return nothing
+    else:  # failure, we return nothing
         geodata = pd.DataFrame()
 
     return trip_steps, geodata
@@ -891,53 +874,45 @@ def compute_emissions_all(data, cmap=cmap_direct):
         matplotlib.colors.to_hex(cmap(x)) for x in np.linspace(0.2, 1, len(list_items))
     ]
     color_direct = dict(zip(list_items, colors))
-    # Departure coordinates
-    lon = data.loc["0"].lon
-    lat = data.loc["0"].lat
-    tag1 = (lon, lat)
-    # Arrival coordinates
-    lon = data.loc[str(data.shape[0] - 1)].lon
-    lat = data.loc[str(data.shape[0] - 1)].lat
-    tag2 = (lon, lat)
 
-    # Check if we should compute it or not
-    train, plane, car, bus = True, True, True, True
-    if (
-        data.shape[0] == 2
-    ):  # Then it's only one step, we will not add it to direct trip calulations
-        # Retrieve the mean of transport: Car/Bus/Train/Plane
-        transp = data.loc["0"].transp
-        if transp == "Train":
-            train = False
-        elif transp == "Plane":
-            plane = False
-        elif transp == "Car":
-            car = False
-        elif transp == "Bus":
-            bus = False
+    # Departure coordinates
+    departure = data.loc["0"]
+    departure_coordinates = (departure.lon, departure.lat)
+    # Arrival coordinates
+    arrival = data.loc["1"]
+    arrival_coordinates = (arrival.lon, arrival.lat)
+
+    # If data is only one step then we do not compute this mean of transport as it will appear in "my_trip"
+    is_one_step_trip = data.shape[0] == 2
+    first_step_transport_means = departure.transp
+
     # Loop
     l = []
     geo = []
 
     # Train
-    if train:
-        gdf, train = train_to_gdf(tag1, tag2, colormap=color_direct["Train"])
+    if not is_one_step_trip or first_step_transport_means == "Train":
+        gdf, train = train_to_gdf(
+            departure_coordinates, arrival_coordinates, colormap=color_direct["Train"]
+        )
         l.append(gdf)
         geo.append(gdf)
 
     # Car & Bus
-    gdf_car, gdf_bus, route = car_bus_to_gdf(tag1, tag2, color=color_direct["Car&Bus"])
-    if bus:
+    gdf_car, gdf_bus, route = car_bus_to_gdf(
+        departure_coordinates, arrival_coordinates, color=color_direct["Car&Bus"]
+    )
+    if not is_one_step_trip or first_step_transport_means == "Bus":
         l.append(gdf_bus)
-    if car:
+    if not is_one_step_trip or first_step_transport_means == "Car":
         l.append(gdf_car)
     geo.append(gdf_car)
 
     # Plane
-    if plane:
+    if not is_one_step_trip or first_step_transport_means == "Plane":
         gdf_plane, gdf_cont = plane_to_gdf(
-            tag1,
-            tag2,
+            departure_coordinates,
+            arrival_coordinates,
             color=color_direct["Plane"],
             color_contrails=color_direct["Plane_contrails"],
         )
@@ -947,7 +922,7 @@ def compute_emissions_all(data, cmap=cmap_direct):
 
     # We do not add the ferry in the general case
 
-    if (route == False) & (train == False) & (plane == False):
+    if l.length == 0:
         # Only happens when plane was asked and the API failed
         data, geodata = pd.DataFrame(), pd.DataFrame()
     else:
