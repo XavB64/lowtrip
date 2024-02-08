@@ -4,8 +4,9 @@ warnings.filterwarnings("ignore")
 
 # Librairies
 from flask import Flask, request, send_from_directory, json
-from backend import *
+from backend import compute_emissions_custom, compute_emissions_all, chart_refactor
 from flask_cors import CORS  # comment this on deployment
+import pandas as pd
 
 print(pd.__version__)
 
@@ -71,7 +72,7 @@ def main():
 
         return response
 
-    return send_from_directory(app.static_folder, "index.html")
+    return {"message": "backend initialized"}
 
 
 if __name__ == "__main__":
