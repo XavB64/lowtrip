@@ -22,7 +22,12 @@ export const Map = ({
   alternativeStepsCoords,
 }: MapProps) => {
   return (
-    <MapContainer center={[48, 20]} zoom={5} scrollWheelZoom={true}>
+    <MapContainer
+      center={[48, 20]}
+      zoom={5}
+      scrollWheelZoom={true}
+      style={{ width: "100%" }}
+    >
       <MapContent
         response={response}
         stepsCoords={stepsCoords}

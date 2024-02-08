@@ -1,4 +1,3 @@
-import { Button, CircularProgress, Stack } from "@mui/material";
 import axios from "axios";
 import { useState } from "react";
 
@@ -7,6 +6,7 @@ import { API_URL } from "../config";
 import { ApiResponse } from "../types";
 import { StepField } from "./step-field";
 import { formatStepsForApi } from "../utils";
+import { Button, Spinner, VStack } from "@chakra-ui/react";
 
 const getPayload = (steps: Step[], stepsToCompare?: Step[]) => {
   const formData = new FormData();
@@ -73,13 +73,12 @@ export const Form = ({
   };
 
   return (
-    <Stack
-      sx={{
-        padding: 3,
-        backgroundColor: "#efefef",
-        borderRadius: "0 12px 12px 12px",
-        justifyContent: "right",
-      }}
+    <VStack
+      padding={5}
+      backgroundColor="#efefef"
+      borderRadius="0 12px 12px 12px"
+      justifyContent="right"
+      alignItems="start"
     >
       {steps.map((step, index) => (
         <StepField
@@ -125,12 +124,8 @@ export const Form = ({
           ...(formIsNotValid && { cursor: "not-allowed", opacity: 0.5 }),
         }}
       >
-        {isLoading ? (
-          <CircularProgress style={{ color: "white" }} />
-        ) : (
-          "Compute emissions"
-        )}
+        {isLoading ? <Spinner /> : "Compute emissions"}
       </Button>
-    </Stack>
+    </VStack>
   );
 };

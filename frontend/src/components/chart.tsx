@@ -1,4 +1,3 @@
-import { Box } from "@mui/material";
 import { round, sumBy, uniq, uniqBy } from "lodash";
 import {
   Bar,
@@ -11,6 +10,7 @@ import {
   YAxis,
 } from "recharts";
 import { ApiResponse, Transport, TripData } from "../types";
+import { Box } from "@chakra-ui/react";
 
 interface ChartProps {
   response?: ApiResponse;

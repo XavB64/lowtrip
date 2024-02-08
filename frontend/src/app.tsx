@@ -1,6 +1,17 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { Container, Stack, Tab, Tabs } from "@mui/material";
+import {
+  ChakraProvider,
+  HStack,
+  VStack,
+  Tabs,
+  TabList,
+  Tab,
+  TabPanel,
+  TabPanels,
+  Heading,
+  Box,
+} from "@chakra-ui/react";
 
 import "./styles.css";
 import { Form } from "./components/form";
@@ -10,12 +21,12 @@ import { ApiResponse } from "./types";
 import { useSteps } from "./hooks";
 import { API_URL } from "./config";
 import NavBar from "./components/navBar";
+import theme from "./theme";
 
-function App() {
+function AppBody() {
   const [response, setResponse] = useState<ApiResponse>();
   const myTripSteps = useSteps();
   const alternativeTripSteps = useSteps();
-  const [activeTab, setActiveTab] = useState(0);
 
   useEffect(() => {
     axios.get(API_URL, {
@@ -24,80 +35,78 @@ function App() {
   }, []);
 
   return (
-    <Stack className="App" style={{ height: "100vh", width: "100vw" }}>
-      <Stack height={"64px"}>
-        <NavBar />
-      </Stack>
-      <Stack className="main-body" direction="row">
-        <Stack
-          maxWidth="30%"
-          justifyContent="space-between"
-          height="100%"
-          overflow="auto"
-        >
-          <Stack padding={3} height="100%">
-            <h1 className="title">Compare the emissions from your travels</h1>
-            <Tabs
-              value={activeTab}
-              onChange={() => setActiveTab((activeTab + 1) % 2)}
-              aria-label="basic tabs example"
-            >
-              <Tab
-                label="My trip"
-                sx={{
-                  textTransform: "none",
-                  fontFamily: "Montserrat",
-                  backgroundColor: activeTab === 0 ? "#efefef" : undefined,
-                  borderRadius: activeTab === 0 ? "12px 12px 0 0" : undefined,
-                }}
-              />
-              <Tab
-                label="Other trip"
-                sx={{
-                  textTransform: "none",
-                  fontFamily: "Montserrat",
-                  backgroundColor: activeTab === 1 ? "#efefef" : undefined,
-                  borderRadius: activeTab === 1 ? "12px 12px 0 0" : undefined,
-                }}
-              />
-            </Tabs>
-            {activeTab === 0 ? (
-              <Form
-                key="main-form"
-                setResponse={setResponse}
-                stepsProps={myTripSteps}
-              />
-            ) : (
-              <Form
-                key="alternative-form"
-                setResponse={setResponse}
-                stepsProps={alternativeTripSteps}
-                stepsToCompare={myTripSteps.values}
-              />
-            )}
-            <Chart response={response} />
-          </Stack>
-        </Stack>
-        <Container
-          style={{ padding: 0, margin: 0, maxWidth: "100%", flexShrink: 3 }}
-        >
-          <Map
-            response={response}
-            stepsCoords={
-              myTripSteps.values
-                .filter((step) => !!step.locationCoords)
-                .map((step) => step.locationCoords) as [number, number][]
-            }
-            alternativeStepsCoords={
-              alternativeTripSteps.values
-                .filter((step) => !!step.locationCoords)
-                .map((step) => step.locationCoords) as [number, number][]
-            }
-          />
-        </Container>
-      </Stack>
-    </Stack>
+    <HStack w="100vw" h="100vh" pt={5}>
+      <NavBar />
+      <VStack
+        maxWidth="30%"
+        justifyContent="space-between"
+        height="100%"
+        overflow="auto"
+        flexShrink={1}
+        padding={3}
+      >
+        <VStack padding={3} spacing={5} height="100%">
+          <Heading
+            color="#595959"
+            fontSize="x-large"
+            fontWeight={900}
+            textAlign="center"
+          >
+            Compare the emissions from your travels
+          </Heading>
+          <Tabs variant="enclosed" w="100%">
+            <TabList>
+              <Tab _selected={{ bg: "#efefef" }} borderRadius="12px 12px 0 0">
+                My trip
+              </Tab>
+              <Tab _selected={{ bg: "#efefef" }} borderRadius="12px 12px 0 0">
+                Alternative trip
+              </Tab>
+            </TabList>
+            <TabPanels>
+              <TabPanel padding={0}>
+                <Form
+                  key="main-form"
+                  setResponse={setResponse}
+                  stepsProps={myTripSteps}
+                />
+              </TabPanel>
+              <TabPanel padding={0}>
+                <Form
+                  key="alternative-form"
+                  setResponse={setResponse}
+                  stepsProps={alternativeTripSteps}
+                  stepsToCompare={myTripSteps.values}
+                />
+              </TabPanel>
+            </TabPanels>
+          </Tabs>
+          <Chart response={response} />
+        </VStack>
+      </VStack>
+      <Box w="100%" h="100%">
+        <Map
+          response={response}
+          stepsCoords={
+            myTripSteps.values
+              .filter((step) => !!step.locationCoords)
+              .map((step) => step.locationCoords) as [number, number][]
+          }
+          alternativeStepsCoords={
+            alternativeTripSteps.values
+              .filter((step) => !!step.locationCoords)
+              .map((step) => step.locationCoords) as [number, number][]
+          }
+        />
+      </Box>
+    </HStack>
   );
 }
 
-export default App;
+export default function App() {
+  return (
+    <ChakraProvider theme={theme}>
+      <AppBody />
+    </ChakraProvider>
+  );
+}
