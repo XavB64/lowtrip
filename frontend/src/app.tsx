@@ -1,17 +1,26 @@
-import { useState } from "react";
+import axios from "axios";
+import { useEffect, useState } from "react";
 import { Container, Stack, Tab, Tabs } from "@mui/material";
+
 import "./styles.css";
 import { Form } from "./components/form";
 import { Chart } from "./components/chart";
 import { Map } from "./components/map";
 import { ApiResponse } from "./types";
 import { useSteps } from "./hooks";
+import { API_URL } from "./config";
 
 function App() {
   const [response, setResponse] = useState<ApiResponse>();
   const myTripSteps = useSteps();
   const alternativeTripSteps = useSteps();
   const [activeTab, setActiveTab] = useState(0);
+
+  useEffect(() => {
+    axios.get(API_URL, {
+      headers: { "Access-Contol-Allow-Origin": "*" },
+    });
+  }, []);
 
   return (
     <Stack direction="row" className="App" style={{ height: "100vh" }}>
