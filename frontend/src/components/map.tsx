@@ -57,7 +57,7 @@ const MapContent = ({
 
   return (
     <>
-      <TileLayer url="https://a.basemaps.cartocdn.com/light_all/{z}/{x}/{y}@2x.png" />
+      <TileLayer url="https://a.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}@2x.png" />
       {response &&
         (JSON.parse(response.data.gdf) as Gdf).features.map((feature) => {
           return (

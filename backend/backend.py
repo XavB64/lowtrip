@@ -574,7 +574,7 @@ def compute_emissions_custom(data, cmap = cmap_custom):
     #Colors
     #Custom trip
     list_items = ['Train', 'Bus', 'Car', 'Plane_contrails', 'Plane', 'Ferry']
-    cmap = matplotlib.cm.get_cmap(cmap_custom)
+    cmap = matplotlib.cm.get_cmap(cmap)
     colors = [matplotlib.colors.to_hex(cmap(x)) for x in np.linspace(0.2, 1, len(list_items))]
     color_custom = dict(zip(list_items, colors))
     #Loop
@@ -595,11 +595,14 @@ def compute_emissions_custom(data, cmap = cmap_custom):
         # Compute depending on the mean of transport
         if mean == 'Train':
             gdf, train = train_to_gdf(tag1, tag2, colormap = color_custom['Train'])
+            #Adding a step variable here to know which trip is it
+            gdf['step'] = str(int(idx) + 1)
             l.append(gdf)
             geo.append(gdf)
 
         elif mean == 'Bus' :
             gdf_bus, route = bus_to_gdf(tag1, tag2, color=color_custom['Bus'])
+            gdf_bus['step'] = str(int(idx) + 1)
             l.append(gdf_bus)
             geo.append(gdf_bus)
 
@@ -607,17 +610,21 @@ def compute_emissions_custom(data, cmap = cmap_custom):
             # We get the number of passenger
             nb = int(data.loc[idx].nb)
             gdf_car, route = car_to_gdf(tag1, tag2, nb=nb,  color=color_custom['Car'])
+            gdf_car['step'] = str(int(idx) + 1)
             l.append(gdf_car)
             geo.append(gdf_car)
 
         elif mean == 'Plane':
             gdf_plane, gdf_cont = plane_to_gdf(tag1, tag2,  color=color_custom['Plane'], color_contrails=color_custom['Plane_contrails'])
+            gdf_plane['step'] = str(int(idx) + 1)
+            gdf_cont['step'] = str(int(idx) + 1)
             l.append(gdf_plane)
             l.append(gdf_cont)
             geo.append(gdf_plane)
 
         elif mean == 'Ferry':
             gdf_ferry = ferry_to_gdf(tag1, tag2,  color=color_custom['Ferry'])
+            gdf_ferry['step'] = str(int(idx) + 1)
             l.append(gdf_ferry)
             geo.append(gdf_ferry)
 
@@ -710,45 +717,34 @@ def compute_emissions_all(data, cmap = cmap_direct):
 
     return data, geodata
 
-def bchart_1(mytrip, direct):
+def prepare_agg_1(mytrip):
     '''
     parameters:
         - mytrip, dataframe of custom trip
-        - direct, dataframe of direct trip
     return:
-        - json
-        - plotly figure
+        - data with changed fields for bar chart
     '''
-    # Treatment for number of passengers in car for direct
-    # all_car = pd.concat(5 * [direct[direct['NAME']=='Car']], ignore_index=True)
-    # all_car['kgCO2eq'] /= 5
-
-    # direct = pd.concat([direct[~direct['Mean of Transport'].isin(['Car'])], all_car])
     if mytrip.shape[0] != 0: # Faire de même pour bchart2
         # Merging means of transport for custom trip
-        mytrip['NAME'] = mytrip['Mean of Transport'] + ' - ' + mytrip['NAME']
+        mytrip['NAME'] = mytrip['step'] + '. ' + mytrip['Mean of Transport'] + ' - ' + mytrip['NAME'] #+ ' - ' + mytrip.index.map(str)
         # Separtating bars
         mytrip['Mean of Transport'] = 'My trip'
-        direct['Type'] = 'Direct'
-    # Combine
-    l_tot = pd.concat([mytrip, direct]).reset_index(drop=True)
-    return plotly_v2(l_tot)
+    return mytrip
 
-def bchart_2(mytrip, alternative):
+def prepare_agg_2(mytrip, alternative):
     '''
     parameters:
         - mytrip, dataframe of custom trip
         - alternative, dataframe of alternative trip
     return:
-        - json
-        - plotly figure
+        - data with changed fields for bar chart
     '''
     # Merging means of transport for custom trips
-    mytrip['NAME'] = mytrip['Mean of Transport'] + ' - ' + mytrip['NAME']
-    alternative['NAME'] = alternative['Mean of Transport'] + ' - ' + alternative['NAME']
+    mytrip['NAME'] = mytrip['step'] + '. ' + mytrip['Mean of Transport'] + ' - ' + mytrip['NAME'] # + ' - ' + mytrip.index.map(str) + '\''
+    alternative['NAME'] = alternative['step'] + '. ' + alternative['Mean of Transport'] + ' - ' + alternative['NAME']+' ' # + ' - ' + alternative.index.map(str)
     # Separtating bars
     mytrip['Mean of Transport'] = 'My trip'
     alternative['Mean of Transport'] = 'Alternative'
-    # Combine
-    l_tot = pd.concat([mytrip, alternative]).reset_index(drop=True)
-    return plotly_v2(l_tot)
+    
+    return mytrip, alternative
+

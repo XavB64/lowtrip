@@ -13,6 +13,9 @@ app = Flask(__name__, static_url_path='', static_folder='frontend/build')
 CORS(app) #comment this on deployment
 # app.config["DEBUG"] = True
 app.config["APPLICATION_ROOT"] = "/"
+#To send to the frontend
+l_geo = ['colors', 'geometry']
+l_var = ['NAME', 'Mean of Transport', 'kgCO2eq', 'colors']
 
 @app.route('/', methods=["GET", "POST"])
 def main():
@@ -23,17 +26,18 @@ def main():
         if request.form['mode'] == '1' : # My trip vs direct trips
             # Convert json into pandas
             df = pd.DataFrame.from_dict(json.loads(request.form['my-trip']))
-          #  df.to_csv('query.csv')
+
             #My trip data and geo data
             data_mytrip, geo_mytrip = compute_emissions_custom(df)
-           # print(data_mytrip)
+
             #Direct data and geo data
             data_direct, geo_direct = compute_emissions_all(df)
-            #Possible to generate a plotly json, maybe better to plot from the data directly in javascript
-            graph_json, figure = bchart_1(data_mytrip, data_direct)
-           # pd.concat([data_mytrip, data_direct]).to_csv('see_res.csv')
-            response = {'gdf' : pd.concat([geo_mytrip, geo_direct])[['colors', 'geometry']].explode().to_json(),
-                        'my_trip' : data_mytrip.to_json(orient='records'), 'direct_trip': data_direct.to_json(orient='records')}
+            #Prepare data for aggregation in the chart -  see frontend
+            data_mytrip = prepare_agg_1(data_mytrip)
+
+            # Response
+            response = {'gdf' : pd.concat([geo_mytrip, geo_direct])[l_geo].explode().to_json(),
+                        'my_trip' : data_mytrip[l_var].to_json(orient='records'), 'direct_trip': data_direct[l_var].to_json(orient='records')}
             
         if request.form['mode'] == '2' : # My trip vs custom trip
             # Convert json into pandas
@@ -45,10 +49,12 @@ def main():
             #Direct data and geo data
             #We change the color to pink
             data_alternative, geo_alternative = compute_emissions_custom(df2, cmap = 'RdPu')
-            #Possible to generate a plotly json
-            graph_json, figure = bchart_2(data_mytrip, data_alternative)
-            response = {'gdf' : pd.concat([geo_mytrip, geo_alternative])[['colors', 'geometry']].explode().to_json(),
-                        'my_trip' : data_mytrip.to_json(orient='records'), 'alternative_trip': data_alternative.to_json(orient='records')}
+            #Prepare data for aggregation in the chart -  see frontend
+            data_mytrip, data_alternative = prepare_agg_2(data_mytrip, data_alternative)
+            
+            # Response
+            response = {'gdf' : pd.concat([geo_mytrip, geo_alternative])[l_geo].explode().to_json(),
+                        'my_trip' : data_mytrip[l_var].to_json(orient='records'), 'alternative_trip': data_alternative[l_var].to_json(orient='records')}
 
         return response
 
