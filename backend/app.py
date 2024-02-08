@@ -13,9 +13,8 @@ app = Flask(__name__, static_url_path='', static_folder='frontend/build')
 CORS(app) #comment this on deployment
 # app.config["DEBUG"] = True
 app.config["APPLICATION_ROOT"] = "/"
-#To send to the frontend
+#Geometry - To send to the frontend
 l_geo = ['colors', 'geometry']
-l_var = ['NAME', 'Mean of Transport', 'kgCO2eq', 'colors']
 
 @app.route('/', methods=["GET", "POST"])
 def main():
@@ -33,11 +32,11 @@ def main():
             #Direct data and geo data
             data_direct, geo_direct = compute_emissions_all(df)
             #Prepare data for aggregation in the chart -  see frontend
-            data_mytrip = prepare_agg_1(data_mytrip)
+            data_mytrip = chart_refactor(data_mytrip)
 
             # Response
             response = {'gdf' : pd.concat([geo_mytrip, geo_direct])[l_geo].explode().to_json(),
-                        'my_trip' : data_mytrip[l_var].to_json(orient='records'), 'direct_trip': data_direct[l_var].to_json(orient='records')}
+                        'my_trip' : data_mytrip.to_json(orient='records'), 'direct_trip': data_direct.to_json(orient='records')}
             
         if request.form['mode'] == '2' : # My trip vs custom trip
             # Convert json into pandas
@@ -50,11 +49,11 @@ def main():
             #We change the color to pink
             data_alternative, geo_alternative = compute_emissions_custom(df2, cmap = 'RdPu')
             #Prepare data for aggregation in the chart -  see frontend
-            data_mytrip, data_alternative = prepare_agg_2(data_mytrip, data_alternative)
+            data_mytrip, data_alternative = chart_refactor(data_mytrip, data_alternative, True)
             
             # Response
             response = {'gdf' : pd.concat([geo_mytrip, geo_alternative])[l_geo].explode().to_json(),
-                        'my_trip' : data_mytrip[l_var].to_json(orient='records'), 'alternative_trip': data_alternative[l_var].to_json(orient='records')}
+                        'my_trip' : data_mytrip.to_json(orient='records'), 'alternative_trip': data_alternative.to_json(orient='records')}
 
         return response
 

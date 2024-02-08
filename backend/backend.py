@@ -31,6 +31,9 @@ import requests
 #Load  world
 world = gpd.read_file('static/world.geojson')
 
+# Fields to return for bar chart
+l_var = ['NAME', 'Mean of Transport', 'kgCO2eq', 'colors']
+
 #Colors
 charte_mollow = ['590D22',
             '800F2F',
@@ -717,34 +720,28 @@ def compute_emissions_all(data, cmap = cmap_direct):
 
     return data, geodata
 
-def prepare_agg_1(mytrip):
-    '''
-    parameters:
-        - mytrip, dataframe of custom trip
-    return:
-        - data with changed fields for bar chart
-    '''
-    if mytrip.shape[0] != 0: # Faire de même pour bchart2
-        # Merging means of transport for custom trip
-        mytrip['NAME'] = mytrip['step'] + '. ' + mytrip['Mean of Transport'] + ' - ' + mytrip['NAME'] #+ ' - ' + mytrip.index.map(str)
-        # Separtating bars
-        mytrip['Mean of Transport'] = 'My trip'
-    return mytrip
 
-def prepare_agg_2(mytrip, alternative):
+def chart_refactor(mytrip, alternative = None, do_alt = False):
     '''
+    This function prepare the data to be displayed in the chart correctly
     parameters:
         - mytrip, dataframe of custom trip
-        - alternative, dataframe of alternative trip
+        - alternative, dataframe of alternative trip if requested
+        - do_alt (bool), is there an alternative trip ?
     return:
         - data with changed fields for bar chart
     '''
     # Merging means of transport for custom trips
     mytrip['NAME'] = mytrip['step'] + '. ' + mytrip['Mean of Transport'] + ' - ' + mytrip['NAME'] # + ' - ' + mytrip.index.map(str) + '\''
-    alternative['NAME'] = alternative['step'] + '. ' + alternative['Mean of Transport'] + ' - ' + alternative['NAME']+' ' # + ' - ' + alternative.index.map(str)
     # Separtating bars
     mytrip['Mean of Transport'] = 'My trip'
-    alternative['Mean of Transport'] = 'Alternative'
     
-    return mytrip, alternative
+    if do_alt :
+        #We have to render alternative as well
+        alternative['NAME'] = alternative['step'] + '. ' + alternative['Mean of Transport'] + ' - ' + alternative['NAME']+' ' # + ' - ' + alternative.index.map(str)
+        alternative['Mean of Transport'] = 'Alternative'
+        # Then we return both
+        return mytrip[l_var], alternative[l_var]
+    else :
+        return mytrip[l_var]
 
