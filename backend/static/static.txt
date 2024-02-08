@@ -1,2 +1,1 @@
-Here are the data for processing (electric carbon intensity, european countries geometry)
-There is also the output files that are used to display path geometry, legend and bar chart
+Data for train emission factors per country and their geometry
