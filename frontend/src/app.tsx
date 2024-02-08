@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   ChakraProvider,
   HStack,
@@ -11,6 +11,7 @@ import {
   TabPanels,
   Heading,
   Box,
+  Stack,
 } from "@chakra-ui/react";
 
 import "./styles.css";
@@ -38,12 +39,13 @@ function AppBody() {
     <HStack w="100vw" h="100vh" pt={5}>
       <NavBar />
       <VStack
-        maxWidth="30%"
+        maxWidth={["100%", "30%"]}
         justifyContent="space-between"
         height="100%"
         overflow="auto"
         flexShrink={1}
-        padding={3}
+        p={3}
+        pt={5}
       >
         <VStack padding={3} spacing={5} height="100%">
           <Heading
@@ -84,7 +86,7 @@ function AppBody() {
           <Chart response={response} />
         </VStack>
       </VStack>
-      <Box w="100%" h="100%">
+      <Box w="100%" h={["800px", "100%"]}>
         <Map
           response={response}
           stepsCoords={
@@ -99,7 +101,7 @@ function AppBody() {
           }
         />
       </Box>
-    </HStack>
+    </Stack>
   );
 }
 
