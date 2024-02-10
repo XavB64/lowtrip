@@ -113,7 +113,7 @@ export const StepField = ({ removeStep, updateStep, step }: StepFieldProps) => {
           <IconButton
             onClick={() => removeStep(step.index)}
             aria-label="delete"
-            style={{ borderRadius: "20px" }}
+            borderRadius="20px"
             icon={<BiTrash size={20} />}
           />
         )}

@@ -95,40 +95,20 @@ export const Form = ({
         />
       ))}
 
-      <Button
-        style={{
-          padding: 0,
-          color: "#b7b7b7",
-          marginBottom: 10,
-          marginTop: 10,
-          textTransform: "none",
-          fontFamily: "Montserrat",
-          fontWeight: 700,
-          fontSize: "16px",
-          width: "fit-content",
-        }}
-        onClick={addStep}
-      >
+      <Button padding={0} color="#b7b7b7" onClick={addStep} variant="ghost">
         Add step
       </Button>
 
       <Button
         onClick={handleSubmit}
-        disabled={isLoading || formIsNotValid}
-        style={{
-          borderRadius: "20px",
-          padding: 0,
-          color: "white",
-          backgroundColor: "#0097A7",
-          margin: 2,
-          textTransform: "none",
-          fontFamily: "Montserrat",
-          fontWeight: 700,
-          fontSize: "16px",
-          width: "100%",
-          height: "50px",
-          ...(formIsNotValid && { cursor: "not-allowed", opacity: 0.5 }),
-        }}
+        isDisabled={isLoading || formIsNotValid}
+        borderRadius="20px"
+        padding={0}
+        colorScheme="blue"
+        margin={2}
+        width="100%"
+        height="50px"
+        cursor={formIsNotValid ? "not-allowed" : "auto"}
       >
         {isLoading ? <Spinner /> : "Compute emissions"}
       </Button>

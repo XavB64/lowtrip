@@ -3,6 +3,7 @@ import {
   Card,
   ChakraProvider,
   Heading,
+  IconButton,
   Stack,
   Tab,
   TabList,
@@ -14,13 +15,13 @@ import {
 import axios from "axios";
 import { useEffect, useRef, useState } from "react";
 
+import { BiChevronUp } from "react-icons/bi";
 import { Chart } from "./components/chart";
 import { Form } from "./components/form";
 import { Map } from "./components/map";
 import NavBar from "./components/nav-bar";
 import { API_URL } from "./config";
 import { useSteps } from "./hooks";
-import "./styles.css";
 import theme from "./theme";
 import { ApiResponse } from "./types";
 
@@ -124,6 +125,17 @@ function AppBody() {
           />
         </Box>
       </Stack>
+      <IconButton
+        aria-label="scroll-to-top"
+        icon={<BiChevronUp />}
+        onClick={() => window.scrollTo({ top: 0, left: 0, behavior: "smooth" })}
+        zIndex={2}
+        position="fixed"
+        bottom={3}
+        left={3}
+        colorScheme="blue"
+        isRound
+      />
     </VStack>
   );
 }
