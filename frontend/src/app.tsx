@@ -25,16 +25,15 @@ function App() {
 
   return (
     <Stack className="App" style={{ height: "100vh", width: "100vw" }}>
-      <Stack maxHeight={"10%"}>
-        <NavBar></NavBar>
+      <Stack height={"64px"}>
+        <NavBar />
       </Stack>
-      <Stack direction="row" flexGrow={3}>
+      <Stack className="main-body" direction="row">
         <Stack
           maxWidth="30%"
           justifyContent="space-between"
           height="100%"
           overflow="auto"
-          flexShrink={1}
         >
           <Stack padding={3} height="100%">
             <h1 className="title">Compare the emissions from your travels</h1>

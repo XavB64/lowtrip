@@ -5,6 +5,7 @@ import {
   BarChart,
   LabelList,
   LabelProps,
+  ResponsiveContainer,
   Tooltip,
   XAxis,
   YAxis,
@@ -30,7 +31,7 @@ export function Chart({ response }: ChartProps) {
   );
 
   return (
-    <Box height="100%">
+    <Box height="100%" width="100%">
       <h2
         style={{
           color: "#595959",
@@ -41,31 +42,31 @@ export function Chart({ response }: ChartProps) {
       >
         Emissions of your trip compared to other means of transportation
       </h2>
-      <BarChart
-        height={400}
-        width={350}
-        data={getChartData(transports, trips)}
-        margin={{ bottom: 20 }}
-      >
-        <XAxis
-          dataKey="name"
-          label={{
-            value: "Mean of transport",
-            position: "insideBottom",
-            offset: -10,
-          }}
-        />
-        <YAxis padding={{ top: 30 }} hide />
-        <Tooltip formatter={(value) => `${round(+value, 1)} kgCO2eq`} />
-        {uniqBy(trips, "NAME").map((trip) => (
-          <Bar dataKey={trip.NAME} fill={trip.colors} stackId="a">
-            <LabelList
-              dataKey="name"
-              content={<CustomizedLabel trips={trips} tripName={trip.NAME} />}
-            />{" "}
-          </Bar>
-        ))}
-      </BarChart>
+      <ResponsiveContainer width="100%" height={350}>
+        <BarChart
+          data={getChartData(transports, trips)}
+          margin={{ bottom: 20 }}
+        >
+          <XAxis
+            dataKey="name"
+            label={{
+              value: "Mean of transport",
+              position: "insideBottom",
+              offset: -10,
+            }}
+          />
+          <YAxis padding={{ top: 30 }} hide />
+          <Tooltip formatter={(value) => `${round(+value, 1)} kgCO2eq`} />
+          {uniqBy(trips, "NAME").map((trip) => (
+            <Bar dataKey={trip.NAME} fill={trip.colors} stackId="a">
+              <LabelList
+                dataKey="name"
+                content={<CustomizedLabel trips={trips} tripName={trip.NAME} />}
+              />{" "}
+            </Bar>
+          ))}
+        </BarChart>
+      </ResponsiveContainer>
     </Box>
   );
 }
