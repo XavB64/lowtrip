@@ -1,18 +1,15 @@
 import * as React from "react";
-import { AppBar, Box, Button, Toolbar, Typography } from "@mui/material";
+import { AppBar, Box, Button, Toolbar } from "@mui/material";
+import logo from "../assets/logo.png";
 
 const navItems = ["Methodology", "About", "Licenses", "Contact"];
 
 const NavBar = () => (
   <AppBar position="static" style={{ background: "#0097A7" }}>
     <Toolbar>
-      <Typography
-        variant="h5"
-        component="div"
-        sx={{ flexGrow: 1, display: { xs: "none", sm: "block" } }}
-      >
-        LowTrip
-      </Typography>
+      <div style={{ flexGrow: 1, height: 64 }}>
+        <img src={logo} height="100%" alt="Lowtrip logo" />
+      </div>
       <Box sx={{ display: { xs: "none", sm: "block" } }}>
         {navItems.map((item) => (
           <Button key={item} sx={{ color: "#fff" }}>
