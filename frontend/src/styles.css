@@ -2,6 +2,12 @@
   font-family: "Montserrat" !important;
 }
 
+.main-body {
+  width: 100%;
+  height: calc(100% - 64px);
+  flex-grow: 3;
+}
+
 .title {
   color: #595959;
   font-size: x-large;
