@@ -4,7 +4,7 @@ warnings.filterwarnings("ignore")
 
 # Librairies
 from flask import Flask, request, send_from_directory, json
-from backend import compute_emissions_custom, compute_emissions_all, chart_refactor
+from backend import compute_emissions_custom, compute_emissions_all, chart_refactor, colors_alternative
 from flask_cors import CORS  # comment this on deployment
 import pandas as pd
 
@@ -54,7 +54,7 @@ def main():
             # Direct data and geo data
             # We change the color to pink
             data_alternative, geo_alternative = compute_emissions_custom(
-                df2, cmap="RdPu"
+                df2, cmap=colors_alternative
             )
             # Prepare data for aggregation in the chart -  see frontend
             data_mytrip, data_alternative = chart_refactor(

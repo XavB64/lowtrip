@@ -48,8 +48,28 @@ charte_mollow = [
 ]
 
 # Select main colors
-cmap_custom = "Blues"  # default
-cmap_direct = "Oranges"
+colors_custom = [
+    "#b3eef5",
+    "#7de4f0",
+    "#4accdb",
+    "#27A4B2",
+    "#148693",
+    "#006773"
+]
+colors_direct = [
+    "#febc78",
+    "#E69138",
+    "#cd781f",
+    "#B45E06",
+]
+colors_alternative = [
+    "#ffd1d9",
+    "#f9b5c1",
+    "#f299a9",
+    "#ec7d92",
+    "#e5617a",
+    "#df4562"
+]
 
 # Geometries from API
 simplified = True
@@ -742,7 +762,7 @@ def plotly_v2(gdf):
     return graph_json, fig
 
 
-def compute_emissions_custom(data, cmap=cmap_custom):
+def compute_emissions_custom(data, cmap=colors_custom):
     """
     parameters:
         - data, pandas dataframe format (will be json)
@@ -753,12 +773,8 @@ def compute_emissions_custom(data, cmap=cmap_custom):
     # Colors
     # Custom trip
     list_items = ["Train", "Bus", "Car", "Plane_contrails", "Plane", "Ferry"]
-    cmap = matplotlib.cm.get_cmap(cmap)
-    colors = [
-        matplotlib.colors.to_hex(cmap(x)) for x in np.linspace(0.2, 1, len(list_items))
-    ]
-    color_custom = dict(zip(list_items, colors))
-
+    color_custom = dict(zip(list_items, cmap))
+    
     l = []
     geo = []
     for idx in data.index[:-1]:  # We loop until last departure
@@ -839,7 +855,7 @@ def compute_emissions_custom(data, cmap=cmap_custom):
     return data, geodata
 
 
-def compute_emissions_all(data, cmap=cmap_direct):
+def compute_emissions_all(data, cmap=colors_direct):
     """
     If data is only one step then we do not compute this mean of transport as it will
     appear in "my_trip"
@@ -852,11 +868,7 @@ def compute_emissions_all(data, cmap=cmap_direct):
     # colors
     # Direct trip
     list_items = ["Train", "Car&Bus", "Plane_contrails", "Plane"]
-    cmap = matplotlib.cm.get_cmap(cmap_direct)
-    colors = [
-        matplotlib.colors.to_hex(cmap(x)) for x in np.linspace(0.2, 1, len(list_items))
-    ]
-    color_direct = dict(zip(list_items, colors))
+    color_direct = dict(zip(list_items, cmap))
     # Departure coordinates
     lon = data.loc["0"].lon
     lat = data.loc["0"].lat

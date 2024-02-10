@@ -1,14 +1,14 @@
-import { Box, Button, IconButton, Stack } from "@mui/material";
 import { useEffect, useRef, useState } from "react";
 import {
-  BiSolidPlaneAlt,
-  BiSolidCar,
-  BiSolidTrain,
   BiSolidBus,
+  BiSolidCar,
+  BiSolidPlaneAlt,
+  BiSolidTrain,
   BiTrash,
 } from "react-icons/bi";
 import { FaFerry } from "react-icons/fa6";
 
+import { Box, Button, HStack, IconButton } from "@chakra-ui/react";
 import { Step, Transport } from "../types";
 
 const TRANSPORTS = [
@@ -90,7 +90,7 @@ export const StepField = ({ removeStep, updateStep, step }: StepFieldProps) => {
 
   return (
     <>
-      <Stack direction="row" spacing={1} marginTop={1}>
+      <HStack w="100%">
         <input
           ref={inputRef}
           value={value}
@@ -98,20 +98,28 @@ export const StepField = ({ removeStep, updateStep, step }: StepFieldProps) => {
             setValue(e.target.value);
           }}
           placeholder={isDeparture ? "From..." : "To..."}
-          className="step-field"
+          style={{
+            width: "-webkit-fill-available",
+            height: "50px",
+            padding: "9px",
+            border: "1px solid lightgrey",
+            borderRadius: "20px",
+            backgroundColor: "white",
+            marginBottom: 1,
+            fontSize: "16px",
+          }}
         />
         {step.index > 2 && (
           <IconButton
             onClick={() => removeStep(step.index)}
             aria-label="delete"
             style={{ borderRadius: "20px" }}
-          >
-            <BiTrash size={20} />
-          </IconButton>
+            icon={<BiTrash size={20} />}
+          />
         )}
-      </Stack>
+      </HStack>
       {!isDeparture && (
-        <Stack
+        <HStack
           direction="row"
           justifyContent="space-between"
           marginBottom={2}
@@ -125,23 +133,22 @@ export const StepField = ({ removeStep, updateStep, step }: StepFieldProps) => {
                 onClick={() =>
                   updateStep(step.index, { transportMean: item.value })
                 }
-                style={{
-                  padding: 0,
-                  width: "30px",
-                  minWidth: "30px",
-                  height: "30px",
-                  borderRadius: "100px",
-                  backgroundColor:
-                    item.value === step.transportMean ? "#474747" : "#b7b7b7",
-                  color: "white",
-                  marginLeft: 5,
-                }}
+                padding={0}
+                width="30px"
+                minWidth="30px"
+                height="30px"
+                borderRadius="100px"
+                backgroundColor={
+                  item.value === step.transportMean ? "#474747" : "#b7b7b7"
+                }
+                color="white"
+                marginLeft={2}
               >
                 {item.icon}
               </Button>
             ))}
           </Box>
-        </Stack>
+        </HStack>
       )}
     </>
   );

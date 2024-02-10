@@ -1,21 +1,36 @@
+import {
+  Box,
+  Card,
+  ChakraProvider,
+  Heading,
+  Stack,
+  Tab,
+  TabList,
+  TabPanel,
+  TabPanels,
+  Tabs,
+  VStack,
+} from "@chakra-ui/react";
 import axios from "axios";
-import { useEffect, useState } from "react";
-import { Container, Stack, Tab, Tabs } from "@mui/material";
+import { useEffect, useRef, useState } from "react";
 
-import "./styles.css";
-import { Form } from "./components/form";
 import { Chart } from "./components/chart";
+import { Form } from "./components/form";
 import { Map } from "./components/map";
-import { ApiResponse } from "./types";
-import { useSteps } from "./hooks";
+import NavBar from "./components/nav-bar";
 import { API_URL } from "./config";
-import NavBar from "./components/navBar";
+import { useSteps } from "./hooks";
+import "./styles.css";
+import theme from "./theme";
+import { ApiResponse } from "./types";
 
-function App() {
+function AppBody() {
   const [response, setResponse] = useState<ApiResponse>();
   const myTripSteps = useSteps();
   const alternativeTripSteps = useSteps();
-  const [activeTab, setActiveTab] = useState(0);
+  const chartRef = useRef(null);
+  const scrollToChart = () =>
+    (chartRef.current as any)?.scrollIntoView({ behavior: "smooth" });
 
   useEffect(() => {
     axios.get(API_URL, {
@@ -24,63 +39,76 @@ function App() {
   }, []);
 
   return (
-    <Stack className="App" style={{ height: "100vh", width: "100vw" }}>
-      <Stack height={"64px"}>
-        <NavBar />
-      </Stack>
-      <Stack className="main-body" direction="row">
-        <Stack
-          maxWidth="30%"
+    <VStack w="100vw" h={["100%", "100vh"]} spacing={0}>
+      <NavBar />
+      <Stack
+        direction={["column", "row"]}
+        w="100%"
+        h="100%"
+        pt={16}
+        spacing={0}
+      >
+        <VStack
+          width={["100%", "45%"]}
           justifyContent="space-between"
           height="100%"
           overflow="auto"
+          p={3}
+          pt={5}
         >
-          <Stack padding={3} height="100%">
-            <h1 className="title">Compare the emissions from your travels</h1>
-            <Tabs
-              value={activeTab}
-              onChange={() => setActiveTab((activeTab + 1) % 2)}
-              aria-label="basic tabs example"
+          <VStack padding={3} spacing={5} height="100%">
+            <Heading
+              color="#595959"
+              fontSize="x-large"
+              fontWeight={900}
+              textAlign="center"
             >
-              <Tab
-                label="My trip"
-                sx={{
-                  textTransform: "none",
-                  fontFamily: "Montserrat",
-                  backgroundColor: activeTab === 0 ? "#efefef" : undefined,
-                  borderRadius: activeTab === 0 ? "12px 12px 0 0" : undefined,
-                }}
-              />
-              <Tab
-                label="Other trip"
-                sx={{
-                  textTransform: "none",
-                  fontFamily: "Montserrat",
-                  backgroundColor: activeTab === 1 ? "#efefef" : undefined,
-                  borderRadius: activeTab === 1 ? "12px 12px 0 0" : undefined,
-                }}
-              />
+              Compare the emissions from your travels
+            </Heading>
+            <Tabs variant="enclosed" w="100%">
+              <TabList>
+                <Tab _selected={{ bg: "#efefef" }} borderRadius="12px 12px 0 0">
+                  My trip
+                </Tab>
+                <Tab _selected={{ bg: "#efefef" }} borderRadius="12px 12px 0 0">
+                  Alternative trip
+                </Tab>
+              </TabList>
+              <TabPanels>
+                <TabPanel padding={0}>
+                  <Form
+                    key="main-form"
+                    setResponse={setResponse}
+                    stepsProps={myTripSteps}
+                    afterSubmit={scrollToChart}
+                  />
+                </TabPanel>
+                <TabPanel padding={0}>
+                  <Form
+                    key="alternative-form"
+                    setResponse={setResponse}
+                    stepsProps={alternativeTripSteps}
+                    stepsToCompare={myTripSteps.values}
+                    afterSubmit={scrollToChart}
+                  />
+                </TabPanel>
+              </TabPanels>
             </Tabs>
-            {activeTab === 0 ? (
-              <Form
-                key="main-form"
-                setResponse={setResponse}
-                stepsProps={myTripSteps}
-              />
-            ) : (
-              <Form
-                key="alternative-form"
-                setResponse={setResponse}
-                stepsProps={alternativeTripSteps}
-                stepsToCompare={myTripSteps.values}
-              />
-            )}
-            <Chart response={response} />
-          </Stack>
-        </Stack>
-        <Container
-          style={{ padding: 0, margin: 0, maxWidth: "100%", flexShrink: 3 }}
-        >
+            <Card
+              ref={chartRef}
+              position={["absolute", "static"]}
+              w={[200, "100%"]}
+              bottom={[3, "auto"]}
+              right={[3, "auto"]}
+              zIndex={2}
+              p="10px"
+              shadow="none"
+            >
+              <Chart response={response} />
+            </Card>
+          </VStack>
+        </VStack>
+        <Box w="100%" h={["95vh", "100%"]}>
           <Map
             response={response}
             stepsCoords={
@@ -94,10 +122,16 @@ function App() {
                 .map((step) => step.locationCoords) as [number, number][]
             }
           />
-        </Container>
+        </Box>
       </Stack>
-    </Stack>
+    </VStack>
   );
 }
 
-export default App;
+export default function App() {
+  return (
+    <ChakraProvider theme={theme}>
+      <AppBody />
+    </ChakraProvider>
+  );
+}

@@ -1,4 +1,3 @@
-import { Button, CircularProgress, Stack } from "@mui/material";
 import axios from "axios";
 import { useState } from "react";
 
@@ -7,6 +6,7 @@ import { API_URL } from "../config";
 import { ApiResponse } from "../types";
 import { StepField } from "./step-field";
 import { formatStepsForApi } from "../utils";
+import { Button, Spinner, VStack } from "@chakra-ui/react";
 
 const getPayload = (steps: Step[], stepsToCompare?: Step[]) => {
   const formData = new FormData();
@@ -27,6 +27,8 @@ const getPayload = (steps: Step[], stepsToCompare?: Step[]) => {
   return formData;
 };
 
+const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
 interface FormProps {
   setResponse: (response: ApiResponse) => void;
   stepsProps: {
@@ -36,12 +38,14 @@ interface FormProps {
     updateStep: (index: number, data: Partial<Step>) => void;
   };
   stepsToCompare?: Step[];
+  afterSubmit: () => void;
 }
 
 export const Form = ({
   setResponse,
   stepsProps,
   stepsToCompare,
+  afterSubmit,
 }: FormProps) => {
   const { values: steps, addStep, removeStep, updateStep } = stepsProps;
   const [isLoading, setIsLoading] = useState(false);
@@ -67,19 +71,20 @@ export const Form = ({
       .catch((err) => {
         console.log(err);
       })
-      .finally(() => {
+      .finally(async () => {
         setIsLoading(false);
+        await delay(200);
+        afterSubmit();
       });
   };
 
   return (
-    <Stack
-      sx={{
-        padding: 3,
-        backgroundColor: "#efefef",
-        borderRadius: "0 12px 12px 12px",
-        justifyContent: "right",
-      }}
+    <VStack
+      padding={5}
+      backgroundColor="#efefef"
+      borderRadius="0 12px 12px 12px"
+      justifyContent="right"
+      alignItems="start"
     >
       {steps.map((step, index) => (
         <StepField
@@ -125,12 +130,8 @@ export const Form = ({
           ...(formIsNotValid && { cursor: "not-allowed", opacity: 0.5 }),
         }}
       >
-        {isLoading ? (
-          <CircularProgress style={{ color: "white" }} />
-        ) : (
-          "Compute emissions"
-        )}
+        {isLoading ? <Spinner /> : "Compute emissions"}
       </Button>
-    </Stack>
+    </VStack>
   );
 };

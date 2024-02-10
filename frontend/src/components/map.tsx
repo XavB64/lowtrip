@@ -9,6 +9,7 @@ import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import { useEffect } from "react";
 import { ApiResponse, Gdf } from "../types";
+import { useBreakpointValue } from "@chakra-ui/react";
 
 interface MapProps {
   response?: ApiResponse;
@@ -21,8 +22,15 @@ export const Map = ({
   stepsCoords,
   alternativeStepsCoords,
 }: MapProps) => {
+  const allowScrollToZoom = useBreakpointValue([false, true], { ssr: false });
+
   return (
-    <MapContainer center={[48, 20]} zoom={5} scrollWheelZoom={true}>
+    <MapContainer
+      center={[48, 20]}
+      zoom={5}
+      scrollWheelZoom={allowScrollToZoom}
+      style={{ width: "100%" }}
+    >
       <MapContent
         response={response}
         stepsCoords={stepsCoords}
