@@ -758,47 +758,58 @@ def compute_emissions_custom(data, cmap=cmap_custom):
         matplotlib.colors.to_hex(cmap(x)) for x in np.linspace(0.2, 1, len(list_items))
     ]
     color_custom = dict(zip(list_items, colors))
-    # Loop
+
     l = []
     geo = []
     for idx in data.index[:-1]:  # We loop until last departure
-        # Mean of transport
-        mean = data.loc[idx].transp
         # Departure coordinates
-        lon = data.loc[idx].lon
-        lat = data.loc[idx].lat
-        tag1 = (lon, lat)
+        depature = data.loc[idx]
+        departure_coordinates = (depature.lon, depature.lat)
+
         # Arrival coordinates
-        lon = data.loc[str(int(idx) + 1)].lon
-        lat = data.loc[str(int(idx) + 1)].lat
-        tag2 = (lon, lat)
+        arrival = data.loc[str(int(idx) + 1)]
+        arrival_coordinates = (arrival.lon, arrival.lat)
+
+        # Mean of transport
+        transport_mean = arrival.transp
 
         # Compute depending on the mean of transport
-        if mean == "Train":
-            gdf, train = train_to_gdf(tag1, tag2, colormap=color_custom["Train"])
+        if transport_mean == "Train":
+            gdf, _train = train_to_gdf(
+                departure_coordinates,
+                arrival_coordinates,
+                colormap=color_custom["Train"],
+            )
             # Adding a step variable here to know which trip is it
             gdf["step"] = str(int(idx) + 1)
             l.append(gdf)
             geo.append(gdf)
 
-        elif mean == "Bus":
-            gdf_bus, route = bus_to_gdf(tag1, tag2, color=color_custom["Bus"])
+        elif transport_mean == "Bus":
+            gdf_bus, _route = bus_to_gdf(
+                departure_coordinates, arrival_coordinates, color=color_custom["Bus"]
+            )
             gdf_bus["step"] = str(int(idx) + 1)
             l.append(gdf_bus)
             geo.append(gdf_bus)
 
-        elif mean == "Car":
+        elif transport_mean == "Car":
             # We get the number of passenger
-            nb = int(data.loc[idx].nb)
-            gdf_car, route = car_to_gdf(tag1, tag2, nb=nb, color=color_custom["Car"])
+            nb = int(arrival.nb)
+            gdf_car, _route = car_to_gdf(
+                departure_coordinates,
+                arrival_coordinates,
+                nb=nb,
+                color=color_custom["Car"],
+            )
             gdf_car["step"] = str(int(idx) + 1)
             l.append(gdf_car)
             geo.append(gdf_car)
 
-        elif mean == "Plane":
+        elif transport_mean == "Plane":
             gdf_plane, gdf_cont = plane_to_gdf(
-                tag1,
-                tag2,
+                departure_coordinates,
+                arrival_coordinates,
                 color=color_custom["Plane"],
                 color_contrails=color_custom["Plane_contrails"],
             )
@@ -808,8 +819,10 @@ def compute_emissions_custom(data, cmap=cmap_custom):
             l.append(gdf_cont)
             geo.append(gdf_plane)
 
-        elif mean == "Ferry":
-            gdf_ferry = ferry_to_gdf(tag1, tag2, color=color_custom["Ferry"])
+        elif transport_mean == "Ferry":
+            gdf_ferry = ferry_to_gdf(
+                departure_coordinates, arrival_coordinates, color=color_custom["Ferry"]
+            )
             gdf_ferry["step"] = str(int(idx) + 1)
             l.append(gdf_ferry)
             geo.append(gdf_ferry)

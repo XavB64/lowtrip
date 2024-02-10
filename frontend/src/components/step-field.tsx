@@ -1,4 +1,5 @@
 import { Box, Button, IconButton, Stack } from "@mui/material";
+import { useEffect, useRef, useState } from "react";
 import {
   BiSolidPlaneAlt,
   BiSolidCar,
@@ -6,9 +7,9 @@ import {
   BiSolidBus,
   BiTrash,
 } from "react-icons/bi";
-import { FaFerry, FaGlasses } from "react-icons/fa6";
+import { FaFerry } from "react-icons/fa6";
+
 import { Step, Transport } from "../types";
-import { useEffect, useRef, useState } from "react";
 
 const TRANSPORTS = [
   {
@@ -34,18 +35,12 @@ const TRANSPORTS = [
 ];
 
 interface StepFieldProps {
-  isLastStep?: boolean;
   removeStep: (index: number) => void;
   updateStep: (index: number, data: Partial<Step>) => void;
   step: Step;
 }
 
-export const StepField = ({
-  removeStep,
-  updateStep,
-  step,
-  isLastStep,
-}: StepFieldProps) => {
+export const StepField = ({ removeStep, updateStep, step }: StepFieldProps) => {
   const autoCompleteRef = useRef(null);
   const inputRef = useRef(null);
 
@@ -90,11 +85,12 @@ export const StepField = ({
       });
     }
     if (!shoudlReset) setShouldReset(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value]);
 
   return (
     <>
-      <Stack direction="row" spacing={1}>
+      <Stack direction="row" spacing={1} marginTop={1}>
         <input
           ref={inputRef}
           value={value}
@@ -102,16 +98,7 @@ export const StepField = ({
             setValue(e.target.value);
           }}
           placeholder={isDeparture ? "From..." : "To..."}
-          style={{
-            width: "-webkit-fill-available",
-            height: "30px",
-            padding: "9px",
-            border: "1px solid lightgrey",
-            borderRadius: "20px",
-            backgroundColor: "white",
-            marginBottom: 1,
-            fontSize: "16px",
-          }}
+          className="step-field"
         />
         {step.index > 2 && (
           <IconButton
@@ -123,12 +110,12 @@ export const StepField = ({
           </IconButton>
         )}
       </Stack>
-      {!isLastStep && (
+      {!isDeparture && (
         <Stack
           direction="row"
           justifyContent="space-between"
           marginBottom={2}
-          marginTop={2}
+          marginTop={1}
         >
           <Box>
             <span style={{ paddingRight: 5, textAlign: "end" }}>by</span>
