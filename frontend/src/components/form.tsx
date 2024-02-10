@@ -46,9 +46,9 @@ export const Form = ({
   const { values: steps, addStep, removeStep, updateStep } = stepsProps;
   const [isLoading, setIsLoading] = useState(false);
 
-  const formIsNotValid = steps.some((step) => {
-    const isLastStep = step.index === steps.length;
-    return !step.locationCoords || (!isLastStep && !step.transportMean);
+  const formIsNotValid = steps.some((step, index) => {
+    const isDeparture = index === 0;
+    return !step.locationCoords || (!isDeparture && !step.transportMean);
   });
 
   const handleSubmit = async () => {
@@ -84,7 +84,6 @@ export const Form = ({
       {steps.map((step, index) => (
         <StepField
           key={`main-form-${index}`}
-          isLastStep={index === steps.length - 1}
           step={step}
           updateStep={updateStep}
           removeStep={removeStep}
