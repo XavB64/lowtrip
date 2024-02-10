@@ -8,8 +8,8 @@ const NavBar = () => (
     w="100%"
     position="fixed"
     background="#515151"
-    px={5}
-    py={3}
+    px={6}
+    py={4}
     boxShadow="md"
     zIndex={3}
     h={16}

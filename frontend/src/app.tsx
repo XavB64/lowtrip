@@ -17,7 +17,7 @@ import { useEffect, useRef, useState } from "react";
 import { Chart } from "./components/chart";
 import { Form } from "./components/form";
 import { Map } from "./components/map";
-import NavBar from "./components/navBar";
+import NavBar from "./components/nav-bar";
 import { API_URL } from "./config";
 import { useSteps } from "./hooks";
 import "./styles.css";
