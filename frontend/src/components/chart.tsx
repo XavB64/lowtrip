@@ -1,3 +1,9 @@
+import {
+  Box,
+  Heading,
+  useBreakpoint,
+  useBreakpointValue,
+} from "@chakra-ui/react";
 import { round, sumBy, uniq, uniqBy } from "lodash";
 import {
   Bar,
@@ -10,13 +16,20 @@ import {
   YAxis,
 } from "recharts";
 import { ApiResponse, Transport, TripData } from "../types";
-import { Box } from "@chakra-ui/react";
 
 interface ChartProps {
   response?: ApiResponse;
 }
 
 export function Chart({ response }: ChartProps) {
+  const breakpoint = useBreakpoint();
+  const chartWidth = useBreakpointValue({
+    base: 180,
+    sm: 200,
+    md: 260,
+    lg: 370,
+  });
+
   if (!response) return null;
 
   const trips: TripData[] = [
@@ -31,42 +44,41 @@ export function Chart({ response }: ChartProps) {
   );
 
   return (
-    <Box height="100%" width="100%">
-      <h2
-        style={{
-          color: "#595959",
-          fontSize: "large",
-          fontWeight: 900,
-          textAlign: "center",
-        }}
-      >
+    <Box height="100%">
+      <Heading color="#595959" fontSize={["small", "large"]} textAlign="center">
         Emissions of your trip compared to other means of transportation
-      </h2>
-      <ResponsiveContainer width="100%" height={350}>
-        <BarChart
-          data={getChartData(transports, trips)}
-          margin={{ bottom: 20 }}
-        >
-          <XAxis
-            dataKey="name"
-            label={{
-              value: "Mean of transport",
-              position: "insideBottom",
-              offset: -10,
-            }}
-          />
-          <YAxis padding={{ top: 30 }} hide />
-          <Tooltip formatter={(value) => `${round(+value, 1)} kgCO2eq`} />
-          {uniqBy(trips, "NAME").map((trip) => (
-            <Bar dataKey={trip.NAME} fill={trip.colors} stackId="a">
-              <LabelList
-                dataKey="name"
-                content={<CustomizedLabel trips={trips} tripName={trip.NAME} />}
-              />{" "}
-            </Bar>
-          ))}
-        </BarChart>
-      </ResponsiveContainer>
+      </Heading>
+      <BarChart
+        height={breakpoint === "base" ? 230 : 350}
+        width={chartWidth}
+        data={getChartData(transports, trips)}
+        margin={{ bottom: 20 }}
+      >
+        <XAxis
+          dataKey="name"
+          label={{
+            value: "Mean of transport",
+            position: "insideBottom",
+            offset: -10,
+          }}
+          fontSize={breakpoint === "base" ? 10 : 14}
+        />
+        <YAxis padding={{ top: 30 }} hide />
+        <Tooltip formatter={(value) => `${round(+value, 1)} kgCO2eq`} />
+        {uniqBy(trips, "NAME").map((trip) => (
+          <Bar
+            key={trip.NAME}
+            dataKey={trip.NAME}
+            fill={trip.colors}
+            stackId="a"
+          >
+            <LabelList
+              dataKey="name"
+              content={<CustomLabel trips={trips} tripName={trip.NAME} />}
+            />{" "}
+          </Bar>
+        ))}
+      </BarChart>
     </Box>
   );
 }
@@ -87,7 +99,8 @@ interface CustomLabelProps extends LabelProps {
   tripName: string;
 }
 
-const CustomizedLabel = ({ trips, tripName, ...props }: CustomLabelProps) => {
+const CustomLabel = ({ trips, tripName, ...props }: CustomLabelProps) => {
+  const breakpoint = useBreakpoint();
   const currentTrips = trips.filter(
     (trip) => trip["Mean of Transport"] === props.value
   );
@@ -102,6 +115,7 @@ const CustomizedLabel = ({ trips, tripName, ...props }: CustomLabelProps) => {
         x={+(props.x ?? 0) + +(props.width ?? 0) / 2}
         y={+(props.y ?? 0) - 20}
         textAnchor="middle"
+        fontSize={breakpoint === "base" ? 10 : 16}
       >
         {round(total)}
       </text>
@@ -109,7 +123,7 @@ const CustomizedLabel = ({ trips, tripName, ...props }: CustomLabelProps) => {
         x={+(props.x ?? 0) + +(props.width ?? 0) / 2}
         y={+(props.y ?? 0) - 5}
         textAnchor="middle"
-        fontSize={12}
+        fontSize={breakpoint === "base" ? 8 : 12}
       >
         kgCO2eq
       </text>

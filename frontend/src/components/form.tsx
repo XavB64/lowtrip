@@ -27,6 +27,8 @@ const getPayload = (steps: Step[], stepsToCompare?: Step[]) => {
   return formData;
 };
 
+const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
 interface FormProps {
   setResponse: (response: ApiResponse) => void;
   stepsProps: {
@@ -36,12 +38,14 @@ interface FormProps {
     updateStep: (index: number, data: Partial<Step>) => void;
   };
   stepsToCompare?: Step[];
+  afterSubmit: () => void;
 }
 
 export const Form = ({
   setResponse,
   stepsProps,
   stepsToCompare,
+  afterSubmit,
 }: FormProps) => {
   const { values: steps, addStep, removeStep, updateStep } = stepsProps;
   const [isLoading, setIsLoading] = useState(false);
@@ -67,8 +71,10 @@ export const Form = ({
       .catch((err) => {
         console.log(err);
       })
-      .finally(() => {
+      .finally(async () => {
         setIsLoading(false);
+        await delay(200);
+        afterSubmit();
       });
   };
 
