@@ -14,10 +14,6 @@ from shapely.geometry import LineString, MultiLineString, Point
 from shapely import ops
 from pyproj import Geod
 
-# Plotting
-import plotly.express as px
-import plotly.graph_objects as go
-from plotly.io import to_json
 
 # Web
 import requests
@@ -82,7 +78,7 @@ else:
 val_perimeter = 500  # km
 
 # Search areas
-search_perimeter = [0.2, 10]  # km
+search_perimeter = [0.2, 5]  # km
 
 # Threshold for unmatched train geometries (sea)
 sea_threshold = 5  # km
@@ -716,50 +712,6 @@ def great_circle_geometry(dep, arr, nb=nb_pts):
     return LineString(l), r.dist / 1e3  # in km
 
 
-def plotly_v2(gdf):
-    # For totals
-    d = dict([(gdf.NAME[idx], gdf.colors[idx]) for idx in gdf.index])
-    dfs = gdf[["Mean of Transport", "kgCO2eq"]].groupby("Mean of Transport").sum()
-    # Plot bars
-    fig = px.bar(
-        gdf,
-        x="Mean of Transport",
-        y="kgCO2eq",
-        color="NAME",
-        color_discrete_map=d,
-        width=200,
-        height=350,
-    )
-    fig.update_layout(showlegend=False)
-    fig.update_layout(
-        margin=dict(l=20, r=20, t=10, b=20),
-        font=dict(size=10),
-        hoverlabel=dict(
-            bgcolor="white",
-            font_size=8,
-        ),  # font_family="Rockwell"
-    )
-    # Plot Total
-    fig.add_trace(
-        go.Scatter(
-            x=dfs.index,
-            y=dfs["kgCO2eq"],
-            text=dfs["kgCO2eq"].apply(lambda x: round(x, 1)),
-            mode="text",
-            textposition="top center",
-            textfont=dict(
-                size=10,
-            ),
-            showlegend=False,
-        )
-    )
-    fig.update_yaxes(range=[0, dfs.max().values[0] * 1.2])
-    # Save the figure
-    # fig.write_html("static/test_chart.html")
-    # Convert the figure to a JSON-compatible dictionary
-    graph_json = to_json(fig)
-
-    return graph_json, fig
 
 
 def compute_emissions_custom(data, cmap=colors_custom):
@@ -884,7 +836,7 @@ def compute_emissions_all(data, cmap=colors_direct):
         data.shape[0] == 2
     ):  # Then it's only one step, we will not add it to direct trip calulations
         # Retrieve the mean of transport: Car/Bus/Train/Plane
-        transp = data.loc["0"].transp
+        transp = data.loc["1"].transp
         if transp == "Train":
             train = False
         elif transp == "Plane":
@@ -909,6 +861,7 @@ def compute_emissions_all(data, cmap=colors_direct):
         l.append(gdf_bus)
     if car:
         l.append(gdf_car)
+    # We add the geometry in any case
     geo.append(gdf_car)
 
     # Plane
