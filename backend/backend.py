@@ -129,7 +129,6 @@ def find_nearest(lon, lat, perim):
     """
     # Extend the area around the point
     buff = list(Point(lon, lat).buffer(kilometer_to_degree(perim)).exterior.coords)
-    # print(len(buff))
     # Request Overpass API turbo data :
     l = flatten_list_of_tuples(buff)
 
@@ -285,10 +284,6 @@ def extend_search(tag1, tag2, perims):
             # Verify than we wan try to request the API again
             if (tag1_new != False) & (tag2_new != False):
                 gdf, train = find_train(tag1_new, tag2_new)
-            # return gdf, train
-            # else :
-            # No need to retry the API
-            #  print(tag1_new, tag2_new)
 
     return gdf, train
 
@@ -339,7 +334,6 @@ def train_to_gdf(
     # If failure then we try to find a better spot nearby - Put in another function
     if train == False:
         # We try to search nearby the coordinates and request again
-        # print( extend_search(tag1, tag2, perims) )
         gdf, train = extend_search(tag1, tag2, perims)
 
     # Validation part for train
@@ -349,8 +343,6 @@ def train_to_gdf(
 
     if train:  # We need to filter by country and add length / Emission factors
         gdf = filter_countries_world(gdf)
-        # Sort values
-        gdf = gdf.sort_values("EF_tot")
         # Add colors, here discretise the colormap
         gdf["colors"] = colormap
         # gdf['colors'] = ['#'+k for k in pd.Series(colormap[::-1])[[int(k) for k in np.linspace(0, len(colormap)-1, gdf.shape[0])]]]
@@ -363,7 +355,6 @@ def train_to_gdf(
             l_length.append(geod.geometry_length(geom) / 1e3)
         # Add the distance to the dataframe
         gdf["path_length"] = l_length
-        # print('Train : ', gdf.path_length.sum(), ' km')
         # Compute emissions : EF * length
         gdf["EF_tot"] = gdf["EF_tot"] / 1e3  # Conversion in in kg
         gdf["kgCO2eq"] = gdf["path_length"] * gdf["EF_tot"]
@@ -529,7 +520,6 @@ def plane_to_gdf(
     """
     # Compute geometry and distance (geodesic)
     geom_plane, bird = great_circle_geometry(tag1, tag2)
-    # print(bird)
 
     # Detour coefficient :
     if bird < 1000:
@@ -632,7 +622,7 @@ def filter_countries_world(gdf, th=sea_threshold):
             #  print('MultiLinestring')
             diff_2 = gpd.GeoDataFrame(list(diff.geometry.values[0].geoms))
         else:
-            print("Linestring")
+            # print("Linestring")
             diff_2 = gpd.GeoDataFrame(list(diff.geometry.values))
         diff_2.columns = ["geometry"]
         diff_2 = diff_2.set_geometry("geometry", crs="epsg:4326")
@@ -729,6 +719,7 @@ def compute_emissions_custom(data, cmap=colors_custom):
     
     l = []
     geo = []
+    fail = False # To check if the query is successfull
     for idx in data.index[:-1]:  # We loop until last departure
         # Departure coordinates
         depature = data.loc[idx]
@@ -748,15 +739,21 @@ def compute_emissions_custom(data, cmap=colors_custom):
                 arrival_coordinates,
                 colormap=color_custom["Train"],
             )
+            if not _train : #One step is not succesful
+                fail = True
+                break
             # Adding a step variable here to know which trip is it
             gdf["step"] = str(int(idx) + 1)
             l.append(gdf)
             geo.append(gdf)
 
         elif transport_mean == "Bus":
-            gdf_bus, _route = bus_to_gdf(
+            gdf_bus, _bus = bus_to_gdf(
                 departure_coordinates, arrival_coordinates, color=color_custom["Bus"]
             )
+            if not _bus : #One step is not succesful
+                fail = True
+                break
             gdf_bus["step"] = str(int(idx) + 1)
             l.append(gdf_bus)
             geo.append(gdf_bus)
@@ -764,12 +761,15 @@ def compute_emissions_custom(data, cmap=colors_custom):
         elif transport_mean == "Car":
             # We get the number of passenger
             nb = int(arrival.nb)
-            gdf_car, _route = car_to_gdf(
+            gdf_car, _car = car_to_gdf(
                 departure_coordinates,
                 arrival_coordinates,
                 nb=nb,
                 color=color_custom["Car"],
             )
+            if not _car : #One step is not succesful
+                fail = True
+                break
             gdf_car["step"] = str(int(idx) + 1)
             l.append(gdf_car)
             geo.append(gdf_car)
@@ -794,17 +794,19 @@ def compute_emissions_custom(data, cmap=colors_custom):
             gdf_ferry["step"] = str(int(idx) + 1)
             l.append(gdf_ferry)
             geo.append(gdf_ferry)
-
-    # Data for bar chart
-    data = pd.concat(l)
-    if data.shape[0] != 0:  # We can go on
-        data = data.reset_index(drop=True).drop("geometry", axis=1)
+            
+    if fail :
+        #One or more step weren't succesful, we return nothing
+        data_custom = pd.DataFrame()
+        geodata = pd.DataFrame()
+    else :
+        # Query successfull, we concatenate the data
+        data_custom = pd.concat(l)
+        data_custom = data_custom.reset_index(drop=True).drop("geometry", axis=1)
         # Geodataframe for map
         geodata = gpd.GeoDataFrame(pd.concat(geo), geometry="geometry", crs="epsg:4326")
-    else:  # My trip failed, we return nothing
-        geodata = pd.DataFrame()
 
-    return data, geodata
+    return data_custom, geodata
 
 
 def compute_emissions_all(data, cmap=colors_direct):
@@ -900,25 +902,37 @@ def chart_refactor(mytrip, alternative=None, do_alt=False):
     return:
         - data with changed fields for bar chart
     """
-    # Merging means of transport for custom trips
-    mytrip["NAME"] = (
-        mytrip["step"] + ". " + mytrip["Mean of Transport"] + " - " + mytrip["NAME"]
-    )  # + ' - ' + mytrip.index.map(str) + '\''
-    # Separtating bars
-    mytrip["Mean of Transport"] = "My trip"
+    #Check if my trip worked
+    if mytrip.shape[0] > 0:
+        # Merging means of transport for custom trips
+        mytrip["NAME"] = (
+            mytrip["step"] + ". " + mytrip["Mean of Transport"] + " - " + mytrip["NAME"]
+        )  # + ' - ' + mytrip.index.map(str) + '\''
+        # Separtating bars
+        mytrip["Mean of Transport"] = "My trip"
+        mytrip = mytrip[l_var]
 
     if do_alt:
-        # We have to render alternative as well
-        alternative["NAME"] = (
-            alternative["step"]
-            + ". "
-            + alternative["Mean of Transport"]
-            + " - "
-            + alternative["NAME"]
-            + " "
-        )  # + ' - ' + alternative.index.map(str)
-        alternative["Mean of Transport"] = "Alternative"
-        # Then we return both
-        return mytrip[l_var], alternative[l_var]
+        #Check if it worked
+        if alternative.shape[0] > 0 :
+            # We have to render alternative as well
+            alternative["NAME"] = (
+                alternative["step"]
+                + ". "
+                + alternative["Mean of Transport"]
+                + " - "
+                + alternative["NAME"]
+                + " "
+            )  # + ' - ' + alternative.index.map(str)
+            alternative["Mean of Transport"] = "Alternative"
+            # Then we return both
+            
+            return mytrip, alternative[l_var]
+        #If it didnt work we return it (empty)
+        
+        else :
+            return mytrip, alternative
+        
+    #If it didnt work we return it (empty)
     else:
-        return mytrip[l_var]
+        return mytrip
