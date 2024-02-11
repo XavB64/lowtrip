@@ -52,7 +52,7 @@ function AppBody() {
         <VStack
           width={["100%", "45%"]}
           justifyContent="space-between"
-          height="100%"
+          height={["calc(100vh - 64px)", "100%"]}
           overflow="auto"
           p={3}
           pt={5}
@@ -66,8 +66,8 @@ function AppBody() {
             >
               Compare the emissions from your travels
             </Heading>
-            <Tabs variant="enclosed" w="100%">
-              <TabList>
+            <Tabs isFitted variant="enclosed" w="100%">
+              <TabList borderBottom="none">
                 <Tab _selected={{ bg: "#efefef" }} borderRadius="12px 12px 0 0">
                   My trip
                 </Tab>
@@ -109,7 +109,7 @@ function AppBody() {
             </Card>
           </VStack>
         </VStack>
-        <Box w="100%" h={["95vh", "100%"]}>
+        <Box w="100%" h={["calc(100vh - 64px)", "100%"]}>
           <Map
             response={response}
             stepsCoords={
@@ -135,6 +135,7 @@ function AppBody() {
         left={3}
         colorScheme="blue"
         isRound
+        display={["flex", "none"]}
       />
     </VStack>
   );
