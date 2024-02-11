@@ -34,10 +34,15 @@ export function Chart({ response }: ChartProps) {
 
   return (
     <Box h="100%" w="100%">
-      <Heading color="#595959" fontSize={["small", "large"]} textAlign="center">
+      <Heading
+        color="#595959"
+        fontSize={["small", "large"]}
+        textAlign="center"
+        marginBottom={3}
+      >
         {response.data.alternative_trip
           ? "Compared emissions of your two trips"
-          : "Emissions of your trip compared to other means of transportation"}
+          : "Your trip VS other means of transport"}
       </Heading>
       <ResponsiveContainer
         height={breakpoint === "base" ? 230 : 350}
@@ -47,15 +52,7 @@ export function Chart({ response }: ChartProps) {
           data={getChartData(transports, trips)}
           margin={{ bottom: 20 }}
         >
-          <XAxis
-            dataKey="name"
-            label={{
-              value: "Mean of transport",
-              position: "insideBottom",
-              offset: -10,
-            }}
-            fontSize={breakpoint === "base" ? 10 : 14}
-          />
+          <XAxis dataKey="name" fontSize={breakpoint === "base" ? 10 : 14} />
           <YAxis padding={{ top: 30 }} hide />
           <Tooltip formatter={(value) => `${round(+value, 1)} kgCO2eq`} />
           {uniqBy(trips, "NAME").map((trip) => (
