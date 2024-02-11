@@ -99,7 +99,7 @@ export const StepField = ({ removeStep, updateStep, step }: StepFieldProps) => {
           }}
           placeholder={isDeparture ? "From..." : "To..."}
           style={{
-            width: "-webkit-fill-available",
+            width: "100%",
             height: "50px",
             padding: "9px",
             border: "1px solid lightgrey",

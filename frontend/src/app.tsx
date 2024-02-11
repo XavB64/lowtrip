@@ -57,14 +57,14 @@ function AppBody() {
           p={3}
           pt={5}
         >
-          <VStack padding={3} spacing={5} height="100%">
+          <VStack padding={3} spacing={5} height="100%" width="100%">
             <Heading
               color="#595959"
               fontSize="x-large"
               fontWeight={900}
               textAlign="center"
             >
-              Compare the emissions from your travels
+              Compare your travel emissions
             </Heading>
             <Tabs variant="enclosed" w="100%">
               <TabList>
@@ -72,7 +72,7 @@ function AppBody() {
                   My trip
                 </Tab>
                 <Tab _selected={{ bg: "#efefef" }} borderRadius="12px 12px 0 0">
-                  Alternative trip
+                  Add another trip to compare
                 </Tab>
               </TabList>
               <TabPanels>
