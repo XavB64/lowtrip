@@ -22,7 +22,7 @@ const NavBar = () => (
     py={4}
     boxShadow="md"
     zIndex={3}
-    h={16}
+    h="64px"
   >
     <Image src={Logo} h="100%" />
     <Spacer />

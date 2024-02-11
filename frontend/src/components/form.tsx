@@ -82,7 +82,7 @@ export const Form = ({
     <VStack
       padding={5}
       backgroundColor="#efefef"
-      borderRadius="0 12px 12px 12px"
+      borderRadius={`${stepsToCompare ? "12px 0" : "0 12px"} 12px 12px`}
       justifyContent="right"
       alignItems="start"
     >
