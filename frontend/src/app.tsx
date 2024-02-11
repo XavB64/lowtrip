@@ -14,8 +14,8 @@ import {
 } from "@chakra-ui/react";
 import axios from "axios";
 import { useEffect, useRef, useState } from "react";
-
 import { BiChevronUp } from "react-icons/bi";
+
 import { Chart } from "./components/chart";
 import { Form } from "./components/form";
 import { Map } from "./components/map";
