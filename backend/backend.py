@@ -84,9 +84,9 @@ search_perimeter = [0.2, 5]  # km
 sea_threshold = 5  # km
 
 # Emission factors kg/pkm
-EF_car = 0.2176
-EF_bus = 0.02942
-EF_ferry = 0.3
+EF_car = .2176
+EF_bus = .02942
+EF_ferry = .3
 EF_plane = {"short": {
     'construction' : .00038,
     'upstream' : .0242,
@@ -536,11 +536,10 @@ def plane_to_gdf(
     # Compute geometry and distance (geodesic)
     geom_plane, bird = great_circle_geometry(tag1, tag2)
 
-    # Detour coefficient :
-    if bird < 1000:
-        bird = (4.1584 * bird ** (-0.212)) * bird
     # Different emission factors depending on the trip length
     if bird < 1000:
+        # Detour coefficient :
+        bird = (4.1584 * bird ** (-0.212)) * bird
         trip_category = 'short'
     elif bird < 3500:
         trip_category = 'medium'
