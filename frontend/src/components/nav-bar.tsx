@@ -1,6 +1,6 @@
 import { Button, HStack, Image, Spacer } from "@chakra-ui/react";
 import Logo from "../assets/logo.png";
-import MethodologyPdf from "../assets/20240210_lowtrip_methodology.pdf";
+import MethodologyPdf from "../assets/lowtrip_methodology.pdf";
 
 const navItems = [
   {
