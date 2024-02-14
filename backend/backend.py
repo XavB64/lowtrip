@@ -83,11 +83,26 @@ search_perimeter = [0.2, 5]  # km
 # Threshold for unmatched train geometries (sea)
 sea_threshold = 5  # km
 
-# Emission factors g/pkm
+# Emission factors kg/pkm
 EF_car = 0.2176
 EF_bus = 0.02942
-EF_plane = {"short": 0.126, "medium": 0.0977, "long": 0.08306}
 EF_ferry = 0.3
+EF_plane = {"short": {
+    'construction' : .00038,
+    'upstream' : .0242,
+    'combustion' : .117
+},
+            "medium": {
+    'construction' : .00036,
+    'upstream' : .0176,
+    'combustion' : .0848
+},
+            "long": {
+    'construction' : .00026,
+    'upstream' : .0143,
+    'combustion' : .0687
+}
+            }
 
 # Number of points in plane geometry
 nb_pts = 100
@@ -526,11 +541,13 @@ def plane_to_gdf(
         bird = (4.1584 * bird ** (-0.212)) * bird
     # Different emission factors depending on the trip length
     if bird < 1000:
-        EF = EF_plane["short"]
+        trip_category = 'short'
     elif bird < 3500:
-        EF = EF_plane["medium"]
+        trip_category = 'medium'
     else:  # It's > 3500
-        EF = EF_plane["long"]
+        trip_category = 'long'
+    # We sum the different contribution for CO2 only
+    EF = np.sum(list(EF_plane[trip_category].values()))
     # Compute geodataframe and dataframe
     gdf_plane = pd.DataFrame(
         pd.Series(
@@ -545,11 +562,11 @@ def plane_to_gdf(
             }
         )
     ).transpose()
-    # gdf_plane.geometry = gdf_plane.geometry.astype('geometry')
+    # Non CO2 contribution are determined from the combustion of fuel only
     gdf_non_co2 = pd.DataFrame(
         pd.Series(
             {
-                "kgCO2eq": EF * contrails * bird,
+                "kgCO2eq": EF_plane[trip_category]['combustion'] * contrails * bird,
                 "colors": color_contrails,
                 "NAME": "Contrails",
                 "Mean of Transport": "Plane",
