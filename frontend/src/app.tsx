@@ -11,6 +11,7 @@ import {
   TabPanels,
   Tabs,
   VStack,
+  Text,
 } from "@chakra-ui/react";
 import axios from "axios";
 import { useEffect, useRef, useState } from "react";
@@ -24,6 +25,7 @@ import { API_URL } from "./config";
 import { useSteps } from "./hooks";
 import theme from "./theme";
 import { ApiResponse } from "./types";
+import { checkIsOnMobile } from "./utils";
 
 function AppBody() {
   const [response, setResponse] = useState<ApiResponse>();
@@ -32,6 +34,8 @@ function AppBody() {
   const chartRef = useRef(null);
   const scrollToChart = () =>
     (chartRef.current as any)?.scrollIntoView({ behavior: "smooth" });
+
+  const isOnMobile = checkIsOnMobile();
 
   useEffect(() => {
     axios.get(API_URL, {
@@ -66,6 +70,17 @@ function AppBody() {
             >
               Compare your travel emissions
             </Heading>
+
+            <VStack>
+              <Text alignSelf={"flex-start"}>
+                Select a departure, a destination and a transport means and
+                compute the emissions of your trip !
+              </Text>
+              <Text alignSelf={"flex-start"}>
+                To compare 2 trips, fill the "Other trip" tab.
+              </Text>
+            </VStack>
+
             <Tabs isFitted variant="enclosed" w="100%">
               <TabList borderBottom="none">
                 <Tab _selected={{ bg: "#efefef" }} borderRadius="12px 12px 0 0">
@@ -125,18 +140,22 @@ function AppBody() {
           />
         </Box>
       </Stack>
-      <IconButton
-        aria-label="scroll-to-top"
-        icon={<BiChevronUp />}
-        onClick={() => window.scrollTo({ top: 0, left: 0, behavior: "smooth" })}
-        zIndex={2}
-        position="fixed"
-        bottom={3}
-        left={3}
-        colorScheme="blue"
-        isRound
-        display={["flex", "none"]}
-      />
+      {isOnMobile && (
+        <IconButton
+          aria-label="scroll-to-top"
+          icon={<BiChevronUp />}
+          onClick={() =>
+            window.scrollTo({ top: 0, left: 0, behavior: "smooth" })
+          }
+          zIndex={2}
+          position="fixed"
+          bottom={3}
+          left={3}
+          colorScheme="blue"
+          isRound
+          display={["flex", "none"]}
+        />
+      )}
     </VStack>
   );
 }

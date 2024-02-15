@@ -19,3 +19,7 @@ export function formatStepsForApi(steps: Step[]) {
   }, {} as { [key: string]: string });
   return { lon, lat, transp, nb };
 }
+
+export function checkIsOnMobile() {
+  return window.innerWidth < 600;
+}
