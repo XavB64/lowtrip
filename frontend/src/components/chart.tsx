@@ -1,5 +1,11 @@
-import { Box, Heading, useBreakpoint } from "@chakra-ui/react";
+import {
+  Box,
+  useBreakpoint,
+  Tooltip as ChakraTooltip,
+  Flex,
+} from "@chakra-ui/react";
 import { round, sumBy, uniq, uniqBy } from "lodash";
+import { BiHelpCircle } from "react-icons/bi";
 import {
   Bar,
   BarChart,
@@ -10,7 +16,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { ApiResponse, Transport, TripData } from "../types";
+import { ApiResponse, TripData } from "../types";
 
 interface ChartProps {
   response?: ApiResponse;
@@ -22,36 +28,39 @@ export function Chart({ response }: ChartProps) {
   if (!response) return null;
 
   const trips: TripData[] = [
-    ...(response.data.direct_trip ? JSON.parse(response.data.direct_trip) : []),
     ...JSON.parse(response.data.my_trip ?? {}),
+    ...(response.data.direct_trip ? JSON.parse(response.data.direct_trip) : []),
     ...(response.data.alternative_trip
       ? JSON.parse(response.data.alternative_trip)
       : []),
   ];
-  const transports = uniq(
-    trips.map((tripData) => tripData["Mean of Transport"])
-  );
 
   return (
     <Box h="100%" w="100%">
-      <Heading
+      <Flex
+        align="center"
         color="#595959"
         fontSize={["small", "large"]}
         textAlign="center"
+        justifyContent="center"
         marginBottom={3}
       >
-        {response.data.alternative_trip
-          ? "Compared emissions of your two trips"
-          : "Your trip VS other means of transport"}
-      </Heading>
+        <h2 style={{ marginRight: "8px" }}>
+          {response.data.alternative_trip
+            ? "Your trip VS other trip"
+            : "Your trip VS other means of transport"}
+        </h2>
+        <ChakraTooltip label="Emissions of nitrogen oxides (NOx), water vapour and soot, combined with the formation of contrails, affect the properties of the atmosphere and lead to an increase in radiative forcing.">
+          <span>
+            <BiHelpCircle />
+          </span>
+        </ChakraTooltip>
+      </Flex>
       <ResponsiveContainer
         height={breakpoint === "base" ? 230 : 350}
         width="100%"
       >
-        <BarChart
-          data={getChartData(transports, trips)}
-          margin={{ bottom: 20 }}
-        >
+        <BarChart data={getChartData(trips)} margin={{ bottom: 20 }}>
           <XAxis dataKey="name" fontSize={breakpoint === "base" ? 10 : 14} />
           <YAxis padding={{ top: 30 }} hide />
           <Tooltip formatter={(value) => `${round(+value, 1)} kgCO2eq`} />
@@ -74,9 +83,19 @@ export function Chart({ response }: ChartProps) {
   );
 }
 
-function getChartData(transports: Transport[], trips: TripData[]) {
+function getChartData(trips: TripData[]) {
+  const transports = uniq(
+    trips.map((tripData) => tripData["Mean of Transport"])
+  );
+
   return transports.map((transport) => {
-    let result: { [key: string]: string | number } = { name: transport };
+    let result: { [key: string]: string | number } = {
+      name: transport,
+      displayedName: transport,
+    };
+    if ((transport as string) === "Alternative") {
+      result.displayedName = "Other";
+    }
     trips.forEach((trip) => {
       if (trip["Mean of Transport"] === transport)
         result[trip.NAME] = trip.kgCO2eq;
