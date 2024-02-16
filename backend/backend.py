@@ -14,7 +14,6 @@ from shapely.geometry import LineString, MultiLineString, Point
 from shapely import ops
 from pyproj import Geod
 
-
 # Web
 import requests
 
@@ -877,9 +876,21 @@ def compute_emissions_all(data, cmap=colors_direct):
     gdf_car, gdf_bus, route = car_bus_to_gdf(tag1, tag2, color=color_direct["Car&Bus"])
     if bus:
         l.append(gdf_bus)
+        #We change it
+        gdf_car['Mean of Transport'] = 'Bus'
     if car:
         l.append(gdf_car)
+    
+    if not (car==True) & (bus==True):
+        #Then the step of custom trip will already display a geometry, display another next to it
+        th = .04
+        print('transform')
+        gdf_car['geometry'] = ops.transform(lambda x, y: (x+th, y+th), gdf_car['geometry'].values[0])
+    else :
+        #We have both
+        gdf_car['Mean of Transport'] = 'Car & Bus'
     # We add the geometry in any case
+    # gdf_car['Mean of Transport'] = 'Car & Bus'
     geo.append(gdf_car)
 
     # Plane

@@ -16,7 +16,7 @@ CORS(app)  # comment this on deployment
 # app.config["DEBUG"] = True
 app.config["APPLICATION_ROOT"] = "/"
 # Geometry - To send to the frontend
-l_geo = ["colors", "geometry"]
+l_geo = ["colors", "Mean of Transport", "geometry"]
 
 
 @app.route("/", methods=["GET", "POST"])
