@@ -1,6 +1,6 @@
 # lowtrip
 
-A web interface to easily compute carbon inventories for different means of transport in Europe
+A web interface to easily compute travel carbon inventories for different means of transport worldwide
 
 ## How to launch the app
 
