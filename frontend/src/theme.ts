@@ -18,6 +18,18 @@ const theme = extendTheme({
       800: "#007380",
       900: "#006773",
     },
+    lightgrey: {
+      50: "#ffffff",
+      100: "#f6f6f6",
+      200: "#ededed",
+      300: "#e4e4e4",
+      400: "#dbdbdb",
+      500: "#d3d3d3",
+      600: "#cacaca",
+      700: "#c1c1c1",
+      800: "#b8b8b8",
+      900: "#afafaf",
+    },
   },
 });
 
