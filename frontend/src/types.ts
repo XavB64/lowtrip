@@ -9,6 +9,13 @@ export interface Step {
   currentInputRef?: React.MutableRefObject<any>;
 }
 
+export interface StepProps {
+  values: Step[];
+  addStep: () => void;
+  removeStep: (index: number) => void;
+  updateStep: (index: number, data: Partial<Step>) => void;
+}
+
 export enum Transport {
   plane = "Plane",
   car = "Car",

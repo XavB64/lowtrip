@@ -1,12 +1,13 @@
 import axios from "axios";
 import { useState } from "react";
 
-import { Step } from "../types";
+import { Button, Divider, HStack, Text, VStack } from "@chakra-ui/react";
+import { BiSolidPlusCircle } from "react-icons/bi";
 import { API_URL } from "../config";
-import { ApiResponse } from "../types";
-import { StepField } from "./step-field";
+import { ApiResponse, Step } from "../types";
 import { formatStepsForApi } from "../utils";
-import { Button, Spinner, VStack } from "@chakra-ui/react";
+import { PrimaryButton } from "./primary-button";
+import { StepField } from "./step-field";
 
 const getPayload = (steps: Step[], stepsToCompare?: Step[]) => {
   const formData = new FormData();
@@ -39,6 +40,7 @@ interface FormProps {
   };
   stepsToCompare?: Step[];
   afterSubmit: () => void;
+  changeTab?: () => void;
 }
 
 export const Form = ({
@@ -46,6 +48,7 @@ export const Form = ({
   stepsProps,
   stepsToCompare,
   afterSubmit,
+  changeTab,
 }: FormProps) => {
   const { values: steps, addStep, removeStep, updateStep } = stepsProps;
   const [isLoading, setIsLoading] = useState(false);
@@ -80,7 +83,8 @@ export const Form = ({
 
   return (
     <VStack
-      padding={5}
+      paddingY={5}
+      paddingX={[3, 5]}
       backgroundColor="#efefef"
       borderRadius={`${stepsToCompare ? "12px 0" : "0 12px"} 12px 12px`}
       justifyContent="right"
@@ -95,23 +99,54 @@ export const Form = ({
         />
       ))}
 
-      <Button padding={0} color="#b7b7b7" onClick={addStep} variant="ghost">
+      <Button
+        onClick={addStep}
+        colorScheme="lightgrey"
+        borderRadius="20px"
+        color="black"
+        leftIcon={<BiSolidPlusCircle />}
+      >
         Add step
       </Button>
 
-      <Button
-        onClick={handleSubmit}
-        isDisabled={isLoading || formIsNotValid}
-        borderRadius="20px"
-        padding={0}
-        colorScheme="blue"
-        margin={2}
+      <Divider
+        borderColor="lightgrey.500"
+        opacity={1}
         width="100%"
-        height="50px"
-        cursor={formIsNotValid ? "not-allowed" : "auto"}
-      >
-        {isLoading ? <Spinner /> : "Compute emissions"}
-      </Button>
+        alignSelf="center"
+        my={3}
+      />
+
+      {stepsToCompare ? (
+        <PrimaryButton
+          onClick={handleSubmit}
+          isDisabled={formIsNotValid}
+          isLoading={isLoading}
+        >
+          Compare with this trip
+        </PrimaryButton>
+      ) : (
+        <>
+          <Text alignSelf="center">Compare with...</Text>
+          <HStack w="100%">
+            <PrimaryButton
+              onClick={handleSubmit}
+              isDisabled={formIsNotValid}
+              isLoading={isLoading}
+            >
+              All means of transport
+            </PrimaryButton>
+            <PrimaryButton
+              onClick={changeTab}
+              isDisabled={formIsNotValid}
+              isLoading={false}
+              variant="outline"
+            >
+              Another trip
+            </PrimaryButton>
+          </HStack>
+        </>
+      )}
     </VStack>
   );
 };

@@ -1,0 +1,116 @@
+import {
+  Card,
+  Heading,
+  Tab,
+  TabList,
+  TabPanel,
+  TabPanels,
+  Tabs,
+  Text,
+  VStack,
+} from "@chakra-ui/react";
+import { Form } from "./form";
+import { Chart } from "./chart";
+import { useRef, useState } from "react";
+import { ApiResponse, StepProps } from "../types";
+
+interface FormPanelProps {
+  response?: ApiResponse;
+  setResponse: (response: ApiResponse) => void;
+  myTripSteps: StepProps;
+  alternativeTripSteps: StepProps;
+}
+
+export function FormPanel({
+  response,
+  setResponse,
+  myTripSteps,
+  alternativeTripSteps,
+}: FormPanelProps) {
+  const [tabIndex, setTabIndex] = useState(0);
+  const handleTabsChange = (index: number) => {
+    setTabIndex(index);
+  };
+  const chartRef = useRef(null);
+  const scrollToChart = () =>
+    (chartRef.current as any)?.scrollIntoView({ behavior: "smooth" });
+
+  return (
+    <VStack
+      width={["100%", "45%"]}
+      justifyContent="space-between"
+      height="100%"
+      minHeight={["calc(100vh - 64px)", "none"]}
+      overflow="auto"
+      p={[1, 3]}
+    >
+      <VStack padding={3} spacing={5} height="100%" width="100%">
+        <Heading
+          color="#595959"
+          fontSize="x-large"
+          fontWeight={900}
+          textAlign="center"
+        >
+          Compare your travel emissions
+        </Heading>
+
+        <VStack fontSize={["sm", "md"]} alignItems="flex-start">
+          <Text>
+            Select a departure, a destination and a transport means and compute
+            the emissions of your trip&nbsp;!
+          </Text>
+          <Text>To compare 2 trips, fill the "Other trip" tab.</Text>
+        </VStack>
+
+        <Tabs
+          index={tabIndex}
+          onChange={handleTabsChange}
+          isFitted
+          variant="enclosed"
+          w="100%"
+        >
+          <TabList borderBottom="none">
+            <Tab _selected={{ bg: "#efefef" }} borderRadius="12px 12px 0 0">
+              My trip
+            </Tab>
+            <Tab _selected={{ bg: "#efefef" }} borderRadius="12px 12px 0 0">
+              Other trip
+            </Tab>
+          </TabList>
+          <TabPanels>
+            <TabPanel padding={0}>
+              <Form
+                key="main-form"
+                setResponse={setResponse}
+                stepsProps={myTripSteps}
+                afterSubmit={scrollToChart}
+                changeTab={() => setTabIndex((tabIndex + 1) % 2)}
+              />
+            </TabPanel>
+            <TabPanel padding={0}>
+              <Form
+                key="alternative-form"
+                setResponse={setResponse}
+                stepsProps={alternativeTripSteps}
+                stepsToCompare={myTripSteps.values}
+                afterSubmit={scrollToChart}
+              />
+            </TabPanel>
+          </TabPanels>
+        </Tabs>
+        <Card
+          ref={chartRef}
+          position={["absolute", "static"]}
+          w={[200, "100%"]}
+          bottom={[3, "auto"]}
+          right={[3, "auto"]}
+          zIndex={2}
+          p="10px"
+          shadow="none"
+        >
+          <Chart response={response} />
+        </Card>
+      </VStack>
+    </VStack>
+  );
+}
