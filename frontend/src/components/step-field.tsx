@@ -8,7 +8,16 @@ import {
 } from "react-icons/bi";
 import { FaFerry } from "react-icons/fa6";
 
-import { Box, Button, HStack, IconButton } from "@chakra-ui/react";
+import {
+  Box,
+  Button,
+  HStack,
+  IconButton,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuList,
+} from "@chakra-ui/react";
 import { Step, Transport } from "../types";
 
 const TRANSPORTS = [
@@ -127,29 +136,106 @@ export const StepField = ({ removeStep, updateStep, step }: StepFieldProps) => {
         >
           <Box>
             <span style={{ paddingRight: 5, textAlign: "end" }}>by</span>
-            {TRANSPORTS.map((item) => (
-              <Button
-                key={item.value}
-                onClick={() =>
-                  updateStep(step.index, { transportMean: item.value })
-                }
-                padding={0}
-                width="30px"
-                minWidth="30px"
-                height="30px"
-                borderRadius="100px"
-                backgroundColor={
-                  item.value === step.transportMean ? "#474747" : "#b7b7b7"
-                }
-                color="white"
-                marginLeft={2}
-              >
-                {item.icon}
-              </Button>
-            ))}
+            {TRANSPORTS.map((item) =>
+              item.value === Transport.car ? (
+                <CarButton
+                  updateStep={updateStep}
+                  isSelected={item.value === step.transportMean}
+                  step={step}
+                />
+              ) : (
+                <TransportButton
+                  updateStep={() =>
+                    updateStep(step.index, {
+                      transportMean: item.value,
+                      passengers: undefined,
+                    })
+                  }
+                  isSelected={item.value === step.transportMean}
+                  icon={item.icon}
+                />
+              )
+            )}
           </Box>
         </HStack>
       )}
     </>
+  );
+};
+
+interface CarButtonProps {
+  updateStep: (index: number, data: Partial<Step>) => void;
+  isSelected: boolean;
+  step: Step;
+}
+
+const CarButton = ({ updateStep, isSelected, step }: CarButtonProps) => {
+  return (
+    <Menu>
+      <MenuButton position="relative">
+        <TransportButton
+          icon={<BiSolidCar size={20} />}
+          isSelected={isSelected}
+        />
+        {step.passengers && (
+          <Box
+            position="absolute"
+            bottom={-1}
+            right={-1}
+            bgColor="#0097a7"
+            color="white"
+            borderRadius="full"
+            fontSize="xs"
+            h={4}
+            w={4}
+          >
+            {step.passengers}
+          </Box>
+        )}
+      </MenuButton>
+      <MenuList zIndex={3}>
+        {[1, 2, 3, 4, 5].map((number) => (
+          <MenuItem
+            key={number}
+            onClick={() =>
+              updateStep(step.index, {
+                transportMean: Transport.car,
+                passengers: number,
+              })
+            }
+          >
+            {number} passenger{number > 1 ? "s" : ""}
+          </MenuItem>
+        ))}
+      </MenuList>
+    </Menu>
+  );
+};
+
+interface TransportButtonProps {
+  updateStep?: () => void;
+  isSelected: boolean;
+  icon: JSX.Element;
+}
+
+const TransportButton = ({
+  updateStep,
+  isSelected,
+  icon,
+}: TransportButtonProps) => {
+  return (
+    <Button
+      onClick={updateStep}
+      padding={0}
+      width="30px"
+      minWidth="30px"
+      height="30px"
+      borderRadius="100px"
+      backgroundColor={isSelected ? "#474747" : "#b7b7b7"}
+      color="white"
+      marginLeft={2}
+    >
+      {icon}
+    </Button>
   );
 };
