@@ -5,6 +5,7 @@ export interface Step {
   locationName?: string;
   locationCoords?: [number, number];
   transportMean?: Transport;
+  passengers?: number;
   currentInputRef?: React.MutableRefObject<any>;
 }
 
