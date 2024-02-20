@@ -460,7 +460,7 @@ def bus_to_gdf(
                     "EF_tot": EF_bus,
                     "path_length": route_dist,
                     "colors": color,
-                    "NAME": "Bus",
+                    "NAME": " ",
                     "Mean of Transport": "Bus",
                     "geometry": geom_route,
                 }
@@ -500,7 +500,7 @@ def car_to_gdf(
                     "EF_tot": EF_car / nb,
                     "path_length": route_dist,
                     "colors": color,
-                    "NAME": "Car",
+                    "NAME": str(nb)+' pass.',
                     "Mean of Transport": "Car",
                     "geometry": geom_route,
                 }
@@ -596,7 +596,7 @@ def ferry_to_gdf(tag1, tag2, EF=EF_ferry, color="#FF0000"):
                 "EF_tot": EF,
                 "path_length": bird,
                 "colors": color,
-                "NAME": "Ferry",
+                "NAME": " ",
                 "Mean of Transport": "Ferry",
                 "geometry": geom,
             }
@@ -874,24 +874,26 @@ def compute_emissions_all(data, cmap=colors_direct):
 
     # Car & Bus
     gdf_car, gdf_bus, route = car_bus_to_gdf(tag1, tag2, color=color_direct["Car&Bus"])
+    # To avoid errors in the bar chart, I don't know why the change of name propagates
+    geo_car = gdf_car.copy()
     if bus:
         l.append(gdf_bus)
         #We change it
-        gdf_car['Mean of Transport'] = 'Bus'
+        #gdf_car['Mean of Transport'] = 'Bus'
     if car:
         l.append(gdf_car)
-    
-    if not (car==True) & (bus==True):
-        #Then the step of custom trip will already display a geometry, display another next to it
-        th = .04
-        print('transform')
-        gdf_car['geometry'] = ops.transform(lambda x, y: (x+th, y+th), gdf_car['geometry'].values[0])
-    else :
-        #We have both
-        gdf_car['Mean of Transport'] = 'Car & Bus'
-    # We add the geometry in any case
-    # gdf_car['Mean of Transport'] = 'Car & Bus'
-    geo.append(gdf_car)
+    #If we have a result for car and bus :
+    if route:
+        #We check if car or bus was asked for a 1 step
+        if  (car==False) | (bus==False):
+            #Then the step of custom trip will already display a geometry, display another next to it
+            th = .04
+            print('transform')
+            geo_car['geometry'] = ops.transform(lambda x, y: (x+th, y+th), geo_car['geometry'].values[0])
+        else :
+        #     #We have both
+            geo_car['Mean of Transport'] = 'Car & Bus'
+    geo.append(geo_car)
 
     # Plane
     if plane:
@@ -933,7 +935,11 @@ def chart_refactor(mytrip, alternative=None, do_alt=False):
     if mytrip.shape[0] > 0:
         # Merging means of transport for custom trips
         mytrip["NAME"] = (
-            mytrip["step"] + ". " + mytrip["Mean of Transport"] + " - " + mytrip["NAME"]
+            mytrip["step"] 
+            + ". " 
+            + mytrip["Mean of Transport"] 
+            + " - " 
+            + mytrip["NAME"]
         )  # + ' - ' + mytrip.index.map(str) + '\''
         # Separtating bars
         mytrip["Mean of Transport"] = "My trip"

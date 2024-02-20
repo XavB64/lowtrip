@@ -26,7 +26,7 @@ export const Map = ({
 
   return (
     <MapContainer
-      center={[48, 20]}
+      center={[48, 10]}
       zoom={5}
       scrollWheelZoom={allowScrollToZoom}
       style={{ width: "100%" }}
@@ -64,8 +64,10 @@ const MapContent = ({
   }, [map, stepsCoords, alternativeStepsCoords]);
 
   return (
-    <>
-      <TileLayer url="https://a.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}@2x.png" />
+    <> 
+      <TileLayer url="https://a.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}@2x.png"
+      attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>' 
+      />
       {response &&
         (JSON.parse(response.data.gdf) as Gdf).features.map((feature) => {
           return (

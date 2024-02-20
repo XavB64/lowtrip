@@ -54,12 +54,11 @@ export function FormPanel({
           Compare your travel emissions
         </Heading>
 
-        <VStack fontSize={["sm", "md"]} alignItems="flex-start">
+        <VStack fontSize={["sm"]} alignItems="flex-start">
           <Text>
-            Select a departure, a destination and a transport means and compute
-            the emissions of your trip&nbsp;!
+          Select departure, destination and means of transport to compare the emissions of your journeys!
           </Text>
-          <Text>To compare 2 trips, fill the "Other trip" tab.</Text>
+          <Text>You can either compare all modes of transport on a specific route, or compare multi-modal routes with steps.</Text>
         </VStack>
 
         <Tabs
