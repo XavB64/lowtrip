@@ -30,8 +30,10 @@ def main():
             df = pd.DataFrame.from_dict(json.loads(request.form["my-trip"]))
 
             # My trip data and geo data
-            data_mytrip, geo_mytrip = compute_emissions_custom(df)
-
+            data_mytrip, geo_mytrip, error = compute_emissions_custom(df)
+            #Error message - for now in the console
+            if len(error) > 0 :
+                print('My trip - ', error)
             # Direct data and geo data
             data_direct, geo_direct = compute_emissions_all(df)
             # Prepare data for aggregation in the chart -  see frontend
@@ -50,12 +52,20 @@ def main():
             df2 = pd.DataFrame.from_dict(json.loads(request.form["alternative-trip"]))
 
             # My trip data and geo data
-            data_mytrip, geo_mytrip = compute_emissions_custom(df)
+            data_mytrip, geo_mytrip, error = compute_emissions_custom(df)
+            #Error message
+            if len(error) > 0 :
+                print('My trip - ', error)
             # Direct data and geo data
             # We change the color to pink
-            data_alternative, geo_alternative = compute_emissions_custom(
+            data_alternative, geo_alternative, error_other = compute_emissions_custom(
                 df2, cmap=colors_alternative
             )
+            #Error message
+            if len(error_other) > 0 : 
+                print('Other trip - ', error_other)
+            if (len(error) > 0) & (len(error_other) > 0):
+                print('Both customize trip failed, please change mean of transport or locations.')
             # Prepare data for aggregation in the chart -  see frontend
             data_mytrip, data_alternative = chart_refactor(
                 data_mytrip, data_alternative, True

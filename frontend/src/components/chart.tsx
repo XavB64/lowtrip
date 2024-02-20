@@ -47,14 +47,10 @@ export function Chart({ response }: ChartProps) {
       >
         <h2 style={{ marginRight: "8px" }}>
           {response.data.alternative_trip
-            ? "Your trip VS other trip"
+            ? "Your trip VS Other trip"
             : "Your trip VS other means of transport"}
         </h2>
-        <ChakraTooltip label="Emissions of nitrogen oxides (NOx), water vapour and soot, combined with the formation of contrails, affect the properties of the atmosphere and lead to an increase in radiative forcing.">
-          <span>
-            <BiHelpCircle />
-          </span>
-        </ChakraTooltip>
+
       </Flex>
       <ResponsiveContainer
         height={breakpoint === "base" ? 230 : 350}
@@ -79,6 +75,12 @@ export function Chart({ response }: ChartProps) {
           ))}
         </BarChart>
       </ResponsiveContainer>
+      <ChakraTooltip label="Plane: the formation of Contrails combined with emissions of nitrogen oxides (NOx)
+      affect the properties of the atmosphere and lead to an increase in radiative forcing.">
+          <span>
+            <BiHelpCircle />
+          </span>
+        </ChakraTooltip>
     </Box>
   );
 }

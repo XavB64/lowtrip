@@ -566,7 +566,7 @@ def plane_to_gdf(
             {
                 "kgCO2eq": EF_plane[trip_category]['combustion'] * contrails * bird,
                 "colors": color_contrails,
-                "NAME": "Contrails",
+                "NAME": "Contrails & NOx",
                 "Mean of Transport": "Plane",
             }
         )
@@ -718,7 +718,6 @@ def great_circle_geometry(dep, arr, nb=nb_pts):
 
 
 
-
 def compute_emissions_custom(data, cmap=colors_custom):
     """
     parameters:
@@ -726,7 +725,10 @@ def compute_emissions_custom(data, cmap=colors_custom):
     return:
         - full dataframe for emissions
         - geodataframe for path
+        - ERROR : string first step that fails
     """
+    ERROR = ''
+    #Ajouter une variable mean/other pour faire un message d'erreur personnalisé ?
     # Colors
     # Custom trip
     list_items = ["Train", "Bus", "Car", "Plane_contrails", "Plane", "Ferry"]
@@ -756,6 +758,7 @@ def compute_emissions_custom(data, cmap=colors_custom):
             )
             if not _train : #One step is not succesful
                 fail = True
+                ERROR = 'step n°'+str(int(idx) + 1)+' failed with train. Please change mean of transport or locations.'
                 break
             # Adding a step variable here to know which trip is it
             gdf["step"] = str(int(idx) + 1)
@@ -768,6 +771,7 @@ def compute_emissions_custom(data, cmap=colors_custom):
             )
             if not _bus : #One step is not succesful
                 fail = True
+                ERROR = 'step n°'+str(int(idx) + 1)+' failed with bus. Please change mean of transport or locations.'
                 break
             gdf_bus["step"] = str(int(idx) + 1)
             l.append(gdf_bus)
@@ -784,6 +788,7 @@ def compute_emissions_custom(data, cmap=colors_custom):
             )
             if not _car : #One step is not succesful
                 fail = True
+                ERROR = 'step n°'+str(int(idx) + 1)+' failed with car. Please change mean of transport or locations.'
                 break
             gdf_car["step"] = str(int(idx) + 1)
             l.append(gdf_car)
@@ -821,7 +826,7 @@ def compute_emissions_custom(data, cmap=colors_custom):
         # Geodataframe for map
         geodata = gpd.GeoDataFrame(pd.concat(geo), geometry="geometry", crs="epsg:4326")
 
-    return data_custom, geodata
+    return data_custom, geodata, ERROR
 
 
 def compute_emissions_all(data, cmap=colors_direct):
@@ -957,7 +962,7 @@ def chart_refactor(mytrip, alternative=None, do_alt=False):
                 + alternative["NAME"]
                 + " "
             )  # + ' - ' + alternative.index.map(str)
-            alternative["Mean of Transport"] = "Alternative"
+            alternative["Mean of Transport"] = "Other trip"
             # Then we return both
             
             return mytrip, alternative[l_var]

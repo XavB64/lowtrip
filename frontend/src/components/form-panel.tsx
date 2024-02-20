@@ -8,11 +8,13 @@ import {
   Tabs,
   Text,
   VStack,
+  Tooltip as ChakraTooltip,
 } from "@chakra-ui/react";
 import { Form } from "./form";
 import { Chart } from "./chart";
 import { useRef, useState } from "react";
 import { ApiResponse, StepProps } from "../types";
+import { BiHelpCircle } from "react-icons/bi";
 
 interface FormPanelProps {
   response?: ApiResponse;
@@ -52,14 +54,21 @@ export function FormPanel({
           textAlign="center"
         >
           Compare your travel emissions
+          <ChakraTooltip label=" Select departure, destination and means of transport to
+          compare the emissions of your journeys! You can either compare all modes of transport on
+          a specific route, or compare multi-modal routes with steps.">
+          <span>
+            <BiHelpCircle />
+          </span>
+        </ChakraTooltip>
         </Heading>
 
-        <VStack fontSize={["sm"]} alignItems="flex-start">
+        {/* <VStack fontSize={["sm"]} alignItems="flex-start">
           <Text>
           Select departure, destination and means of transport to compare the emissions of your journeys!
           </Text>
           <Text>You can either compare all modes of transport on a specific route, or compare multi-modal routes with steps.</Text>
-        </VStack>
+        </VStack> */}
 
         <Tabs
           index={tabIndex}
