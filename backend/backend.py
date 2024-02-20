@@ -408,7 +408,7 @@ def car_bus_to_gdf(
                     "EF_tot": EF_car,
                     "path_length": route_dist,
                     "colors": color,
-                    "NAME": "Car",
+                    "NAME": "1 pass.", #Préciser 1 passager ici pour le moment ?
                     "Mean of Transport": "Car",
                     "geometry": geom_route,
                 }
