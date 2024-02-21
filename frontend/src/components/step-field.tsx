@@ -169,6 +169,8 @@ interface CarButtonProps {
   step: Step;
 }
 
+const thumbUp: string = "👍";
+
 const CarButton = ({ updateStep, isSelected, step }: CarButtonProps) => {
   return (
     <Menu>
@@ -194,7 +196,7 @@ const CarButton = ({ updateStep, isSelected, step }: CarButtonProps) => {
         )}
       </MenuButton>
       <MenuList zIndex={3}>
-        {[1, 2, 3, 4, 5].map((number) => (
+        {[1, 2, 3, 4, 5, thumbUp].map((number) => (
           <MenuItem
             key={number}
             onClick={() =>
@@ -203,8 +205,8 @@ const CarButton = ({ updateStep, isSelected, step }: CarButtonProps) => {
                 passengers: number,
               })
             }
-          >
-            {number} passenger{number > 1 ? "s" : ""}
+          > {number === thumbUp ? "Hitch-hiking" : `${number} passenger${number > 1 ? "s" : ""}`}
+            
           </MenuItem>
         ))}
       </MenuList>

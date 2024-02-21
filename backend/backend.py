@@ -83,7 +83,8 @@ search_perimeter = [0.2, 5]  # km
 sea_threshold = 5  # km
 
 # Emission factors kg/pkm
-EF_car = .2176
+EF_car = {'construction' : .0256, 
+          'fuel' : .192} # total : .2176
 EF_bus = .02942
 EF_ferry = .3
 EF_plane = {"short": {
@@ -404,8 +405,8 @@ def car_bus_to_gdf(
         gdf_car = pd.DataFrame(
             pd.Series(
                 {
-                    "kgCO2eq": route_dist * EF_car,
-                    "EF_tot": EF_car,
+                    "kgCO2eq": route_dist * np.sum(list(EF_car.values())),
+                    "EF_tot": np.sum(list(EF_car.values())),
                     "path_length": route_dist,
                     "colors": color,
                     "NAME": "1 pass.", #Préciser 1 passager ici pour le moment ?
@@ -486,6 +487,14 @@ def car_to_gdf(
     """
     ### Route OSRM - create a separate function
     geom_route, route_dist, route = find_route(tag1, tag2)
+    if nb != "👍" :
+        nb = int(nb)
+        EF = (np.sum(list(EF_car.values())) / nb) + EF_car['fuel'] * .04 * (nb - 1) #Over consumption due to weight and luggages
+        name = str(nb)+' pass.'
+    else : #Hitch-hiking
+        EF = EF_car['fuel'] * .04
+        print('coucou')
+        name = 'Hitch-hiking'
 
     # Validation part for route
     if route:  # We have a geometry
@@ -496,11 +505,11 @@ def car_to_gdf(
         gdf_car = pd.DataFrame(
             pd.Series(
                 {
-                    "kgCO2eq": route_dist * EF_car / nb,
-                    "EF_tot": EF_car / nb,
+                    "kgCO2eq": route_dist * EF,
+                    "EF_tot": EF, #Adding consumption with more weight
                     "path_length": route_dist,
                     "colors": color,
-                    "NAME": str(nb)+' pass.',
+                    "NAME": name,
                     "Mean of Transport": "Car",
                     "geometry": geom_route,
                 }
@@ -779,11 +788,10 @@ def compute_emissions_custom(data, cmap=colors_custom):
 
         elif transport_mean == "Car":
             # We get the number of passenger
-            nb = int(arrival.nb)
             gdf_car, _car = car_to_gdf(
                 departure_coordinates,
                 arrival_coordinates,
-                nb=nb,
+                nb=arrival.nb,
                 color=color_custom["Car"],
             )
             if not _car : #One step is not succesful
