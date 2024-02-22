@@ -58,7 +58,8 @@ export function FormPanel({
           compare the emissions of your journeys! You can either compare all modes of transport on
           a specific route, or compare multi-modal routes with steps.">
           <span>
-            <BiHelpCircle />
+            <BiHelpCircle 
+            style={{ display: "inline-block", marginLeft: "5px" }} />
           </span>
         </ChakraTooltip>
         </Heading>

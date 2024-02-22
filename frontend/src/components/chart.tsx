@@ -74,13 +74,20 @@ export function Chart({ response }: ChartProps) {
             </Bar>
           ))}
         </BarChart>
-      </ResponsiveContainer>
+        </ResponsiveContainer>
+        <ResponsiveContainer
+        height="auto"
+        width="100%">
+        <Flex justifyContent="flex-end">
       <ChakraTooltip label="Plane: the formation of Contrails combined with emissions of nitrogen oxides (NOx)
       affect the properties of the atmosphere and lead to an increase in radiative forcing.">
           <span>
-            <BiHelpCircle />
+            <BiHelpCircle 
+            style={{display: "inline-block", marginRight: "5px" }}/>
           </span>
         </ChakraTooltip>
+        </Flex>
+        </ResponsiveContainer>
     </Box>
   );
 }
