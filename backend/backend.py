@@ -69,9 +69,9 @@ colors_alternative = [
 # Geometries from API
 simplified = True
 if simplified:
-    train_s, route_s = "1", "simplified"
+    train_s, train_t, route_s = "simplified", "1", "simplified" 
 else:
-    train_s, route_s = "0", "full"
+    train_s, train_t, route_s = "full", "0", "full" 
 
 # Validation perimeter
 val_perimeter = 500  # km
@@ -174,48 +174,55 @@ def find_nearest(lon, lat, perim):
     else:
         # Couldn't find a node
         return False
+    
 
-
-def find_train(tag1, tag2):
+def find_train(tag1, tag2, method = 'signal'):
     """
     Find train path between 2 points. Can use ntag API or signal.
     parameters:
         - tag1, tag2 : list or tuple like (lon, lat)
+        - method : signal / trainmap
     return:
         - gdf, a geoserie with the path geometry / None if failure
         - train, boolean
     """
     # format lon, lat
     # Build the request url
+    if method == 'trainmap' :
     # trainmap
-    url = (
-        f"https://trainmap.ntag.fr/api/route?dep={tag1[0]},{tag1[1]}&arr={tag2[0]},{tag2[1]}&simplify="
-        + train_s
-    )  # 1 to simplify it
+        url = (
+            f"https://trainmap.ntag.fr/api/route?dep={tag1[0]},{tag1[1]}&arr={tag2[0]},{tag2[1]}&simplify="
+            + train_t
+        )  # 1 to simplify it
+    else : 
     # signal
-    # url = f'https://signal.eu.org/osm/eu/route/v1/train/{tag1[0]},{tag1[1]};{tag2[0]},{tag2[1]}?overview=full' #or simplified
+        url = (
+            f'https://signal.eu.org/osm/eu/route/v1/train/{tag1[0]},{tag1[1]};{tag2[0]},{tag2[1]}?overview='
+            + train_s
+            + "&geometries=geojson"
+        )# simplified
     # Send the GET request
+    # import time
+    # s = time.time()
     response = requests.get(url)
+    # print(time.time() - s)
 
     # Check if the request was successful (status code 200)
     if response.status_code == 200:
         print("Path retrieved!")
-        response = requests.get(url)
-
+        if method == 'trainmap' :
         # Store data in a geodataserie - trainmap
-        gdf = gpd.GeoSeries(
-            LineString(response.json()["geometry"]["coordinates"][0]), crs="epsg:4326"
-        )
+            gdf = gpd.GeoSeries(
+                LineString(response.json()["geometry"]["coordinates"][0]), crs="epsg:4326"
+            )
         # geom = LineString(response.json()['geometry']['coordinates'][0])
         # geod = Geod(ellps="WGS84")
         # print('Train intial', geod.geometry_length(geom) / 1e3)
-
+        else :
         # Store data - signal
-        # geom = LineString(convert.decode_polyline(requests.get(url).json()['routes'][0]['geometry'])['coordinates'])
-        # #geometry = resp.json()['waypoints'][0]['hint']
-        # gdf = gpd.GeoSeries(geom, crs='epsg:4326')
-        # geod = Geod(ellps="WGS84")
-        # print('Train intial', geod.geometry_length(geom) / 1e3)
+            gdf = gpd.GeoSeries(
+                LineString(response.json()["routes"][0]["geometry"]["coordinates"]), crs="epsg:4326"
+            )  
         train = True
     else:
         # Error message
@@ -493,7 +500,6 @@ def car_to_gdf(
         name = str(nb)+' pass.'
     else : #Hitch-hiking
         EF = EF_car['fuel'] * .04
-        print('coucou')
         name = 'Hitch-hiking'
 
     # Validation part for route
