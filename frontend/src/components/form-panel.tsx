@@ -9,7 +9,7 @@ import {
   Text,
   VStack,
   Tooltip as ChakraTooltip,
-  useDisclosure
+  useDisclosure,
 } from "@chakra-ui/react";
 import { Form } from "./form";
 import { Chart } from "./chart";
@@ -64,8 +64,8 @@ export function FormPanel({
             <BiHelpCircle 
             style={{ display: "inline-block", marginLeft: "5px" }} 
             onMouseEnter={onOpen}
-          onMouseLeave={onClose}
-          onClick={onToggle}
+            onMouseLeave={onClose}
+            onClick={onToggle}
             />
           </span>
         </ChakraTooltip>

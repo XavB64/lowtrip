@@ -3,6 +3,7 @@ import {
   useBreakpoint,
   Tooltip as ChakraTooltip,
   Flex,
+  useDisclosure,
 } from "@chakra-ui/react";
 import { round, sumBy, uniq, uniqBy } from "lodash";
 import { BiHelpCircle } from "react-icons/bi";
@@ -24,6 +25,7 @@ interface ChartProps {
 
 export function Chart({ response }: ChartProps) {
   const breakpoint = useBreakpoint();
+  const { isOpen, onOpen, onToggle, onClose } = useDisclosure();
 
   if (!response) return null;
 
@@ -34,7 +36,6 @@ export function Chart({ response }: ChartProps) {
       ? JSON.parse(response.data.alternative_trip)
       : []),
   ];
-
   return (
     <Box h="100%" w="100%">
       <Flex
@@ -75,19 +76,26 @@ export function Chart({ response }: ChartProps) {
           ))}
         </BarChart>
         </ResponsiveContainer>
-        <ResponsiveContainer
+        
+        
+        <Flex justifyContent="flex-end"
         height="auto"
         width="100%">
-        <Flex justifyContent="flex-end">
       <ChakraTooltip label="Plane: the formation of Contrails combined with emissions of nitrogen oxides (NOx)
-      affect the properties of the atmosphere and lead to an increase in radiative forcing.">
+      affect the properties of the atmosphere and lead to an increase in radiative forcing."
+     isOpen={isOpen}
+      >
           <span>
             <BiHelpCircle 
-            style={{display: "inline-block", marginRight: "5px" }}/>
+            style={{display: "inline-block", marginRight: "5px" }}
+            onMouseEnter={onOpen}
+            onMouseLeave={onClose}
+            onClick={onToggle}
+            />
           </span>
         </ChakraTooltip>
         </Flex>
-        </ResponsiveContainer>
+        
     </Box>
   );
 }
