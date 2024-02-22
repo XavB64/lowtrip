@@ -9,6 +9,7 @@ import {
   Text,
   VStack,
   Tooltip as ChakraTooltip,
+  useDisclosure
 } from "@chakra-ui/react";
 import { Form } from "./form";
 import { Chart } from "./chart";
@@ -36,7 +37,7 @@ export function FormPanel({
   const chartRef = useRef(null);
   const scrollToChart = () =>
     (chartRef.current as any)?.scrollIntoView({ behavior: "smooth" });
-
+  const { isOpen, onOpen, onToggle, onClose } = useDisclosure();
   return (
     <VStack
       width={["100%", "45%"]}
@@ -56,10 +57,16 @@ export function FormPanel({
           Compare your travel emissions
           <ChakraTooltip label=" Select departure, destination and means of transport to
           compare the emissions of your journeys! You can either compare all modes of transport on
-          a specific route, or compare multi-modal routes with steps.">
+          a specific route, or compare multi-modal routes with steps."
+          isOpen={isOpen}
+          >
           <span>
             <BiHelpCircle 
-            style={{ display: "inline-block", marginLeft: "5px" }} />
+            style={{ display: "inline-block", marginLeft: "5px" }} 
+            onMouseEnter={onOpen}
+          onMouseLeave={onClose}
+          onClick={onToggle}
+            />
           </span>
         </ChakraTooltip>
         </Heading>
