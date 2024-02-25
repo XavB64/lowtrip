@@ -38,7 +38,7 @@ export interface Gdf {
   features: {
     id: string;
     type: string;
-    properties: { colors: string };
+    properties: { colors: string; "Mean of Transport": string };
     geometry: { type: string; coordinates: [number, number][] };
   }[];
 }
