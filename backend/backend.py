@@ -909,6 +909,9 @@ def compute_emissions_all(data, cmap=colors_direct):
             th = .04
             print('transform')
             geo_car['geometry'] = ops.transform(lambda x, y: (x+th, y+th), geo_car['geometry'].values[0])
+            # We have to change the name of mean of transport Car or Bus if it's Bus
+            if car == False :
+                geo_car['Mean of Transport'] = 'Bus'
         else :
         #     #We have both
             geo_car['Mean of Transport'] = 'Car & Bus'
