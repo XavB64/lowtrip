@@ -1,13 +1,21 @@
 import axios from "axios";
 import { useState } from "react";
 
-import { Button, Divider, HStack, Text, VStack } from "@chakra-ui/react";
+import {
+  Button,
+  Divider,
+  HStack,
+  Text,
+  VStack,
+  useDisclosure,
+} from "@chakra-ui/react";
 import { BiSolidPlusCircle } from "react-icons/bi";
 import { API_URL } from "../config";
 import { ApiResponse, Step } from "../types";
 import { formatStepsForApi } from "../utils";
 import { PrimaryButton } from "./primary-button";
 import { StepField } from "./step-field";
+import ErrorModal from "./error-modal";
 
 const getPayload = (steps: Step[], stepsToCompare?: Step[]) => {
   const formData = new FormData();
@@ -51,6 +59,8 @@ export const Form = ({
   changeTab,
 }: FormProps) => {
   const { values: steps, addStep, removeStep, updateStep } = stepsProps;
+  const { isOpen, onOpen: openErrorModal, onClose } = useDisclosure();
+  const [errorMessage, setErrorMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   const formIsNotValid = steps.some((step, index) => {
@@ -69,10 +79,16 @@ export const Form = ({
         headers: { "Access-Contol-Allow-Origin": "*" },
       })
       .then((response: ApiResponse) => {
-        setResponse(response);
+        if (response.data.error) {
+          setErrorMessage(response.data.error);
+          openErrorModal();
+        } else {
+          setResponse(response);
+        }
       })
       .catch((err) => {
         console.log(err);
+        openErrorModal();
       })
       .finally(async () => {
         setIsLoading(false);
@@ -149,6 +165,15 @@ export const Form = ({
           </HStack>
         </>
       )}
+
+      <ErrorModal
+        isOpen={isOpen}
+        onClose={() => {
+          onClose();
+          setErrorMessage("");
+        }}
+        errorMessage={errorMessage}
+      />
     </VStack>
   );
 };

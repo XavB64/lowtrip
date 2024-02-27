@@ -30,6 +30,7 @@ export interface ApiResponse {
     my_trip: string;
     direct_trip?: string;
     alternative_trip?: string;
+    error: string;
   };
 }
 
