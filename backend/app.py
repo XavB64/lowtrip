@@ -41,7 +41,7 @@ def main():
 
             # Response
             response = {
-                "gdf": pd.concat([geo_mytrip, geo_direct])[l_geo].explode().to_json(),
+                "gdf": pd.concat([geo_direct, geo_mytrip])[l_geo].explode().to_json(),
                 "my_trip": data_mytrip.to_json(orient="records"),
                 "direct_trip": data_direct.to_json(orient="records"),
                 "error":error,
