@@ -922,7 +922,8 @@ def compute_emissions_all(data, cmap=colors_direct):
         else :
         #     #We have both
             geo_car['Mean of Transport'] = 'Car & Bus'
-    geo.append(geo_car)
+        print(geo_car)
+        geo.append(geo_car)
 
     # Plane
     if plane:
@@ -943,7 +944,8 @@ def compute_emissions_all(data, cmap=colors_direct):
         data, geodata = pd.DataFrame(), pd.DataFrame()
     else:
         # Data for bar chart
-        data = pd.concat(l).reset_index(drop=True).drop("geometry", axis=1)
+        data = pd.concat(l).reset_index(drop=True)[['kgCO2eq',  'colors', 'NAME',
+       'Mean of Transport']]
         # Geodataframe for map
         geodata = gpd.GeoDataFrame(pd.concat(geo), geometry="geometry", crs="epsg:4326")
 
