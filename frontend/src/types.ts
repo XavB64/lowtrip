@@ -19,10 +19,10 @@ export interface StepProps {
 export enum Transport {
   plane = "Plane",
   car = "Car",
+  ecar = 'eCar',
   bus = "Bus",
   train = "Train",
   ferry = "Ferry",
-  ecar = 'ecar'
 }
 
 export interface ApiResponse {
@@ -31,6 +31,8 @@ export interface ApiResponse {
     my_trip: string;
     direct_trip?: string;
     alternative_trip?: string;
+    error: string;
+    error_other?: string;
   };
 }
 

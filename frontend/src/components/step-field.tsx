@@ -35,16 +35,16 @@ const TRANSPORTS = [
     icon: <BiSolidCar size={20} />,
   },
   {
+    value: Transport.ecar,
+    icon: <MdElectricCar size={20} />,
+  },
+  {
     value: Transport.bus,
     icon: <BiSolidBus size={20} />,
   },
   {
     value: Transport.ferry,
     icon: <FaFerry size={20} />,
-  },
-  {
-    value: Transport.ecar,
-    icon: <MdElectricCar size={20} />,
   },
 ];
 

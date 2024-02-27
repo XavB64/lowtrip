@@ -44,6 +44,7 @@ def main():
                 "gdf": pd.concat([geo_mytrip, geo_direct])[l_geo].explode().to_json(),
                 "my_trip": data_mytrip.to_json(orient="records"),
                 "direct_trip": data_direct.to_json(orient="records"),
+                "error":error,
             }
 
         if request.form["mode"] == "2":  # My trip vs custom trip
@@ -78,6 +79,8 @@ def main():
                 .to_json(),
                 "my_trip": data_mytrip.to_json(orient="records"),
                 "alternative_trip": data_alternative.to_json(orient="records"),
+                "error" : error,
+                "error_other" : error_other,
             }
 
         return response
