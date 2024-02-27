@@ -127,14 +127,16 @@ export const Form = ({
         </PrimaryButton>
       ) : (
         <>
-          <Text alignSelf="center">Compare with...</Text>
+          {steps.length < 3 && <Text alignSelf="center">Compare with...</Text>}
           <HStack w="100%">
             <PrimaryButton
               onClick={handleSubmit}
               isDisabled={formIsNotValid}
               isLoading={isLoading}
             >
-              All means of transport
+              {steps.length < 3
+                ? "All means of transport"
+                : "Compute emissions"}
             </PrimaryButton>
             <PrimaryButton
               onClick={changeTab}
@@ -142,7 +144,7 @@ export const Form = ({
               isLoading={false}
               variant="outline"
             >
-              Another trip
+              {steps.length < 3 ? "Another trip" : "Compare with another trip"}
             </PrimaryButton>
           </HStack>
         </>
