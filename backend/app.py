@@ -4,7 +4,12 @@ warnings.filterwarnings("ignore")
 
 # Librairies
 from flask import Flask, request, send_from_directory, json
-from backend import compute_emissions_custom, compute_emissions_all, chart_refactor, colors_alternative
+from backend import (
+    compute_emissions_custom,
+    compute_emissions_all,
+    chart_refactor,
+    colors_alternative,
+)
 from flask_cors import CORS  # comment this on deployment
 import pandas as pd
 
@@ -31,9 +36,9 @@ def main():
 
             # My trip data and geo data
             data_mytrip, geo_mytrip, error = compute_emissions_custom(df)
-            #Error message - for now in the console
-            if len(error) > 0 :
-                print('My trip - ', error)
+            # Error message - for now in the console
+            if len(error) > 0:
+                print("My trip - ", error)
             # Direct data and geo data
             data_direct, geo_direct = compute_emissions_all(df)
             # Prepare data for aggregation in the chart -  see frontend
@@ -44,6 +49,7 @@ def main():
                 "gdf": pd.concat([geo_mytrip, geo_direct])[l_geo].explode().to_json(),
                 "my_trip": data_mytrip.to_json(orient="records"),
                 "direct_trip": data_direct.to_json(orient="records"),
+                "error": error,
             }
 
         if request.form["mode"] == "2":  # My trip vs custom trip
@@ -53,19 +59,21 @@ def main():
 
             # My trip data and geo data
             data_mytrip, geo_mytrip, error = compute_emissions_custom(df)
-            #Error message
-            if len(error) > 0 :
-                print('My trip - ', error)
+            # Error message
+            if len(error) > 0:
+                print("My trip - ", error)
             # Direct data and geo data
             # We change the color to pink
             data_alternative, geo_alternative, error_other = compute_emissions_custom(
                 df2, cmap=colors_alternative
             )
-            #Error message
-            if len(error_other) > 0 : 
-                print('Other trip - ', error_other)
+            # Error message
+            if len(error_other) > 0:
+                print("Other trip - ", error_other)
             if (len(error) > 0) & (len(error_other) > 0):
-                print('Both customize trip failed, please change mean of transport or locations.')
+                print(
+                    "Both customize trip failed, please change mean of transport or locations."
+                )
             # Prepare data for aggregation in the chart -  see frontend
             data_mytrip, data_alternative = chart_refactor(
                 data_mytrip, data_alternative, True

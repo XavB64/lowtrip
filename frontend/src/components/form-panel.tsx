@@ -6,7 +6,6 @@ import {
   TabPanel,
   TabPanels,
   Tabs,
-  Text,
   VStack,
   Tooltip as ChakraTooltip,
   useDisclosure,
@@ -61,8 +60,8 @@ export function FormPanel({
           isOpen={isOpen}
           >
           <span>
-            <BiHelpCircle 
-            style={{ display: "inline-block", marginLeft: "5px" }} 
+            <BiHelpCircle
+            style={{ display: "inline-block", marginLeft: "5px" }}
             onMouseEnter={onOpen}
             onMouseLeave={onClose}
             onClick={onToggle}
