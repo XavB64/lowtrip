@@ -74,7 +74,7 @@ else:
     train_s, train_t, route_s = "full", "0", "full" 
 
 # Validation perimeter
-val_perimeter = 500  # km
+val_perimeter = 100  # km
 
 # Search areas
 search_perimeter = [0.2, 5]  # km
@@ -106,6 +106,8 @@ EF_plane = {"short": {
 
 # Number of points in plane geometry
 nb_pts = 100
+# Min distance for plane comparison
+min_plane_dist = 500 #km
 
 # Additional emissions from plane
 cont_coeff = 2
@@ -881,6 +883,11 @@ def compute_emissions_all(data, cmap=colors_direct):
             car = False
         elif transp == "Bus":
             bus = False
+    #Check distance for plane
+    geod = Geod(ellps = 'WGS84')
+    if geod.geometry_length(LineString([tag1, tag2])) / 1e3 < min_plane_dist :
+        #Then we do not suggest the plane solution
+        plane = False
     # Loop
     l = []
     geo = []
