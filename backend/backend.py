@@ -22,8 +22,9 @@ import requests
 ######################
 
 
-# Load  world
+# Load  world datasets
 world = gpd.read_file("static/world.geojson")
+carbon_intensity_electricity = gpd.read_file('static/carbon_intensity_electricity.geojson')
 
 # Fields to return for bar chart
 l_var = ["NAME", "Mean of Transport", "kgCO2eq", "colors"]
@@ -371,7 +372,7 @@ def train_to_gdf(
             gdf, train = pd.DataFrame(), False
 
     if train:  # We need to filter by country and add length / Emission factors
-        gdf = filter_countries_world(gdf)
+        gdf = filter_countries_world(gdf, method = 'train')
         # Add colors, here discretise the colormap
         gdf["colors"] = colormap
         # gdf['colors'] = ['#'+k for k in pd.Series(colormap[::-1])[[int(k) for k in np.linspace(0, len(colormap)-1, gdf.shape[0])]]]
@@ -412,9 +413,12 @@ def ecar_to_gdf(
             geom_route, route_dist, route = None, None, False
 
     if route:  # We need to filter by country and add length / Emission factors
-        gdf = filter_ecar(gpd.GeoSeries(
-                geom_route, crs="epsg:4326"
-            )  )
+        gdf = filter_countries_world(gpd.GeoSeries(
+               geom_route, crs="epsg:4326"), method = 'ecar')
+        
+        # filter_ecar(gpd.GeoSeries(
+        #         geom_route, crs="epsg:4326"
+        #     )  )
         # Add colors, here discretise the colormap
         gdf["colors"] = color
         # gdf['colors'] = ['#'+k for k in pd.Series(colormap[::-1])[[int(k) for k in np.linspace(0, len(colormap)-1, gdf.shape[0])]]]
@@ -428,7 +432,7 @@ def ecar_to_gdf(
         # Add the distance to the dataframe
         gdf["path_length"] = l_length
         # Compute emissions : EF * length
-        gdf["EF_tot"] =(gdf["mix"] * EF_ecar['fuel']) / 1e3 + EF_ecar['construction'] # g/kWh * kWh/km
+        gdf["EF_tot"] =(gdf["EF_tot"] * EF_ecar['fuel']) / 1e3 + EF_ecar['construction'] # g/kWh * kWh/km
         gdf["kgCO2eq"] = gdf["path_length"] * gdf["EF_tot"]
         gdf["Mean of Transport"] = "eCar"
     # Returning the result
@@ -674,25 +678,34 @@ def ferry_to_gdf(tag1, tag2, EF=EF_ferry, color="#FF0000"):
     return gdf_ferry
 
 
-def filter_countries_world(gdf, th=sea_threshold):
+def filter_countries_world(gdf, method, th=sea_threshold):
     """
     Filter train path by countries (world.geojson)
     parameters:
         - gdf : train geometry in geoserie
+        - mode : train / ecar
         - th : threshold to remove unmatched gaps between countries that are too small (km)
     return:
         - Geodataframe of train path by countries
     """
+    if method == 'train':
+        iso = "ISO2"
+        EF = "EF_tot"
+        data = world
+    else : #ecar
+        iso = 'Code'
+        EF = 'mix'
+        data = carbon_intensity_electricity
     # Make the split by geometry
     gdf.name = "geometry"
     res = gpd.overlay(
         gpd.GeoDataFrame(gdf, geometry="geometry", crs="epsg:4326"),
-        world,
+        data,
         how="intersection",
     )
     diff = gpd.overlay(
         gpd.GeoDataFrame(gdf, geometry="geometry", crs="epsg:4326"),
-        world,
+        data,
         how="difference",
     )
     # Check if the unmatched data is significant
@@ -710,15 +723,15 @@ def filter_countries_world(gdf, th=sea_threshold):
         diff_2 = diff_2.set_geometry("geometry", crs="epsg:4326")
         # Filter depending is the gap is long enough to be taken into account and join with nearest country
         test = diff_2[diff_2.length > kilometer_to_degree(th)].sjoin_nearest(
-            world, how="left"
+            data, how="left"
         )
         # Aggregation per country and combining geometries
         u = (
             pd.concat([res.explode(), test.explode()])
-            .groupby("ISO2")
+            .groupby(iso)
             .agg(
                 NAME=("NAME", lambda x: x.iloc[0]),
-                EF_tot=("EF_tot", lambda x: x.iloc[0]),
+                EF_tot=(EF, lambda x: x.iloc[0]),
                 geometry=(
                     "geometry",
                     lambda x: ops.linemerge(MultiLineString(x.values)),
@@ -728,79 +741,10 @@ def filter_countries_world(gdf, th=sea_threshold):
     else:
         u = (
             res.explode()
-            .groupby("ISO2")
+            .groupby(iso)
             .agg(
                 NAME=("NAME", lambda x: x.iloc[0]),
-                EF_tot=("EF_tot", lambda x: x.iloc[0]),
-                geometry=(
-                    "geometry",
-                    lambda x: ops.linemerge(MultiLineString(x.values)),
-                ),
-            )
-        )
-    # Rendering result
-    res = gpd.GeoDataFrame(u, geometry="geometry", crs="epsg:4326").reset_index()
-    return res
-
-carbon_intensity_electricity = gpd.read_file('static/carbon_intensity_electricity.geojson')
-
-def filter_ecar(gdf, th=sea_threshold):
-    """
-    Filter train path by countries (world.geojson)
-    parameters:
-        - gdf : train geometry in geoserie
-        - th : threshold to remove unmatched gaps between countries that are too small (km)
-    return:
-        - Geodataframe of train path by countries
-    """
-    # Make the split by geometry
-    gdf.name = "geometry"
-    res = gpd.overlay(
-        gpd.GeoDataFrame(gdf, geometry="geometry", crs="epsg:4326"),
-        carbon_intensity_electricity,
-        how="intersection",
-    )
-    diff = gpd.overlay(
-        gpd.GeoDataFrame(gdf, geometry="geometry", crs="epsg:4326"),
-        carbon_intensity_electricity,
-        how="difference",
-    )
-    # Check if the unmatched data is significant
-    if diff.length.sum() > kilometer_to_degree(th):
-        # In case we have bridges / tunnels across sea:
-        # Distinction depending on linestring / multilinestring
-        if diff.geometry[0].geom_type == "MultiLineString":
-            #  print('MultiLinestring')
-            diff_2 = gpd.GeoDataFrame(list(diff.geometry.values[0].geoms))
-        else:
-            # print("Linestring")
-            diff_2 = gpd.GeoDataFrame(list(diff.geometry.values))
-        diff_2.columns = ["geometry"]
-        diff_2 = diff_2.set_geometry("geometry", crs="epsg:4326")
-        # Filter depending is the gap is long enough to be taken into account and join with nearest country
-        test = diff_2[diff_2.length > kilometer_to_degree(th)].sjoin_nearest(
-            carbon_intensity_electricity, how="left"
-        )
-        # Aggregation per country and combining geometries
-        u = (
-            pd.concat([res.explode(), test.explode()])
-            .groupby("Code")
-            .agg(
-                NAME=("NAME", lambda x: x.iloc[0]),
-                mix=("mix", lambda x: x.iloc[0]),
-                geometry=(
-                    "geometry",
-                    lambda x: ops.linemerge(MultiLineString(x.values)),
-                ),
-            )
-        )
-    else:
-        u = (
-            res.explode()
-            .groupby("Code")
-            .agg(
-                NAME=("NAME", lambda x: x.iloc[0]),
-                mix=("mix", lambda x: x.iloc[0]),
+                EF_tot=(EF, lambda x: x.iloc[0]),
                 geometry=(
                     "geometry",
                     lambda x: ops.linemerge(MultiLineString(x.values)),
