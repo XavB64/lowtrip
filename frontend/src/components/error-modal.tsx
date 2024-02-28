@@ -32,7 +32,7 @@ const ErrorModal = ({
         )}
       </ModalBody>
       <ModalFooter>
-        <Button onClick={onClose}>Try with another trip</Button>
+        <Button onClick={onClose}>Modify trip</Button>
       </ModalFooter>
     </ModalContent>
   </Modal>

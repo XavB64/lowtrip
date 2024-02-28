@@ -775,7 +775,7 @@ def compute_emissions_custom(data, cmap=colors_custom):
             )
             if not _train : #One step is not succesful
                 fail = True
-                ERROR = 'step n°'+str(int(idx) + 1)+' failed with train. Please change mean of transport or locations.'
+                ERROR = 'step n°'+str(int(idx) + 1)+' failed with Train, please change mean of transport or locations. '
                 break
             # Adding a step variable here to know which trip is it
             gdf["step"] = str(int(idx) + 1)
@@ -788,7 +788,7 @@ def compute_emissions_custom(data, cmap=colors_custom):
             )
             if not _bus : #One step is not succesful
                 fail = True
-                ERROR = 'step n°'+str(int(idx) + 1)+' failed with bus. Please change mean of transport or locations.'
+                ERROR = 'step n°'+str(int(idx) + 1)+' failed with Bus, please change mean of transport or locations. '
                 break
             gdf_bus["step"] = str(int(idx) + 1)
             l.append(gdf_bus)
@@ -804,7 +804,7 @@ def compute_emissions_custom(data, cmap=colors_custom):
             )
             if not _car : #One step is not succesful
                 fail = True
-                ERROR = 'step n°'+str(int(idx) + 1)+' failed with car. Please change mean of transport or locations.'
+                ERROR = 'step n°'+str(int(idx) + 1)+' failed with Car, please change mean of transport or locations. '
                 break
             gdf_car["step"] = str(int(idx) + 1)
             l.append(gdf_car)

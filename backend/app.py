@@ -33,20 +33,36 @@ def main():
         if request.form["mode"] == "1":  # My trip vs direct trips
             # Convert json into pandas
             df = pd.DataFrame.from_dict(json.loads(request.form["my-trip"]))
-
+            print(df)
             # My trip data and geo data
             data_mytrip, geo_mytrip, error = compute_emissions_custom(df)
             # Error message - for now in the console
             if len(error) > 0:
                 print("My trip - ", error)
-            # Direct data and geo data
-            data_direct, geo_direct = compute_emissions_all(df)
+                
+            if not df.shape[0] > 2 :
+                # Direct data and geo data
+                data_direct, geo_direct = compute_emissions_all(df)
+            else :
+                data_direct, geo_direct = pd.DataFrame(), pd.DataFrame()
+                
             # Prepare data for aggregation in the chart -  see frontend
             data_mytrip = chart_refactor(data_mytrip)
+            
+            if len(error) > 0:
+                error = 'My trip: '+error
+            
+            #Check if gdf is empty
+            gdf = pd.concat([geo_mytrip, geo_direct])
+            if gdf.shape[0] == 0:
+                gdf = None
+            else :
+                gdf = gdf[l_geo].explode().to_json()
+                
 
             # Response
             response = {
-                "gdf": pd.concat([geo_mytrip, geo_direct])[l_geo].explode().to_json(),
+                "gdf": gdf,
                 "my_trip": data_mytrip.to_json(orient="records"),
                 "direct_trip": data_direct.to_json(orient="records"),
                 "error": error,
@@ -61,7 +77,7 @@ def main():
             data_mytrip, geo_mytrip, error = compute_emissions_custom(df)
             # Error message
             if len(error) > 0:
-                print("My trip - ", error)
+                error = 'My trip: '+error
             # Direct data and geo data
             # We change the color to pink
             data_alternative, geo_alternative, error_other = compute_emissions_custom(
@@ -69,11 +85,14 @@ def main():
             )
             # Error message
             if len(error_other) > 0:
-                print("Other trip - ", error_other)
+                error_other = 'Other trip: ' + error_other
+                
+            #Check if we have geo data :
             if (len(error) > 0) & (len(error_other) > 0):
-                print(
-                    "Both customize trip failed, please change mean of transport or locations."
-                )
+                gdf = None
+            else :
+                gdf = pd.concat([geo_mytrip, geo_alternative])[l_geo].explode().to_json()
+           
             # Prepare data for aggregation in the chart -  see frontend
             data_mytrip, data_alternative = chart_refactor(
                 data_mytrip, data_alternative, True
@@ -81,11 +100,10 @@ def main():
 
             # Response
             response = {
-                "gdf": pd.concat([geo_mytrip, geo_alternative])[l_geo]
-                .explode()
-                .to_json(),
+                "gdf": gdf,
                 "my_trip": data_mytrip.to_json(orient="records"),
                 "alternative_trip": data_alternative.to_json(orient="records"),
+                "error": error + error_other,
             }
 
         return response
