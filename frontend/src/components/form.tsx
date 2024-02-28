@@ -160,7 +160,7 @@ export const Form = ({
               isLoading={false}
               variant="outline"
             >
-              {steps.length < 3 ? "Another trip" : "Compare with another trip"}
+              {steps.length < 3 ? "Another trip" : "Compare to another trip"}
             </PrimaryButton>
           </HStack>
         </>
