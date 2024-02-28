@@ -85,6 +85,11 @@ sea_threshold = 5  # km
 # Emission factors kg/pkm
 EF_car = {'construction' : .0256, 
           'fuel' : .192} # total : .2176
+EF_ecar = {
+    'construction' : 0.0836,
+    'fuel' : 0.17 #kWh / km
+}
+
 EF_bus = .02942
 EF_ferry = .3
 EF_plane = {"short": {
@@ -482,7 +487,7 @@ def bus_to_gdf(
 
 
 def car_to_gdf(
-    tag1, tag2, EF_car=EF_car, color="#00FF00", validate=val_perimeter, nb=1
+    tag1, tag2, EF_car=EF_car, color="#00FF00", validate=val_perimeter, nb=1, electric = False
 ):
     """
     parameters:
@@ -494,39 +499,69 @@ def car_to_gdf(
     return:
         - full dataframe for car
     """
-    ### Route OSRM - create a separate function
-    geom_route, route_dist, route = find_route(tag1, tag2)
-    if nb != "👍" :
-        nb = int(nb)
-        EF = (np.sum(list(EF_car.values())) / nb) + EF_car['fuel'] * .04 * (nb - 1) #Over consumption due to weight and luggages
-        name = str(nb)+' pass.'
-    else : #Hitch-hiking
-        EF = EF_car['fuel'] * .04
-        name = 'Hitch-hiking'
+    if electric == False :
+        ### Route OSRM - create a separate function
+        geom_route, route_dist, route = find_route(tag1, tag2)
+        if nb != "👍" :
+            nb = int(nb)
+            EF = (np.sum(list(EF_car.values())) / nb) + EF_car['fuel'] * .04 * (nb - 1) #Over consumption due to weight and luggages
+            name = str(nb)+' pass.'
+        else : #Hitch-hiking
+            EF = EF_car['fuel'] * .04
+            name = 'Hitch-hiking'
 
-    # Validation part for route
-    if route:  # We have a geometry
-        if not validate_geom(tag1, tag2, geom_route, validate):
-            geom_route, route_dist, route = None, None, False
+        # Validation part for route
+        if route:  # We have a geometry
+            if not validate_geom(tag1, tag2, geom_route, validate):
+                geom_route, route_dist, route = None, None, False
 
-    if route:
-        gdf_car = pd.DataFrame(
-            pd.Series(
-                {
-                    "kgCO2eq": route_dist * EF,
-                    "EF_tot": EF, #Adding consumption with more weight
-                    "path_length": route_dist,
-                    "colors": color,
-                    "NAME": name,
-                    "Mean of Transport": "Car",
-                    "geometry": geom_route,
-                }
-            )
-        ).transpose()  #'EF_tot':EF_car / nb,
-    else:
-        gdf_car = pd.DataFrame()
+        if route:
+            gdf_car = pd.DataFrame(
+                pd.Series(
+                    {
+                        "kgCO2eq": route_dist * EF,
+                        "EF_tot": EF, #Adding consumption with more weight
+                        "path_length": route_dist,
+                        "colors": color,
+                        "NAME": name,
+                        "Mean of Transport": "Car",
+                        "geometry": geom_route,
+                    }
+                )
+            ).transpose()  #'EF_tot':EF_car / nb,
+        else:
+            gdf_car = pd.DataFrame()
 
+    else : #Electric car
+        ### Route OSRM - create a separate function
+        geom_route, route_dist, route = find_route(tag1, tag2)
+        EF = .05
+
+        # Validation part for route
+        if route:  # We have a geometry
+            if not validate_geom(tag1, tag2, geom_route, validate):
+                geom_route, route_dist, route = None, None, False
+
+        if route:
+            gdf_car = pd.DataFrame(
+                pd.Series(
+                    {
+                        "kgCO2eq": route_dist * EF,
+                        "EF_tot": EF, #Adding consumption with more weight
+                        "path_length": route_dist,
+                        "colors": color,
+                        "NAME": 'Electric',
+                        "Mean of Transport": "eCar",
+                        "geometry": geom_route,
+                    }
+                )
+            ).transpose()  #'EF_tot':EF_car / nb,
+        else:
+            gdf_car = pd.DataFrame()
+
+    # Return the result
     return gdf_car, route
+
 
 
 def plane_to_gdf(
@@ -805,6 +840,22 @@ def compute_emissions_custom(data, cmap=colors_custom):
             if not _car : #One step is not succesful
                 fail = True
                 ERROR = 'step n°'+str(int(idx) + 1)+' failed with Car, please change mean of transport or locations. '
+                break
+            gdf_car["step"] = str(int(idx) + 1)
+            l.append(gdf_car)
+            geo.append(gdf_car)
+        elif transport_mean == "eCar":
+            # We get the number of passenger
+            gdf_car, _car = car_to_gdf(
+                departure_coordinates,
+                arrival_coordinates,
+                nb=arrival.nb,
+                color=color_custom["Car"],
+                electric = True
+            )
+            if not _car : #One step is not succesful
+                fail = True
+                ERROR = 'step n°'+str(int(idx) + 1)+' failed with eCar, please change mean of transport or locations. '
                 break
             gdf_car["step"] = str(int(idx) + 1)
             l.append(gdf_car)

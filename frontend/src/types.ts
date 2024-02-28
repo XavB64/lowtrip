@@ -19,6 +19,7 @@ export interface StepProps {
 export enum Transport {
   plane = "Plane",
   car = "Car",
+  ecar = 'eCar',
   bus = "Bus",
   train = "Train",
   ferry = "Ferry",

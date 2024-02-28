@@ -7,6 +7,7 @@ import {
   BiTrash,
 } from "react-icons/bi";
 import { FaFerry } from "react-icons/fa6";
+import { MdElectricCar } from "react-icons/md";
 
 import {
   Box,
@@ -36,6 +37,10 @@ const TRANSPORTS = [
   {
     value: Transport.bus,
     icon: <BiSolidBus size={20} />,
+  },
+  {
+    value: Transport.ecar,
+    icon: <MdElectricCar size={20} />,
   },
   {
     value: Transport.ferry,

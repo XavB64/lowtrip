@@ -76,7 +76,7 @@ const MapContent = ({
             <>
               <Polyline
                 key={`${JSON.stringify(feature.geometry.coordinates)}bis`}
-                pathOptions={{ color: feature.properties.colors }}
+                pathOptions={{ color: feature.properties.colors, opacity: 0.9 }}
                 positions={feature.geometry.coordinates.map((coordinate) => [
                   coordinate[1],
                   coordinate[0],
@@ -84,7 +84,7 @@ const MapContent = ({
               />
               <Polyline
                 key={JSON.stringify(feature.geometry.coordinates)}
-                pathOptions={{ opacity: 0, weight: 10 }}
+                pathOptions={{ opacity: 0, weight: 20 }}
                 positions={feature.geometry.coordinates.map((coordinate) => [
                   coordinate[1],
                   coordinate[0],

@@ -53,7 +53,7 @@ def main():
                 error = 'My trip: '+error
             
             #Check if gdf is empty
-            gdf = pd.concat([geo_mytrip, geo_direct])
+            gdf = pd.concat([geo_direct, geo_mytrip])
             if gdf.shape[0] == 0:
                 gdf = None
             else :
