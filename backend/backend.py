@@ -391,6 +391,50 @@ def train_to_gdf(
     # Returning the result
     return gdf, train
 
+def ecar_to_gdf(
+    tag1, tag2, nb=1, validate=val_perimeter, color="#00FF00"
+):  # charte_mollow
+    """
+    parameters:
+        - tag1, tag2
+        - perims
+        - validate
+        - colormap, list of colors
+    return:
+        - full dataframe for trains
+    """
+    ### Route OSRM - create a separate function
+    geom_route, route_dist, route = find_route(tag1, tag2)
+    EF = .05
+
+    # Validation part for route
+    if route:  # We have a geometry
+        if not validate_geom(tag1, tag2, geom_route, validate):
+            geom_route, route_dist, route = None, None, False
+
+    if route:  # We need to filter by country and add length / Emission factors
+        gdf = filter_ecar(gpd.GeoSeries(
+                geom_route, crs="epsg:4326"
+            )  )
+        # Add colors, here discretise the colormap
+        gdf["colors"] = color
+        # gdf['colors'] = ['#'+k for k in pd.Series(colormap[::-1])[[int(k) for k in np.linspace(0, len(colormap)-1, gdf.shape[0])]]]
+        # Adding and computing emissions
+        # For trains
+        l_length = []
+        # Compute the true distance
+        geod = Geod(ellps="WGS84")
+        for geom in gdf.geometry.values:
+            l_length.append(geod.geometry_length(geom) / 1e3)
+        # Add the distance to the dataframe
+        gdf["path_length"] = l_length
+        # Compute emissions : EF * length
+        gdf["EF_tot"] =(gdf["mix"] * EF_ecar['fuel'] + EF_ecar['construction']) / 1e3 # g/kWh * kWh/km
+        gdf["kgCO2eq"] = gdf["path_length"] * gdf["EF_tot"]
+        gdf["Mean of Transport"] = "eCar"
+    # Returning the result
+    return gdf, route
+
 
 def car_bus_to_gdf(
     tag1, tag2, EF_car=EF_car, EF_bus=EF_bus, color="#00FF00", validate=val_perimeter
@@ -487,7 +531,7 @@ def bus_to_gdf(
 
 
 def car_to_gdf(
-    tag1, tag2, EF_car=EF_car, color="#00FF00", validate=val_perimeter, nb=1, electric = False
+    tag1, tag2, EF_car=EF_car, color="#00FF00", validate=val_perimeter, nb=1
 ):
     """
     parameters:
@@ -499,65 +543,37 @@ def car_to_gdf(
     return:
         - full dataframe for car
     """
-    if electric == False :
-        ### Route OSRM - create a separate function
-        geom_route, route_dist, route = find_route(tag1, tag2)
-        if nb != "👍" :
-            nb = int(nb)
-            EF = (np.sum(list(EF_car.values())) / nb) + EF_car['fuel'] * .04 * (nb - 1) #Over consumption due to weight and luggages
-            name = str(nb)+' pass.'
-        else : #Hitch-hiking
-            EF = EF_car['fuel'] * .04
-            name = 'Hitch-hiking'
+    ### Route OSRM - create a separate function
+    geom_route, route_dist, route = find_route(tag1, tag2)
+    if nb != "👍" :
+        nb = int(nb)
+        EF = (np.sum(list(EF_car.values())) / nb) + EF_car['fuel'] * .04 * (nb - 1) #Over consumption due to weight and luggages
+        name = str(nb)+' pass.'
+    else : #Hitch-hiking
+        EF = EF_car['fuel'] * .04
+        name = 'Hitch-hiking'
 
-        # Validation part for route
-        if route:  # We have a geometry
-            if not validate_geom(tag1, tag2, geom_route, validate):
-                geom_route, route_dist, route = None, None, False
+    # Validation part for route
+    if route:  # We have a geometry
+        if not validate_geom(tag1, tag2, geom_route, validate):
+            geom_route, route_dist, route = None, None, False
 
-        if route:
-            gdf_car = pd.DataFrame(
-                pd.Series(
-                    {
-                        "kgCO2eq": route_dist * EF,
-                        "EF_tot": EF, #Adding consumption with more weight
-                        "path_length": route_dist,
-                        "colors": color,
-                        "NAME": name,
-                        "Mean of Transport": "Car",
-                        "geometry": geom_route,
-                    }
-                )
-            ).transpose()  #'EF_tot':EF_car / nb,
-        else:
-            gdf_car = pd.DataFrame()
-
-    else : #Electric car
-        ### Route OSRM - create a separate function
-        geom_route, route_dist, route = find_route(tag1, tag2)
-        EF = .05
-
-        # Validation part for route
-        if route:  # We have a geometry
-            if not validate_geom(tag1, tag2, geom_route, validate):
-                geom_route, route_dist, route = None, None, False
-
-        if route:
-            gdf_car = pd.DataFrame(
-                pd.Series(
-                    {
-                        "kgCO2eq": route_dist * EF,
-                        "EF_tot": EF, #Adding consumption with more weight
-                        "path_length": route_dist,
-                        "colors": color,
-                        "NAME": 'Electric',
-                        "Mean of Transport": "eCar",
-                        "geometry": geom_route,
-                    }
-                )
-            ).transpose()  #'EF_tot':EF_car / nb,
-        else:
-            gdf_car = pd.DataFrame()
+    if route:
+        gdf_car = pd.DataFrame(
+            pd.Series(
+                {
+                    "kgCO2eq": route_dist * EF,
+                    "EF_tot": EF, #Adding consumption with more weight
+                    "path_length": route_dist,
+                    "colors": color,
+                    "NAME": name,
+                    "Mean of Transport": "Car",
+                    "geometry": geom_route,
+                }
+            )
+        ).transpose()  #'EF_tot':EF_car / nb,
+    else:
+        gdf_car = pd.DataFrame()
 
     # Return the result
     return gdf_car, route
@@ -727,6 +743,75 @@ def filter_countries_world(gdf, th=sea_threshold):
     res = gpd.GeoDataFrame(u, geometry="geometry", crs="epsg:4326").reset_index()
     return res
 
+carbon_intensity_electricity = gpd.read_file('static/carbon_intensity_electricity.geojson')
+
+def filter_ecar(gdf, th=sea_threshold):
+    """
+    Filter train path by countries (world.geojson)
+    parameters:
+        - gdf : train geometry in geoserie
+        - th : threshold to remove unmatched gaps between countries that are too small (km)
+    return:
+        - Geodataframe of train path by countries
+    """
+    # Make the split by geometry
+    gdf.name = "geometry"
+    res = gpd.overlay(
+        gpd.GeoDataFrame(gdf, geometry="geometry", crs="epsg:4326"),
+        carbon_intensity_electricity,
+        how="intersection",
+    )
+    diff = gpd.overlay(
+        gpd.GeoDataFrame(gdf, geometry="geometry", crs="epsg:4326"),
+        carbon_intensity_electricity,
+        how="difference",
+    )
+    # Check if the unmatched data is significant
+    if diff.length.sum() > kilometer_to_degree(th):
+        # In case we have bridges / tunnels across sea:
+        # Distinction depending on linestring / multilinestring
+        if diff.geometry[0].geom_type == "MultiLineString":
+            #  print('MultiLinestring')
+            diff_2 = gpd.GeoDataFrame(list(diff.geometry.values[0].geoms))
+        else:
+            # print("Linestring")
+            diff_2 = gpd.GeoDataFrame(list(diff.geometry.values))
+        diff_2.columns = ["geometry"]
+        diff_2 = diff_2.set_geometry("geometry", crs="epsg:4326")
+        # Filter depending is the gap is long enough to be taken into account and join with nearest country
+        test = diff_2[diff_2.length > kilometer_to_degree(th)].sjoin_nearest(
+            carbon_intensity_electricity, how="left"
+        )
+        # Aggregation per country and combining geometries
+        u = (
+            pd.concat([res.explode(), test.explode()])
+            .groupby("Code")
+            .agg(
+                NAME=("NAME", lambda x: x.iloc[0]),
+                mix=("mix", lambda x: x.iloc[0]),
+                geometry=(
+                    "geometry",
+                    lambda x: ops.linemerge(MultiLineString(x.values)),
+                ),
+            )
+        )
+    else:
+        u = (
+            res.explode()
+            .groupby("Code")
+            .agg(
+                NAME=("NAME", lambda x: x.iloc[0]),
+                mix=("mix", lambda x: x.iloc[0]),
+                geometry=(
+                    "geometry",
+                    lambda x: ops.linemerge(MultiLineString(x.values)),
+                ),
+            )
+        )
+    # Rendering result
+    res = gpd.GeoDataFrame(u, geometry="geometry", crs="epsg:4326").reset_index()
+    return res
+
 
 def great_circle_geometry(dep, arr, nb=nb_pts):
     """
@@ -844,14 +929,28 @@ def compute_emissions_custom(data, cmap=colors_custom):
             gdf_car["step"] = str(int(idx) + 1)
             l.append(gdf_car)
             geo.append(gdf_car)
+            
         elif transport_mean == "eCar":
             # We get the number of passenger
-            gdf_car, _car = car_to_gdf(
+            # gdf_car, _car = car_to_gdf(
+            #     departure_coordinates,
+            #     arrival_coordinates,
+            #     nb=arrival.nb,
+            #     color=color_custom["Car"],
+            #     electric = True
+            # )
+            # if not _car : #One step is not succesful
+            #     fail = True
+            #     ERROR = 'step n°'+str(int(idx) + 1)+' failed with eCar, please change mean of transport or locations. '
+            #     break
+            # gdf_car["step"] = str(int(idx) + 1)
+            # l.append(gdf_car)
+            # geo.append(gdf_car)
+            gdf_car, _car = ecar_to_gdf(
                 departure_coordinates,
                 arrival_coordinates,
                 nb=arrival.nb,
                 color=color_custom["Car"],
-                electric = True
             )
             if not _car : #One step is not succesful
                 fail = True
@@ -922,7 +1021,7 @@ def compute_emissions_all(data, cmap=colors_direct):
     # Check if we should compute it or not
     train, plane, car, bus = True, True, True, True
     if (
-        data.shape[0] == 2
+        data.shape[0] == 2 
     ):  # Then it's only one step, we will not add it to direct trip calulations
         # Retrieve the mean of transport: Car/Bus/Train/Plane
         transp = data.loc["1"].transp
