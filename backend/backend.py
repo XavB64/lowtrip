@@ -431,8 +431,11 @@ def ecar_to_gdf(
             l_length.append(geod.geometry_length(geom) / 1e3)
         # Add the distance to the dataframe
         gdf["path_length"] = l_length
+        #Handle nb passengers
+        nb = int(nb)
+        gdf['NAME'] = ' '+ str(nb)+' pass. '+gdf['NAME']
         # Compute emissions : EF * length
-        gdf["EF_tot"] =(gdf["EF_tot"] * EF_ecar['fuel']) / 1e3 + EF_ecar['construction'] # g/kWh * kWh/km
+        gdf["EF_tot"] =(gdf["EF_tot"] * EF_ecar['fuel'] * (1 + .04 * (nb - 1)) / (1e3 * nb))  + (EF_ecar['construction'] / nb) # g/kWh * kWh/km
         gdf["kgCO2eq"] = gdf["path_length"] * gdf["EF_tot"]
         gdf["Mean of Transport"] = "eCar"
     # Returning the result
@@ -987,12 +990,12 @@ def compute_emissions_all(data, cmap=colors_direct):
         #We change it
         #gdf_car['Mean of Transport'] = 'Bus'
     if car:
-        l.append(gdf_car)
+        l.append(gdf_car.copy())
     #If we have a result for car and bus :
     if route: # Adapt and add ecar
         #We check if car or bus was asked for a 1 step
         if  (car==True) & (bus==True) & (transp!='eCar'):
-            gdf_car['Mean of Transport'] = 'Car & Bus'
+            gdf_car['Mean of Transport'] = 'Road'
             geo.append(gdf_car)
 
     # Plane
