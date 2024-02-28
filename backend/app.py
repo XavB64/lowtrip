@@ -33,12 +33,8 @@ def main():
         if request.form["mode"] == "1":  # My trip vs direct trips
             # Convert json into pandas
             df = pd.DataFrame.from_dict(json.loads(request.form["my-trip"]))
-            print(df)
             # My trip data and geo data
             data_mytrip, geo_mytrip, error = compute_emissions_custom(df)
-            # Error message - for now in the console
-            if len(error) > 0:
-                print("My trip - ", error)
                 
             if not df.shape[0] > 2 :
                 # Direct data and geo data
@@ -49,6 +45,7 @@ def main():
             # Prepare data for aggregation in the chart -  see frontend
             data_mytrip = chart_refactor(data_mytrip)
             
+            #Error formatting
             if len(error) > 0:
                 error = 'My trip: '+error
             
@@ -59,7 +56,6 @@ def main():
             else :
                 gdf = gdf[l_geo].explode().to_json()
                 
-
             # Response
             response = {
                 "gdf": gdf,

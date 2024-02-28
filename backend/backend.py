@@ -405,7 +405,6 @@ def ecar_to_gdf(
     """
     ### Route OSRM - create a separate function
     geom_route, route_dist, route = find_route(tag1, tag2)
-    EF = .05
 
     # Validation part for route
     if route:  # We have a geometry
@@ -429,7 +428,7 @@ def ecar_to_gdf(
         # Add the distance to the dataframe
         gdf["path_length"] = l_length
         # Compute emissions : EF * length
-        gdf["EF_tot"] =(gdf["mix"] * EF_ecar['fuel'] + EF_ecar['construction']) / 1e3 # g/kWh * kWh/km
+        gdf["EF_tot"] =(gdf["mix"] * EF_ecar['fuel']) / 1e3 + EF_ecar['construction'] # g/kWh * kWh/km
         gdf["kgCO2eq"] = gdf["path_length"] * gdf["EF_tot"]
         gdf["Mean of Transport"] = "eCar"
     # Returning the result
@@ -911,7 +910,8 @@ def compute_emissions_custom(data, cmap=colors_custom):
                 ERROR = 'step n°'+str(int(idx) + 1)+' failed with Bus, please change mean of transport or locations. '
                 break
             gdf_bus["step"] = str(int(idx) + 1)
-            l.append(gdf_bus)
+            l.append(gdf_bus.copy())
+            gdf_bus['Mean of Transport'] = 'Road'
             geo.append(gdf_bus)
 
         elif transport_mean == "Car":
@@ -927,25 +927,11 @@ def compute_emissions_custom(data, cmap=colors_custom):
                 ERROR = 'step n°'+str(int(idx) + 1)+' failed with Car, please change mean of transport or locations. '
                 break
             gdf_car["step"] = str(int(idx) + 1)
-            l.append(gdf_car)
+            l.append(gdf_car.copy())
+            gdf_car['Mean of Transport'] = 'Road'
             geo.append(gdf_car)
             
         elif transport_mean == "eCar":
-            # We get the number of passenger
-            # gdf_car, _car = car_to_gdf(
-            #     departure_coordinates,
-            #     arrival_coordinates,
-            #     nb=arrival.nb,
-            #     color=color_custom["Car"],
-            #     electric = True
-            # )
-            # if not _car : #One step is not succesful
-            #     fail = True
-            #     ERROR = 'step n°'+str(int(idx) + 1)+' failed with eCar, please change mean of transport or locations. '
-            #     break
-            # gdf_car["step"] = str(int(idx) + 1)
-            # l.append(gdf_car)
-            # geo.append(gdf_car)
             gdf_car, _car = ecar_to_gdf(
                 departure_coordinates,
                 arrival_coordinates,
@@ -957,7 +943,8 @@ def compute_emissions_custom(data, cmap=colors_custom):
                 ERROR = 'step n°'+str(int(idx) + 1)+' failed with eCar, please change mean of transport or locations. '
                 break
             gdf_car["step"] = str(int(idx) + 1)
-            l.append(gdf_car)
+            l.append(gdf_car.copy())
+            gdf_car['Mean of Transport'] = 'Road'
             geo.append(gdf_car)
 
         elif transport_mean == "Plane":
@@ -1020,19 +1007,18 @@ def compute_emissions_all(data, cmap=colors_direct):
 
     # Check if we should compute it or not
     train, plane, car, bus = True, True, True, True
-    if (
-        data.shape[0] == 2 
-    ):  # Then it's only one step, we will not add it to direct trip calulations
-        # Retrieve the mean of transport: Car/Bus/Train/Plane
-        transp = data.loc["1"].transp
-        if transp == "Train":
-            train = False
-        elif transp == "Plane":
-            plane = False
-        elif transp == "Car":
-            car = False
-        elif transp == "Bus":
-            bus = False
+
+    # Retrieve the mean of transport: Car/Bus/Train/Plane
+    transp = data.loc["1"].transp
+    if transp == "Train":
+        train = False
+    elif transp == "Plane":
+        plane = False
+    elif transp == "Car":
+        car = False
+    elif transp == "Bus":
+        bus = False
+    
     #Check distance for plane
     geod = Geod(ellps = 'WGS84')
     if geod.geometry_length(LineString([tag1, tag2])) / 1e3 < min_plane_dist :
@@ -1051,7 +1037,7 @@ def compute_emissions_all(data, cmap=colors_direct):
     # Car & Bus
     gdf_car, gdf_bus, route = car_bus_to_gdf(tag1, tag2, color=color_direct["Car&Bus"])
     # To avoid errors in the bar chart, I don't know why the change of name propagates
-    geo_car = gdf_car.copy()
+    #geo_car = gdf_car.copy()
     if bus:
         l.append(gdf_bus)
         #We change it
@@ -1059,21 +1045,11 @@ def compute_emissions_all(data, cmap=colors_direct):
     if car:
         l.append(gdf_car)
     #If we have a result for car and bus :
-    if route:
+    if route: # Adapt and add ecar
         #We check if car or bus was asked for a 1 step
-        if  (car==False) | (bus==False):
-            #Then the step of custom trip will already display a geometry, display another next to it
-            th = .04
-            print('transform')
-            geo_car['geometry'] = ops.transform(lambda x, y: (x+th, y+th), geo_car['geometry'].values[0])
-            # We have to change the name of mean of transport Car or Bus if it's Bus
-            if car == False :
-                geo_car['Mean of Transport'] = 'Bus'
-        else :
-        #     #We have both
-            geo_car['Mean of Transport'] = 'Car & Bus'
-        print(geo_car)
-        geo.append(geo_car)
+        if  (car==True) & (bus==True) & (transp!='eCar'):
+            gdf_car['Mean of Transport'] = 'Car & Bus'
+            geo.append(gdf_car)
 
     # Plane
     if plane:
