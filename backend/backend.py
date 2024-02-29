@@ -227,6 +227,7 @@ def find_train(tag1, tag2, method = 'signal'):
         # geod = Geod(ellps="WGS84")
         # print('Train intial', geod.geometry_length(geom) / 1e3)
         else :
+            train_dist = response.json()["routes"][0]['distance'] / 1e3 #km
         # Store data - signal
             gdf = gpd.GeoSeries(
                 LineString(response.json()["routes"][0]["geometry"]["coordinates"]), crs="epsg:4326"
@@ -235,9 +236,9 @@ def find_train(tag1, tag2, method = 'signal'):
     else:
         # Error message
         print(f"Failed to retrieve data. Status code: {response.status_code}")
-        gdf, train = pd.DataFrame(), False
+        gdf, train, train_dist = pd.DataFrame(), False, 0
         # We will try to request again with overpass
-    return gdf, train
+    return gdf, train, train_dist
 
 
 def find_route(tag1, tag2):
@@ -302,7 +303,7 @@ def extend_search(tag1, tag2, perims):
     # return None, False
     else:
         # We can retry the API
-        gdf, train = find_train(tag1_new, tag2)
+        gdf, train, train_dist = find_train(tag1_new, tag2)
         if train == False:
             # We can change tag2
             for perim in perims:  # Could be up to 10k  ~ size of Bdx
@@ -313,9 +314,9 @@ def extend_search(tag1, tag2, perims):
 
             # Verify than we wan try to request the API again
             if (tag1_new != False) & (tag2_new != False):
-                gdf, train = find_train(tag1_new, tag2_new)
+                gdf, train, train_dist = find_train(tag1_new, tag2_new)
 
-    return gdf, train
+    return gdf, train, train_dist
 
 
 def validate_geom(tag1, tag2, geom, th):
@@ -359,7 +360,7 @@ def train_to_gdf(
         - full dataframe for trains
     """
     # First try with coordinates supplied by the user
-    gdf, train = find_train(tag1, tag2)
+    gdf, train, train_dist = find_train(tag1, tag2)
 
     # If failure then we try to find a better spot nearby - Put in another function
     if train == False:
@@ -385,6 +386,9 @@ def train_to_gdf(
             l_length.append(geod.geometry_length(geom) / 1e3)
         # Add the distance to the dataframe
         gdf["path_length"] = l_length
+        #Rescale the length with train_dist (especially when simplified = True)
+        print('Rescaling factor', train_dist / gdf["path_length"].sum())
+        gdf["path_length"] = gdf["path_length"] * (train_dist / gdf["path_length"].sum())
         # Compute emissions : EF * length
         gdf["EF_tot"] = gdf["EF_tot"] / 1e3  # Conversion in in kg
         gdf["kgCO2eq"] = gdf["path_length"] * gdf["EF_tot"]
@@ -416,9 +420,6 @@ def ecar_to_gdf(
         gdf = filter_countries_world(gpd.GeoSeries(
                geom_route, crs="epsg:4326"), method = 'ecar')
         
-        # filter_ecar(gpd.GeoSeries(
-        #         geom_route, crs="epsg:4326"
-        #     )  )
         # Add colors, here discretise the colormap
         gdf["colors"] = color
         # gdf['colors'] = ['#'+k for k in pd.Series(colormap[::-1])[[int(k) for k in np.linspace(0, len(colormap)-1, gdf.shape[0])]]]
@@ -431,6 +432,9 @@ def ecar_to_gdf(
             l_length.append(geod.geometry_length(geom) / 1e3)
         # Add the distance to the dataframe
         gdf["path_length"] = l_length
+         #Rescale the length with route_dist (especially when simplified = True)
+        print('Rescaling factor', route_dist / gdf["path_length"].sum())
+        gdf["path_length"] = gdf["path_length"] * (route_dist / gdf["path_length"].sum())
         #Handle nb passengers
         nb = int(nb)
         gdf['NAME'] = ' '+ str(nb)+' pass. '+gdf['NAME']
