@@ -35,19 +35,26 @@ def main():
             df = pd.DataFrame.from_dict(json.loads(request.form["my-trip"]))
             # My trip data and geo data
             data_mytrip, geo_mytrip, error = compute_emissions_custom(df)
+            
+            #Error formatting
+            if len(error) > 0:
+                error = 'My trip: '+error
                 
             if not df.shape[0] > 2 :
                 # Direct data and geo data
+                return_direct = True
                 data_direct, geo_direct = compute_emissions_all(df)
+                # Could be cool to add a message but the error stops the computation every time
+                # if data_direct.shape[0] == 0:
+                #     error += ' Sorry, we could not find other means of transport to compare your trip with.'
             else :
+                return_direct = False
                 data_direct, geo_direct = pd.DataFrame(), pd.DataFrame()
                 
             # Prepare data for aggregation in the chart -  see frontend
             data_mytrip = chart_refactor(data_mytrip)
             
-            #Error formatting
-            if len(error) > 0:
-                error = 'My trip: '+error
+
             
             #Check if gdf is empty
             gdf = pd.concat([geo_direct, geo_mytrip])
@@ -55,14 +62,21 @@ def main():
                 gdf = None
             else :
                 gdf = gdf[l_geo].explode().to_json()
-                
+            
+            if return_direct :
             # Response
-            response = {
-                "gdf": gdf,
-                "my_trip": data_mytrip.to_json(orient="records"),
-                "direct_trip": data_direct.to_json(orient="records"),
-                "error": error,
-            }
+                response = {
+                    "gdf": gdf,
+                    "my_trip": data_mytrip.to_json(orient="records"),
+                    "direct_trip": data_direct.to_json(orient="records"),
+                    "error": error,
+                }
+            else :
+                response = {
+                    "gdf": gdf,
+                    "my_trip": data_mytrip.to_json(orient="records"),
+                    "error": error,
+                }
 
         if request.form["mode"] == "2":  # My trip vs custom trip
             # Convert json into pandas

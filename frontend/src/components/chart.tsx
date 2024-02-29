@@ -49,7 +49,9 @@ export function Chart({ response }: ChartProps) {
         <h2 style={{ marginRight: "8px" }}>
           {response.data.alternative_trip
             ? "Your trip VS Other trip"
-            : "Your trip VS other means of transport"}
+            : response.data.direct_trip 
+            ? "Your trip VS other means of transport"
+            : "Your trip emissions"}
         </h2>
 
       </Flex>
