@@ -148,7 +148,14 @@ export const StepField = ({ removeStep, updateStep, step }: StepFieldProps) => {
                   isSelected={item.value === step.transportMean}
                   step={step}
                 />
-              ) : (
+              ) : item.value === Transport.ecar ?(
+                <ECarButton
+                  updateStep={updateStep}
+                  isSelected={item.value === step.transportMean}
+                  step={step}
+                />
+              ) :
+              (
                 <TransportButton
                   updateStep={() =>
                     updateStep(step.index, {
@@ -174,6 +181,12 @@ interface CarButtonProps {
   step: Step;
 }
 
+interface ECarButtonProps {
+  updateStep: (index: number, data: Partial<Step>) => void;
+  isSelected: boolean;
+  step: Step;
+}
+
 const thumbUp: string = "👍";
 
 const CarButton = ({ updateStep, isSelected, step }: CarButtonProps) => {
@@ -184,7 +197,7 @@ const CarButton = ({ updateStep, isSelected, step }: CarButtonProps) => {
           icon={<BiSolidCar size={20} />}
           isSelected={isSelected}
         />
-        {step.passengers && (
+        {step.transportMean === 'Car' && step.passengers && (
           <Box
             position="absolute"
             bottom={-1}
@@ -211,6 +224,49 @@ const CarButton = ({ updateStep, isSelected, step }: CarButtonProps) => {
               })
             }
           > {number === thumbUp ? "Hitch-hiking" : `${number} passenger${number > 1 ? "s" : ""}`}
+            
+          </MenuItem>
+        ))}
+      </MenuList>
+    </Menu>
+  );
+};
+
+const ECarButton = ({ updateStep, isSelected, step }: ECarButtonProps) => {
+  return (
+    <Menu>
+      <MenuButton position="relative">
+        <TransportButton
+          icon={<MdElectricCar size={20} />}
+          isSelected={isSelected}
+        />
+        {step.transportMean === 'eCar' &&step.passengers && (
+          <Box
+            position="absolute"
+            bottom={-1}
+            right={-1}
+            bgColor="#0097a7"
+            color="white"
+            borderRadius="full"
+            fontSize="xs"
+            h={4}
+            w={4}
+          >
+            {step.passengers}
+          </Box>
+        )}
+      </MenuButton>
+      <MenuList zIndex={3}>
+        {[1, 2, 3, 4, 5].map((number) => (
+          <MenuItem
+            key={number}
+            onClick={() =>
+              updateStep(step.index, {
+                transportMean: Transport.ecar,
+                passengers: number,
+              })
+            }
+          > {`${number} passenger${number > 1 ? "s" : ""}`}
             
           </MenuItem>
         ))}
