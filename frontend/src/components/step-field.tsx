@@ -20,38 +20,78 @@ import {
   MenuButton,
   MenuItem,
   MenuList,
+  Tooltip as ChakraTooltip,
 } from "@chakra-ui/react";
 import { Step, Transport } from "../types";
 
+// Tooltip as ChakraTooltip,
+// useDisclosure,
+// } from "@chakra-ui/react";
+
 const TRANSPORTS = [
   {
-    value: Transport.plane,
-    icon: <BiSolidPlaneAlt size={20} />,
-  },
-  {
     value: Transport.train,
-    icon: <BiSolidTrain size={20} />,
+    icon: 
+    <ChakraTooltip label="Train" >
+    <span>
+    <BiSolidTrain size={20} />
+    </span>
+  </ChakraTooltip> 
   },
   {
-    value: Transport.car,
-    icon: <BiSolidCar size={20} />,
+    value: Transport.plane,
+    icon: 
+    <ChakraTooltip label="Plane" >
+    <span>
+    <BiSolidPlaneAlt size={20} />
+    </span>
+  </ChakraTooltip> 
   },
   {
     value: Transport.bus,
-    icon: <BiSolidBus size={20} />,
+    icon: 
+    <ChakraTooltip label="Bus" >
+    <span>
+    <BiSolidBus size={20} />
+    </span>
+  </ChakraTooltip> 
+  },
+  {
+    value: Transport.car,
+    icon: 
+    <ChakraTooltip label="Car" >
+    <span>
+    <BiSolidCar size={20} />
+    </span>
+  </ChakraTooltip> 
   },
   {
     value: Transport.ecar,
-    icon: <MdElectricCar size={20} />,
+    icon: 
+    <ChakraTooltip label="Electric Car" >
+    <span>
+    <MdElectricCar size={20} />
+    </span>
+  </ChakraTooltip> 
   },
   {
     value: Transport.ferry,
-    icon: <FaFerry size={20} />,
+    icon: 
+    <ChakraTooltip label="Ferry" >
+    <span>
+    <FaFerry size={20} />
+    </span>
+  </ChakraTooltip> 
   },
   {
     value: Transport.bicycle,
-    icon: <IoMdBicycle size={20} />,
-  },
+    icon :
+  <ChakraTooltip label="Bicycle" >
+    <span>
+    <IoMdBicycle size={20} />
+    </span>
+  </ChakraTooltip> 
+},
 ];
 
 interface StepFieldProps {
@@ -198,6 +238,7 @@ const thumbUp: string = "👍";
 const CarButton = ({ updateStep, isSelected, step }: CarButtonProps) => {
   return (
     <Menu>
+      <ChakraTooltip label="Thermal Car" >
       <MenuButton position="relative">
         <TransportButton
           icon={<BiSolidCar size={20} />}
@@ -219,6 +260,7 @@ const CarButton = ({ updateStep, isSelected, step }: CarButtonProps) => {
           </Box>
         )}
       </MenuButton>
+      </ChakraTooltip>
       <MenuList zIndex={3}>
         {[1, 2, 3, 4, 5, thumbUp].map((number) => (
           <MenuItem
@@ -241,6 +283,7 @@ const CarButton = ({ updateStep, isSelected, step }: CarButtonProps) => {
 const ECarButton = ({ updateStep, isSelected, step }: ECarButtonProps) => {
   return (
     <Menu>
+      <ChakraTooltip label="Electric car" >
       <MenuButton position="relative">
         <TransportButton
           icon={<MdElectricCar size={20} />}
@@ -262,6 +305,7 @@ const ECarButton = ({ updateStep, isSelected, step }: ECarButtonProps) => {
           </Box>
         )}
       </MenuButton>
+      </ChakraTooltip>
       <MenuList zIndex={3}>
         {[1, 2, 3, 4, 5].map((number) => (
           <MenuItem
