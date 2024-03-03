@@ -58,21 +58,9 @@ const TRANSPORTS = [
   },
   {
     value: Transport.car,
-    icon: 
-    <ChakraTooltip label="Car" >
-    <span>
-    <BiSolidCar size={20} />
-    </span>
-  </ChakraTooltip> 
   },
   {
     value: Transport.ecar,
-    icon: 
-    <ChakraTooltip label="Electric Car" >
-    <span>
-    <MdElectricCar size={20} />
-    </span>
-  </ChakraTooltip> 
   },
   {
     value: Transport.ferry,
@@ -283,7 +271,7 @@ const CarButton = ({ updateStep, isSelected, step }: CarButtonProps) => {
 const ECarButton = ({ updateStep, isSelected, step }: ECarButtonProps) => {
   return (
     <Menu>
-      <ChakraTooltip label="Electric car" >
+      <ChakraTooltip label="Electric Car" >
       <MenuButton position="relative">
         <TransportButton
           icon={<MdElectricCar size={20} />}
