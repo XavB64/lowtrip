@@ -23,6 +23,7 @@ export enum Transport {
   bus = "Bus",
   train = "Train",
   ferry = "Ferry",
+  bicycle = 'Bicycle'
 }
 
 export interface ApiResponse {

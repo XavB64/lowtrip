@@ -92,6 +92,7 @@ EF_ecar = {
 }
 
 EF_bus = .02942
+EF_bycicle = .005
 EF_ferry = .3
 EF_plane = {"short": {
     'construction' : .00038,
@@ -276,6 +277,73 @@ def find_route(tag1, tag2):
 
     return geom_route, route_dist, route
 
+def find_bicycle(tag1, tag2):
+    ### Openrouteservie
+    api_key = "5b3ce3597851110001cf62484e73101571fe41d0bfc8f8454030eb48"
+    url = (
+    "https://api.openrouteservice.org/v2/directions/cycling-regular?api_key="
+    + api_key
+    + "&start="
+    + str(tag1[0])
+    + ","
+    + str(tag1[1])
+    + "&end="
+    + str(tag2[0])
+    + ","
+    + str(tag2[1])
+)
+    response = requests.get(url)
+    if response.status_code == 200:
+        geom = response.json()["features"][0]["geometry"]
+        geom_route = LineString(geom["coordinates"]).simplify(.05, preserve_topology=False)  # convert.decode_polyline(geom)
+        route = True
+        route_dist = response.json()["features"][0]["properties"]["summary"]['distance'] / 1e3 #km
+        print('Bicycle length', round(route_dist, 1))
+    else:
+        geom_route, route, route_idst = None, False, None
+
+    return geom_route, route, route_dist
+
+
+def bicycle_to_gdf(
+    tag1, tag2, EF=EF_bycicle, color="#00FF00", validate=val_perimeter
+):
+    """
+    parameters:
+        - tag1, tag2
+        - EF_bus, float emission factor for bus by pkm
+        - color, color in hex of path and bar chart
+        - validate
+        - nb, number of passenger in the car (used only for custom trip)
+    return:
+        - full dataframe for bus
+    """
+    ### Route OSRM - create a separate function
+    geom_route, route, route_dist = find_bicycle(tag1, tag2)
+
+    # Validation part for route
+    if route:  # We have a geometry
+        if not validate_geom(tag1, tag2, geom_route, validate):
+            geom_route, route, route_dist = None, False, None
+
+    if route:
+        gdf_bike = pd.DataFrame(
+            pd.Series(
+                {
+                    "kgCO2eq": EF * route_dist,
+                    "EF_tot": EF,
+                    "path_length": None,
+                    "colors": color,
+                    "NAME": " ",
+                    "Mean of Transport": "Bicycle",
+                    "geometry": geom_route,
+                }
+            )
+        ).transpose()  #'EF_tot':EF_bus, enlever geometry
+    else:
+        gdf_bike = pd.DataFrame()
+    return gdf_bike, route
+
 
 def extend_search(tag1, tag2, perims):
     """
@@ -300,6 +368,7 @@ def extend_search(tag1, tag2, perims):
         # Then we will find nothing
         gdf = pd.DataFrame()
         train = False
+        train_dist = None
     # return None, False
     else:
         # We can retry the API
@@ -365,36 +434,38 @@ def train_to_gdf(
     # If failure then we try to find a better spot nearby - Put in another function
     if train == False:
         # We try to search nearby the coordinates and request again
-        gdf, train = extend_search(tag1, tag2, perims)
+        gdf, train, train_dist= extend_search(tag1, tag2, perims)
 
     # Validation part for train
     if train:  # We have a geometry
         if not validate_geom(tag1, tag2, gdf.values[0], validate):
-            gdf, train = pd.DataFrame(), False
+            return pd.DataFrame(), False
 
-    if train:  # We need to filter by country and add length / Emission factors
-        gdf = filter_countries_world(gdf, method = 'train')
-        # Add colors, here discretise the colormap
-        gdf["colors"] = colormap
-        # gdf['colors'] = ['#'+k for k in pd.Series(colormap[::-1])[[int(k) for k in np.linspace(0, len(colormap)-1, gdf.shape[0])]]]
-        # Adding and computing emissions
-        # For trains
-        l_length = []
-        # Compute the true distance
-        geod = Geod(ellps="WGS84")
-        for geom in gdf.geometry.values:
-            l_length.append(geod.geometry_length(geom) / 1e3)
-        # Add the distance to the dataframe
-        gdf["path_length"] = l_length
-        #Rescale the length with train_dist (especially when simplified = True)
-        print('Rescaling factor', train_dist / gdf["path_length"].sum())
-        gdf["path_length"] = gdf["path_length"] * (train_dist / gdf["path_length"].sum())
-        # Compute emissions : EF * length
-        gdf["EF_tot"] = gdf["EF_tot"] / 1e3  # Conversion in in kg
-        gdf["kgCO2eq"] = gdf["path_length"] * gdf["EF_tot"]
-        gdf["Mean of Transport"] = "Train"
-    # Returning the result
-    return gdf, train
+        else :  # We need to filter by country and add length / Emission factors
+            gdf = filter_countries_world(gdf, method = 'train')
+            # Add colors, here discretise the colormap
+            gdf["colors"] = colormap
+            # gdf['colors'] = ['#'+k for k in pd.Series(colormap[::-1])[[int(k) for k in np.linspace(0, len(colormap)-1, gdf.shape[0])]]]
+            # Adding and computing emissions
+            # For trains
+            l_length = []
+            # Compute the true distance
+            geod = Geod(ellps="WGS84")
+            for geom in gdf.geometry.values:
+                l_length.append(geod.geometry_length(geom) / 1e3)
+            # Add the distance to the dataframe
+            gdf["path_length"] = l_length
+            #Rescale the length with train_dist (especially when simplified = True)
+            print('Rescaling factor', train_dist / gdf["path_length"].sum())
+            gdf["path_length"] = gdf["path_length"] * (train_dist / gdf["path_length"].sum())
+            # Compute emissions : EF * length
+            gdf["EF_tot"] = gdf["EF_tot"] / 1e3  # Conversion in in kg
+            gdf["kgCO2eq"] = gdf["path_length"] * gdf["EF_tot"]
+            gdf["Mean of Transport"] = "Train"
+            # Returning the result
+            return gdf, train
+    else :
+        return pd.DataFrame(), False
 
 def ecar_to_gdf(
     tag1, tag2, nb=1, validate=val_perimeter, color="#00FF00"
@@ -414,36 +485,39 @@ def ecar_to_gdf(
     # Validation part for route
     if route:  # We have a geometry
         if not validate_geom(tag1, tag2, geom_route, validate):
-            geom_route, route_dist, route = None, None, False
+            #gdf, geom_route, route_dist, route = pd.DataFrame(), None, None, False
+            return pd.DataFrame(), False
 
-    if route:  # We need to filter by country and add length / Emission factors
-        gdf = filter_countries_world(gpd.GeoSeries(
-               geom_route, crs="epsg:4326"), method = 'ecar')
-        
-        # Add colors, here discretise the colormap
-        gdf["colors"] = color
-        # gdf['colors'] = ['#'+k for k in pd.Series(colormap[::-1])[[int(k) for k in np.linspace(0, len(colormap)-1, gdf.shape[0])]]]
-        # Adding and computing emissions
-        # For trains
-        l_length = []
-        # Compute the true distance
-        geod = Geod(ellps="WGS84")
-        for geom in gdf.geometry.values:
-            l_length.append(geod.geometry_length(geom) / 1e3)
-        # Add the distance to the dataframe
-        gdf["path_length"] = l_length
-         #Rescale the length with route_dist (especially when simplified = True)
-        print('Rescaling factor', route_dist / gdf["path_length"].sum())
-        gdf["path_length"] = gdf["path_length"] * (route_dist / gdf["path_length"].sum())
-        #Handle nb passengers
-        nb = int(nb)
-        gdf['NAME'] = ' '+ str(nb)+' pass. '+gdf['NAME']
-        # Compute emissions : EF * length
-        gdf["EF_tot"] =(gdf["EF_tot"] * EF_ecar['fuel'] * (1 + .04 * (nb - 1)) / (1e3 * nb))  + (EF_ecar['construction'] / nb) # g/kWh * kWh/km
-        gdf["kgCO2eq"] = gdf["path_length"] * gdf["EF_tot"]
-        gdf["Mean of Transport"] = "eCar"
-    # Returning the result
-    return gdf, route
+        else :  # We need to filter by country and add length / Emission factors
+            gdf = filter_countries_world(gpd.GeoSeries(
+                geom_route, crs="epsg:4326"), method = 'ecar')
+            
+            # Add colors, here discretise the colormap
+            gdf["colors"] = color
+            # gdf['colors'] = ['#'+k for k in pd.Series(colormap[::-1])[[int(k) for k in np.linspace(0, len(colormap)-1, gdf.shape[0])]]]
+            # Adding and computing emissions
+            # For trains
+            l_length = []
+            # Compute the true distance
+            geod = Geod(ellps="WGS84")
+            for geom in gdf.geometry.values:
+                l_length.append(geod.geometry_length(geom) / 1e3)
+            # Add the distance to the dataframe
+            gdf["path_length"] = l_length
+            #Rescale the length with route_dist (especially when simplified = True)
+            print('Rescaling factor', route_dist / gdf["path_length"].sum())
+            gdf["path_length"] = gdf["path_length"] * (route_dist / gdf["path_length"].sum())
+            #Handle nb passengers
+            nb = int(nb)
+            gdf['NAME'] = ' '+ str(nb)+' pass. '+gdf['NAME']
+            # Compute emissions : EF * length
+            gdf["EF_tot"] =(gdf["EF_tot"] * EF_ecar['fuel'] * (1 + .04 * (nb - 1)) / (1e3 * nb))  + (EF_ecar['construction'] / nb) # g/kWh * kWh/km
+            gdf["kgCO2eq"] = gdf["path_length"] * gdf["EF_tot"]
+            gdf["Mean of Transport"] = "eCar"
+            # Returning the result
+            return gdf, route
+    else:
+        return pd.DataFrame(), False
 
 
 def car_bus_to_gdf(
@@ -897,6 +971,22 @@ def compute_emissions_custom(data, cmap=colors_custom):
             l.append(gdf_car.copy())
             gdf_car['Mean of Transport'] = 'Road'
             geo.append(gdf_car)
+            
+        elif transport_mean == "Bicycle":
+            # We get the number of passenger
+            gdf_bike, _bike = bicycle_to_gdf(
+                departure_coordinates,
+                arrival_coordinates,
+                color=color_custom["Train"],
+            )
+            if not _bike : #One step is not succesful
+                fail = True
+                ERROR = 'step n°'+str(int(idx) + 1)+' failed with Bicycle, please change mean of transport or locations. '
+                break
+            gdf_bike["step"] = str(int(idx) + 1)
+            l.append(gdf_bike.copy())
+            gdf_bike['Mean of Transport'] = 'Road (bicycle)'
+            geo.append(gdf_bike)
 
         elif transport_mean == "Plane":
             gdf_plane, gdf_cont = plane_to_gdf(
