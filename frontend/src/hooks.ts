@@ -1,11 +1,15 @@
 import { useCallback, useState } from "react";
 import { Step } from "./types";
+import nextId from "react-id-generator";
 
 export function useSteps() {
-  const [steps, setSteps] = useState<Step[]>([{ index: 1 }, { index: 2 }]);
+  const [steps, setSteps] = useState<Step[]>([
+    { index: 1, id: nextId() },
+    { index: 2, id: nextId() },
+  ]);
 
   const addStep = useCallback(
-    () => setSteps([...steps, { index: steps.length + 1 }]),
+    () => setSteps([...steps, { index: steps.length + 1, id: nextId() }]),
     [steps, setSteps]
   );
 

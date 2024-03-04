@@ -106,9 +106,9 @@ export const Form = ({
       justifyContent="right"
       alignItems="start"
     >
-      {steps.map((step, index) => (
+      {steps.map((step) => (
         <StepField
-          key={`main-form-${index}-${step.locationName}`}
+          key={`main-form-${step.id}`}
           step={step}
           updateStep={updateStep}
           removeStep={removeStep}
