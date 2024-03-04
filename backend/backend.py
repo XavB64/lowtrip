@@ -94,20 +94,21 @@ EF_ecar = {
 EF_bus = .02942
 EF_bycicle = .005
 EF_ferry = .3
-EF_plane = {"short": {
-    'construction' : .00038,
-    'upstream' : .0242,
-    'combustion' : .117
+EF_plane = {
+    "short": {
+        'construction' : .00038,
+        'upstream' : .0242,
+        'combustion' : .117
 },
-            "medium": {
-    'construction' : .00036,
-    'upstream' : .0176,
-    'combustion' : .0848
+    "medium": {
+        'construction' : .00036,
+        'upstream' : .0176,
+        'combustion' : .0848
 },
-            "long": {
-    'construction' : .00026,
-    'upstream' : .0143,
-    'combustion' : .0687
+    "long": {
+        'construction' : .00026,
+        'upstream' : .0143,
+        'combustion' : .0687
 }
             }
 

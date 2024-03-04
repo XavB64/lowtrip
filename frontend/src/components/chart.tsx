@@ -62,7 +62,9 @@ export function Chart({ response }: ChartProps) {
         <BarChart data={getChartData(trips)} margin={{ bottom: 20 }}>
           <XAxis dataKey="name" fontSize={breakpoint === "base" ? 10 : 14} />
           <YAxis padding={{ top: 30 }} hide />
-          <Tooltip formatter={(value) => `${round(+value, 1)} kgCO2eq`} />
+          <Tooltip formatter={(value) => `${round(+value, 0)} kg`}
+           contentStyle={{ fontSize : '10px'}}
+           />
           {uniqBy(trips, "NAME").map((trip) => (
             <Bar
               key={trip.NAME}
