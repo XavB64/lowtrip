@@ -19,6 +19,7 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-icons": "^4.12.0",
+    "react-id-generator": "^3.0.2",
     "react-leaflet": "^4.2.1",
     "react-scripts": "5.0.1",
     "recharts": "^2.11.0",

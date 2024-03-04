@@ -2,6 +2,7 @@ import React from "react";
 
 export interface Step {
   index: number;
+  id: string;
   locationName?: string;
   locationCoords?: [number, number];
   transportMean?: Transport;
