@@ -151,7 +151,7 @@ export const Form = ({
               isLoading={isLoading}
             >
               {steps.length < 3
-                ? "All means of transport"
+                ? "Train Bus Car Plane"
                 : "Compute emissions"}
             </PrimaryButton>
             <PrimaryButton
@@ -160,7 +160,9 @@ export const Form = ({
               isLoading={false}
               variant="outline"
             >
-              {steps.length < 3 ? "Another trip" : "Compare to another trip"}
+              {steps.length < 3 
+                ? "Another trip" 
+                : "Compare to another trip"}
             </PrimaryButton>
           </HStack>
         </>

@@ -51,8 +51,8 @@ def main():
                 return_direct = False
                 data_direct, geo_direct = pd.DataFrame(), pd.DataFrame()
                 
-            # Prepare data for aggregation in the chart -  see frontend
-            data_mytrip = chart_refactor(data_mytrip)
+                # Prepare data for aggregation in the chart -  see frontend
+                data_mytrip = chart_refactor(data_mytrip)
             
 
             

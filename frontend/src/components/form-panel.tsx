@@ -55,7 +55,7 @@ export function FormPanel({
         >
           Compare your travel emissions
           <ChakraTooltip label=" Select departure, destination and means of transport to
-          compare the emissions of your journeys! You can either compare all modes of transport on
+          compare the emissions of your journeys! You can either compare several modes of transport on
           a specific route, or compare multi-modal routes with steps."
           isOpen={isOpen}
           >

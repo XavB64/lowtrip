@@ -63,7 +63,7 @@ export function Chart({ response }: ChartProps) {
           <XAxis dataKey="name" fontSize={breakpoint === "base" ? 10 : 14} />
           <YAxis padding={{ top: 30 }} hide />
           <Tooltip formatter={(value) => `${round(+value, 0)} kg`}
-           contentStyle={{ fontSize : '10px'}}
+           contentStyle={{ fontSize : '12px'}}
            />
           {uniqBy(trips, "NAME").map((trip) => (
             <Bar
@@ -86,8 +86,10 @@ export function Chart({ response }: ChartProps) {
         height="auto"
         width="100%">
       <ChakraTooltip label="Plane: the formation of Contrails combined with emissions of nitrogen oxides (NOx)
-      affect the properties of the atmosphere and lead to an increase in radiative forcing."
+      affect the properties of the atmosphere and lead to an increase in radiative forcing.
+      The represented connection might not be currently operated by a flight company. This mode is not displayed by default when the journey length is below 300km."
      isOpen={isOpen}
+     fontSize={9}
       >
           <span>
             <BiHelpCircle 

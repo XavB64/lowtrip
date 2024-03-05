@@ -84,42 +84,58 @@ search_perimeter = [0.2, 5]  # km
 sea_threshold = 5  # km
 
 # Emission factors kg/pkm
-EF_car = {'construction' : .0256, 
-          'fuel' : .192} # total : .2176
+EF_car = {
+    'construction' : .0256, 
+    'fuel' : .192, # total : .2176
+    'infra' : .0007
+} 
 EF_ecar = {
     'construction' : 0.0836,
-    'fuel' : 0.17 #kWh / km
+    'fuel' : 0.187, #kWh / km
+    'infra' : .0007 
 }
+EF_bus = {
+    'construction' : 0.00442,
+    'fuel' : 0.025, #total .02942
+    'infra' : .0007
+} 
 
-EF_bus = .02942
+EF_rail_infra = .007
+
 EF_bycicle = .005
+
 EF_ferry = .3
+
 EF_plane = {
     "short": {
         'construction' : .00038,
         'upstream' : .0242,
-        'combustion' : .117
+        'combustion' : .117,
+         "infra":.0003
 },
     "medium": {
         'construction' : .00036,
         'upstream' : .0176,
-        'combustion' : .0848
+        'combustion' : .0848,
+         "infra":.0003
 },
     "long": {
         'construction' : .00026,
         'upstream' : .0143,
-        'combustion' : .0687
+        'combustion' : .0687,
+         "infra":.0003
 }
             }
 
 # Number of points in plane geometry
 nb_pts = 100
 # Min distance for plane comparison
-min_plane_dist = 500 #km
+min_plane_dist = 300 #km
 
 # Additional emissions from plane
 cont_coeff = 2
 hold = 3.81  # kg/p
+detour = 1.076
 
 
 ###################
@@ -418,7 +434,7 @@ def validate_geom(tag1, tag2, geom, th):
 
 
 def train_to_gdf(
-    tag1, tag2, perims=search_perimeter, validate=val_perimeter, colormap=charte_mollow
+    tag1, tag2, perims=search_perimeter, EF_infra = EF_rail_infra, validate=val_perimeter, colormap=charte_mollow
 ):  # charte_mollow
     """
     parameters:
@@ -461,7 +477,9 @@ def train_to_gdf(
             gdf["path_length"] = gdf["path_length"] * (train_dist / gdf["path_length"].sum())
             # Compute emissions : EF * length
             gdf["EF_tot"] = gdf["EF_tot"] / 1e3  # Conversion in in kg
-            gdf["kgCO2eq"] = gdf["path_length"] * gdf["EF_tot"]
+            gdf["kgCO2eq"] = gdf["path_length"] * (gdf["EF_tot"] + EF_infra)
+            
+            #Add infra
             gdf["Mean of Transport"] = "Train"
             # Returning the result
             return gdf, train
@@ -510,9 +528,9 @@ def ecar_to_gdf(
             gdf["path_length"] = gdf["path_length"] * (route_dist / gdf["path_length"].sum())
             #Handle nb passengers
             nb = int(nb)
-            gdf['NAME'] = ' '+ str(nb)+' pass. '+gdf['NAME']
+            gdf['NAME'] = ' '+ str(nb)+'pass. '+gdf['NAME']
             # Compute emissions : EF * length
-            gdf["EF_tot"] =(gdf["EF_tot"] * EF_ecar['fuel'] * (1 + .04 * (nb - 1)) / (1e3 * nb))  + (EF_ecar['construction'] / nb) # g/kWh * kWh/km
+            gdf["EF_tot"] =(gdf["EF_tot"] * EF_ecar['fuel'] * (1 + .04 * (nb - 1)) / (1e3 * nb))  + ((EF_ecar['construction'] + EF_ecar['infra']) / nb) # g/kWh * kWh/km
             gdf["kgCO2eq"] = gdf["path_length"] * gdf["EF_tot"]
             gdf["Mean of Transport"] = "eCar"
             # Returning the result
@@ -561,8 +579,8 @@ def car_bus_to_gdf(
         gdf_bus = pd.DataFrame(
             pd.Series(
                 {
-                    "kgCO2eq": route_dist * EF_bus,
-                    "EF_tot": EF_bus,
+                    "kgCO2eq": route_dist * np.sum(list(EF_bus.values())),
+                    "EF_tot": np.sum(list(EF_bus.values())),
                     "path_length": route_dist,
                     "colors": color,
                     "NAME": "Bus",
@@ -600,8 +618,8 @@ def bus_to_gdf(
         gdf_bus = pd.DataFrame(
             pd.Series(
                 {
-                    "kgCO2eq": route_dist * EF_bus,
-                    "EF_tot": EF_bus,
+                    "kgCO2eq": route_dist * np.sum(list(EF_bus.values())),
+                    "EF_tot": np.sum(list(EF_bus.values())),
                     "path_length": route_dist,
                     "colors": color,
                     "NAME": " ",
@@ -633,7 +651,7 @@ def car_to_gdf(
     if nb != "👍" :
         nb = int(nb)
         EF = (np.sum(list(EF_car.values())) / nb) + EF_car['fuel'] * .04 * (nb - 1) #Over consumption due to weight and luggages
-        name = str(nb)+' pass.'
+        name = str(nb)+'pass.'
     else : #Hitch-hiking
         EF = EF_car['fuel'] * .04
         name = 'Hitch-hiking'
@@ -671,6 +689,7 @@ def plane_to_gdf(
     EF_plane=EF_plane,
     contrails=cont_coeff,
     holding=hold,
+    detour=detour,
     color="#00008B",
     color_contrails="#00004B",
 ):
@@ -690,13 +709,13 @@ def plane_to_gdf(
 
     # Different emission factors depending on the trip length
     if bird < 1000:
-        # Detour coefficient :
-        bird = (4.1584 * bird ** (-0.212)) * bird
         trip_category = 'short'
     elif bird < 3500:
         trip_category = 'medium'
     else:  # It's > 3500
         trip_category = 'long'
+    #detour_coeffient
+    bird = bird * detour
     # We sum the different contribution for CO2 only
     EF = np.sum(list(EF_plane[trip_category].values()))
     # Compute geodataframe and dataframe
@@ -924,7 +943,8 @@ def compute_emissions_custom(data, cmap=colors_custom):
                 break
             # Adding a step variable here to know which trip is it
             gdf["step"] = str(int(idx) + 1)
-            l.append(gdf)
+            l.append(gdf.copy())
+            gdf['Mean of Transport'] = 'Railway'
             geo.append(gdf)
 
         elif transport_mean == "Bus":
@@ -986,7 +1006,7 @@ def compute_emissions_custom(data, cmap=colors_custom):
                 break
             gdf_bike["step"] = str(int(idx) + 1)
             l.append(gdf_bike.copy())
-            gdf_bike['Mean of Transport'] = 'Road (bicycle)'
+            gdf_bike['Mean of Transport'] = 'Bike route'
             geo.append(gdf_bike)
 
         elif transport_mean == "Plane":
@@ -998,8 +1018,9 @@ def compute_emissions_custom(data, cmap=colors_custom):
             )
             gdf_plane["step"] = str(int(idx) + 1)
             gdf_cont["step"] = str(int(idx) + 1)
-            l.append(gdf_plane)
+            l.append(gdf_plane.copy())
             l.append(gdf_cont)
+            gdf_plane['Mean of Transport'] = 'Flight path'
             geo.append(gdf_plane)
 
         elif transport_mean == "Ferry":
@@ -1073,7 +1094,8 @@ def compute_emissions_all(data, cmap=colors_direct):
     # Train
     if train:
         gdf, train = train_to_gdf(tag1, tag2, colormap=color_direct["Train"])
-        l.append(gdf)
+        l.append(gdf.copy())
+        gdf['Mean of Transport'] = 'Railway'
         geo.append(gdf)
 
     # Car & Bus
@@ -1101,8 +1123,9 @@ def compute_emissions_all(data, cmap=colors_direct):
             color=color_direct["Plane"],
             color_contrails=color_direct["Plane_contrails"],
         )
-        l.append(gdf_plane)
+        l.append(gdf_plane.copy())
         l.append(gdf_cont)
+        gdf_plane['Mean of Transport'] = 'Flight path'
         geo.append(gdf_plane)
 
     # We do not add the ferry in the general case
