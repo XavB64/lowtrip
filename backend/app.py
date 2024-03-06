@@ -35,6 +35,8 @@ def main():
             df = pd.DataFrame.from_dict(json.loads(request.form["my-trip"]))
             # My trip data and geo data
             data_mytrip, geo_mytrip, error = compute_emissions_custom(df)
+            data_mytrip.to_csv('just_to_see.csv')
+            geo_mytrip.to_csv('geometry.csv')
             
             #Error formatting
             if len(error) > 0:
@@ -67,7 +69,7 @@ def main():
             # Response
                 response = {
                     "gdf": gdf,
-                    "my_trip": data_mytrip.to_json(orient="records"),
+                    "my_trip": data_mytrip.dropna(axis=1).to_json(orient="records"),
                     "direct_trip": data_direct.to_json(orient="records"),
                     "error": error,
                 }

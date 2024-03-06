@@ -93,7 +93,10 @@ EF_bus = {
     'infra' : .0007
 } 
 
-EF_rail_infra = .0065
+EF_train = {
+    'construction' : 0.0006,
+    'infra' : .0065
+    } 
 
 EF_bycicle = .005
 

@@ -6,7 +6,7 @@ from parameters import(
     EF_ecar,
     EF_ferry,
     EF_plane,
-    EF_rail_infra,
+    EF_train,
     search_perimeter,
     val_perimeter, 
     charte_mollow,
@@ -77,7 +77,7 @@ def bicycle_to_gdf(
 
 
 def train_to_gdf(
-    tag1, tag2, perims=search_perimeter, EF_infra = EF_rail_infra, validate=val_perimeter, colormap=charte_mollow
+    tag1, tag2, perims=search_perimeter, EF_infra = EF_train, validate=val_perimeter, colormap=charte_mollow
 ):  # charte_mollow
     """
     parameters:
@@ -103,8 +103,6 @@ def train_to_gdf(
 
         else :  # We need to filter by country and add length / Emission factors
             gdf = filter_countries_world(gdf, method = 'train')
-            # Add colors, here discretise the colormap
-            gdf["colors"] = colormap
             # gdf['colors'] = ['#'+k for k in pd.Series(colormap[::-1])[[int(k) for k in np.linspace(0, len(colormap)-1, gdf.shape[0])]]]
             # Adding and computing emissions
             # For trains
@@ -120,10 +118,24 @@ def train_to_gdf(
             gdf["path_length"] = gdf["path_length"] * (train_dist / gdf["path_length"].sum())
             # Compute emissions : EF * length
             gdf["EF_tot"] = gdf["EF_tot"] / 1e3  # Conversion in in kg
-            gdf["kgCO2eq"] = gdf["path_length"] * (gdf["EF_tot"] + EF_infra)
+            gdf["kgCO2eq"] = gdf["path_length"] * gdf["EF_tot"]
+            # Add colors, here discretise the colormap
+            gdf["colors"] = colors_transport['Train'][0]
+            gdf = pd.concat([
+                gdf,
+                pd.DataFrame(
+                {
+                    "kgCO2eq": [train_dist * EF_train['construction'], train_dist * EF_train['infra']],
+                    "EF_tot": [EF_train['construction'], EF_train['infra']],
+                    "colors": colors_transport['Train'][1:],
+                    "NAME": ['Construction', 'Infra'],
+                }
+                )
+            ])
             
             #Add infra
             gdf["Mean of Transport"] = "Train"
+            gdf.reset_index(inplace=True)
             # Returning the result
             return gdf, train
     else :

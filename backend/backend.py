@@ -76,7 +76,7 @@ def compute_emissions_custom(data, cmap=colors_custom):
             gdf, _train = train_to_gdf(
                 departure_coordinates,
                 arrival_coordinates,
-                colormap=color_custom["Train"],
+                #colormap=color_custom["Train"],
             )
             if not _train : #One step is not succesful
                 fail = True
@@ -86,7 +86,7 @@ def compute_emissions_custom(data, cmap=colors_custom):
             gdf["step"] = str(int(idx) + 1)
             l.append(gdf.copy())
             gdf['Mean of Transport'] = 'Railway'
-            geo.append(gdf)
+            geo.append(gdf.drop(gdf.index[-2:]))
 
         elif transport_mean == "Bus":
             gdf_bus, _bus = bus_to_gdf(
