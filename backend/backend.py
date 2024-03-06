@@ -100,7 +100,7 @@ EF_bus = {
     'infra' : .0007
 } 
 
-EF_rail_infra = .007
+EF_rail_infra = .0065
 
 EF_bycicle = .005
 
@@ -650,10 +650,11 @@ def car_to_gdf(
     geom_route, route_dist, route = find_route(tag1, tag2)
     if nb != "👍" :
         nb = int(nb)
+        EF_fuel = EF_car['fuel'] * (1 + .04 * (nb - 1))
         EF = (np.sum(list(EF_car.values())) / nb) + EF_car['fuel'] * .04 * (nb - 1) #Over consumption due to weight and luggages
         name = str(nb)+'pass.'
     else : #Hitch-hiking
-        EF = EF_car['fuel'] * .04
+        EF_fuel = EF_car['fuel'] * .04
         name = 'Hitch-hiking'
 
     # Validation part for route
@@ -665,8 +666,8 @@ def car_to_gdf(
         gdf_car = pd.DataFrame(
             pd.Series(
                 {
-                    "kgCO2eq": route_dist * EF,
-                    "EF_tot": EF, #Adding consumption with more weight
+                    # "kgCO2eq": [route_dist * EF_fuel, route_dist * EF['construction'], route_dist * EF['Infra']]
+                    # "EF_tot": EF, #Adding consumption with more weight
                     "path_length": route_dist,
                     "colors": color,
                     "NAME": name,
@@ -674,12 +675,23 @@ def car_to_gdf(
                     "geometry": geom_route,
                 }
             )
-        ).transpose()  #'EF_tot':EF_car / nb,
+        ).transpose()
+        data_car = pd.DataFrame(
+                {
+                    "kgCO2eq": [route_dist * EF_fuel, route_dist * EF_car['construction'], route_dist * EF_car['infra']],
+                    "EF_tot": [EF_fuel, EF_car['construction'], EF_car['infra']],
+                    "colors": [ '#280000', '#570000', '#B10F2E'],
+                    "NAME": ['Usage', 'Construction', 'Infra'],
+                    "Mean of Transport": ["Car", "Car", "Car"],
+                }
+            )
+         #'EF_tot':EF_car / nb,
+        data_car.to_csv('just_to_see.csv')
     else:
-        gdf_car = pd.DataFrame()
+        gdf_car, data_car = pd.DataFrame(), pd.DataFrame()
 
     # Return the result
-    return gdf_car, route
+    return gdf_car, data_car, route
 
 
 
@@ -962,7 +974,7 @@ def compute_emissions_custom(data, cmap=colors_custom):
 
         elif transport_mean == "Car":
             # We get the number of passenger
-            gdf_car, _car = car_to_gdf(
+            gdf_car, data_car, _car = car_to_gdf(
                 departure_coordinates,
                 arrival_coordinates,
                 nb=arrival.nb,
@@ -973,7 +985,7 @@ def compute_emissions_custom(data, cmap=colors_custom):
                 ERROR = 'step n°'+str(int(idx) + 1)+' failed with Car, please change mean of transport or locations. '
                 break
             gdf_car["step"] = str(int(idx) + 1)
-            l.append(gdf_car.copy())
+            l.append(data_car) #gdf_car.copy()
             gdf_car['Mean of Transport'] = 'Road'
             geo.append(gdf_car)
             
@@ -1038,7 +1050,7 @@ def compute_emissions_custom(data, cmap=colors_custom):
     else :
         # Query successfull, we concatenate the data
         data_custom = pd.concat(l)
-        data_custom = data_custom.reset_index(drop=True).drop("geometry", axis=1)
+        data_custom = data_custom.reset_index(drop=True)#.drop("geometry", axis=1)
         # Geodataframe for map
         geodata = gpd.GeoDataFrame(pd.concat(geo), geometry="geometry", crs="epsg:4326")
 
