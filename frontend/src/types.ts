@@ -42,7 +42,7 @@ export interface Gdf {
   features: {
     id: string;
     type: string;
-    properties: { colors: string; "Mean of Transport": string };
+    properties: { colors: string; "label": string };
     geometry: { type: string; coordinates: [number, number][] };
   }[];
 }

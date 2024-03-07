@@ -21,7 +21,6 @@ CORS(app)  # comment this on deployment
 # app.config["DEBUG"] = True
 app.config["APPLICATION_ROOT"] = "/"
 # Geometry - To send to the frontend
-l_geo = ["colors", "Mean of Transport", "geometry"]
 
 
 @app.route("/", methods=["GET", "POST"])
@@ -35,8 +34,6 @@ def main():
             df = pd.DataFrame.from_dict(json.loads(request.form["my-trip"]))
             # My trip data and geo data
             data_mytrip, geo_mytrip, error = compute_emissions_custom(df)
-            data_mytrip.to_csv('just_to_see.csv')
-            geo_mytrip.to_csv('geometry.csv')
             
             #Error formatting
             if len(error) > 0:
@@ -63,9 +60,11 @@ def main():
             if gdf.shape[0] == 0:
                 gdf = None
             else :
-                gdf = gdf[l_geo].explode().to_json()
+                gdf = gdf.explode().to_json() #[l_geo]
             
             if return_direct :
+                data_direct.to_csv('just_to_see.csv')
+                #geo_mytrip.to_csv('geometry.csv')
             # Response
                 response = {
                     "gdf": gdf,
@@ -93,7 +92,8 @@ def main():
             # Direct data and geo data
             # We change the color to pink
             data_alternative, geo_alternative, error_other = compute_emissions_custom(
-                df2, cmap=colors_alternative
+                df2, 
+                #cmap=colors_alternative
             )
             # Error message
             if len(error_other) > 0:
@@ -103,7 +103,7 @@ def main():
             if (len(error) > 0) & (len(error_other) > 0):
                 gdf = None
             else :
-                gdf = pd.concat([geo_mytrip, geo_alternative])[l_geo].explode().to_json()
+                gdf = pd.concat([geo_mytrip, geo_alternative]).explode().to_json() #[l_geo]
            
             # Prepare data for aggregation in the chart -  see frontend
             data_mytrip, data_alternative = chart_refactor(

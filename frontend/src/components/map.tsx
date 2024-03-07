@@ -98,7 +98,7 @@ const MapContent = ({
                       borderRadius={2}
                       bgColor={feature.properties.colors}
                     />
-                    <Text>{feature.properties["Mean of Transport"]}</Text>
+                    <Text>{feature.properties["label"]}</Text>
                   </HStack>
                 </Tooltip>
               </Polyline>
