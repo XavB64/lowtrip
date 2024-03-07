@@ -68,7 +68,7 @@ def main():
             # Response
                 response = {
                     "gdf": gdf,
-                    "my_trip": data_mytrip.dropna(axis=1).to_json(orient="records"),
+                    "my_trip": data_mytrip.to_json(orient="records"),
                     "direct_trip": data_direct.to_json(orient="records"),
                     "error": error,
                 }

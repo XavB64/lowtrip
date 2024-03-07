@@ -11,16 +11,24 @@ carbon_intensity_electricity = gpd.read_file('static/carbon_intensity_electricit
 
 
 colors_transport = {
-    'Train' : ['#CCFCCB', '#96E6B3', '#568259'],
-    'Plane' : ['#004BA8', '#4A525A', '#24272B', '#3E78B2'],
-    'Road' : [ '#280000', '#570000', '#B10F2E'],
-    'Bicycle' : ['#F1FFFA'],
-    'Ferry' : ['#55868C']	
+   # 'Train' : ['#CCFCCB', '#96E6B3', '#568259'],
+    'Plane' : [ "#27A4B2", "#4accdb"],
+        #['#004BA8',  '#3E78B2'], #'#4A525A', '#24272B',
+    'Road' : '#f767a1', #, '#570000', '#B10F2E'
+    'Bicycle' : "#b3eef5",
+    'Ferry' : "#006773"	
 }
 
+train_cmap = 'Greens'
+ecar_cmap = 'RdPu'#YlOrRd'
+
+bon_min, bon_max = 0.2, 0.8
+
+color_construction = '#c0bbbb'#'#280000'
+color_infra = '#c0bbbb' # '#280000'
 
 # Fields to return for bar chart
-l_var = ["NAME", "Mean of Transport", "kgCO2eq", "colors"]
+#l_var = ["NAME", "Mean of Transport", "kgCO2eq", "colors"]
 
 # Colors
 charte_mollow = [

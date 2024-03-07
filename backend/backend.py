@@ -17,7 +17,6 @@ from parameters import(
     colors_alternative,
     min_plane_dist,
     colors_direct,
-    l_var
 )
 
 from transport import(
