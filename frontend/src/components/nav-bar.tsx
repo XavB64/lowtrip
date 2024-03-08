@@ -17,17 +17,6 @@ import i18n from "i18next";
 import { useTranslation } from "react-i18next";
 import { PrimaryButton } from "./primary-button";
 
-const navItems = [
-  {
-    name: "Methodology",
-    component: (
-      <a href={MethodologyPdf} target="_blank" rel="noreferrer">
-        Methodology
-      </a>
-    ),
-  },
-];
-
 const LANGUAGES = ["fr", "en"];
 
 const LanguageSelector = () => {
@@ -35,7 +24,7 @@ const LanguageSelector = () => {
   return (
     <Popover placement="bottom">
       <PopoverTrigger>
-        <Button borderRadius="15px">Paramètres</Button>
+        <Button borderRadius="15px">{t("navbar.settings")}</Button>
       </PopoverTrigger>
       <PopoverContent
         color="white"
@@ -58,7 +47,7 @@ const LanguageSelector = () => {
                     variant={isSelectedLanguage ? undefined : "outline"}
                     disabled={isSelectedLanguage}
                   >
-                    {t(`language_${language}`)}
+                    {t(`navbar.language_${language}`)}
                   </PrimaryButton>
                 );
               })}
@@ -70,33 +59,47 @@ const LanguageSelector = () => {
   );
 };
 
-const NavBar = () => (
-  <HStack
-    w="100%"
-    position="fixed"
-    background="#515151"
-    px={6}
-    py={4}
-    boxShadow="md"
-    zIndex={3}
-    h="64px"
-  >
-    <Image src={Logo} h="100%" />
-    <Spacer />
-    <HStack display={["none", "block"]}>
-      {navItems.map((item) => (
-        <Button
-          key={item.name}
-          color="#fff"
-          variant="ghost"
-          _hover={{ backgroundColor: "none", color: "#D1D1D1" }}
-          _active={{ backgroundColor: "none", color: "#D1D1D1" }}
-        >
-          {item.component}
-        </Button>
-      ))}
-      <LanguageSelector />
+const NavBar = () => {
+  const { t } = useTranslation();
+  const navItems = [
+    {
+      name: "Methodology",
+      component: (
+        <a href={MethodologyPdf} target="_blank" rel="noreferrer">
+          {t("navbar.methodology")}
+        </a>
+      ),
+    },
+  ];
+
+  return (
+    <HStack
+      w="100%"
+      position="fixed"
+      background="#515151"
+      px={6}
+      py={4}
+      boxShadow="md"
+      zIndex={3}
+      h="64px"
+    >
+      <Image src={Logo} h="100%" />
+      <Spacer />
+      <HStack display={["none", "block"]}>
+        {navItems.map((item) => (
+          <Button
+            key={item.name}
+            color="#fff"
+            variant="ghost"
+            _hover={{ backgroundColor: "none", color: "#D1D1D1" }}
+            _active={{ backgroundColor: "none", color: "#D1D1D1" }}
+          >
+            {item.component}
+          </Button>
+        ))}
+        <LanguageSelector />
+      </HStack>
     </HStack>
-  </HStack>
-);
+  );
+};
 export default NavBar;

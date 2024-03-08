@@ -18,12 +18,14 @@ import {
   YAxis,
 } from "recharts";
 import { ApiResponse, TripData } from "../types";
+import { useTranslation } from "react-i18next";
 
 interface ChartProps {
   response?: ApiResponse;
 }
 
 export function Chart({ response }: ChartProps) {
+  const { t } = useTranslation();
   const breakpoint = useBreakpoint();
   const { isOpen, onOpen, onToggle, onClose } = useDisclosure();
 
@@ -48,12 +50,11 @@ export function Chart({ response }: ChartProps) {
       >
         <h2 style={{ marginRight: "8px" }}>
           {response.data.alternative_trip
-            ? "Your trip VS Other trip"
-            : response.data.direct_trip 
-            ? "Your trip VS other means of transport"
-            : "Your trip emissions"}
+            ? t("results.vsOtherTrip")
+            : response.data.direct_trip
+            ? t("results.vsOtherMeans")
+            : t("results.yourTripEmissions")}
         </h2>
-
       </Flex>
       <ResponsiveContainer
         height={breakpoint === "base" ? 230 : 350}
@@ -62,13 +63,14 @@ export function Chart({ response }: ChartProps) {
         <BarChart data={getChartData(trips)} margin={{ bottom: 20 }}>
           <XAxis dataKey="name" fontSize={breakpoint === "base" ? 8 : 14} />
           <YAxis padding={{ top: 30 }} hide />
-          <Tooltip formatter={(value) => `${round(+value, 0)} kg`}
-           contentStyle={{ fontSize : '12px'}}
-           />
+          <Tooltip
+            formatter={(value) => `${round(+value, 0)} kg`}
+            contentStyle={{ fontSize: "12px" }}
+          />
           {uniqBy(trips, "NAME").map((trip) => (
             <Bar
               key={trip.NAME}
-              dataKey={trip.NAME}
+              dataKey={t(trip.NAME)}
               fill={trip.colors}
               stackId="a"
             >
@@ -79,29 +81,24 @@ export function Chart({ response }: ChartProps) {
             </Bar>
           ))}
         </BarChart>
-        </ResponsiveContainer>
-        
-        
-        <Flex justifyContent="flex-end"
-        height="auto"
-        width="100%">
-      <ChakraTooltip label="Plane: the formation of Contrails combined with emissions of nitrogen oxides (NOx)
-      affect the properties of the atmosphere and lead to an increase in radiative forcing.
-      The represented connection might not be currently operated by a flight company. This mode is not displayed by default when the journey length is below 300km."
-     isOpen={isOpen}
-     fontSize={9}
-      >
+      </ResponsiveContainer>
+
+      <Flex justifyContent="flex-end" height="auto" width="100%">
+        <ChakraTooltip
+          label={t("results.explanation")}
+          isOpen={isOpen}
+          fontSize={9}
+        >
           <span>
-            <BiHelpCircle 
-            style={{display: "inline-block", marginRight: "5px" }}
-            onMouseEnter={onOpen}
-            onMouseLeave={onClose}
-            onClick={onToggle}
+            <BiHelpCircle
+              style={{ display: "inline-block", marginRight: "5px" }}
+              onMouseEnter={onOpen}
+              onMouseLeave={onClose}
+              onClick={onToggle}
             />
           </span>
         </ChakraTooltip>
-        </Flex>
-        
+      </Flex>
     </Box>
   );
 }

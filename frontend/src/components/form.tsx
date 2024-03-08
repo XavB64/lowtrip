@@ -16,6 +16,7 @@ import { formatStepsForApi } from "../utils";
 import { PrimaryButton } from "./primary-button";
 import { StepField } from "./step-field";
 import ErrorModal from "./error-modal";
+import { useTranslation } from "react-i18next";
 
 const getPayload = (steps: Step[], stepsToCompare?: Step[]) => {
   const formData = new FormData();
@@ -58,6 +59,7 @@ export const Form = ({
   afterSubmit,
   changeTab,
 }: FormProps) => {
+  const { t } = useTranslation();
   const { values: steps, addStep, removeStep, updateStep } = stepsProps;
   const { isOpen, onOpen: openErrorModal, onClose } = useDisclosure();
   const [errorMessage, setErrorMessage] = useState("");
@@ -122,7 +124,7 @@ export const Form = ({
         color="black"
         leftIcon={<BiSolidPlusCircle />}
       >
-        Add step
+        {t("form.addStep")}
       </Button>
 
       <Divider
@@ -139,11 +141,13 @@ export const Form = ({
           isDisabled={formIsNotValid}
           isLoading={isLoading}
         >
-          Compare with this trip
+          {t("form.compareWithThisTrip")}
         </PrimaryButton>
       ) : (
         <>
-          {steps.length < 3 && <Text alignSelf="center">Compare with...</Text>}
+          {steps.length < 3 && (
+            <Text alignSelf="center">{t("form.compareWith")}</Text>
+          )}
           <HStack w="100%">
             <PrimaryButton
               onClick={handleSubmit}
@@ -151,9 +155,8 @@ export const Form = ({
               isLoading={isLoading}
             >
               {steps.length < 3
-
-                ? "Other modes"
-                : "Compute emissions"}
+                ? t("form.otherTransportMeans")
+                : t("form.computeEmissions")}
             </PrimaryButton>
             <PrimaryButton
               onClick={changeTab}
@@ -161,9 +164,9 @@ export const Form = ({
               isLoading={false}
               variant="outline"
             >
-              {steps.length < 3 
-                ? "Another trip" 
-                : "Compare to another trip"}
+              {steps.length < 3
+                ? t("form.anotherTrip")
+                : t("form.compareToAnotherTrip")}
             </PrimaryButton>
           </HStack>
         </>
