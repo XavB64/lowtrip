@@ -22,6 +22,7 @@ import {
   Tooltip as ChakraTooltip,
 } from "@chakra-ui/react";
 import { Step, Transport, thumbUp } from "../types";
+import { useTranslation } from "react-i18next";
 
 const TRANSPORTS = [
   {
@@ -61,6 +62,7 @@ interface StepFieldProps {
 }
 
 export const StepField = ({ removeStep, updateStep, step }: StepFieldProps) => {
+  const { t } = useTranslation();
   const autoCompleteRef = useRef(null);
   const inputRef = useRef(null);
 
@@ -117,7 +119,9 @@ export const StepField = ({ removeStep, updateStep, step }: StepFieldProps) => {
           onChange={(e) => {
             setValue(e.target.value);
           }}
-          placeholder={isDeparture ? "From..." : "To..."}
+          placeholder={
+            isDeparture ? t("form.placeholderFrom") : t("form.placeholderTo")
+          }
           style={{
             width: "100%",
             height: "50px",
@@ -146,7 +150,9 @@ export const StepField = ({ removeStep, updateStep, step }: StepFieldProps) => {
           marginTop={1}
         >
           <Box>
-            <span style={{ paddingRight: 5, textAlign: "end" }}>by</span>
+            <span style={{ paddingRight: 5, textAlign: "end" }}>
+              {t("form.by")}
+            </span>
             {TRANSPORTS.map((item) =>
               item.value === Transport.car || item.value === Transport.ecar ? (
                 <CarButton
@@ -154,7 +160,7 @@ export const StepField = ({ removeStep, updateStep, step }: StepFieldProps) => {
                   isSelected={item.value === step.transportMean}
                   step={step}
                   icon={item.icon}
-                  item={item.value}
+                  transport={item.value}
                 />
               ) : (
                 <TransportButton
@@ -182,7 +188,7 @@ interface CarButtonProps {
   isSelected: boolean;
   step: Step;
   icon: JSX.Element;
-  item: Transport.car | Transport.ecar;
+  transport: Transport.car | Transport.ecar;
 }
 
 const CarButton = ({
@@ -190,18 +196,19 @@ const CarButton = ({
   isSelected,
   step,
   icon,
-  item: value,
+  transport,
 }: CarButtonProps) => {
+  const { t } = useTranslation();
   const passergerChoices =
-    value === Transport.car ? [1, 2, 3, 4, 5, thumbUp] : [1, 2, 3, 4, 5];
+    transport === Transport.car ? [1, 2, 3, 4, 5, thumbUp] : [1, 2, 3, 4, 5];
   return (
     <Menu>
-      <ChakraTooltip label={value}>
+      <ChakraTooltip label={t(`form.transportMeans.${transport}`)}>
         <MenuButton position="relative">
           <TransportButton
             icon={icon}
             isSelected={isSelected}
-            transport={value}
+            transport={transport}
           />
           {isSelected && step.passengers && (
             <Box
@@ -226,15 +233,17 @@ const CarButton = ({
             key={passengerNumber}
             onClick={() =>
               updateStep(step.index, {
-                transportMean: value,
+                transportMean: transport,
                 passengers: passengerNumber,
               })
             }
           >
             {" "}
             {typeof passengerNumber !== "number"
-              ? "Hitch-hiking"
-              : `${passengerNumber} passenger${passengerNumber > 1 ? "s" : ""}`}
+              ? t("form.hitchHiking")
+              : t("form.passengersNb", {
+                  count: passengerNumber,
+                })}
           </MenuItem>
         ))}
       </MenuList>
@@ -255,8 +264,9 @@ const TransportButton = ({
   icon,
   transport,
 }: TransportButtonProps) => {
+  const { t } = useTranslation();
   return (
-    <ChakraTooltip label={transport}>
+    <ChakraTooltip label={t(`form.transportMeans.${transport}`)}>
       <Button
         onClick={updateStep}
         padding={0}

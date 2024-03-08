@@ -15,6 +15,7 @@ import { Chart } from "./chart";
 import { useRef, useState } from "react";
 import { ApiResponse, StepProps } from "../types";
 import { BiHelpCircle } from "react-icons/bi";
+import { useTranslation } from "react-i18next";
 
 interface FormPanelProps {
   response?: ApiResponse;
@@ -29,14 +30,18 @@ export function FormPanel({
   myTripSteps,
   alternativeTripSteps,
 }: FormPanelProps) {
+  const { t } = useTranslation();
   const [tabIndex, setTabIndex] = useState(0);
   const handleTabsChange = (index: number) => {
     setTabIndex(index);
   };
   const chartRef = useRef(null);
+
   const scrollToChart = () =>
     (chartRef.current as any)?.scrollIntoView({ behavior: "smooth" });
+
   const { isOpen, onOpen, onToggle, onClose } = useDisclosure();
+
   return (
     <VStack
       width={["100%", "45%"]}
@@ -61,21 +66,17 @@ export function FormPanel({
           fontWeight={900}
           textAlign="center"
         >
-          Compare your travel emissions
-          <ChakraTooltip label=" Select departure, destination and means of transport to
-          compare the emissions of your journeys! You can either compare several modes of transport on
-          a specific route, or compare multi-modal routes with steps."
-          isOpen={isOpen}
-          >
-          <span>
-            <BiHelpCircle
-            style={{ display: "inline-block", marginLeft: "5px" }}
-            onMouseEnter={onOpen}
-            onMouseLeave={onClose}
-            onClick={onToggle}
-            />
-          </span>
-        </ChakraTooltip>
+          {t("home.compareTravelEmissions")}
+          <ChakraTooltip label={t("home.toolDescription")} isOpen={isOpen}>
+            <span>
+              <BiHelpCircle
+                style={{ display: "inline-block", marginLeft: "5px" }}
+                onMouseEnter={onOpen}
+                onMouseLeave={onClose}
+                onClick={onToggle}
+              />
+            </span>
+          </ChakraTooltip>
         </Heading>
 
         <Tabs
@@ -87,10 +88,10 @@ export function FormPanel({
         >
           <TabList borderBottom="none">
             <Tab _selected={{ bg: "#efefef" }} borderRadius="12px 12px 0 0">
-              My trip
+              {t("form.tabMyTrip")}
             </Tab>
             <Tab _selected={{ bg: "#efefef" }} borderRadius="12px 12px 0 0">
-              Other trip
+              {t("form.tabOtherTrip")}
             </Tab>
           </TabList>
           <TabPanels>
