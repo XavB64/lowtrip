@@ -1,12 +1,14 @@
 import React from "react";
 
+export const thumbUp: string = "👍";
+
 export interface Step {
   index: number;
   id: string;
   locationName?: string;
   locationCoords?: [number, number];
   transportMean?: Transport;
-  passengers?: number;
+  passengers?: number | typeof thumbUp;
   currentInputRef?: React.MutableRefObject<any>;
 }
 
@@ -20,11 +22,11 @@ export interface StepProps {
 export enum Transport {
   plane = "Plane",
   car = "Car",
-  ecar = 'eCar',
+  ecar = "eCar",
   bus = "Bus",
   train = "Train",
   ferry = "Ferry",
-  bicycle = 'Bicycle'
+  bicycle = "Bicycle",
 }
 
 export interface ApiResponse {
@@ -42,7 +44,7 @@ export interface Gdf {
   features: {
     id: string;
     type: string;
-    properties: { colors: string; "label": string };
+    properties: { colors: string; label: string };
     geometry: { type: string; coordinates: [number, number][] };
   }[];
 }
