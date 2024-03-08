@@ -1,6 +1,21 @@
-import { Button, HStack, Image, Spacer } from "@chakra-ui/react";
+import {
+  Box,
+  Button,
+  Flex,
+  HStack,
+  Image,
+  Popover,
+  PopoverArrow,
+  PopoverBody,
+  PopoverContent,
+  PopoverTrigger,
+  Spacer,
+} from "@chakra-ui/react";
 import Logo from "../assets/logo.png";
 import MethodologyPdf from "../assets/lowtrip_methodology.pdf";
+import i18n from "i18next";
+import { useTranslation } from "react-i18next";
+import { PrimaryButton } from "./primary-button";
 
 const navItems = [
   {
@@ -12,6 +27,48 @@ const navItems = [
     ),
   },
 ];
+
+const LANGUAGES = ["fr", "en"];
+
+const LanguageSelector = () => {
+  const { t } = useTranslation();
+  return (
+    <Popover placement="bottom">
+      <PopoverTrigger>
+        <Button borderRadius="15px">Paramètres</Button>
+      </PopoverTrigger>
+      <PopoverContent
+        color="white"
+        bg="#efefef"
+        borderColor="#efefef"
+        borderRadius="15px"
+      >
+        <PopoverArrow bg="#efefef" />
+        <PopoverBody>
+          <Box>
+            <Flex align="center" textAlign="center" justifyContent="center">
+              {LANGUAGES.map((language) => {
+                const isSelectedLanguage = i18n.language === language;
+                return (
+                  <PrimaryButton
+                    marginRight={1}
+                    onClick={() => {
+                      i18n.changeLanguage(language);
+                    }}
+                    variant={isSelectedLanguage ? undefined : "outline"}
+                    disabled={isSelectedLanguage}
+                  >
+                    {t(`language_${language}`)}
+                  </PrimaryButton>
+                );
+              })}
+            </Flex>
+          </Box>
+        </PopoverBody>
+      </PopoverContent>
+    </Popover>
+  );
+};
 
 const NavBar = () => (
   <HStack
@@ -38,8 +95,8 @@ const NavBar = () => (
           {item.component}
         </Button>
       ))}
+      <LanguageSelector />
     </HStack>
   </HStack>
 );
-
 export default NavBar;
