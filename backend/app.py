@@ -63,8 +63,6 @@ def main():
                 gdf = gdf.explode().to_json() #[l_geo]
             
             if return_direct :
-                data_direct.to_csv('just_to_see.csv')
-                #geo_mytrip.to_csv('geometry.csv')
             # Response
                 response = {
                     "gdf": gdf,

@@ -47,14 +47,14 @@ export function FormPanel({
       p={[1, 3]}
     >
       <VStack padding={3} spacing={5} height="100%" width="100%">
-        <Heading
+        {/* <Heading
           color="#FF0000"
           fontSize="large"
           fontWeight={900}
           textAlign="center"
         >
-          BETA - Report any feedback to xavier.bonnemaizon@student-cs.fr
-        </Heading>
+          BETA - Report any feedback to ...
+        </Heading> */}
         <Heading
           color="#595959"
           fontSize="x-large"
@@ -77,13 +77,6 @@ export function FormPanel({
           </span>
         </ChakraTooltip>
         </Heading>
-
-        {/* <VStack fontSize={["sm"]} alignItems="flex-start">
-          <Text>
-          Select departure, destination and means of transport to compare the emissions of your journeys!
-          </Text>
-          <Text>You can either compare all modes of transport on a specific route, or compare multi-modal routes with steps.</Text>
-        </VStack> */}
 
         <Tabs
           index={tabIndex}

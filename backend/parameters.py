@@ -113,9 +113,9 @@ EF_plane = {
 }
             }
 
-######
-## Plane
-#######
+##########
+## Plane##
+##########
 
 # Number of points in plane geometry
 nb_pts = 100

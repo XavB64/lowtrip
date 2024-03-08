@@ -9,18 +9,9 @@ from parameters import(
     EF_train,
     search_perimeter,
     val_perimeter, 
-    # charte_mollow,
     hold,
     cont_coeff,
     detour,
-    # colors_transport,
-    # color_construction,
-    # color_infra,
-    # ecar_cmap,
-    # train_cmap,
-    # bon_max,
-    # bon_min,
-
 )
 
 from utils import(
