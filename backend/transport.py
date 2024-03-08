@@ -33,7 +33,6 @@ from utils import(
     find_train
 )
 
-import matplotlib
 import pandas as pd
 import numpy as np
 from pyproj import Geod
@@ -69,7 +68,7 @@ def bicycle_to_gdf(
                     "EF_tot": [EF],
                     "path_length": [route_dist],
                     "colors": [color],
-                    "NAME": ["Bicycle"],
+                    "NAME": ["Bike build"],
                     "Mean of Transport": ["Bicycle"],
                 }
             )
@@ -77,7 +76,7 @@ def bicycle_to_gdf(
         gdf_bike = pd.DataFrame(
                 {
                     "colors": [color],
-                    "label": ["Bike Route"],
+                    "label": ["Bike Route: " + str(int(route_dist)) + 'km'],
                     "geometry": [geom_route],
                 }
         )
@@ -115,9 +114,7 @@ def train_to_gdf(
 
         else :  # We need to filter by country and add length / Emission factors
             gdf = filter_countries_world(gdf, method = 'train')
-            # gdf['colors'] = ['#'+k for k in pd.Series(colormap[::-1])[[int(k) for k in np.linspace(0, len(colormap)-1, gdf.shape[0])]]]
             # Adding and computing emissions
-            # For trains
             l_length = []
             # Compute the true distance
             geod = Geod(ellps="WGS84")
@@ -132,23 +129,8 @@ def train_to_gdf(
             gdf["EF_tot"] = gdf["EF_tot"] / 1e3  # Conversion in in kg
             gdf["kgCO2eq"] = gdf["path_length"] * gdf["EF_tot"]
             # Add colors, here discretise the colormap
-            #cmap = matplotlib.cm.get_cmap(train_cmap)
-            #gdf = gdf.sort_values('EF_tot')
             gdf["colors"] = color_usage
-            # [matplotlib.colors.to_hex(cmap(.5)) if gdf.shape[0] == 1 
-            #                  else matplotlib.colors.to_hex(cmap(x)) for x in np.linspace(bon_min, bon_max, gdf.shape[0], endpoint=False)]
-            #colors_transport['Train'][0]
-            # gdf = pd.concat([
-            #     gdf,
-            #     pd.DataFrame(
-            #     {
-            #         "kgCO2eq": [train_dist * EF_train['construction'], train_dist * EF_train['infra']],
-            #         "EF_tot": [EF_train['construction'], EF_train['infra']],
-            #         "colors": colors_transport['Train'][1:],
-            #         "NAME": ['Construction', 'Infra'],
-            #     }
-            #     )
-            # ])
+            # Write
             gdf = pd.concat([
                 pd.DataFrame(
                 {
@@ -161,10 +143,9 @@ def train_to_gdf(
                 gdf
             ])
             
-            
             #Add infra
             gdf["Mean of Transport"] = "Train"
-            gdf["label"] = "Railway"
+            gdf["label"] = "Railway: " + str(int(train_dist)) + "km ("+ gdf["NAME"] + ")"
             gdf.reset_index(inplace=True)
             
             data_train = gdf[['kgCO2eq', 'colors', 'NAME', 'Mean of Transport']]
@@ -199,17 +180,9 @@ def ecar_to_gdf(
             gdf = filter_countries_world(gpd.GeoSeries(
                 geom_route, crs="epsg:4326"), method = 'ecar')
             
-            # Add colors, here discretise the colormap
-            #gdf["colors"] = colors_transport['Road'][0]
-            # gdf = gdf.sort_values('EF_tot')
-            # cmap = matplotlib.cm.get_cmap(ecar_cmap)
-
+            # Add colors
             gdf["colors"] =  color_usage
-            # [matplotlib.colors.to_hex(cmap(.5)) if gdf.shape[0] == 1 
-            #                  else matplotlib.colors.to_hex(cmap(x)) for x in np.linspace(bon_min, bon_max, gdf.shape[0], endpoint=False)]
-            # gdf['colors'] = ['#'+k for k in pd.Series(colormap[::-1])[[int(k) for k in np.linspace(0, len(colormap)-1, gdf.shape[0])]]]
-            # Adding and computing emissions
-            # For trains
+
             l_length = []
             # Compute the true distance
             geod = Geod(ellps="WGS84")
@@ -221,38 +194,26 @@ def ecar_to_gdf(
             print('Rescaling factor', route_dist / gdf["path_length"].sum())
             gdf["path_length"] = gdf["path_length"] * (route_dist / gdf["path_length"].sum())
             #Handle nb passengers
-            gdf['NAME'] = ' ' + gdf['NAME']
+            gdf['NAME'] = ' '+ gdf['NAME']
             nb = int(nb)
-            #gdf['NAME'] = ' '+ str(nb)+'pass. '+gdf['NAME']
             # Compute emissions : EF * length
             gdf["EF_tot"] =gdf["EF_tot"] * EF_ecar['fuel'] * (1 + .04 * (nb - 1)) / (1e3 * nb)   # g/kWh * kWh/km
             gdf["kgCO2eq"] = gdf["path_length"] * gdf["EF_tot"]
             # Add infra and construction
-            # gdf = pd.concat([
-            #     gdf,
-            #     pd.DataFrame(
-            #     {
-            #         "kgCO2eq": [route_dist * EF_ecar['construction'] / nb, route_dist * EF_ecar['infra'] / nb],
-            #         "EF_tot": [EF_ecar['construction'], EF_ecar['infra']],
-            #         "colors": colors_transport['Road'][1:],
-            #         "NAME": ['Construction', 'Infra'],
-            #     }
-            #     )
-            # ])
             gdf = pd.concat([
                 pd.DataFrame(
                 {
                     "kgCO2eq": [route_dist * EF_ecar['construction'] / nb],
                     "EF_tot": [EF_ecar['construction']],
                     "colors": [color_cons],
-                    "NAME": ['Prod eCar'],
+                    "NAME": ['Construction'],
                 }
                 ),
                 gdf
             ])
             name = str(nb)+'p.'
             gdf["Mean of Transport"] = ['eCar ' + name for k in range(gdf.shape[0])]
-            gdf['label'] = 'Road'
+            gdf['label'] = 'Road: ' + str(int(route_dist)) + "km ("+ gdf["NAME"] + ")"
             gdf.reset_index(inplace=True)
             #
             data_ecar = gdf[['kgCO2eq', 'colors', 'NAME', 'Mean of Transport']]
@@ -288,24 +249,14 @@ def car_bus_to_gdf(
 
     if route:
         #data_car
-        # data_car =  pd.DataFrame(
-        #         {
-        #             "kgCO2eq": [route_dist * EF_car['fuel'], route_dist * EF_car['construction'], route_dist * EF_car['infra']],
-        #             "EF_tot": [EF_car['fuel'], EF_car['construction'], EF_car['infra']],
-        #             "path_length" : [route_dist, route_dist, route_dist],
-        #             "colors": colors_transport['Road'],
-        #             "NAME": ['Usage', 'Construction', 'Infra'],
-        #             "Mean of Transport" : ["Car" for k in range(3)]
-        #         }
-        #         )
         data_car =  pd.DataFrame(
                 {
                     "kgCO2eq": [route_dist * EF_car['fuel'], route_dist * EF_car['construction']],
                     "EF_tot": [EF_car['fuel'], EF_car['construction']],
                     "path_length" : [route_dist, route_dist],
                     "colors": [color_usage, color_cons],
-                    "NAME": ['Fuel car', 'Prod car'],
-                    "Mean of Transport" : ["Car" for k in range(2)]
+                    "NAME": ['Fuel', 'Construction'],
+                    "Mean of Transport" : ["Car 1p." for k in range(2)]
                 }
                 )[::-1]
         #geo_car
@@ -313,7 +264,7 @@ def car_bus_to_gdf(
             pd.Series(
                 {
                     "colors": color_usage,
-                    "label": "Road",
+                    "label": 'Road: ' + str(int(route_dist)) + 'km',
                     "geometry": geom_route,
                 }
             )
@@ -325,7 +276,7 @@ def car_bus_to_gdf(
                     "EF_tot": [EF_bus['fuel'], EF_bus['construction']],
                     "path_length" : [route_dist, route_dist],
                     "colors": [color_usage, color_cons],
-                    "NAME": ['Fuel bus', 'Prod bus'],
+                    "NAME": ['Fuel', 'Construction'],
                     "Mean of Transport" : ["Bus" for k in range(2)]
                 }
                 )[::-1]
@@ -363,7 +314,7 @@ def bus_to_gdf(
                     "EF_tot": [EF_bus['fuel'], EF_bus['construction']],
                     "path_length" : [route_dist, route_dist],
                     "colors": [color_usage, color_cons],
-                    "NAME": ['Fuel bus', 'Prod bus'],
+                    "NAME": ['Fuel', 'Construction'],
                     "Mean of Transport" : ["Bus" for k in range(2)]
                 }
                 )[::-1]
@@ -372,7 +323,7 @@ def bus_to_gdf(
             pd.Series(
                 {
                     "colors": color_usage,
-                    "label": "Road",
+                    "label": 'Road: ' + str(int(route_dist))+ 'km',
                     "geometry": geom_route,
                 }
             )
@@ -403,7 +354,7 @@ def car_to_gdf(
         EF_fuel = EF_car['fuel'] * (1 + .04 * (nb - 1)) / nb
         EF_cons = EF_car['construction'] / nb
         # EF_infra = EF_car['infra'] /nb
-        name = str(nb)+'pass.'
+        name = str(nb)+'p.'
     else : #Hitch-hiking
         EF_fuel = EF_car['fuel'] * .04
         EF_cons, EF_infra = 0, 0
@@ -416,22 +367,13 @@ def car_to_gdf(
 
     if route:
         #data car
-        # data_car = pd.DataFrame(
-        #         {
-        #             "kgCO2eq": [route_dist * EF_fuel, route_dist * EF_cons, route_dist * EF_infra],
-        #             "EF_tot": [EF_fuel, EF_cons, EF_car['infra']],
-        #             "colors": colors_transport['Road'],
-        #             "NAME": ['Usage', 'Construction', 'Infra'],
-        #             "Mean of Transport": ['Car ' + name for k in range(3)],
-        #         }
-        #     )
         data_car =  pd.DataFrame(
                 {
                     "kgCO2eq": [route_dist * EF_fuel, route_dist * EF_cons],
                     "EF_tot": [EF_fuel, EF_cons],
                     "path_length" : [route_dist, route_dist],
                     "colors": [color_usage, color_cons],
-                    "NAME": ['Fuel car', 'Prod car'],
+                    "NAME": ['Fuel', 'Construction'],
                     "Mean of Transport" : ["Car " + name for k in range(2)]
                 }
                 )[::-1]
@@ -440,14 +382,12 @@ def car_to_gdf(
             pd.Series(
                 {
                     "colors": color_usage,
-                    "label": "Road",
+                    "label": 'Road: ' + str(int(route_dist))+ 'km',
                     "geometry": geom_route,
                 }
             )
         ).transpose()
 
-         #'EF_tot':EF_car / nb,
-        #data_car.to_csv('just_to_see.csv')
     else:
         data_car, geo_car = pd.DataFrame(), pd.DataFrame()
 
@@ -489,25 +429,6 @@ def plane_to_gdf(
     #detour_coeffient
     bird = bird * detour
     
-    #Data plane
-#     data_plane = pd.DataFrame(
-#     {
-#         "kgCO2eq": [bird * np.sum(list(EF_plane[trip_category].values())[1:3]) + holding, 
-#                     bird * EF_plane[trip_category]['construction'], 
-#                     bird * EF_plane[trip_category]['infra'],
-#                     bird * EF_plane[trip_category]['combustion'] * contrails
-#                     ],
-#         "EF_tot": [
-#                     np.sum(list(EF_plane[trip_category].values())[1:3]), 
-#                     EF_plane[trip_category]['construction'], 
-#                     EF_plane[trip_category]['infra'],
-#                     EF_plane[trip_category]['combustion'] * contrails
-#             ],
-#         "colors": colors_transport['Plane'],
-#         "NAME": ['Usage', 'Construction', 'Infra', 'Contrails'],
-#         "Mean of Transport": ["Plane", "Plane", "Plane", "Plane"],
-#     }
-# )
     data_plane = pd.DataFrame(
     {
         "kgCO2eq": [bird * np.sum(list(EF_plane[trip_category].values())[1:3]) + holding, 
@@ -527,7 +448,7 @@ def plane_to_gdf(
         pd.Series(
             {
                 "colors": color_usage,
-                "label": "Flight path",
+                "label": "Flight path: " + str(int(bird))+ 'km',
                 "geometry": geom_plane,
             }
         )
@@ -567,7 +488,7 @@ def ferry_to_gdf(tag1, tag2, EF=EF_ferry, color_usage="#ffffff"):
         pd.Series(
             {
                 "colors": color_usage,
-                "label" : "Ferry",
+                "label" : "Ferry: " + str(int(bird))+ 'km',
                 "geometry": geom,
             }
         )

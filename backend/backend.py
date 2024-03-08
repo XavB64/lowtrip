@@ -30,12 +30,9 @@ from transport import(
 )
 
 
-
 ######################
 #### Functions #######
 ######################
-
-
 
 
 def compute_emissions_custom(data, 
@@ -50,11 +47,6 @@ def compute_emissions_custom(data,
         - ERROR : string first step that fails
     """
     ERROR = ''
-    #Ajouter une variable mean/other pour faire un message d'erreur personnalisé ?
-    # Colors
-    # Custom trip
-    #list_items = ["Train", "Bus", "Car", "Plane_contrails", "Plane", "Ferry"]
-    #color_custom = dict(zip(list_items, cmap))
     
     l = []
     geo = []
@@ -87,7 +79,6 @@ def compute_emissions_custom(data,
             # Adding a step variable here to know which trip is it
             data_train["step"] = str(int(idx) + 1)
             l.append(data_train)
-            #gdf['Mean of Transport'] = 'Railway'
             geo.append(geo_train)
 
         elif transport_mean == "Bus":
@@ -102,7 +93,6 @@ def compute_emissions_custom(data,
                 break
             data_bus["step"] = str(int(idx) + 1)
             l.append(data_bus)
-            #gdf_bus['Mean of Transport'] = 'Road'
             geo.append(geo_bus)
 
         elif transport_mean == "Car":
@@ -120,7 +110,6 @@ def compute_emissions_custom(data,
                 break
             data_car["step"] = str(int(idx) + 1)
             l.append(data_car) #gdf_car.copy()
-            #gdf_car['Mean of Transport'] = 'Road'
             geo.append(geo_car)
             
         elif transport_mean == "eCar":
@@ -137,7 +126,6 @@ def compute_emissions_custom(data,
                 break
             data_ecar["step"] = str(int(idx) + 1)
             l.append(data_ecar)
-            #gdf_car['Mean of Transport'] = 'Road'
             geo.append(geo_ecar)
             
         elif transport_mean == "Bicycle":
@@ -153,7 +141,6 @@ def compute_emissions_custom(data,
                 break
             data_bike["step"] = str(int(idx) + 1)
             l.append(data_bike)
-            #geo_bike['Mean of Transport'] = 'Bike route'
             geo.append(geo_bike)
 
         elif transport_mean == "Plane":
@@ -164,10 +151,7 @@ def compute_emissions_custom(data,
                 color_cont = cmap["Contrails"]
             )
             data_plane["step"] = str(int(idx) + 1)
-            #gdf_cont["step"] = str(int(idx) + 1)
-            #l.append(gdf_plane.copy())
             l.append(data_plane)
-            #gdf_plane['Mean of Transport'] = 'Flight path'
             geo.append(geo_plane)
 
         elif transport_mean == "Ferry":
@@ -207,8 +191,6 @@ def compute_emissions_all(data,
     """
     # colors
     # Direct trip
-    #list_items = ["Train", "Car&Bus", "Plane_contrails", "Plane"]
-    #color_direct = dict(zip(list_items, cmap))
     # Departure coordinates
     lon = data.loc["0"].lon
     lat = data.loc["0"].lat
@@ -251,23 +233,23 @@ def compute_emissions_all(data,
         geo.append(geo_train)
 
     # Car & Bus
+    if transp == 'eCar': #we use custom colors
+        cmap_road = colors_custom
+    else :
+        cmap_road = cmap
     data_car, geo_car, data_bus, route = car_bus_to_gdf(tag1, tag2, 
-                                                        color_usage = cmap["Road"],
-                                                        color_cons = cmap["Cons_infra"]
+                                                        color_usage = cmap_road["Road"],
+                                                        color_cons = cmap_road["Cons_infra"]
                                                         )
-    # To avoid errors in the bar chart, I don't know why the change of name propagates
-    #geo_car = gdf_car.copy()
+    
     if bus:
         l.append(data_bus)
-        #We change it
-        #gdf_car['Mean of Transport'] = 'Bus'
     if car:
         l.append(data_car)
     #If we have a result for car and bus :
     if route: # Adapt and add ecar
         #We check if car or bus was asked for a 1 step
         if  (car==True) & (bus==True) & (transp!='eCar'):
-            #gdf_car['Mean of Transport'] = 'Road'
             geo.append(geo_car)
 
     # Plane
@@ -278,9 +260,7 @@ def compute_emissions_all(data,
             color_usage = cmap["Plane"],
             color_cont = cmap["Contrails"]
             )
-       # l.append(gdf_plane.copy())
         l.append(data_plane)
-       # gdf_plane['Mean of Transport'] = 'Flight path'
         geo.append(geo_plane)
 
     # We do not add the ferry in the general case
@@ -291,9 +271,6 @@ def compute_emissions_all(data,
     else:
         # Data for bar chart
         data = pd.concat(l).reset_index(drop=True)
-    #     [['kgCO2eq',  'colors', 'NAME',
-    #    'Mean of Transport']]
-        # Geodataframe for map
         geodata = gpd.GeoDataFrame(pd.concat(geo), geometry="geometry", crs="epsg:4326")
 
     return data, geodata

@@ -1,5 +1,4 @@
 import warnings
-
 warnings.filterwarnings("ignore")
 
 # Librairies
@@ -15,7 +14,6 @@ from parameters import (
 from flask_cors import CORS  # comment this on deployment
 import pandas as pd
 
-print(pd.__version__)
 
 # Application
 app = Flask(__name__, static_url_path="", static_folder="frontend/build")

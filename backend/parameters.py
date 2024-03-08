@@ -9,40 +9,9 @@ world = gpd.read_file("static/world.geojson")
 carbon_intensity_electricity = gpd.read_file('static/carbon_intensity_electricity.geojson')
 
 
-
-colors_transport = {
-   # 'Train' : ['#CCFCCB', '#96E6B3', '#568259'],
-    'Plane' : [ "#27A4B2", "#4accdb"],
-        #['#004BA8',  '#3E78B2'], #'#4A525A', '#24272B',
-    'Road' : '#f767a1', #, '#570000', '#B10F2E'
-    'Bicycle' : "#b3eef5",
-    'Ferry' : "#006773"	
-}
-
-train_cmap = 'Greens'
-ecar_cmap = 'RdPu'#YlOrRd'
-
-bon_min, bon_max = 0.2, 0.8
-
-color_construction = '#c0bbbb'#'#280000'
-color_infra = '#c0bbbb' # '#280000'
-
-# Fields to return for bar chart
-#l_var = ["NAME", "Mean of Transport", "kgCO2eq", "colors"]
-
-# Colors
-charte_mollow = [
-    "590D22",
-    "800F2F",
-    "A4133C",
-    "C9184A",
-    "FF4D6D",
-    "FF758F",
-    "FF8FA3",
-    "FFB3C1",
-    "FFCCD5",
-    "FFD6DD",
-]
+####################
+#### COLORS ########
+####################
 
 # Select main colors
 l_colors_custom = [
@@ -56,10 +25,6 @@ l_colors_custom = [
     "#006773"
 ]
 
-list_items = ["Bicycle", "Train", "Road", "Cons_infra", "Contrails", "Plane", "Ferry"]
-colors_custom = dict(zip(list_items, l_colors_custom))
-
-
 l_colors_direct = [
     "#febc78",
     "#E69138",
@@ -67,9 +32,6 @@ l_colors_direct = [
     "#cd781f",
     "#B45E06",
 ]
-
-l_direct = [ "Train", "Road", "Cons_infra", "Contrails", "Plane"]
-colors_direct = dict(zip(l_direct, l_colors_direct))
 
 l_colors_alternative = [
     #"#ffdfe4",
@@ -82,6 +44,10 @@ l_colors_alternative = [
     "#df4562"
 ]
 
+list_items = ["Bicycle", "Train", "Road", "Cons_infra", "Contrails", "Plane", "Ferry"]
+colors_custom = dict(zip(list_items, l_colors_custom))
+l_direct = [ "Train", "Road", "Cons_infra", "Contrails", "Plane"]
+colors_direct = dict(zip(l_direct, l_colors_direct))
 colors_alternative = dict(zip(list_items, l_colors_alternative))
 
 # Geometries from API
@@ -146,6 +112,10 @@ EF_plane = {
          "infra":.0003
 }
             }
+
+######
+## Plane
+#######
 
 # Number of points in plane geometry
 nb_pts = 100
