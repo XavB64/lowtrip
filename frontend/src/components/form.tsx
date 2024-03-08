@@ -152,7 +152,7 @@ export const Form = ({
             >
               {steps.length < 3
 
-                ? "Other transport modes"
+                ? "Other modes"
                 : "Compute emissions"}
             </PrimaryButton>
             <PrimaryButton

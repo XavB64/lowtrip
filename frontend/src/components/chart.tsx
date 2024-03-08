@@ -60,7 +60,7 @@ export function Chart({ response }: ChartProps) {
         width="100%"
       >
         <BarChart data={getChartData(trips)} margin={{ bottom: 20 }}>
-          <XAxis dataKey="name" fontSize={breakpoint === "base" ? 10 : 14} />
+          <XAxis dataKey="name" fontSize={breakpoint === "base" ? 8 : 14} />
           <YAxis padding={{ top: 30 }} hide />
           <Tooltip formatter={(value) => `${round(+value, 0)} kg`}
            contentStyle={{ fontSize : '12px'}}
