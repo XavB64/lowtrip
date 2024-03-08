@@ -48,6 +48,14 @@ export function FormPanel({
     >
       <VStack padding={3} spacing={5} height="100%" width="100%">
         <Heading
+          color="#FF0000"
+          fontSize="large"
+          fontWeight={900}
+          textAlign="center"
+        >
+          BETA - Report any feedback to xavier.bonnemaizon@student-cs.fr
+        </Heading>
+        <Heading
           color="#595959"
           fontSize="x-large"
           fontWeight={900}
