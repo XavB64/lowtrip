@@ -8,7 +8,7 @@ import {
 } from "react-icons/bi";
 import { FaFerry } from "react-icons/fa6";
 import { MdElectricCar } from "react-icons/md";
-import {IoMdBicycle} from "react-icons/io"
+import { IoMdBicycle } from "react-icons/io";
 
 import {
   Box,
@@ -21,41 +21,37 @@ import {
   MenuList,
   Tooltip as ChakraTooltip,
 } from "@chakra-ui/react";
-import { Step, Transport } from "../types";
-
-// Tooltip as ChakraTooltip,
-// useDisclosure,
-// } from "@chakra-ui/react";
+import { Step, Transport, thumbUp } from "../types";
 
 const TRANSPORTS = [
   {
     value: Transport.train,
-    icon: <BiSolidTrain size={20} />
+    icon: <BiSolidTrain size={20} />,
   },
   {
     value: Transport.plane,
-    icon: <BiSolidPlaneAlt size={20} />
+    icon: <BiSolidPlaneAlt size={20} />,
   },
   {
     value: Transport.bus,
-    icon: <BiSolidBus size={20} />
+    icon: <BiSolidBus size={20} />,
   },
   {
     value: Transport.car,
-    icon: <BiSolidCar size={20} />
+    icon: <BiSolidCar size={20} />,
   },
   {
     value: Transport.ecar,
-    icon : <MdElectricCar size={20} />
+    icon: <MdElectricCar size={20} />,
   },
   {
     value: Transport.ferry,
-    icon: <FaFerry size={20} />
+    icon: <FaFerry size={20} />,
   },
   {
     value: Transport.bicycle,
-    icon : <IoMdBicycle size={20} /> 
-},
+    icon: <IoMdBicycle size={20} />,
+  },
 ];
 
 interface StepFieldProps {
@@ -152,24 +148,15 @@ export const StepField = ({ removeStep, updateStep, step }: StepFieldProps) => {
           <Box>
             <span style={{ paddingRight: 5, textAlign: "end" }}>by</span>
             {TRANSPORTS.map((item) =>
-              item.value === Transport.car ? (
+              item.value === Transport.car || item.value === Transport.ecar ? (
                 <CarButton
                   updateStep={updateStep}
                   isSelected={item.value === step.transportMean}
                   step={step}
                   icon={item.icon}
-                  value={item.value}
+                  item={item.value}
                 />
-              ) : item.value === Transport.ecar ?(
-                <ECarButton
-                  updateStep={updateStep}
-                  isSelected={item.value === step.transportMean}
-                  step={step}
-                  icon={item.icon}
-                  value={item.value}
-                />
-              ) :
-              (
+              ) : (
                 <TransportButton
                   updateStep={() =>
                     updateStep(step.index, {
@@ -179,7 +166,7 @@ export const StepField = ({ removeStep, updateStep, step }: StepFieldProps) => {
                   }
                   isSelected={item.value === step.transportMean}
                   icon={item.icon}
-                  value={item.value}
+                  transport={item.value}
                 />
               )
             )}
@@ -195,102 +182,59 @@ interface CarButtonProps {
   isSelected: boolean;
   step: Step;
   icon: JSX.Element;
-  value: string;
+  item: Transport.car | Transport.ecar;
 }
 
-interface ECarButtonProps {
-  updateStep: (index: number, data: Partial<Step>) => void;
-  isSelected: boolean;
-  step: Step;
-  icon: JSX.Element;
-  value: string;
-}
-
-const thumbUp: string = "👍";
-
-const CarButton = ({ updateStep, isSelected, step, icon, value }: CarButtonProps) => {
+const CarButton = ({
+  updateStep,
+  isSelected,
+  step,
+  icon,
+  item: value,
+}: CarButtonProps) => {
+  const passergerChoices =
+    value === Transport.car ? [1, 2, 3, 4, 5, thumbUp] : [1, 2, 3, 4, 5];
   return (
     <Menu>
-      <ChakraTooltip label={value} >
-      <MenuButton position="relative">
-        <TransportButton
-          icon={icon}
-          isSelected={isSelected}
-        />
-        {step.transportMean === 'Car' && step.passengers && (
-          <Box
-            position="absolute"
-            bottom={-1}
-            right={-1}
-            bgColor="#0097a7"
-            color="white"
-            borderRadius="full"
-            fontSize="xs"
-            h={4}
-            w={4}
-          >
-            {step.passengers}
-          </Box>
-        )}
-      </MenuButton>
+      <ChakraTooltip label={value}>
+        <MenuButton position="relative">
+          <TransportButton
+            icon={icon}
+            isSelected={isSelected}
+            transport={value}
+          />
+          {isSelected && step.passengers && (
+            <Box
+              position="absolute"
+              bottom={-1}
+              right={-1}
+              bgColor="#0097a7"
+              color="white"
+              borderRadius="full"
+              fontSize="xs"
+              h={4}
+              w={4}
+            >
+              {step.passengers}
+            </Box>
+          )}
+        </MenuButton>
       </ChakraTooltip>
       <MenuList zIndex={3}>
-        {[1, 2, 3, 4, 5, thumbUp].map((number) => (
+        {passergerChoices.map((passengerNumber) => (
           <MenuItem
-            key={number}
+            key={passengerNumber}
             onClick={() =>
               updateStep(step.index, {
-                transportMean: Transport.car,
-                passengers: number,
+                transportMean: value,
+                passengers: passengerNumber,
               })
             }
-          > {number === thumbUp ? "Hitch-hiking" : `${number} passenger${number > 1 ? "s" : ""}`}
-            
-          </MenuItem>
-        ))}
-      </MenuList>
-    </Menu>
-  );
-};
-
-const ECarButton = ({ updateStep, isSelected, step, icon, value }: ECarButtonProps) => {
-  return (
-    <Menu>
-      <ChakraTooltip label={value} >
-      <MenuButton position="relative">
-        <TransportButton
-          icon={icon}
-          isSelected={isSelected}
-        />
-        {step.transportMean === 'eCar' &&step.passengers && (
-          <Box
-            position="absolute"
-            bottom={-1}
-            right={-1}
-            bgColor="#0097a7"
-            color="white"
-            borderRadius="full"
-            fontSize="xs"
-            h={4}
-            w={4}
           >
-            {step.passengers}
-          </Box>
-        )}
-      </MenuButton>
-      </ChakraTooltip>
-      <MenuList zIndex={3}>
-        {[1, 2, 3, 4, 5].map((number) => (
-          <MenuItem
-            key={number}
-            onClick={() =>
-              updateStep(step.index, {
-                transportMean: Transport.ecar,
-                passengers: number,
-              })
-            }
-          > {`${number} passenger${number > 1 ? "s" : ""}`}
-            
+            {" "}
+            {typeof passengerNumber !== "number"
+              ? "Hitch-hiking"
+              : `${passengerNumber} passenger${passengerNumber > 1 ? "s" : ""}`}
           </MenuItem>
         ))}
       </MenuList>
@@ -302,30 +246,30 @@ interface TransportButtonProps {
   updateStep?: () => void;
   isSelected: boolean;
   icon: JSX.Element;
-  value: string;
+  transport: Transport;
 }
 
 const TransportButton = ({
   updateStep,
   isSelected,
   icon,
-  value
+  transport,
 }: TransportButtonProps) => {
   return (
-    <ChakraTooltip label={value} >
-    <Button
-      onClick={updateStep}
-      padding={0}
-      width="30px"
-      minWidth="30px"
-      height="30px"
-      borderRadius="100px"
-      backgroundColor={isSelected ? "#474747" : "#b7b7b7"}
-      color="white"
-      marginLeft={2}
-    >
-      {icon}
-    </Button>
+    <ChakraTooltip label={transport}>
+      <Button
+        onClick={updateStep}
+        padding={0}
+        width="30px"
+        minWidth="30px"
+        height="30px"
+        borderRadius="100px"
+        backgroundColor={isSelected ? "#474747" : "#b7b7b7"}
+        color="white"
+        marginLeft={2}
+      >
+        {icon}
+      </Button>
     </ChakraTooltip>
   );
 };
