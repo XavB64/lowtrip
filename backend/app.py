@@ -8,7 +8,9 @@ from backend import (
     compute_emissions_custom,
     compute_emissions_all,
     chart_refactor,
-    colors_alternative,
+)
+from parameters import (
+        colors_alternative,
 )
 from flask_cors import CORS  # comment this on deployment
 import pandas as pd
@@ -93,7 +95,7 @@ def main():
             # We change the color to pink
             data_alternative, geo_alternative, error_other = compute_emissions_custom(
                 df2, 
-                #cmap=colors_alternative
+                cmap=colors_alternative
             )
             # Error message
             if len(error_other) > 0:

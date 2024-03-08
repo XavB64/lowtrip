@@ -14,7 +14,6 @@ from pyproj import Geod
 
 from parameters import(
     colors_custom,
-    colors_alternative,
     min_plane_dist,
     colors_direct,
 )
@@ -40,7 +39,7 @@ from transport import(
 
 
 def compute_emissions_custom(data, 
-                             #cmap=colors_custom
+                             cmap=colors_custom
                              ):
     """
     parameters:
@@ -77,7 +76,9 @@ def compute_emissions_custom(data,
             data_train, geo_train, _train = train_to_gdf(
                 departure_coordinates,
                 arrival_coordinates,
-                #colormap=color_custom["Train"],
+                color_usage = cmap["Train"],
+                color_infra = cmap["Cons_infra"]
+                
             )
             if not _train : #One step is not succesful
                 fail = True
@@ -92,7 +93,8 @@ def compute_emissions_custom(data,
         elif transport_mean == "Bus":
             data_bus, geo_bus, _bus = bus_to_gdf(
                 departure_coordinates, arrival_coordinates, 
-                #color=color_custom["Bus"]
+                color_usage = cmap["Road"],
+                color_cons = cmap["Cons_infra"]
             )
             if not _bus : #One step is not succesful
                 fail = True
@@ -109,7 +111,8 @@ def compute_emissions_custom(data,
                 departure_coordinates,
                 arrival_coordinates,
                 nb=arrival.nb,
-                #color=color_custom["Car"],
+                color_usage = cmap["Road"],
+                color_cons = cmap["Cons_infra"]
             )
             if not _car : #One step is not succesful
                 fail = True
@@ -125,7 +128,8 @@ def compute_emissions_custom(data,
                 departure_coordinates,
                 arrival_coordinates,
                 nb=arrival.nb,
-                #color=color_custom["Car"],
+                color_usage = cmap["Road"],
+                color_cons = cmap["Cons_infra"]
             )
             if not _car : #One step is not succesful
                 fail = True
@@ -141,7 +145,7 @@ def compute_emissions_custom(data,
             data_bike, geo_bike, _bike = bicycle_to_gdf(
                 departure_coordinates,
                 arrival_coordinates,
-                #color=color_custom["Train"],
+                color = cmap["Bicycle"]
             )
             if not _bike : #One step is not succesful
                 fail = True
@@ -156,8 +160,8 @@ def compute_emissions_custom(data,
             data_plane, geo_plane = plane_to_gdf(
                 departure_coordinates,
                 arrival_coordinates,
-                # color=color_custom["Plane"],
-                # color_contrails=color_custom["Plane_contrails"],
+                color_usage = cmap["Plane"],
+                color_cont = cmap["Contrails"]
             )
             data_plane["step"] = str(int(idx) + 1)
             #gdf_cont["step"] = str(int(idx) + 1)
@@ -169,7 +173,7 @@ def compute_emissions_custom(data,
         elif transport_mean == "Ferry":
             data_ferry, geo_ferry = ferry_to_gdf(
                 departure_coordinates, arrival_coordinates, 
-                #color=color_custom["Ferry"]
+                color_usage = cmap["Ferry"],
             )
             data_ferry["step"] = str(int(idx) + 1)
             l.append(data_ferry)
@@ -190,7 +194,7 @@ def compute_emissions_custom(data,
 
 
 def compute_emissions_all(data, 
-                          #cmap=colors_direct
+                          cmap=colors_direct
                           ):
     """
     If data is only one step then we do not compute this mean of transport as it will
@@ -240,14 +244,16 @@ def compute_emissions_all(data,
     # Train
     if train:
         data_train, geo_train, train = train_to_gdf(tag1, tag2, 
-                                                    #colormap=color_direct["Train"]
+                                                    color_usage = cmap["Train"],
+                                                    color_infra = cmap["Cons_infra"]
                                                     )
         l.append(data_train)
         geo.append(geo_train)
 
     # Car & Bus
     data_car, geo_car, data_bus, route = car_bus_to_gdf(tag1, tag2, 
-                                                        #color=color_direct["Car&Bus"]
+                                                        color_usage = cmap["Road"],
+                                                        color_cons = cmap["Cons_infra"]
                                                         )
     # To avoid errors in the bar chart, I don't know why the change of name propagates
     #geo_car = gdf_car.copy()
@@ -269,9 +275,9 @@ def compute_emissions_all(data,
         data_plane, geo_plane = plane_to_gdf(
             tag1,
             tag2,
-            # color=color_direct["Plane"],
-            # color_contrails=color_direct["Plane_contrails"],
-        )
+            color_usage = cmap["Plane"],
+            color_cont = cmap["Contrails"]
+            )
        # l.append(gdf_plane.copy())
         l.append(data_plane)
        # gdf_plane['Mean of Transport'] = 'Flight path'

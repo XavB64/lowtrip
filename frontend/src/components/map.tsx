@@ -111,8 +111,8 @@ const MapContent = ({
           position={coords}
           icon={markerIcon(
             index === 0 || index === stepsCoords.length - 1
-              ? "#0097A7"
-              : "#93D3DB"
+            ? "#0097A7"
+            : "#93D3DB"
           )}
         />
       ))}
@@ -122,8 +122,8 @@ const MapContent = ({
           position={coords}
           icon={markerIcon(
             index === 0 || index === alternativeStepsCoords.length - 1
-              ? "#FF758F"
-              : "#FFBBC7"
+            ? "#FF758F"
+            : "#FFBBC7"
           )}
         />
       ))}
