@@ -17,6 +17,7 @@ import { useSteps } from "./hooks";
 import theme from "./theme";
 import { ApiResponse } from "./types";
 import { checkIsOnMobile } from "./utils";
+import "./i18n";
 
 function AppBody() {
   const [response, setResponse] = useState<ApiResponse>();

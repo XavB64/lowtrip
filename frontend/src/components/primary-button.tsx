@@ -2,13 +2,13 @@ import { Button, ButtonProps, Spinner } from "@chakra-ui/react";
 
 interface PrimaryButtonProps extends ButtonProps {
   onClick?: () => void;
-  isLoading: boolean;
-  isDisabled: boolean;
+  isLoading?: boolean;
+  isDisabled?: boolean;
 }
 export function PrimaryButton({
   onClick,
-  isLoading,
-  isDisabled,
+  isLoading = false,
+  isDisabled = false,
   ...props
 }: PrimaryButtonProps) {
   return (
