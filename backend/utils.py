@@ -15,7 +15,7 @@ from parameters import(
     train_s,
     train_t,
     route_s,
-    world,
+    train_intensity,
     carbon_intensity_electricity, 
     sea_threshold,
     nb_pts
@@ -81,7 +81,7 @@ def great_circle_geometry(dep, arr, nb=nb_pts):
 
 def filter_countries_world(gdf, method, th=sea_threshold):
     """
-    Filter train path by countries (world.geojson)
+    Filter train path by countries (train_intensity.geojson)
     parameters:
         - gdf : train geometry in geoserie
         - mode : train / ecar
@@ -92,7 +92,7 @@ def filter_countries_world(gdf, method, th=sea_threshold):
     if method == 'train':
         iso = "ISO2"
         EF = "EF_tot"
-        data = world
+        data = train_intensity
     else : #ecar
         iso = 'Code'
         EF = 'mix'

@@ -5,7 +5,7 @@
 
 import geopandas as gpd
 # Load  world datasets
-world = gpd.read_file("static/world.geojson")
+train_intensity = gpd.read_file("static/world.geojson")
 carbon_intensity_electricity = gpd.read_file('static/carbon_intensity_electricity.geojson')
 
 
