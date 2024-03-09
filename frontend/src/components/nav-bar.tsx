@@ -10,6 +10,8 @@ import {
   PopoverContent,
   PopoverTrigger,
   Spacer,
+  useBreakpointValue,
+  useBreakpoint
 } from "@chakra-ui/react";
 import Logo from "../assets/logo.png";
 import MethodologyPdf from "../assets/lowtrip_methodology.pdf";
@@ -21,10 +23,12 @@ const LANGUAGES = ["fr", "en"];
 
 const LanguageSelector = () => {
   const { t } = useTranslation();
+  const breakpoint = useBreakpoint();
   return (
     <Popover placement="bottom">
       <PopoverTrigger>
-        <Button borderRadius="15px">{t("navbar.settings")}</Button>
+        <Button borderRadius="15px" fontSize={breakpoint === "base" ? 9 : 16}>{t("navbar.settings")}
+        </Button>
       </PopoverTrigger>
       <PopoverContent
         color="white"
@@ -41,6 +45,7 @@ const LanguageSelector = () => {
                 return (
                   <PrimaryButton
                     marginRight={1}
+                    fontSize={breakpoint === "base" ? 14 : 16}
                     onClick={() => {
                       i18n.changeLanguage(language);
                     }}
@@ -59,11 +64,17 @@ const LanguageSelector = () => {
   );
 };
 
+
+
 const NavBar = () => {
-  const { t } = useTranslation();
-  const navItems = [
+   // Determine the display of the navigation items based on screen size
+    const displayNavItems = useBreakpointValue({base: "block", md: "block" }); 
+    const breakpoint = useBreakpoint();
+    const { t } = useTranslation();
+    const navItems = [
     {
       name: "Methodology",
+      
       component: (
         <a href={MethodologyPdf} target="_blank" rel="noreferrer">
           {t("navbar.methodology")}
@@ -77,7 +88,7 @@ const NavBar = () => {
       w="100%"
       position="fixed"
       background="#515151"
-      px={6}
+      px={breakpoint === "base" ? 3 : 6}
       py={4}
       boxShadow="md"
       zIndex={3}
@@ -85,10 +96,12 @@ const NavBar = () => {
     >
       <Image src={Logo} h="100%" />
       <Spacer />
-      <HStack display={["none", "block"]}>
+      <HStack display={displayNavItems}> 
+  {/* display={["none", "block"]}> */}
         {navItems.map((item) => (
           <Button
             key={item.name}
+            fontSize={breakpoint === "base" ? 9 : 16}
             color="#fff"
             variant="ghost"
             _hover={{ backgroundColor: "none", color: "#D1D1D1" }}

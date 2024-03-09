@@ -101,7 +101,7 @@ def train_to_gdf(
     # Validation part for train
     if train:  # We have a geometry
         if not validate_geom(tag1, tag2, gdf.values[0], validate):
-            return pd.DataFrame(), False
+            return pd.DataFrame(), pd.DataFrame(), False
 
         else :  # We need to filter by country and add length / Emission factors
             gdf = filter_countries_world(gdf, method = 'train')
@@ -185,7 +185,6 @@ def ecar_to_gdf(
             print('Rescaling factor', route_dist / gdf["path_length"].sum())
             gdf["path_length"] = gdf["path_length"] * (route_dist / gdf["path_length"].sum())
             #Handle nb passengers
-            gdf['NAME'] = ' '+ gdf['NAME']
             nb = int(nb)
             # Compute emissions : EF * length
             gdf["EF_tot"] =gdf["EF_tot"] * EF_ecar['fuel'] * (1 + .04 * (nb - 1)) / (1e3 * nb)   # g/kWh * kWh/km
@@ -205,6 +204,7 @@ def ecar_to_gdf(
             name = str(nb)+'p.'
             gdf["Mean of Transport"] = ['eCar ' + name for k in range(gdf.shape[0])]
             gdf['label'] = 'Road: ' + str(int(route_dist)) + "km ("+ gdf["NAME"] + ")"
+            gdf['NAME'] = ' '+ gdf['NAME']
             gdf.reset_index(inplace=True)
             #
             data_ecar = gdf[['kgCO2eq', 'colors', 'NAME', 'Mean of Transport']]

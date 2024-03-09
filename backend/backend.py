@@ -247,10 +247,12 @@ def compute_emissions_all(data,
     if car:
         l.append(data_car)
     #If we have a result for car and bus :
+    route_added = False
     if route: # Adapt and add ecar
         #We check if car or bus was asked for a 1 step
         if  (car==True) & (bus==True) & (transp!='eCar'):
             geo.append(geo_car)
+            route_added = True
 
     # Plane
     if plane:
@@ -271,7 +273,10 @@ def compute_emissions_all(data,
     else:
         # Data for bar chart
         data = pd.concat(l).reset_index(drop=True)
-        geodata = gpd.GeoDataFrame(pd.concat(geo), geometry="geometry", crs="epsg:4326")
+        if (route==True) & (route_added == False) & (train == False) & (plane == False) :
+            geodata = pd.DataFrame()
+        else :
+            geodata = gpd.GeoDataFrame(pd.concat(geo), geometry="geometry", crs="epsg:4326")
 
     return data, geodata
 
