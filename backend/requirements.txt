@@ -3,7 +3,7 @@ shapely == 2.0.1
 geopandas == 0.14.0
 plotly == 5.9.0
 pandas == 2.0.0
-numpy == 1.21.0
+numpy == 1.23.2
 networkx == 2.8.4
 momepy == 0.6.0
 pyproj == 3.6.1
