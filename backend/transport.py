@@ -21,7 +21,9 @@ from utils import(
     great_circle_geometry,
     find_bicycle,
     find_route,
-    find_train
+    find_train,
+    gdf_lines,
+    get_shortest_path
 )
 
 import pandas as pd
@@ -457,7 +459,12 @@ def ferry_to_gdf(tag1, tag2, EF=EF_ferry, color_usage="#ffffff"):
         - full dataframe for ferry
     """
     # Compute geometry
-    geom = LineString([tag1, tag2])
+    #Convert the inputs in float
+    start = tuple([float(x) for x in tag1])
+    end = tuple([float(x) for x in tag2])
+    # Here new function
+    geom = get_shortest_path(gdf_lines(start, end), start, end)
+    #geom = LineString([tag1, tag2])
     # Compute the true distance
     geod = Geod(ellps="WGS84")
     bird = geod.geometry_length(geom) / 1e3

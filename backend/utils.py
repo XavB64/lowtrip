@@ -5,10 +5,13 @@
 
 import numpy as np
 from pyproj import Geod
-from shapely.geometry import Point, LineString, MultiLineString
+from shapely.geometry import Point, LineString, MultiLineString, Point, CAP_STYLE
 from shapely import ops
+from shapely.ops import unary_union, nearest_points
 import pandas as pd
 import geopandas as gpd
+import momepy
+import networkx as nx
 
 
 from parameters import(
@@ -392,3 +395,111 @@ def find_bicycle(tag1, tag2):
         geom_route, route, route_idst = None, False, None
 
     return geom_route, route, route_dist
+
+#CREATE FERRY ROUTE
+
+def create_cost(world = train_intensity, buffer = 0 ):
+    '''
+    world is the dataset from geopandas, already loaded for trains and ecar
+    Return a list of geometries as well as the overall multi geometry
+    '''
+    coast_lines = unary_union(world.buffer(buffer, cap_style=CAP_STYLE.square).geometry).boundary
+    #To shapely list
+    coast_exp = list(gpd.GeoSeries(coast_lines).explode().values)
+    return coast_lines, coast_exp
+
+def get_line_coast(point, coast) :
+    '''
+    coast the full shapely geometry
+    '''
+    #Get linestring to get to the see
+    nearest_point_on_line = nearest_points(Point(point), coast)[1]
+
+    # Create a new linestring connecting the two points
+    new_linestring = LineString([Point(point), nearest_point_on_line])
+    #print(list(new_linestring.coords))
+    
+    return new_linestring
+
+def extend_line(line, additional_length = 0.1): #, start=True
+    # Define the additional length you want to add to the LineString
+    #additional_length = 0.2
+
+    # Get the coordinates of the first and last points of the LineString
+    start_point = line.coords[0]
+    end_point = line.coords[-1]
+
+    # # Calculate the direction vector from the second point to the first point
+    # direction_vector_start = (
+    #     line.coords[1][0] - start_point[0],
+    #     line.coords[1][1] - start_point[1]
+    # )
+
+    # # Calculate the new start point by extending the first point along the direction vector
+    # new_start_point = (start_point[0] - direction_vector_start[0] * additional_length,
+    #                 start_point[1] - direction_vector_start[1] * additional_length)
+
+    # Calculate the direction vector from the last point to the second-to-last point
+    direction_vector_end = (
+        end_point[0] - line.coords[-2][0],
+        end_point[1] - line.coords[-2][1]
+    )
+
+    # Calculate the new end point by extending the last point along the direction vector
+    new_end_point = (end_point[0] + direction_vector_end[0] * additional_length,
+                    end_point[1] + direction_vector_end[1] * additional_length)
+
+    # if start :
+    #     #We extend from the start also
+    # # Create a new LineString with the extended length
+    #     extended_line = LineString([new_start_point, *line.coords[1:], new_end_point])
+    # else :
+    extended_line = LineString([start_point, *line.coords[1:], new_end_point])
+    
+    
+    return extended_line
+
+def get_sea_lines(start, end, world = train_intensity, nb = 80):
+    #We use train because it's already loaded
+    # Create a mesh
+    # Possibility to optimize the mesh ?
+    quadri = []
+    for lon in np.linspace(-135, 180, nb): #limiter au range longitude - latidue +/- 20
+        quadri.append(LineString([(lon, -90), (lon, 90)]))
+    for lat in np.linspace(-60, 75, nb):
+        quadri.append(LineString([(-180, lat), (180, lat)]))
+    #Add also the direct path 
+    quadri.append(LineString([start, end]))
+    #Cut  the geometries where there is sea
+    sea =  gpd.overlay(gpd.GeoDataFrame(geometry = gpd.GeoSeries(
+        quadri)), world[['geometry']] , how='difference', keep_geom_type=False)#.explore(), crs='epsg:4326')
+    
+    # Need to extend lines ? seems not
+    #sea['geometry'] = sea['geometry'].apply(lambda x : extend_line(x, additional_length=0.001))
+    return sea.explode()
+
+def gdf_lines(start, end):
+    # Get coast lines
+    coast_lines0, coast_exp0 = create_cost(buffer=0)
+    #Combine
+    full_edge = unary_union(coast_exp0 + 
+                            [extend_line(get_line_coast(p, coast_lines0)) for p in [start, end]] + 
+                            #Extend the lines for the shortest path to the sea
+                            [extend_line(k) for k in list(get_sea_lines(start, end).geometry.values)]) # get the lines where ferry can navigate
+    return gpd.GeoDataFrame(geometry = gpd.GeoSeries(full_edge)).explode() #, crs='epsg:4326'
+
+
+def get_shortest_path(line_gdf, start, end):
+    # To graph
+    graph = momepy.gdf_to_nx(line_gdf, approach = 'primal', multigraph = False)
+    #print(graph.nodes)
+    #Shortest path
+    path = nx.shortest_path(graph, source = start, target = end, weight='mm_len')
+    # Extract the edge geometries of the shortest path
+    shortest_path_edges = [(path[i], path[i + 1]) for i in range(len(path) - 1)]
+    shortest_path_geometries = [graph.get_edge_data(u, v)['geometry'] for u, v in shortest_path_edges if 'geometry' in graph.get_edge_data(u, v)]
+
+    # Merge the geometries of the edges in the shortest path
+    merged_geometry = unary_union(shortest_path_geometries)
+
+    return merged_geometry
