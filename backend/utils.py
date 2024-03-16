@@ -421,7 +421,7 @@ def get_line_coast(point, coast) :
     
     return new_linestring
 
-def extend_line(line, additional_length = 0.1): #, start=True
+def extend_line(line, additional_length = 0.001): #, start=True
     # Define the additional length you want to add to the LineString
     #additional_length = 0.2
 
@@ -478,11 +478,25 @@ def get_sea_lines(start, end, world = train_intensity, nb = 80):
     #sea['geometry'] = sea['geometry'].apply(lambda x : extend_line(x, additional_length=0.001))
     return sea.explode()
 
-def gdf_lines(start, end):
+def gdf_lines(start, end, add_canal = True):
     # Get coast lines
     coast_lines0, coast_exp0 = create_cost(buffer=0)
+    canal = []
+    if add_canal : 
+        # Panama
+        canal.append(LineString([
+            (-79.51006995072298, 8.872893100443669),
+            (-80.05324567583347, 9.517999845306024)                                 
+                                 ]))
+        # Suez
+        canal.append(LineString([
+            (33.91896382986125, 27.263740326941672),
+            (32.505571710241114, 29.64748606563672),
+            (32.42803964605657, 32.58754502651166)                                 
+                                 ]))
+        
     #Combine
-    full_edge = unary_union(coast_exp0 + 
+    full_edge = unary_union(coast_exp0 + canal +
                             [extend_line(get_line_coast(p, coast_lines0)) for p in [start, end]] + 
                             #Extend the lines for the shortest path to the sea
                             [extend_line(k) for k in list(get_sea_lines(start, end).geometry.values)]) # get the lines where ferry can navigate
