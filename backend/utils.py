@@ -424,7 +424,6 @@ def get_line_coast(point, coast) :
 def extend_line(line, additional_length = 0.001): #, start=True
     # Define the additional length you want to add to the LineString
     #additional_length = 0.2
-
     # Get the coordinates of the first and last points of the LineString
     start_point = line.coords[0]
     end_point = line.coords[-1]
@@ -456,17 +455,17 @@ def extend_line(line, additional_length = 0.001): #, start=True
     # else :
     extended_line = LineString([start_point, *line.coords[1:], new_end_point])
     
-    
     return extended_line
 
-def get_sea_lines(start, end, world = train_intensity, nb = 80):
+def get_sea_lines(start, end, world = train_intensity, nb = 20, exp = 10):
     #We use train because it's already loaded
     # Create a mesh
     # Possibility to optimize the mesh ?
+    #s = time.time()
     quadri = []
-    for lon in np.linspace(-135, 180, nb): #limiter au range longitude - latidue +/- 20
+    for lon in np.linspace(min(start[0], end[0]) - exp, max(start[0], end[0]) + exp, nb): #limiter au range longitude - latidue +/- 20
         quadri.append(LineString([(lon, -90), (lon, 90)]))
-    for lat in np.linspace(-60, 75, nb):
+    for lat in np.linspace(min(start[1], end[1]) - exp, max(start[1], end[1]) + exp, nb):
         quadri.append(LineString([(-180, lat), (180, lat)]))
     #Add also the direct path 
     quadri.append(LineString([start, end]))
@@ -476,6 +475,7 @@ def get_sea_lines(start, end, world = train_intensity, nb = 80):
     
     # Need to extend lines ? seems not
     #sea['geometry'] = sea['geometry'].apply(lambda x : extend_line(x, additional_length=0.001))
+    #print('Get sea lines : ', round(time.time() - s, 3))
     return sea.explode()
 
 def gdf_lines(start, end, add_canal = True):
@@ -496,14 +496,17 @@ def gdf_lines(start, end, add_canal = True):
                                  ]))
         
     #Combine
+   # s = time.time()
     full_edge = unary_union(coast_exp0 + canal +
                             [extend_line(get_line_coast(p, coast_lines0)) for p in [start, end]] + 
                             #Extend the lines for the shortest path to the sea
                             [extend_line(k) for k in list(get_sea_lines(start, end).geometry.values)]) # get the lines where ferry can navigate
+    #print('Extend line : ', round(time.time() - s, 3))
     return gpd.GeoDataFrame(geometry = gpd.GeoSeries(full_edge)).explode() #, crs='epsg:4326'
 
 
 def get_shortest_path(line_gdf, start, end):
+    #s = time.time()
     # To graph
     graph = momepy.gdf_to_nx(line_gdf, approach = 'primal', multigraph = False)
     #print(graph.nodes)
@@ -515,5 +518,5 @@ def get_shortest_path(line_gdf, start, end):
 
     # Merge the geometries of the edges in the shortest path
     merged_geometry = unary_union(shortest_path_geometries)
-
+   # print('network : ', round(time.time() - s, 3))
     return merged_geometry
