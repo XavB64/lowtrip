@@ -421,22 +421,12 @@ def get_line_coast(point, coast) :
     
     return new_linestring
 
-def extend_line(line, additional_length = 0.001): #, start=True
+def extend_line(line, additional_length = 0.001, start = False): #, start=True
     # Define the additional length you want to add to the LineString
     #additional_length = 0.2
     # Get the coordinates of the first and last points of the LineString
     start_point = line.coords[0]
     end_point = line.coords[-1]
-
-    # # Calculate the direction vector from the second point to the first point
-    # direction_vector_start = (
-    #     line.coords[1][0] - start_point[0],
-    #     line.coords[1][1] - start_point[1]
-    # )
-
-    # # Calculate the new start point by extending the first point along the direction vector
-    # new_start_point = (start_point[0] - direction_vector_start[0] * additional_length,
-    #                 start_point[1] - direction_vector_start[1] * additional_length)
 
     # Calculate the direction vector from the last point to the second-to-last point
     direction_vector_end = (
@@ -448,12 +438,22 @@ def extend_line(line, additional_length = 0.001): #, start=True
     new_end_point = (end_point[0] + direction_vector_end[0] * additional_length,
                     end_point[1] + direction_vector_end[1] * additional_length)
 
-    # if start :
-    #     #We extend from the start also
-    # # Create a new LineString with the extended length
-    #     extended_line = LineString([new_start_point, *line.coords[1:], new_end_point])
-    # else :
-    extended_line = LineString([start_point, *line.coords[1:], new_end_point])
+    if start :
+            # Calculate the direction vector from the second point to the first point
+        direction_vector_start = (
+            line.coords[1][0] - start_point[0],
+            line.coords[1][1] - start_point[1]
+        )
+
+        # Calculate the new start point by extending the first point along the direction vector
+        new_start_point = (start_point[0] - direction_vector_start[0] * additional_length,
+                        start_point[1] - direction_vector_start[1] * additional_length)
+
+        #We extend from the start also
+    # Create a new LineString with the extended length
+        extended_line = LineString([new_start_point, *line.coords[1:], new_end_point])
+    else :
+        extended_line = LineString([start_point, *line.coords[1:], new_end_point])
     
     return extended_line
 
@@ -500,7 +500,7 @@ def gdf_lines(start, end, add_canal = True):
     full_edge = unary_union(coast_exp0 + canal +
                             [extend_line(get_line_coast(p, coast_lines0)) for p in [start, end]] + 
                             #Extend the lines for the shortest path to the sea
-                            [extend_line(k) for k in list(get_sea_lines(start, end).geometry.values)]) # get the lines where ferry can navigate
+                            [extend_line(k, start=True) for k in list(get_sea_lines(start, end).geometry.values)]) # get the lines where ferry can navigate
     #print('Extend line : ', round(time.time() - s, 3))
     return gpd.GeoDataFrame(geometry = gpd.GeoSeries(full_edge)).explode() #, crs='epsg:4326'
 
