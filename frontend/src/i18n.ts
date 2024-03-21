@@ -12,7 +12,15 @@ i18n
     resources: {
       en: {
         translation: {
+          contact: {
+            emailIsRequired: "Email is required",
+            sendEmail: "Send your message",
+            sendingEmail: "Sending...",
+            yourEmail: "Your email",
+            yourMessage: "What do you want to tell us?",
+          },
           navbar: {
+            contact: "Contact",
             language_en: "English",
             language_fr: "French",
             methodology: "Methodology",
@@ -60,7 +68,15 @@ i18n
       },
       fr: {
         translation: {
+          contact: {
+            emailIsRequired: "Email obligatoire",
+            sendEmail: "Envoie ton message",
+            sendingEmail: "Envoi en cours...",
+            yourEmail: "Ton email",
+            yourMessage: "Qu'as-tu à nous dire ?",
+          },
           navbar: {
+            contact: "Contact",
             language_en: "Anglais",
             language_fr: "Français",
             methodology: "Méthodologie",
