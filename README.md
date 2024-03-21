@@ -12,9 +12,9 @@ per-capita emissions should not exceed 2 tons CO2eq in 2050 to limit global warm
 
 ## How the emissions are calculated?
 
-To calculate CO2 equivalent emissions per person, we multiply the distance of a journey (km) by the corresponding emission factor (mass of CO2 per person per km) of a mean of transport. For a, mutlistep journey, these emissions are summed over the different steps.
+To calculate CO2 equivalent emissions per person, we multiply the distance of a journey (km) by the corresponding emission factor (mass of CO2 equivalent per person per km) of a mean of transport. For a, mutlistep journey, these emissions are summed over the different steps.
 
-$$CO_2 = \sum_{step} Distance(km) \times Emission factor(kgCO_2 / km) $$
+$$CO_2eq = \sum_{step} Distance(km) \times Emission factor(kgCO_2eq / km) $$
 
 ### Estimation of distances
 
