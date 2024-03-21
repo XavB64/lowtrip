@@ -1,6 +1,6 @@
 # lowtrip
 
-## A web interface to easily compute per passenger travel carbon inventories for different means of transport worldwide. 
+## A web interface to compute travel CO2eq for different means of transport worldwide. 
 
 The work presented here is independent and not-for-profit. This work has been carried out on a
 voluntary basis and presents no conflict of interest.
@@ -44,7 +44,6 @@ Emissions factors consider usage (linked to the manufacture and use of energy to
 | --- |  :---: |  :---: |  :---: |
 | `Train` | :white_check_mark: |  | :white_check_mark: |
 | `Car & Bus & eCar` | :white_check_mark: | :white_check_mark: |  |
-| `Electric car` | :white_check_mark: | :white_check_mark: |  |
 | `Bike route` | | :white_check_mark: | Not found |
 | `Plane` |  :white_check_mark: |  |  |
 | `Ferry` |  :white_check_mark: | Not found | Not found |
