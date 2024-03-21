@@ -464,9 +464,9 @@ def get_sea_lines(start, end, world = train_intensity, nb = 20, exp = 10):
     #s = time.time()
     quadri = []
     for lon in np.linspace(min(start[0], end[0]) - exp, max(start[0], end[0]) + exp, nb): #limiter au range longitude - latidue +/- 20
-        quadri.append(LineString([(lon, -90), (lon, 90)]))
+        quadri.append(LineString([(lon, min(start[1], end[1]) - exp - 10), (lon, max(start[1], end[1]) + exp + 10)]))
     for lat in np.linspace(min(start[1], end[1]) - exp, max(start[1], end[1]) + exp, nb):
-        quadri.append(LineString([(-180, lat), (180, lat)]))
+        quadri.append(LineString([(min(start[0], end[0]) - exp - 10, lat), (max(start[0], end[0]) + exp + 10, lat)]))
     #Add also the direct path 
     quadri.append(LineString([start, end]))
     #Cut  the geometries where there is sea
