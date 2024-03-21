@@ -11,13 +11,18 @@ import {
   PopoverTrigger,
   Spacer,
   useBreakpointValue,
-  useBreakpoint
+  useBreakpoint,
+  VStack,
+  Stack,
+  ChakraProvider,
 } from "@chakra-ui/react";
 import Logo from "../assets/logo.png";
 import MethodologyPdf from "../assets/lowtrip_methodology.pdf";
 import i18n from "i18next";
 import { useTranslation } from "react-i18next";
 import { PrimaryButton } from "./primary-button";
+import { Link, Outlet } from "react-router-dom";
+import theme from "../theme";
 
 const LANGUAGES = ["fr", "en"];
 
@@ -27,7 +32,8 @@ const LanguageSelector = () => {
   return (
     <Popover placement="bottom">
       <PopoverTrigger>
-        <Button borderRadius="15px" fontSize={breakpoint === "base" ? 9 : 16}>{t("navbar.settings")}
+        <Button borderRadius="15px" fontSize={breakpoint === "base" ? 9 : 16}>
+          {t("navbar.settings")}
         </Button>
       </PopoverTrigger>
       <PopoverContent
@@ -64,22 +70,23 @@ const LanguageSelector = () => {
   );
 };
 
-
-
 const NavBar = () => {
-   // Determine the display of the navigation items based on screen size
-    const displayNavItems = useBreakpointValue({base: "block", md: "block" }); 
-    const breakpoint = useBreakpoint();
-    const { t } = useTranslation();
-    const navItems = [
+  // Determine the display of the navigation items based on screen size
+  const displayNavItems = useBreakpointValue({ base: "block", md: "block" });
+  const breakpoint = useBreakpoint();
+  const { t } = useTranslation();
+  const navItems = [
     {
       name: "Methodology",
-      
       component: (
         <a href={MethodologyPdf} target="_blank" rel="noreferrer">
           {t("navbar.methodology")}
         </a>
       ),
+    },
+    {
+      name: "Contact",
+      component: <Link to="/contact">{t("navbar.contact")}</Link>,
     },
   ];
 
@@ -94,10 +101,11 @@ const NavBar = () => {
       zIndex={3}
       h="64px"
     >
-      <Image src={Logo} h="100%" />
+      <Link to="/" style={{ height: "100%" }}>
+        <Image src={Logo} h="100%" />
+      </Link>
       <Spacer />
-      <HStack display={displayNavItems}> 
-  {/* display={["none", "block"]}> */}
+      <HStack display={displayNavItems}>
         {navItems.map((item) => (
           <Button
             key={item.name}
@@ -115,4 +123,21 @@ const NavBar = () => {
     </HStack>
   );
 };
-export default NavBar;
+
+const NavbarWrapper = () => (
+  <ChakraProvider theme={theme}>
+    <VStack w="100vw" h={["100%", "100vh"]} spacing={0}>
+      <NavBar />
+      <Stack
+        direction={["column", "row"]}
+        w="100%"
+        h="100%"
+        pt="64px"
+        spacing={0}
+      >
+        <Outlet />
+      </Stack>
+    </VStack>
+  </ChakraProvider>
+);
+export default NavbarWrapper;
