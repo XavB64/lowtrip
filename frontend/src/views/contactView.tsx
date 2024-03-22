@@ -10,10 +10,11 @@ import {
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import axios from "axios";
-
-const EMAIL_API_SERVICE_KEY = process.env.EMAIL_API_SERVICE_KEY ?? "";
-const EMAIL_API_SERVICE_URL = process.env.EMAIL_API_SERVICE_URL ?? "";
-const LOWTRIP_MANAGER_EMAIL = process.env.LOWTRIP_MANAGER_EMAIL ?? "";
+import {
+  EMAIL_API_SERVICE_KEY,
+  EMAIL_API_SERVICE_URL,
+  LOWTRIP_MANAGER_EMAIL,
+} from "../config";
 
 async function sendEmail(senderEmail: string, message: string) {
   try {
