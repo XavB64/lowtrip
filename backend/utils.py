@@ -12,6 +12,7 @@ import pandas as pd
 import geopandas as gpd
 import momepy
 import networkx as nx
+import os
 
 
 from parameters import(
@@ -371,7 +372,7 @@ def find_route(tag1, tag2):
 
 def find_bicycle(tag1, tag2):
     ### Openrouteservie
-    api_key = "5b3ce3597851110001cf62484e73101571fe41d0bfc8f8454030eb48"
+    api_key = os.environ.get('BICYCLE_API_KEY')
     url = (
     "https://api.openrouteservice.org/v2/directions/cycling-regular?api_key="
     + api_key
