@@ -16,16 +16,9 @@
 // // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import {
-  Box,
   Button,
-  Flex,
   HStack,
   Image,
-  Popover,
-  PopoverArrow,
-  PopoverBody,
-  PopoverContent,
-  PopoverTrigger,
   Spacer,
   useBreakpointValue,
   useBreakpoint,
@@ -39,108 +32,15 @@ import {
   IconButton,
   useDisclosure,
 } from "@chakra-ui/react";
-import { IoMdSettings } from "react-icons/io";
 import { GiHamburgerMenu } from "react-icons/gi";
 
-import Logo from "../assets/logo.png";
-import MethodologyPdf from "../assets/lowtrip_methodology.pdf";
-import i18n from "i18next";
+import Logo from "../../assets/logo.png";
+import MethodologyPdf from "../../assets/lowtrip_methodology.pdf";
 import { useTranslation } from "react-i18next";
-import { PrimaryButton } from "./primary-button";
 import { Link, Outlet } from "react-router-dom";
-import theme from "../theme";
-import UserSettingsModal from "./nav-bar/user-settings-modal";
-
-const LANGUAGES = ["fr", "en"];
-const MAP_THEMES = ["light", "dark"];
-
-export const SettingsChoices = ({
-  options,
-  onChange,
-  optionIsSelected,
-  translationKey,
-}: {
-  options: string[];
-  onChange: (option: string) => void;
-  optionIsSelected: (option: string) => boolean;
-  translationKey: string;
-}) => {
-  const { t } = useTranslation();
-  const breakpoint = useBreakpoint();
-  return (
-    <Box mb={1}>
-      <Flex align="center" textAlign="center" justifyContent="center">
-        {options.map((option) => {
-          const isSelected = optionIsSelected(option);
-          return (
-            <PrimaryButton
-              marginRight={1}
-              fontSize={breakpoint === "base" ? 14 : 16}
-              onClick={() => {
-                onChange(option);
-              }}
-              variant={isSelected ? undefined : "outline"}
-              disabled={isSelected}
-            >
-              {t(`navbar.${translationKey}_${option}`)}
-            </PrimaryButton>
-          );
-        })}
-      </Flex>
-    </Box>
-  );
-};
-
-const UserSettingsSelector = ({
-  themeSettings: { isDarkTheme, switchMapTheme },
-}: {
-  themeSettings: {
-    isDarkTheme: boolean;
-    switchMapTheme: () => void;
-  };
-}) => {
-  const breakpoint = useBreakpoint();
-  return (
-    <Popover placement="bottom">
-      <PopoverTrigger>
-        <Button
-          borderRadius="15px"
-          fontSize={breakpoint === "base" ? 9 : 16}
-          colorScheme="transparent"
-        >
-          <IoMdSettings size={25} color="white" />
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent
-        color="white"
-        bg="#efefef"
-        borderColor="#efefef"
-        borderRadius="15px"
-      >
-        <PopoverArrow bg="#efefef" />
-        <PopoverBody>
-          <SettingsChoices
-            options={LANGUAGES}
-            onChange={(language) => i18n.changeLanguage(language)}
-            optionIsSelected={(language) => i18n.language === language}
-            translationKey="language"
-          />
-          <SettingsChoices
-            options={MAP_THEMES}
-            onChange={() => {
-              switchMapTheme();
-            }}
-            optionIsSelected={(theme) =>
-              (isDarkTheme && theme === "dark") ||
-              (!isDarkTheme && theme === "light")
-            }
-            translationKey="theme"
-          />
-        </PopoverBody>
-      </PopoverContent>
-    </Popover>
-  );
-};
+import theme from "../../theme";
+import UserSettingsModal from "./user-settings-modal";
+import UserSettingsSelector from "./user-settings-selector";
 
 const NavBar = ({
   themeSettings,
