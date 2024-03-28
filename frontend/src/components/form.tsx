@@ -21,10 +21,11 @@ import { useState } from "react";
 import {
   Button,
   Divider,
-  HStack,
+  Stack,
   Text,
   VStack,
   useDisclosure,
+  useBreakpoint,
 } from "@chakra-ui/react";
 import { BiSolidPlusCircle } from "react-icons/bi";
 import { API_URL } from "../config";
@@ -81,6 +82,7 @@ export const Form = ({
   const { isOpen, onOpen: openErrorModal, onClose } = useDisclosure();
   const [errorMessage, setErrorMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const breakpoint = useBreakpoint();
 
   const formIsNotValid = steps.some((step, index) => {
     const isDeparture = index === 0;
@@ -165,7 +167,7 @@ export const Form = ({
           {steps.length < 3 && (
             <Text alignSelf="center">{t("form.compareWith")}</Text>
           )}
-          <HStack w="100%">
+          <Stack w="100%" direction={breakpoint === "base" ? "column" : "row"}>
             <PrimaryButton
               onClick={handleSubmit}
               isDisabled={formIsNotValid}
@@ -185,7 +187,7 @@ export const Form = ({
                 ? t("form.anotherTrip")
                 : t("form.compareToAnotherTrip")}
             </PrimaryButton>
-          </HStack>
+          </Stack>
         </>
       )}
 
