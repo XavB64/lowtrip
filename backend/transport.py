@@ -45,7 +45,8 @@ from utils import(
 import pandas as pd
 import numpy as np
 from pyproj import Geod
-from shapely.geometry import LineString
+#Need for ferry if straight line
+#from shapely.geometry import LineString
 import geopandas as gpd
 
 def bicycle_to_gdf(
@@ -54,12 +55,12 @@ def bicycle_to_gdf(
     """
     parameters:
         - tag1, tag2
-        - EF_bus, float emission factor for bus by pkm
+        - EF_bus, float emission factor for bike by pkm
         - color, color in hex of path and bar chart
         - validate
         - nb, number of passenger in the car (used only for custom trip)
     return:
-        - full dataframe for bus
+        - full dataframe for bike
     """
     ### Route OSRM - create a separate function
     geom_route, route, route_dist = find_bicycle(tag1, tag2)
