@@ -32,8 +32,16 @@ import {
   VStack,
   Stack,
   ChakraProvider,
+  Menu,
+  MenuButton,
+  MenuList,
+  MenuItem,
+  IconButton,
+  useDisclosure,
 } from "@chakra-ui/react";
 import { IoMdSettings } from "react-icons/io";
+import { GiHamburgerMenu } from "react-icons/gi";
+
 import Logo from "../assets/logo.png";
 import MethodologyPdf from "../assets/lowtrip_methodology.pdf";
 import i18n from "i18next";
@@ -41,11 +49,12 @@ import { useTranslation } from "react-i18next";
 import { PrimaryButton } from "./primary-button";
 import { Link, Outlet } from "react-router-dom";
 import theme from "../theme";
+import UserSettingsModal from "./nav-bar/user-settings-modal";
 
 const LANGUAGES = ["fr", "en"];
 const MAP_THEMES = ["light", "dark"];
 
-const SettingsChoices = ({
+export const SettingsChoices = ({
   options,
   onChange,
   optionIsSelected,
@@ -145,6 +154,7 @@ const NavBar = ({
   const displayNavItems = useBreakpointValue({ base: "block", md: "block" });
   const breakpoint = useBreakpoint();
   const { t } = useTranslation();
+  const { isOpen, onOpen: openErrorModal, onClose } = useDisclosure();
   const navItems = [
     {
       name: "Methodology",
@@ -176,19 +186,49 @@ const NavBar = ({
       </Link>
       <Spacer />
       <HStack display={displayNavItems}>
-        {navItems.map((item) => (
-          <Button
-            key={item.name}
-            fontSize={breakpoint === "base" ? 9 : 16}
-            color="#fff"
-            variant="ghost"
-            _hover={{ backgroundColor: "none", color: "#D1D1D1" }}
-            _active={{ backgroundColor: "none", color: "#D1D1D1" }}
-          >
-            {item.component}
-          </Button>
-        ))}
-        <UserSettingsSelector themeSettings={themeSettings} />
+        {breakpoint !== "base" ? (
+          <>
+            {navItems.map((item) => (
+              <Button
+                key={item.name}
+                fontSize={16}
+                color="#fff"
+                variant="ghost"
+                _hover={{ backgroundColor: "none", color: "#D1D1D1" }}
+                _active={{ backgroundColor: "none", color: "#D1D1D1" }}
+              >
+                {item.component}
+              </Button>
+            ))}
+            <UserSettingsSelector themeSettings={themeSettings} />
+          </>
+        ) : (
+          <>
+            <Menu>
+              <MenuButton
+                as={IconButton}
+                aria-label="Options"
+                icon={<GiHamburgerMenu size={25} />}
+                colorScheme="transparent"
+              />
+              <MenuList>
+                {navItems.map((item) => (
+                  <MenuItem key={item.name}>{item.component}</MenuItem>
+                ))}
+                <MenuItem onClick={openErrorModal}>
+                  {t("navbar.settings")}
+                </MenuItem>
+              </MenuList>
+            </Menu>
+            <UserSettingsModal
+              isOpen={isOpen}
+              onClose={() => {
+                onClose();
+              }}
+              themeSettings={themeSettings}
+            />
+          </>
+        )}
       </HStack>
     </HStack>
   );

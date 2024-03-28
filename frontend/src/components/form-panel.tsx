@@ -132,18 +132,20 @@ export function FormPanel({
             </TabPanel>
           </TabPanels>
         </Tabs>
-        <Card
-          ref={chartRef}
-          position={["absolute", "static"]}
-          w={[200, "100%"]}
-          bottom={[3, "auto"]}
-          right={[3, "auto"]}
-          zIndex={2}
-          p="10px"
-          shadow="none"
-        >
-          <Chart response={response} />
-        </Card>
+        {response && (
+          <Card
+            ref={chartRef}
+            position={["absolute", "static"]}
+            w={[200, "100%"]}
+            bottom={[3, "auto"]}
+            right={[3, "auto"]}
+            zIndex={2}
+            p="10px"
+            shadow="none"
+          >
+            <Chart response={response} />
+          </Card>
+        )}
       </VStack>
     </VStack>
   );
