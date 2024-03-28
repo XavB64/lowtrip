@@ -16,31 +16,13 @@
 // // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import axios from "axios";
-import { useEffect } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import "./i18n";
 
 import NavbarWrapper from "./components/nav-bar";
 import { API_URL } from "./config";
 import { ContactView, ErrorView, MainView } from "./views";
-
-const router = createBrowserRouter([
-  {
-    path: "/",
-    element: <NavbarWrapper />,
-    children: [
-      {
-        path: "/",
-        element: <MainView />,
-      },
-      {
-        path: "/contact",
-        element: <ContactView />,
-      },
-    ],
-    errorElement: <ErrorView />,
-  },
-]);
 
 const App = () => {
   // first API call to wake up the server
@@ -50,9 +32,35 @@ const App = () => {
     });
   }, []);
 
-  return (
-      <RouterProvider router={router} />
+  const [isDarkTheme, setIsDarkTheme] = useState(false);
+
+  const themeSettings = useMemo(
+    () => ({
+      isDarkTheme,
+      switchMapTheme: () => setIsDarkTheme((prev) => !prev),
+    }),
+    [isDarkTheme]
   );
+
+  const router = createBrowserRouter([
+    {
+      path: "/",
+      element: <NavbarWrapper themeSettings={themeSettings} />,
+      children: [
+        {
+          path: "/",
+          element: <MainView isDarkTheme={isDarkTheme}/>,
+        },
+        {
+          path: "/contact",
+          element: <ContactView />,
+        },
+      ],
+      errorElement: <ErrorView />,
+    },
+  ]);
+
+  return <RouterProvider router={router} />;
 };
 
 export default App;

@@ -15,6 +15,7 @@
 // // You should have received a copy of the GNU General Public License
 // // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import React, { useEffect, useMemo } from "react";
 import {
   MapContainer,
   Marker,
@@ -24,18 +25,19 @@ import {
   useMap,
 } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
-import { useEffect } from "react";
 import { ApiResponse, Gdf } from "../types";
 import { Box, HStack, Text, useBreakpointValue } from "@chakra-ui/react";
 import { markerIcon } from "../assets/marker-icon";
 
 interface MapProps {
+  isDarkTheme: boolean;
   response?: ApiResponse;
   stepsCoords: [number, number][];
   alternativeStepsCoords: [number, number][];
 }
 
 export const Map = ({
+  isDarkTheme,
   response,
   stepsCoords,
   alternativeStepsCoords,
@@ -50,6 +52,7 @@ export const Map = ({
       style={{ width: "100%" }}
     >
       <MapContent
+        isDarkTheme={isDarkTheme}
         response={response}
         stepsCoords={stepsCoords}
         alternativeStepsCoords={alternativeStepsCoords}
@@ -59,11 +62,17 @@ export const Map = ({
 };
 
 const MapContent = ({
+  isDarkTheme,
   response,
   stepsCoords,
   alternativeStepsCoords,
 }: MapProps) => {
   const map = useMap();
+
+  const theme = useMemo(
+    () => (isDarkTheme ? "dark_all" : "rastertiles/voyager"),
+    [isDarkTheme]
+  );
 
   useEffect(() => {
     const allCoords = [...stepsCoords, ...alternativeStepsCoords];
@@ -84,7 +93,7 @@ const MapContent = ({
   return (
     <>
       <TileLayer
-        url="https://a.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}@2x.png"
+        url={`https://a.basemaps.cartocdn.com/${theme}/{z}/{x}/{y}@2x.png`}
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
       />
       {response &&
@@ -128,8 +137,8 @@ const MapContent = ({
           position={coords}
           icon={markerIcon(
             index === 0 || index === stepsCoords.length - 1
-            ? "#0097A7"
-            : "#93D3DB"
+              ? "#0097A7"
+              : "#93D3DB"
           )}
         />
       ))}
@@ -139,8 +148,8 @@ const MapContent = ({
           position={coords}
           icon={markerIcon(
             index === 0 || index === alternativeStepsCoords.length - 1
-            ? "#FF758F"
-            : "#FFBBC7"
+              ? "#FF758F"
+              : "#FFBBC7"
           )}
         />
       ))}

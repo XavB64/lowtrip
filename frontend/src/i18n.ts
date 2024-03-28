@@ -24,7 +24,8 @@ i18n
             language_en: "English",
             language_fr: "French",
             methodology: "Methodology",
-            settings: "Settings",
+            theme_dark: "Dark",
+            theme_light: "Light",
           },
           home: {
             compareTravelEmissions: "Compare your travel emissions",
@@ -80,7 +81,8 @@ i18n
             language_en: "Anglais",
             language_fr: "Français",
             methodology: "Méthodologie",
-            settings: "Paramètres",
+            theme_dark: "Sombre",
+            theme_light: "Clair",
           },
           home: {
             compareTravelEmissions: "Compare les émissions de ton voyage",

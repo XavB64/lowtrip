@@ -1,4 +1,4 @@
-import { Box, IconButton, Stack } from "@chakra-ui/react";
+import { Box, IconButton } from "@chakra-ui/react";
 import { useState } from "react";
 import { BiChevronUp } from "react-icons/bi";
 
@@ -8,7 +8,7 @@ import { ApiResponse } from "../types";
 import { Map } from "../components/map";
 import { checkIsOnMobile } from "../utils";
 
-const MainView = () => {
+const MainView = ({ isDarkTheme }: { isDarkTheme: boolean }) => {
   const [response, setResponse] = useState<ApiResponse>();
   const myTripSteps = useSteps();
   const alternativeTripSteps = useSteps();
@@ -25,6 +25,7 @@ const MainView = () => {
       />
       <Box w="100%" h={["calc(100vh - 64px)", "100%"]}>
         <Map
+          isDarkTheme={isDarkTheme}
           response={response}
           stepsCoords={
             myTripSteps.values

@@ -33,6 +33,7 @@ import {
   Stack,
   ChakraProvider,
 } from "@chakra-ui/react";
+import { IoMdSettings } from "react-icons/io";
 import Logo from "../assets/logo.png";
 import MethodologyPdf from "../assets/lowtrip_methodology.pdf";
 import i18n from "i18next";
@@ -42,15 +43,63 @@ import { Link, Outlet } from "react-router-dom";
 import theme from "../theme";
 
 const LANGUAGES = ["fr", "en"];
+const MAP_THEMES = ["light", "dark"];
 
-const LanguageSelector = () => {
+const SettingsChoices = ({
+  options,
+  onChange,
+  optionIsSelected,
+  translationKey,
+}: {
+  options: string[];
+  onChange: (option: string) => void;
+  optionIsSelected: (option: string) => boolean;
+  translationKey: string;
+}) => {
   const { t } = useTranslation();
+  const breakpoint = useBreakpoint();
+  return (
+    <Box mb={1}>
+      <Flex align="center" textAlign="center" justifyContent="center">
+        {options.map((option) => {
+          const isSelected = optionIsSelected(option);
+          return (
+            <PrimaryButton
+              marginRight={1}
+              fontSize={breakpoint === "base" ? 14 : 16}
+              onClick={() => {
+                onChange(option);
+              }}
+              variant={isSelected ? undefined : "outline"}
+              disabled={isSelected}
+            >
+              {t(`navbar.${translationKey}_${option}`)}
+            </PrimaryButton>
+          );
+        })}
+      </Flex>
+    </Box>
+  );
+};
+
+const UserSettingsSelector = ({
+  themeSettings: { isDarkTheme, switchMapTheme },
+}: {
+  themeSettings: {
+    isDarkTheme: boolean;
+    switchMapTheme: () => void;
+  };
+}) => {
   const breakpoint = useBreakpoint();
   return (
     <Popover placement="bottom">
       <PopoverTrigger>
-        <Button borderRadius="15px" fontSize={breakpoint === "base" ? 9 : 16}>
-          {t("navbar.settings")}
+        <Button
+          borderRadius="15px"
+          fontSize={breakpoint === "base" ? 9 : 16}
+          colorScheme="transparent"
+        >
+          <IoMdSettings size={25} color="white" />
         </Button>
       </PopoverTrigger>
       <PopoverContent
@@ -61,33 +110,37 @@ const LanguageSelector = () => {
       >
         <PopoverArrow bg="#efefef" />
         <PopoverBody>
-          <Box>
-            <Flex align="center" textAlign="center" justifyContent="center">
-              {LANGUAGES.map((language) => {
-                const isSelectedLanguage = i18n.language === language;
-                return (
-                  <PrimaryButton
-                    marginRight={1}
-                    fontSize={breakpoint === "base" ? 14 : 16}
-                    onClick={() => {
-                      i18n.changeLanguage(language);
-                    }}
-                    variant={isSelectedLanguage ? undefined : "outline"}
-                    disabled={isSelectedLanguage}
-                  >
-                    {t(`navbar.language_${language}`)}
-                  </PrimaryButton>
-                );
-              })}
-            </Flex>
-          </Box>
+          <SettingsChoices
+            options={LANGUAGES}
+            onChange={(language) => i18n.changeLanguage(language)}
+            optionIsSelected={(language) => i18n.language === language}
+            translationKey="language"
+          />
+          <SettingsChoices
+            options={MAP_THEMES}
+            onChange={() => {
+              switchMapTheme();
+            }}
+            optionIsSelected={(theme) =>
+              (isDarkTheme && theme === "dark") ||
+              (!isDarkTheme && theme === "light")
+            }
+            translationKey="theme"
+          />
         </PopoverBody>
       </PopoverContent>
     </Popover>
   );
 };
 
-const NavBar = () => {
+const NavBar = ({
+  themeSettings,
+}: {
+  themeSettings: {
+    isDarkTheme: boolean;
+    switchMapTheme: () => void;
+  };
+}) => {
   // Determine the display of the navigation items based on screen size
   const displayNavItems = useBreakpointValue({ base: "block", md: "block" });
   const breakpoint = useBreakpoint();
@@ -135,16 +188,23 @@ const NavBar = () => {
             {item.component}
           </Button>
         ))}
-        <LanguageSelector />
+        <UserSettingsSelector themeSettings={themeSettings} />
       </HStack>
     </HStack>
   );
 };
 
-const NavbarWrapper = () => (
+const NavbarWrapper = ({
+  themeSettings,
+}: {
+  themeSettings: {
+    isDarkTheme: boolean;
+    switchMapTheme: () => void;
+  };
+}) => (
   <ChakraProvider theme={theme}>
     <VStack w="100vw" h={["100%", "100vh"]} spacing={0}>
-      <NavBar />
+      <NavBar themeSettings={themeSettings} />
       <Stack
         direction={["column", "row"]}
         w="100%"
