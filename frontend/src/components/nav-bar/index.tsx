@@ -35,6 +35,7 @@ import {
 import { GiHamburgerMenu } from "react-icons/gi";
 
 import Logo from "../../assets/logo.png";
+import gitLogo from "../../assets/github.png";
 import MethodologyPdf from "../../assets/lowtrip_methodology.pdf";
 import { useTranslation } from "react-i18next";
 import { Link, Outlet } from "react-router-dom";
@@ -57,16 +58,22 @@ const NavBar = ({
   const { isOpen, onOpen: openErrorModal, onClose } = useDisclosure();
   const navItems = [
     {
-      name: "Methodology",
-      component: (
-        <a href={MethodologyPdf} target="_blank" rel="noreferrer">
-          {t("navbar.methodology")}
-        </a>
-      ),
+      name: "About",
+      component: <Link to="/about">{t("navbar.about")}</Link>,
     },
     {
       name: "Contact",
       component: <Link to="/contact">{t("navbar.contact")}</Link>,
+    },
+    {
+      name: "Methods",
+      component: <Link to="/method">{t("navbar.methodology")}</Link>,
+    },
+    {
+      name: "Github",
+      component: <Link to="https://github.com/XavB64/lowtrip/" style={{ height: "100%" }}>
+      <Image src={gitLogo} h={breakpoint === "base" ? 6 :  "80%"} />
+    </Link>
     },
   ];
 

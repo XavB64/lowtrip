@@ -27,6 +27,7 @@ i18n
             settings: "Settings",
             theme_dark: "Dark",
             theme_light: "Light",
+            about: "About",
           },
           home: {
             compareTravelEmissions: "Compare your travel emissions",
@@ -113,6 +114,7 @@ i18n
             settings: "Paramètres",
             theme_dark: "Sombre",
             theme_light: "Clair",
+            about: "À propos",
           },
           home: {
             compareTravelEmissions: "Compare les émissions de ton voyage",

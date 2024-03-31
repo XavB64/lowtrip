@@ -22,7 +22,7 @@ import "./i18n";
 
 import NavbarWrapper from "./components/nav-bar";
 import { API_URL } from "./config";
-import { ContactView, ErrorView, MainView } from "./views";
+import { ContactView, ErrorView, MainView, MethodView, AboutView } from "./views";
 
 const App = () => {
   // first API call to wake up the server
@@ -54,6 +54,14 @@ const App = () => {
         {
           path: "/contact",
           element: <ContactView />,
+        },
+        {
+          path: "/method",
+          element: <MethodView />,
+        },
+        {
+          path: "/about",
+          element: <AboutView />,
         },
       ],
       errorElement: <ErrorView />,
