@@ -1,4 +1,3 @@
-
 // // Lowtrip, a web interface to compute travel CO2eq for different means of transport worldwide.
 
 // // Copyright (C) 2024  Bonnemaizon Xavier, Ni Clara, Gres Paola & Pellas Chiara
@@ -22,6 +21,8 @@ import {
   Tooltip as ChakraTooltip,
   Flex,
   useDisclosure,
+  Heading,
+  Text,
 } from "@chakra-ui/react";
 import { round, sumBy, uniq, uniqBy } from "lodash";
 import { BiHelpCircle } from "react-icons/bi";
@@ -35,8 +36,10 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { ApiResponse, TripData } from "../types";
+import { ApiResponse, EmissionsCategory, Transport, TripData } from "../types";
 import { useTranslation } from "react-i18next";
+import { TFunction } from "i18next";
+import { NameType } from "recharts/types/component/DefaultTooltipContent";
 
 interface ChartProps {
   response?: ApiResponse;
@@ -66,29 +69,35 @@ export function Chart({ response }: ChartProps) {
         justifyContent="center"
         marginBottom={3}
       >
-        <h2 style={{ marginRight: "8px" }}>
+        <Text mr={3} fontSize="lg">
           {response.data.alternative_trip
             ? t("results.vsOtherTrip")
             : response.data.direct_trip
             ? t("results.vsOtherMeans")
             : t("results.yourTripEmissions")}
-        </h2>
+        </Text>
       </Flex>
       <ResponsiveContainer
         height={breakpoint === "base" ? 230 : 350}
         width="100%"
       >
-        <BarChart data={getChartData(trips)} margin={{ bottom: 20 }}>
-          <XAxis dataKey="name" fontSize={breakpoint === "base" ? 8 : 14} />
+        <BarChart data={getChartData(trips, t)} margin={{ bottom: 20 }}>
+          <XAxis
+            dataKey="displayedName"
+            fontSize={breakpoint === "base" ? 8 : 14}
+          />
           <YAxis padding={{ top: 30 }} hide />
           <Tooltip
-            formatter={(value) => `${round(+value, 0)} kg`}
+            formatter={(value, name) => [
+              `${round(+value, 0)} kg`,
+              getLabel(name, t),
+            ]}
             contentStyle={{ fontSize: "12px" }}
           />
           {uniqBy(trips, "NAME").map((trip) => (
             <Bar
               key={trip.NAME}
-              dataKey={t(trip.NAME)}
+              dataKey={trip.NAME}
               fill={trip.colors}
               stackId="a"
             >
@@ -121,7 +130,10 @@ export function Chart({ response }: ChartProps) {
   );
 }
 
-function getChartData(trips: TripData[]) {
+function getChartData(
+  trips: TripData[],
+  t: TFunction<"translation", undefined>
+) {
   const transports = uniq(
     trips.map((tripData) => tripData["Mean of Transport"])
   );
@@ -129,7 +141,7 @@ function getChartData(trips: TripData[]) {
   return transports.map((transport) => {
     let result: { [key: string]: string | number } = {
       name: transport,
-      displayedName: transport,
+      displayedName: getLabel(transport, t),
     };
     if ((transport as string) === "Alternative") {
       result.displayedName = "Other";
@@ -177,4 +189,37 @@ const CustomLabel = ({ trips, tripName, ...props }: CustomLabelProps) => {
       </text>
     </>
   );
+};
+
+const transportMeansMapper: Record<Transport | string, string> = {
+  [Transport.plane]: "chart.transportMeans.plane",
+  [Transport.car]: "chart.transportMeans.car",
+  [Transport.ecar]: "chart.transportMeans.ecar",
+  [Transport.bus]: "chart.transportMeans.bus",
+  [Transport.train]: "chart.transportMeans.train",
+  [Transport.ferry]: "chart.transportMeans.ferry",
+  [Transport.bicycle]: "chart.transportMeans.bicycle",
+  "My trip": "chart.transportMeans.myTrip",
+  "Other trip": "chart.transportMeans.otherTrip",
+};
+
+function getLabel(name: NameType, t: TFunction<"translation", undefined>) {
+  return name
+    .toString()
+    .split(" ")
+    .map((substring) => {
+      const transport = transportMeansMapper[substring];
+      const category = categoryMapper[substring];
+      return t(transport ?? category ?? substring);
+    })
+    .join(" ");
+}
+
+const categoryMapper: Record<EmissionsCategory | string, string> = {
+  [EmissionsCategory.infra]: "chart.category.infra",
+  [EmissionsCategory.construction]: "chart.category.construction",
+  [EmissionsCategory.fuel]: "chart.category.fuel",
+  [EmissionsCategory.kerosene]: "chart.category.kerosene",
+  [EmissionsCategory.contrails]: "chart.category.contrails",
+  [EmissionsCategory.bikeBuild]: "chart.category.bikeBuild",
 };

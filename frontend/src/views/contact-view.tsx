@@ -25,9 +25,7 @@ async function sendEmail(senderEmail: string, message: string) {
       htmlContent: `Message envoyé par ${senderEmail}:<br/><br/> ${message}`,
     };
 
-    console.log(process.env.EMAIL_API_KEY);
-
-    const response = await axios({
+    return axios({
       method: "post",
       url: EMAIL_API_SERVICE_URL,
       headers: {
@@ -36,7 +34,6 @@ async function sendEmail(senderEmail: string, message: string) {
       },
       data: data,
     });
-    console.log("Email sent successfully:", response.data);
   } catch (error) {}
 }
 

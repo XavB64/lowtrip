@@ -49,7 +49,7 @@ const App = () => {
       children: [
         {
           path: "/",
-          element: <MainView isDarkTheme={isDarkTheme}/>,
+          element: <MainView isDarkTheme={isDarkTheme} />,
         },
         {
           path: "/contact",
