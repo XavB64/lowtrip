@@ -78,7 +78,7 @@ def bicycle_to_gdf(
                     "EF_tot": [EF],
                     "path_length": [route_dist],
                     "colors": [color],
-                    "NAME": ["Bike build"],
+                    "NAME": ["Bike-build"],
                     "Mean of Transport": ["Bicycle"],
                 }
             )
@@ -86,7 +86,8 @@ def bicycle_to_gdf(
         gdf_bike = pd.DataFrame(
                 {
                     "colors": [color],
-                    "label": ["Bike Route: " + str(int(route_dist)) + 'km'],
+                    "label": ["Bike"],
+                    "length": str(int(route_dist)) + "km",
                     "geometry": [geom_route],
                 }
         )
@@ -155,11 +156,12 @@ def train_to_gdf(
             
             #Add infra
             gdf["Mean of Transport"] = "Train"
-            gdf["label"] = "Railway: " + str(int(train_dist)) + "km ("+ gdf["NAME"] + ")"
+            gdf["label"] = "Railway"
+            gdf['length'] = str(int(train_dist)) + "km (" + gdf["NAME"] + ")"
             gdf.reset_index(inplace=True)
             
             data_train = gdf[['kgCO2eq', 'colors', 'NAME', 'Mean of Transport']]
-            geo_train = gdf[['colors', 'label', 'geometry']].dropna(axis=0)
+            geo_train = gdf[['colors', 'label', 'geometry', 'length']].dropna(axis=0)
             # Returning the result
             return data_train, geo_train, train
     else :
@@ -221,13 +223,14 @@ def ecar_to_gdf(
                 gdf
             ])
             name = str(nb)+'p.'
-            gdf["Mean of Transport"] = ['eCar ' + name for k in range(gdf.shape[0])]
-            gdf['label'] = 'Road: ' + str(int(route_dist)) + "km ("+ gdf["NAME"] + ")"
+            gdf["Mean of Transport"] = ['eCar' for k in range(gdf.shape[0])]
+            gdf['label'] = 'Road'
+            gdf['length'] = str(int(route_dist)) + "km (" + gdf["NAME"] + ")"
             gdf['NAME'] = ' '+ gdf['NAME']
             gdf.reset_index(inplace=True)
             #
             data_ecar = gdf[['kgCO2eq', 'colors', 'NAME', 'Mean of Transport']]
-            geo_ecar = gdf[['colors', 'label', 'geometry']].dropna(axis=0)
+            geo_ecar = gdf[['colors', 'label', 'geometry', 'length']].dropna(axis=0)
             # Returning the result
             return data_ecar, geo_ecar, route
     else:
@@ -274,7 +277,8 @@ def car_bus_to_gdf(
             pd.Series(
                 {
                     "colors": color_usage,
-                    "label": 'Road: ' + str(int(route_dist)) + 'km',
+                    "label": 'Road',
+                    "length": str(int(route_dist)) + "km",
                     "geometry": geom_route,
                 }
             )
@@ -333,7 +337,8 @@ def bus_to_gdf(
             pd.Series(
                 {
                     "colors": color_usage,
-                    "label": 'Road: ' + str(int(route_dist))+ 'km',
+                    "label": 'Road',
+                    "length": str(int(route_dist)) + "km",
                     "geometry": geom_route,
                 }
             )
@@ -384,7 +389,7 @@ def car_to_gdf(
                     "path_length" : [route_dist, route_dist],
                     "colors": [color_usage, color_cons],
                     "NAME": ['Fuel', 'Construction'],
-                    "Mean of Transport" : ["Car " + name for k in range(2)]
+                    "Mean of Transport" : ["Car" for k in range(2)]
                 }
                 )[::-1]
         #geo_car
@@ -392,7 +397,8 @@ def car_to_gdf(
             pd.Series(
                 {
                     "colors": color_usage,
-                    "label": 'Road: ' + str(int(route_dist))+ 'km',
+                    "label": 'Road',
+                    "length": str(int(route_dist)) + "km",
                     "geometry": geom_route,
                 }
             )
@@ -449,7 +455,7 @@ def plane_to_gdf(
                     EF_plane[trip_category]['combustion'] * contrails
             ],
         "colors": [color_usage, color_cont],
-        "NAME": ['Kerosene', 'Contrails & NOx'],
+        "NAME": ['Kerosene', 'Contrails'],
         "Mean of Transport": ["Plane", "Plane"],
     }
 )
@@ -458,7 +464,8 @@ def plane_to_gdf(
         pd.Series(
             {
                 "colors": color_usage,
-                "label": "Flight path: " + str(int(bird))+ 'km',
+                "label": "Flight",
+                "length": str(int(bird)) + "km",
                 "geometry": geom_plane,
             }
         )
@@ -503,7 +510,8 @@ def ferry_to_gdf(tag1, tag2, EF=EF_ferry, color_usage="#ffffff"):
         pd.Series(
             {
                 "colors": color_usage,
-                "label" : "Ferry: " + str(int(bird))+ 'km',
+                "label" : "Ferry",
+                "length": str(int(bird)) + "km",
                 "geometry": geom,
             }
         )

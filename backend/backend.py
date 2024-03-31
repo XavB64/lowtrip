@@ -64,7 +64,7 @@ def compute_emissions_custom(data,
     """
     ERROR = ''
     
-    l = []
+    emissions_data = []
     geo = []
     fail = False # To check if the query is successfull
     for idx in data.index[:-1]:  # We loop until last departure
@@ -94,7 +94,7 @@ def compute_emissions_custom(data,
                 break
             # Adding a step variable here to know which trip is it
             data_train["step"] = str(int(idx) + 1)
-            l.append(data_train)
+            emissions_data.append(data_train)
             geo.append(geo_train)
 
         elif transport_mean == "Bus":
@@ -108,7 +108,7 @@ def compute_emissions_custom(data,
                 ERROR = 'step n°'+str(int(idx) + 1)+' failed with Bus, please change mean of transport or locations. '
                 break
             data_bus["step"] = str(int(idx) + 1)
-            l.append(data_bus)
+            emissions_data.append(data_bus)
             geo.append(geo_bus)
 
         elif transport_mean == "Car":
@@ -125,7 +125,7 @@ def compute_emissions_custom(data,
                 ERROR = 'step n°'+str(int(idx) + 1)+' failed with Car, please change mean of transport or locations. '
                 break
             data_car["step"] = str(int(idx) + 1)
-            l.append(data_car) #gdf_car.copy()
+            emissions_data.append(data_car) #gdf_car.copy()
             geo.append(geo_car)
             
         elif transport_mean == "eCar":
@@ -141,7 +141,7 @@ def compute_emissions_custom(data,
                 ERROR = 'step n°'+str(int(idx) + 1)+' failed with eCar, please change mean of transport or locations. '
                 break
             data_ecar["step"] = str(int(idx) + 1)
-            l.append(data_ecar)
+            emissions_data.append(data_ecar)
             geo.append(geo_ecar)
             
         elif transport_mean == "Bicycle":
@@ -156,7 +156,7 @@ def compute_emissions_custom(data,
                 ERROR = 'step n°'+str(int(idx) + 1)+' failed with Bicycle, please change mean of transport or locations. '
                 break
             data_bike["step"] = str(int(idx) + 1)
-            l.append(data_bike)
+            emissions_data.append(data_bike)
             geo.append(geo_bike)
 
         elif transport_mean == "Plane":
@@ -167,7 +167,7 @@ def compute_emissions_custom(data,
                 color_cont = cmap["Contrails"]
             )
             data_plane["step"] = str(int(idx) + 1)
-            l.append(data_plane)
+            emissions_data.append(data_plane)
             geo.append(geo_plane)
 
         elif transport_mean == "Ferry":
@@ -176,7 +176,7 @@ def compute_emissions_custom(data,
                 color_usage = cmap["Ferry"],
             )
             data_ferry["step"] = str(int(idx) + 1)
-            l.append(data_ferry)
+            emissions_data.append(data_ferry)
             geo.append(geo_ferry)
             
     if fail :
@@ -185,7 +185,7 @@ def compute_emissions_custom(data,
         geodata = pd.DataFrame()
     else :
         # Query successfull, we concatenate the data
-        data_custom = pd.concat(l)
+        data_custom = pd.concat(emissions_data)
         data_custom = data_custom.reset_index(drop=True)#.drop("geometry", axis=1)
         # Geodataframe for map
         geodata = gpd.GeoDataFrame(pd.concat(geo), geometry="geometry", crs="epsg:4326")

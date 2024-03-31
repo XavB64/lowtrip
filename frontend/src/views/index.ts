@@ -1,3 +1,3 @@
-export { default as ContactView } from "./contactView";
-export { default as ErrorView } from "./errorView";
-export { default as MainView } from "./mainView";
+export { default as ContactView } from "./contact-view";
+export { default as ErrorView } from "./error-view";
+export { default as MainView } from "./main-view";

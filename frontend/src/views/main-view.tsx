@@ -23,7 +23,7 @@ const MainView = ({ isDarkTheme }: { isDarkTheme: boolean }) => {
         myTripSteps={myTripSteps}
         alternativeTripSteps={alternativeTripSteps}
       />
-      <Box w="100%" h={["calc(100vh - 64px)", "100%"]}>
+      <Box w="100%" h={["calc(100vh - 64px)", "100%"]} position="relative">
         <Map
           isDarkTheme={isDarkTheme}
           response={response}

@@ -16,7 +16,7 @@ export function formatStepsForApi(steps: Step[]) {
   const nb = steps.reduce((jsonResult, step, index) => {
     jsonResult[index.toString()] = step.passengers ?? 1;
     return jsonResult;
-  }, {} as { [key: string]: number });
+  }, {} as { [key: string]: number | string });
   return { lon, lat, transp, nb };
 }
 

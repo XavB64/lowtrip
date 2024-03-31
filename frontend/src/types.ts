@@ -44,7 +44,7 @@ export interface Gdf {
   features: {
     id: string;
     type: string;
-    properties: { colors: string; label: string };
+    properties: { colors: string; label: string; length: string };
     geometry: { type: string; coordinates: [number, number][] };
   }[];
 }
@@ -58,4 +58,13 @@ export interface TripData {
   kgCO2eq: number;
   "Mean of Transport": Transport;
   Type: string;
+}
+
+export enum EmissionsCategory {
+  infra = "Infra",
+  construction = "Construction",
+  fuel = "Fuel",
+  kerosene = "Kerosene",
+  contrails = "Contrails",
+  bikeBuild = "Bike-build",
 }

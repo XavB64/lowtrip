@@ -26,8 +26,17 @@ import {
 } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import { ApiResponse, Gdf } from "../types";
-import { Box, HStack, Text, useBreakpointValue } from "@chakra-ui/react";
+import {
+  Box,
+  Card,
+  HStack,
+  Text,
+  VStack,
+  useBreakpointValue,
+} from "@chakra-ui/react";
 import { markerIcon } from "../assets/marker-icon";
+import { useTranslation } from "react-i18next";
+import { uniqBy } from "lodash";
 
 interface MapProps {
   isDarkTheme: boolean;
@@ -45,19 +54,22 @@ export const Map = ({
   const allowScrollToZoom = useBreakpointValue([false, true], { ssr: false });
 
   return (
-    <MapContainer
-      center={[48, 10]}
-      zoom={5}
-      scrollWheelZoom={allowScrollToZoom}
-      style={{ width: "100%" }}
-    >
-      <MapContent
-        isDarkTheme={isDarkTheme}
-        response={response}
-        stepsCoords={stepsCoords}
-        alternativeStepsCoords={alternativeStepsCoords}
-      />
-    </MapContainer>
+    <>
+      <Legend response={response} />
+      <MapContainer
+        center={[48, 10]}
+        zoom={5}
+        scrollWheelZoom={allowScrollToZoom}
+        style={{ width: "100%", position: "relative" }}
+      >
+        <MapContent
+          isDarkTheme={isDarkTheme}
+          response={response}
+          stepsCoords={stepsCoords}
+          alternativeStepsCoords={alternativeStepsCoords}
+        />
+      </MapContainer>
+    </>
   );
 };
 
@@ -68,6 +80,7 @@ const MapContent = ({
   alternativeStepsCoords,
 }: MapProps) => {
   const map = useMap();
+  const { t } = useTranslation();
 
   const theme = useMemo(
     () => (isDarkTheme ? "dark_all" : "rastertiles/voyager"),
@@ -124,7 +137,10 @@ const MapContent = ({
                       borderRadius={2}
                       bgColor={feature.properties.colors}
                     />
-                    <Text>{feature.properties["label"]}</Text>
+                    <Text>
+                      {t(pathMapper[feature.properties["label"]])} :{" "}
+                      {feature.properties.length}
+                    </Text>
                   </HStack>
                 </Tooltip>
               </Polyline>
@@ -155,4 +171,34 @@ const MapContent = ({
       ))}
     </>
   );
+};
+
+const Legend = ({ response }: { response?: ApiResponse }) => {
+  const { t } = useTranslation();
+  if (!response) return null;
+  return (
+    <Card position="absolute" zIndex={2} top={5} right={5} p={3}>
+      <VStack align="start">
+        {uniqBy(
+          (JSON.parse(response.data.gdf) as Gdf).features,
+          (feature) => feature.properties.label
+        ).map((feature) => (
+          <HStack>
+            <Box w={5} h={3} backgroundColor={feature.properties.colors} />
+            <Text fontSize="sm">
+              {t(pathMapper[feature.properties["label"]])}
+            </Text>
+          </HStack>
+        ))}
+      </VStack>
+    </Card>
+  );
+};
+
+const pathMapper: Record<string, string> = {
+  Railway: "chart.paths.railway",
+  Road: "chart.paths.road",
+  Bike: "chart.paths.bike",
+  Flight: "chart.paths.flight",
+  Ferry: "chart.paths.ferry",
 };
