@@ -21,7 +21,6 @@ import {
   Tooltip as ChakraTooltip,
   Flex,
   useDisclosure,
-  Heading,
   Text,
 } from "@chakra-ui/react";
 import { round, sumBy, uniq, uniqBy } from "lodash";

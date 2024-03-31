@@ -177,13 +177,20 @@ const Legend = ({ response }: { response?: ApiResponse }) => {
   const { t } = useTranslation();
   if (!response) return null;
   return (
-    <Card position="absolute" zIndex={2} top={5} right={5} p={3}>
+    <Card
+      display={["none", "none", "flex"]}
+      position="absolute"
+      zIndex={2}
+      top={5}
+      right={5}
+      p={3}
+    >
       <VStack align="start">
         {uniqBy(
           (JSON.parse(response.data.gdf) as Gdf).features,
           (feature) => feature.properties.label
         ).map((feature) => (
-          <HStack>
+          <HStack key={feature.properties.label}>
             <Box w={5} h={3} backgroundColor={feature.properties.colors} />
             <Text fontSize="sm">
               {t(pathMapper[feature.properties["label"]])}
