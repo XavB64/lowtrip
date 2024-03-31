@@ -66,9 +66,9 @@ export function Chart({ response }: ChartProps) {
         fontSize={["small", "large"]}
         textAlign="center"
         justifyContent="center"
-        marginBottom={3}
+        marginBottom={2}
       >
-        <Text mr={3} fontSize="lg">
+        <Text mr={3} fontSize={breakpoint === "base" ? 10 : 20}>
           {response.data.alternative_trip
             ? t("results.vsOtherTrip")
             : response.data.direct_trip
@@ -80,7 +80,7 @@ export function Chart({ response }: ChartProps) {
         height={breakpoint === "base" ? 230 : 350}
         width="100%"
       >
-        <BarChart data={getChartData(trips, t)} margin={{ bottom: 20 }}>
+        <BarChart data={getChartData(trips, t)} margin={{ bottom: 0 }}>
           <XAxis
             dataKey="displayedName"
             fontSize={breakpoint === "base" ? 8 : 14}
@@ -198,8 +198,10 @@ const transportMeansMapper: Record<Transport | string, string> = {
   [Transport.train]: "chart.transportMeans.train",
   [Transport.ferry]: "chart.transportMeans.ferry",
   [Transport.bicycle]: "chart.transportMeans.bicycle",
-  "My trip": "chart.transportMeans.myTrip",
-  "Other trip": "chart.transportMeans.otherTrip",
+  [Transport.myTrip]: "chart.transportMeans.myTrip",
+  [Transport.otherTrip]: "chart.transportMeans.otherTrip",
+    // "My trip": "chart.transportMeans.myTrip",
+  // "Other trip": "chart.transportMeans.otherTrip",
 };
 
 function getLabel(name: NameType, t: TFunction<"translation", undefined>) {
