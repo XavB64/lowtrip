@@ -158,7 +158,7 @@ i18n
             transportMeans: {
               plane: "Avion",
               car: "Voiture",
-              ecar: "EV",
+              ecar: "VE",
               bus: "Bus",
               train: "Train",
               ferry: "Ferry",

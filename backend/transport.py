@@ -223,7 +223,7 @@ def ecar_to_gdf(
                 gdf
             ])
             name = str(nb)+'p.'
-            gdf["Mean of Transport"] = ['eCar' for k in range(gdf.shape[0])]
+            gdf["Mean of Transport"] = ['eCar ' + name for k in range(gdf.shape[0])]
             gdf['label'] = 'Road'
             gdf['length'] = str(int(route_dist)) + "km (" + gdf["NAME"] + ")"
             gdf['NAME'] = ' '+ gdf['NAME']
@@ -373,7 +373,7 @@ def car_to_gdf(
     else : #Hitch-hiking
         EF_fuel = EF_car['fuel'] * .04
         EF_cons, EF_infra = 0, 0
-        name = 'HH'
+        name = "👍"#'HH'
 
     # Validation part for route
     if route:  # We have a geometry
@@ -389,7 +389,7 @@ def car_to_gdf(
                     "path_length" : [route_dist, route_dist],
                     "colors": [color_usage, color_cons],
                     "NAME": ['Fuel', 'Construction'],
-                    "Mean of Transport" : ["Car" for k in range(2)]
+                    "Mean of Transport" : ["Car " + name for k in range(2)]
                 }
                 )[::-1]
         #geo_car
