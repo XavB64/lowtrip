@@ -96,10 +96,143 @@ i18n
               bikeBuild: "Bike production",
             },
           },
+          method: {
+            introduction: {
+              title: "Introduction",
+              text1:
+                "The work presented here is independent, not-for-profit and open source.",
+              text2:
+                "The aim of this web app is to present precise carbon inventories per passenger for each mode of transport and each journey. These results enable users to make informed choices in the context of reducing their greenhouse gas emissions to mitigate climate change. To put these results into context, total yearly per-capita net emissions should not exceed 2 tons CO2eq in 2050 to limit global warming below 2°C (IPCC).",
+            },
+            howEmissionsAreComputed: {
+              title: "How the emissions are calculated?",
+              text1:
+                "To calculate CO2 equivalent emissions per person, we multiply the distance of a journey (km) by the corresponding emission factor (mass of CO2 equivalent per person per km) of a mean of transport. For a mutlistep journey, these emissions are summed over the different steps.",
+            },
+            distanceEstimation: {
+              title: "Estimation of distances",
+              table: {
+                title_1: "Mean of Transport",
+                title_2: "Distance source",
+                transport_1: "Train",
+                transport_2: "Car - Bus - eCar",
+                transport_3: "Bike route",
+                transport_4: "Plane",
+                transport_5: "Ferry",
+                data_openstreetmap: "OpenStreetMap network",
+                data_geodesic: "Geodesic distance",
+                data_approximation: "Aproximation of shortest path",
+              },
+            },
+            emissionFactors: {
+              title: "What do emission factors depend on?",
+              table1: {
+                title_1: "Mean of Transport",
+                title_2: "Variable",
+                title_3: "Why?",
+                transport_1: "Train",
+                transport_2: "Bus - Bike",
+                transport_3: "Voiture",
+                transport_4: "eCar",
+                transport_5: "Plane",
+                transport_6: "Ferry",
+                variables_1: "Visited country",
+                variables_2: "-",
+                variables_3: "Number of passengers",
+                variables_4: "Number of passengers & Visited countries",
+                variables_5: "Travel distance",
+                variables_6: "(not yet) user parameters",
+              },
+              table2: {
+                title_1: "Mean of Transport",
+                title_2: "Usage",
+                title_3: "Vehicle production",
+                title_4: "Infrastructure construction",
+                transport_1: "Train",
+                transport_2: "Bus - Car - eCar",
+                transport_3: "Bicycle",
+                transport_4: "Plane",
+                transport_5: "Ferry",
+                data_not_found: "No found",
+              },
+              text1:
+                "Emissions factors consider usage (linked to the manufacture and use of energy to move the vehicle) as well as infrastructure and vehicle construction where these are significant. The table below summarizes the types of emissions taken into account by lowtrip. Empty cells mean that the related emissions did not contribute significantly to the result and are therefore excluded to facilitate understanding and readability for the user.",
+              text2:
+                "All the assumptions, data and sources used are available in the",
+              text3: "methodology",
+              text4: " document.",
+            },
+          },
         },
       },
       fr: {
         translation: {
+          method: {
+            introduction: {
+              title: "Introduction",
+              text1: "Ce travail est indépendant, gratuit et open-source.",
+              text2:
+                "L'objectif de cette application est de fournir des bilans carbone par passager précis pour chaque mode de transport et trajet. \n Ces résultats permmettent à l'utilisateur de faire des choix informés dans le contexte de réduction de leur empreinte carbone pour freiner les effets du réchauffement climatique. \n Pour mettre ces valeurs en contexte, l'empreinte nette annuelle et personnelle ne doit pas dépasser les 2t CO2eq en 2050 afin de rester sous 2°C de réchauffement (GIEC).",
+            },
+            howEmissionsAreComputed: {
+              title: "Comment les émissions sont-elles calculées ?",
+              text1:
+                "Pour calculer les émissions de CO2eq par personne, nous multiplions la distance d'un voyage (km) par le facteur d'émission correspondant (masse de CO2 équivalent par personne par km) au moyen de transport. \n Pour un voyage à plusieurs étapes, ces émissions sont sommées sur les différentes étapes.",
+            },
+            distanceEstimation: {
+              title: "Estimation des distances",
+              table: {
+                title_1: "Moyen de Transport",
+                title_2: "Source de la Distance",
+                row_1: "Train",
+                row_2: "Voiture - Bus - VE",
+                row_3: "Voie cyclable",
+                row_4: "Avion",
+                row_5: "Ferry",
+                data_openstreetmap: "Réseau OpenStreetMap",
+                data_geodesic: "Distance géodésique",
+                data_approximation: "Aproximation du plus court chemin",
+              },
+            },
+            emissionFactors: {
+              title: "De quoi dépendent les facteurs d'émissions ?",
+              table1: {
+                title_1: "Moyen de Transport",
+                title_2: "Variable",
+                title_3: "Pourquoi ?",
+                row_1: "Train",
+                row_2: "Bus - Vélo",
+                row_3: "Voiture",
+                row_4: "EV",
+                row_5: "Avion",
+                row_6: "Ferry",
+                variables_1: "Pays traversés",
+                variables_2: "-",
+                variables_3: "Nombre de passagers",
+                variables_4: "Nombre de passagers & Pays traversés",
+                variables_5: "Distance du trajet",
+                variables_6: "(en cours) Paramètres utilisateur",
+              },
+              table2: {
+                title_1: "Moyen de Transport",
+                title_2: "Usage",
+                title_3: "Production du véhicule",
+                title_4: "Construction des infrastructures",
+                transport_1: "Train",
+                transport_2: "Bus - Voiture - VE",
+                transport_3: "Vélo",
+                transport_4: "Avion",
+                transport_5: "Ferry",
+                data_not_found: "Non trouvé",
+              },
+              text1:
+                "Les facteurs d'émissions considèrent l'utilisation (en lien avec la production et l'utilisation de l'énergie pour faire avancer le véhicule) ainsi que les infrastructures et la construction du véhicule lorques ces dernières sont significatives. \n La table ci dessous résume les types d'émissions prises en compte dans lowtrip. Les cellules vides signifient que le facteur d'émission correspondant ne contribue pas significativement au résultat, et se retrouve exclu du rendu final afin de faciliter la compréhension et la lecture.",
+              text2:
+                "Toutes les hypothèses, données et sources sont disponibles dans le document de",
+              text3: "méthodologie",
+              text4: ".",
+            },
+          },
           contact: {
             emailIsRequired: "Email obligatoire",
             sendEmail: "Envoie ton message",
