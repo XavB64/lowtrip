@@ -130,26 +130,68 @@ export const StepField = ({ removeStep, updateStep, step }: StepFieldProps) => {
   return (
     <>
       <HStack w="100%">
-        <input
-          ref={inputRef}
-          value={value}
-          onChange={(e) => {
-            setValue(e.target.value);
-          }}
-          placeholder={
-            isDeparture ? t("form.placeholderFrom") : t("form.placeholderTo")
-          }
+        <div
           style={{
+            position: "relative",
             width: "100%",
-            height: "50px",
-            padding: "9px",
-            border: "1px solid lightgrey",
-            borderRadius: "20px",
-            backgroundColor: "white",
-            marginBottom: 1,
-            fontSize: "16px",
           }}
-        />
+        >
+          <input
+            ref={inputRef}
+            value={value}
+            onChange={(e) => {
+              setValue(e.target.value);
+            }}
+            placeholder={
+              isDeparture ? t("form.placeholderFrom") : t("form.placeholderTo")
+            }
+            style={{
+              width: "100%",
+              height: "50px",
+              padding: "9px",
+              border: "1px solid lightgrey",
+              borderRadius: "20px",
+              backgroundColor: "white",
+              marginBottom: 1,
+              fontSize: "16px",
+            }}
+          />
+          {value && (
+            <button
+              className="clear-input-button"
+              aria-label="Clear input"
+              title={t("form.clearInput")}
+              onClick={() => {
+                updateStep(step.index, {
+                  locationCoords: undefined,
+                  locationName: undefined,
+                });
+                setValue("");
+              }}
+              style={{
+                position: "absolute",
+                right: "0.5rem",
+                bottom: "1rem",
+                justifyContent: "center",
+                alignItems: "center",
+                width: "1.5rem",
+                height: "1.5rem",
+                appearance: "none",
+                border: "none",
+                borderRadius: "50%",
+                background: "gray",
+                margin: 0,
+                padding: "2px",
+                color: "white",
+                fontSize: "1.5rem",
+                display: "flex",
+              }}
+            >
+              ×
+            </button>
+          )}
+        </div>
+
         {step.index > 2 && (
           <IconButton
             onClick={() => removeStep(step.index)}
