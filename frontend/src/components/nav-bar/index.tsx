@@ -36,7 +36,6 @@ import { GiHamburgerMenu } from "react-icons/gi";
 
 import Logo from "../../assets/lowtrip_logo.png";
 import gitLogo from "../../assets/github.png";
-import MethodologyPdf from "../../assets/lowtrip_methodology.pdf";
 import { useTranslation } from "react-i18next";
 import { Link, Outlet } from "react-router-dom";
 import theme from "../../theme";
@@ -88,8 +87,8 @@ const NavBar = ({
       zIndex={3}
       h="64px"
     >
-      <Link to="/" style={{ height: "100%" }}>
-        <Image src={Logo} h="100%" />
+      <Link to="/" style={{ height: "120%" }}>
+        <Image src={Logo} h="120%" />
       </Link>
       <Spacer />
       <HStack display={displayNavItems}>

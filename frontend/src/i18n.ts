@@ -85,7 +85,7 @@ i18n
               road: "Road",
               bike: "Bike route",
               flight: "Flight path",
-              ferry: "Ferry",
+              ferry: "Ferry route",
             },
             category: {
               infra: "Infrastructure",
@@ -102,12 +102,12 @@ i18n
               text1:
                 "The work presented here is independent, not-for-profit and open source.",
               text2:
-                "The aim of this web app is to present precise carbon inventories per passenger for each mode of transport and each journey. These results enable users to make informed choices in the context of reducing their greenhouse gas emissions to mitigate climate change. To put these results into context, total yearly per-capita net emissions should not exceed 2 tons CO2eq in 2050 to limit global warming below 2°C (IPCC).",
+                "The aim of this web app is to present precise carbon inventories per passenger for each mode of transport and each journey. These results enable users to make informed choices in the context of reducing their greenhouse gas emissions to mitigate climate change. To put these results into context, total yearly per-capita net emissions should not exceed 2 tons CO2eq in 2050 to limit global warming below +2°C.",
             },
             howEmissionsAreComputed: {
               title: "How the emissions are calculated?",
               text1:
-                "To calculate CO2 equivalent emissions per person, we multiply the distance of a journey (km) by the corresponding emission factor (mass of CO2 equivalent per person per km) of a mean of transport. For a mutlistep journey, these emissions are summed over the different steps.",
+                "To calculate CO2 equivalent emissions per person, we multiply the distance of a journey (km) by the corresponding emission factor (mass of CO2 equivalent per person per km) of a mean of transport. For a mutlistep journey, these emissions are summed over the different steps:",
             },
             distanceEstimation: {
               title: "Estimation of distances",
@@ -120,7 +120,7 @@ i18n
                 transport_4: "Plane",
                 transport_5: "Ferry",
                 data_openstreetmap: "OpenStreetMap network",
-                data_geodesic: "Geodesic distance",
+                data_geodesic: "Geodesic distance + average detour",
                 data_approximation: "Aproximation of shortest path",
               },
             },
@@ -136,12 +136,18 @@ i18n
                 transport_4: "eCar",
                 transport_5: "Plane",
                 transport_6: "Ferry",
-                variables_1: "Visited country",
+                variables_1: "Visited countries",
                 variables_2: "-",
                 variables_3: "Number of passengers",
                 variables_4: "Number of passengers & Visited countries",
                 variables_5: "Travel distance",
                 variables_6: "(not yet) user parameters",
+                why_1: "≠ Electrification rate;≠ Energy carbon intensity;≠ Filling rates",
+                why_2 : "-",
+                why_3 : "Personal footprint allocation;Consumption increases with weight",
+                why_4 : "Idem Car;≠ Energy carbon intensity",
+                why_5 : "Higher proportion of take-off for short-haul routes;Use of generally less efficient planes",
+                why_6 : "-",
               },
               table2: {
                 title_1: "Mean of Transport",
@@ -156,9 +162,9 @@ i18n
                 data_not_found: "No found",
               },
               text1:
-                "Emissions factors consider usage (linked to the manufacture and use of energy to move the vehicle) as well as infrastructure and vehicle construction where these are significant. The table below summarizes the types of emissions taken into account by lowtrip. Empty cells mean that the related emissions did not contribute significantly to the result and are therefore excluded to facilitate understanding and readability for the user.",
+                "Emission factors consider usage (linked to the manufacture and use of energy to move the vehicle) as well as infrastructure and vehicle construction where these are significant. The table below summarizes the types of emissions taken into account by lowtrip. Empty cells mean that the related emissions did not contribute significantly to the result and are therefore excluded to facilitate understanding and readability for the user.",
               text2:
-                "All the assumptions, data and sources used are available in the",
+                "All assumptions, data and sources used are available in the",
               text3: "methodology",
               text4: " document.",
             },
@@ -172,25 +178,25 @@ i18n
               title: "Introduction",
               text1: "Ce travail est indépendant, gratuit et open-source.",
               text2:
-                "L'objectif de cette application est de fournir des bilans carbone par passager précis pour chaque mode de transport et trajet. \n Ces résultats permmettent à l'utilisateur de faire des choix informés dans le contexte de réduction de leur empreinte carbone pour freiner les effets du réchauffement climatique. \n Pour mettre ces valeurs en contexte, l'empreinte nette annuelle et personnelle ne doit pas dépasser les 2t CO2eq en 2050 afin de rester sous 2°C de réchauffement (GIEC).",
+                "L'objectif de cette application est de fournir des bilans carbone par passager précis pour chaque mode de transport et trajet. Ces résultats permmettent à l'utilisateur de faire des choix informés dans le contexte de réduction de leur empreinte carbone pour freiner les effets du réchauffement climatique. Pour mettre ces valeurs en contexte, l'empreinte nette annuelle et personnelle ne doit pas dépasser les 2t CO2eq en 2050 afin de rester sous +2°C de réchauffement.",
             },
             howEmissionsAreComputed: {
               title: "Comment les émissions sont-elles calculées ?",
               text1:
-                "Pour calculer les émissions de CO2eq par personne, nous multiplions la distance d'un voyage (km) par le facteur d'émission correspondant (masse de CO2 équivalent par personne par km) au moyen de transport. \n Pour un voyage à plusieurs étapes, ces émissions sont sommées sur les différentes étapes.",
+                "Pour calculer les émissions de CO2eq par personne, nous multiplions la distance d'un voyage (km) par le facteur d'émission correspondant (masse de CO2 équivalent par personne par km) au moyen de transport. \n Pour un voyage à plusieurs étapes, ces émissions sont sommées sur les différentes étapes:",
             },
             distanceEstimation: {
               title: "Estimation des distances",
               table: {
                 title_1: "Moyen de Transport",
                 title_2: "Source de la Distance",
-                row_1: "Train",
-                row_2: "Voiture - Bus - VE",
-                row_3: "Voie cyclable",
-                row_4: "Avion",
-                row_5: "Ferry",
+                transport_1: "Train",
+                transport_2: "Voiture - Bus - VE",
+                transport_3: "Voie cyclable",
+                transport_4: "Avion",
+                transport_5: "Ferry",
                 data_openstreetmap: "Réseau OpenStreetMap",
-                data_geodesic: "Distance géodésique",
+                data_geodesic: "Distance géodésique + déviation moyenne",
                 data_approximation: "Aproximation du plus court chemin",
               },
             },
@@ -203,7 +209,7 @@ i18n
                 row_1: "Train",
                 row_2: "Bus - Vélo",
                 row_3: "Voiture",
-                row_4: "EV",
+                row_4: "VE",
                 row_5: "Avion",
                 row_6: "Ferry",
                 variables_1: "Pays traversés",
@@ -212,6 +218,12 @@ i18n
                 variables_4: "Nombre de passagers & Pays traversés",
                 variables_5: "Distance du trajet",
                 variables_6: "(en cours) Paramètres utilisateur",
+                why_1: "≠ Taux d'éléctrification;≠ Intensité carbone de l'énergie;≠ Taux de remplissage",
+                why_2 : "-",
+                why_3 : "Attribution de l'empreinte personnelle;Augmentation de la consommation avec le poids",
+                why_4 : "Idem Voiture;≠ Intensités carbone de l'énergie",
+                why_5 : "Part plus importante du décollage pour les trajets courts;Utilisation d'appareils en général moins performants",
+                why_6 : "-",
               },
               table2: {
                 title_1: "Moyen de Transport",
@@ -253,7 +265,7 @@ i18n
           home: {
             compareTravelEmissions: "Compare les émissions de ton voyage",
             toolDescription:
-              "Choisis un point de départ, un point d'arrivée et un moyen de transport pour comparer les émissions CO2 de ton voyage ! Tu peux soit comparer les émissions d'un même trajet mais avec différents moyens de transport, ou comparer des voyages mutlimodaux à étapes.",
+              "Choisis un point de départ, un point d'arrivée et un moyen de transport pour comparer les émissions CO2 de ton voyage ! Tu peux soit comparer les émissions d'un même trajet mais avec différents moyens de transport, soit comparer des voyages mutlimodaux à étapes.",
           },
           form: {
             addStep: "Ajouter une étape",
@@ -283,8 +295,8 @@ i18n
             hitchHiking: "Auto-stop",
           },
           results: {
-            vsOtherTrip: "Ton voyage VS ton autre voyage",
-            vsOtherMeans: "Ton voyage VS les autres moyens de transport",
+            vsOtherTrip: "Ton voyage VS Autre voyage",
+            vsOtherMeans: "Ton voyage VS Autres moyens de transport",
             yourTripEmissions: "Les émissions de ton voyage",
             explanation:
               "Avion : la formation de traînées de condensation combinée aux émissions d'oxydes d'azote (NOx) affecte les propriétés de l'atmosphère et entraîne une augmentation du forçage radiatif. Le trajet représenté reste théorique et pourrait ne pas être exploité par une compagnie aérienne. Ce mode n'est pas affiché par défaut lorsque la distance du voyage est inférieure à 300 km.",
@@ -304,9 +316,9 @@ i18n
             paths: {
               railway: "Voie ferrée",
               road: "Route",
-              bike: "Piste cyclable",
-              flight: "Voie aérienne",
-              ferry: "Bateau",
+              bike: "Voie cyclable",
+              flight: "Route aérienne",
+              ferry: "Voie maritime",
             },
             category: {
               infra: "Infrastructure",

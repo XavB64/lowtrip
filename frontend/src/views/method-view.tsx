@@ -48,8 +48,8 @@ const MethodView = () => {
 
   const equation =
     i18n.language === "fr"
-      ? "CO_2eq = \\sum_{étape} Distance(km) \\times Facteur \\: d'émission(kgCO2eq/km)"
-      : "CO_2eq = \\sum_{step} Distance(km) \\times Emission \\: rate(kgCO2eq/km)";
+      ? "CO_2eq = \\sum_{étape} Distance(km) \\times Facteur \\: d'Émission(kgCO2eq/km)"
+      : "CO_2eq = \\sum_{step} Distance(km) \\times Emission \\: Factor(kgCO2eq/km)";
 
   // Render the LaTeX equation using KaTeX
   useEffect(() => {
@@ -172,36 +172,42 @@ const MethodView = () => {
                 {t("method.emissionFactors.table1.transport_1")}
               </Td>
               <Td>{t("method.emissionFactors.table1.variables_1")}</Td>
+              <Td>{t("method.emissionFactors.table1.why_1").split(';').map((line)=><div>{line}</div>)}</Td>
             </Tr>
             <Tr>
               <Td bg="blue.100">
                 {t("method.emissionFactors.table1.transport_2")}
               </Td>
               <Td>{t("method.emissionFactors.table1.variables_2")}</Td>
+              <Td>{t("method.emissionFactors.table1.why_2").split(';').map((line)=><div>{line}</div>)}</Td>
             </Tr>
             <Tr>
               <Td bg="blue.100">
-                {t("method.emissionFactors.table1.transport_3")}
+                {t("method.emissionFactors.table1.transport_3").split(';').map((line)=><div>{line}</div>)}
               </Td>
               <Td>{t("method.emissionFactors.table1.variables_3")}</Td>
+              <Td>{t("method.emissionFactors.table1.why_3").split(';').map((line)=><div>{line}</div>)}</Td>
             </Tr>
             <Tr>
               <Td bg="blue.100">
                 {t("method.emissionFactors.table1.transport_4")}
               </Td>
               <Td>{t("method.emissionFactors.table1.variables_4")}</Td>
+              <Td>{t("method.emissionFactors.table1.why_4").split(';').map((line)=><div>{line}</div>)}</Td>
             </Tr>
             <Tr>
               <Td bg="blue.100">
                 {t("method.emissionFactors.table1.transport_5")}
               </Td>
               <Td>{t("method.emissionFactors.table1.variables_5")}</Td>
+              <Td>{t("method.emissionFactors.table1.why_5").split(';').map((line)=><div>{line}</div>)}</Td>
             </Tr>
             <Tr>
               <Td bg="blue.100">
                 {t("method.emissionFactors.table1.transport_6")}
               </Td>
               <Td>{t("method.emissionFactors.table1.variables_6")}</Td>
+              <Td>{t("method.emissionFactors.table1.why_6").split(';').map((line)=><div>{line}</div>)}</Td>
             </Tr>
             {/* Add more rows as needed */}
           </Tbody>
