@@ -1,21 +1,21 @@
 
 <img src="https://github.com/XavB64/lowtrip/blob/main/frontend/src/assets/lowtrip_color.png" alt="lowtrip" width="400"/>
 
-## A web interface to compute travel CO2eq for different means of transport worldwide. 
+## a web app to compute travel CO2eq for different means of transport worldwide 
 
 The work presented here is independent and not-for-profit. This work has been carried out on a
-voluntary basis and presents no conflict of interest.
+voluntary basis.
 
 The aim of this web app is to present precise carbon inventories per passenger for each mode of
 transport and each journey. These results enable users to make informed choices in the context of
-reducing their greenhouse gas emissions to mitigate climate change. To put these results into context, total yearly
-per-capita emissions should not exceed 2 tons CO2eq in 2050 to limit global warming below 2°C (IPCC).
+reducing their greenhouse gas emissions to mitigate climate change. To put these results into context, total net yearly
+per-capita emissions should not exceed 2 tons CO2eq in 2050 to limit global warming below +2°C.
 
 ## How the emissions are calculated?
 
-To calculate CO2 equivalent emissions per person, we multiply the distance of a journey (km) by the corresponding emission factor (mass of CO2 equivalent per person per km) of a mean of transport. For a, mutlistep journey, these emissions are summed over the different steps.
+To calculate CO2 equivalent emissions per person, we multiply the distance of a journey (km) by the corresponding emission factor (mass of CO2 equivalent per person per km) of a mean of transport. For a mutlistep journey, these emissions are summed over the different steps:
 
-$$CO_2eq = \sum_{step} Distance(km) \times Emission factor(kgCO_2eq / km) $$
+$$CO_2eq = \sum_{step} Distance(km) \times Emission rate(kgCO_2eq / km) $$
 
 ### Estimation of distances
 
@@ -33,13 +33,13 @@ $$CO_2eq = \sum_{step} Distance(km) \times Emission factor(kgCO_2eq / km) $$
 | --- | --- |
 | `Train` | Visited countries |
 | `Bus` | - |
-| `Car` | User-specified parameters |
-| `Electric car` | Visited countries & User-specified parameters |
+| `Car` | Number of passengers |
+| `Electric car` | Visited countries & Number of passengers |
 | `Bike route` | - |
 | `Plane` | Distance of journey |
-| `Ferry` | User-specified parameters |
+| `Ferry` | (not yet) User-specified parameters |
 
-Emissions factors consider usage (linked to the manufacture and use of energy to move the vehicle) as well as infrastructure and vehicle construction where these are significant. The table below summarizes the types of emissions taken into account by lowtrip. Blank spaces mean that the related emissions did not contribute significantly to the result and are therefore excluded to facilitate understanding and readability for the user.
+Emissions factors consider usage (linked to the manufacture and use of energy to move the vehicle) as well as infrastructure and vehicle construction where these are significant. The table below summarizes the types of emissions taken into account by lowtrip. Empty cells mean that the related emissions did not contribute significantly to the result and are therefore excluded to facilitate understanding and readability for the user.
 
 | Mean of Transport | Usage | Vehicle construction | Infrastruture construction |
 | --- |  :---: |  :---: |  :---: |
@@ -49,7 +49,7 @@ Emissions factors consider usage (linked to the manufacture and use of energy to
 | `Plane` |  :white_check_mark: |  |  |
 | `Ferry` |  :white_check_mark: | Not found | Not found |
 
-All the assumptions, data and sources used are available in the [methodology](https://github.com/XavB64/lowtrip/blob/main/frontend/src/assets/lowtrip_methodology.pdf).
+All assumptions, data and sources used are available in the [methodology](https://github.com/XavB64/lowtrip/blob/main/frontend/src/assets/lowtrip_methodology.pdf) document.
 
 ## How to launch the app?
 
