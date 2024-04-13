@@ -1,4 +1,5 @@
-# lowtrip
+
+<img src="https://github.com/XavB64/lowtrip/blob/main/frontend/src/assets/lowtrip_color.png" alt="lowtrip" width="400"/>
 
 ## A web interface to compute travel CO2eq for different means of transport worldwide. 
 
