@@ -13,9 +13,9 @@ per-capita emissions should not exceed 2 tons CO2eq in 2050 to limit global warm
 
 ## How the emissions are calculated?
 
-To calculate CO2 equivalent emissions per person, we multiply the distance of a journey (km) by the corresponding emission rate (mass of CO2 equivalent per person per km) of a mean of transport. For a mutlistep journey, these emissions are summed over the different steps:
+To calculate CO2 equivalent emissions per person, we multiply the distance of a journey (km) by the corresponding emission factor (mass of CO2 equivalent per person per km) of a mean of transport. For a mutlistep journey, these emissions are summed over the different steps:
 
-$$CO_2eq = \sum_{step} Distance(km) \times Emission \\: Rate(kgCO_2eq / km) $$
+$$CO_2eq = \sum_{step} Distance(km) \times Emission \\: Factor(kgCO_2eq / km) $$
 
 ### Estimation of distances
 
@@ -27,7 +27,7 @@ $$CO_2eq = \sum_{step} Distance(km) \times Emission \\: Rate(kgCO_2eq / km) $$
 | `Plane` | Geodesic distance |
 | `Ferry` | Approximation of shortest path |
 
-### What do emission rates depend on?
+### What do emission factors depend on?
 
 | Mean of Transport | Variable |
 | --- | --- |
@@ -39,7 +39,7 @@ $$CO_2eq = \sum_{step} Distance(km) \times Emission \\: Rate(kgCO_2eq / km) $$
 | `Plane` | Distance of journey |
 | `Ferry` | (not yet) User-specified parameters |
 
-Emissions rates consider usage (linked to the manufacture and use of energy to move the vehicle) as well as infrastructure and vehicle construction where these are significant. The table below summarizes the types of emissions taken into account by lowtrip. Empty cells mean that the related emissions did not contribute significantly to the result and are therefore excluded to facilitate understanding and readability for the user.
+Emissions factors consider usage (linked to the manufacture and use of energy to move the vehicle) as well as infrastructure and vehicle construction where these are significant. The table below summarizes the types of emissions taken into account by lowtrip. Empty cells mean that the related emissions did not contribute significantly to the result and are therefore excluded to facilitate understanding and readability for the user.
 
 | Mean of Transport | Usage | Vehicle construction | Infrastruture construction |
 | --- |  :---: |  :---: |  :---: |
