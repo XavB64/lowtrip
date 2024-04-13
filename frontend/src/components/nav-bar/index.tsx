@@ -34,7 +34,7 @@ import {
 } from "@chakra-ui/react";
 import { GiHamburgerMenu } from "react-icons/gi";
 
-import Logo from "../../assets/logo.png";
+import Logo from "../../assets/lowtrip_logo.png";
 import gitLogo from "../../assets/github.png";
 import MethodologyPdf from "../../assets/lowtrip_methodology.pdf";
 import { useTranslation } from "react-i18next";
