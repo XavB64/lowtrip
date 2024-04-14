@@ -63,7 +63,7 @@ i18n
           },
           results: {
             vsOtherTrip: "Your trip VS Other trip",
-            vsOtherMeans: "Your trip VS other means of transport",
+            vsOtherMeans: "Your trip VS Other means of transport",
             yourTripEmissions: "Your trip emissions",
             explanation:
               "Plane: the formation of Contrails combined with emissions of nitrogen oxides (NOx) affect the properties of the atmosphere and lead to an increase in radiative forcing. The represented connection might not be currently operated by a flight company. This mode is not displayed by default when the journey length is below 300km.",
