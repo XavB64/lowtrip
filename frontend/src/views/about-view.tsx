@@ -1,10 +1,4 @@
-import {
-  Box,
-  Image,
-  Link,
-  Text,
-} from "@chakra-ui/react";
-// import { useState } from "react";
+import { Box, Image, Stack, Text } from "@chakra-ui/react";
 import { useTranslation } from "react-i18next";
 import mollow from "../assets/logo_mollow.png";
 import sailcoop from "../assets/logo_sailcoop.jpg";
@@ -15,57 +9,100 @@ import { checkIsOnMobile } from "../utils";
 const AboutView = () => {
   const { t } = useTranslation();
   const isOnMobile = checkIsOnMobile();
-  const horizontalPadding = isOnMobile ? "10%" : "20%";
 
   return (
-
-    <Box 
-    h="100%" 
-    w="100%" 
-    paddingLeft={horizontalPadding}
-    paddingRight={horizontalPadding}
-    marginTop={3}
-    color="#595959"
-        fontSize={["small", "large"]}
-        textAlign="left"
-        justifyContent="center"
+    <Box
+      h="100%"
+      w="100%"
+      paddingLeft="10%"
+      paddingRight="10%"
+      marginTop={3}
+      color="#595959"
+      fontSize={["small", "large"]}
     >
-      
+      <Stack
+        marginBottom={10}
+        direction={isOnMobile ? "column-reverse" : "row"}
+        width="100%"
+        alignItems="center"
+      >
+        <a href="https://www.mollow.eu/" target="_blank" rel="noreferrer">
+          <Image src={mollow} />
+        </a>
+        <Box paddingLeft={isOnMobile ? 0 : 5}>
+          <Text marginBottom={3}>
+            {t("about.mollow_1")}
+            <a
+              href="https://www.mollow.eu/"
+              target="_blank"
+              rel="noreferrer"
+              style={{ color: "blue" }}
+            >
+              Mollow
+            </a>
+            {t("about.mollow_2")}
+          </Text>
+          <Text marginBottom={3}>{t("about.mollow_3")}</Text>
+        </Box>
+      </Stack>
 
-        <Text marginBottom={3}>
-        {t("about.mollow_1")}
-        </Text>
-        <Text marginBottom={3}>
-        {t("about.mollow_2")}
-        </Text>
-        <Link to='https://www.mollow.eu/' >
-        <Image src={mollow} h={isOnMobile  ? "100%" :  "50%"} />
-        </Link>
-        <Text marginBottom={3} marginTop={3}>
-        {t("about.sailcoop_1")}
-        </Text>
-        <Text marginBottom={3}>
-        {t("about.sailcoop_2")}
-        </Text>
-        <Link to='https://www.sailcoop.fr/'>
-        <Image src={sailcoop} h={isOnMobile  ? "100%" :  "50%"}/>
-        </Link>
-        <Text marginBottom={3}  marginTop={3}>
-        {t("about.bonpote")}
-        </Text>
-        <Link to='https://bonpote.com/aller-voir-les-aurores-boreales-en-train-3-000km-de-bonheur/'>
-        <Image src={bonpote} h={isOnMobile  ? "100%" :  "60%"} />
-        </Link>
-        <Text marginBottom={3} marginTop={3}>
-        {t("about.shimla")}
-        </Text>
-        <Link to='https://www.shimla.fr/' >
-        <Image src={shimla} marginTop={3} h={isOnMobile  ? "100%" :  "70%"} />
-        </Link>
+      <Stack
+        marginBottom={10}
+        direction={isOnMobile ? "column" : "row"}
+        width="100%"
+        alignItems="center"
+      >
+        <Box paddingRight={isOnMobile ? 0 : 5}>
+          <Text marginBottom={3} marginTop={3}>
+            {t("about.sailcoop_1")}
+          </Text>
+          <Text marginBottom={3}>{t("about.sailcoop_2")}</Text>
+        </Box>
+        <a href="https://www.sailcoop.fr/" target="_blank" rel="noreferrer">
+          <Image src={sailcoop} />
+        </a>
+      </Stack>
 
+      <Stack
+        marginBottom={10}
+        direction={isOnMobile ? "column-reverse" : "row"}
+        alignItems="center"
+      >
+        <a
+          href="https://bonpote.com/aller-voir-les-aurores-boreales-en-train-3-000km-de-bonheur/"
+          target="_blank"
+          rel="noreferrer"
+        >
+          <Image src={bonpote} />
+        </a>
+        <Text
+          marginBottom={3}
+          marginTop={3}
+          marginLeft={isOnMobile ? 0 : 5}
+          width={isOnMobile ? "100%" : "150%"}
+        >
+          {t("about.bonpote")}
+        </Text>
+      </Stack>
+
+      <Stack
+        marginBottom={10}
+        direction={isOnMobile ? "column" : "row"}
+        alignItems="center"
+      >
+        <Text
+          marginBottom={3}
+          marginTop={3}
+          marginRight={isOnMobile ? 0 : 5}
+          width={isOnMobile ? "100%" : "150%"}
+        >
+          {t("about.shimla")}
+        </Text>
+        <a href="https://www.shimla.fr/" target="_blank" rel="noreferrer">
+          <Image src={shimla} marginTop={3} />
+        </a>
+      </Stack>
     </Box>
-
-    
   );
 };
 
