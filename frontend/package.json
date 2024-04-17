@@ -60,6 +60,7 @@
   },
   "devDependencies": {
     "@types/google.maps": "^3.54.10",
+    "@types/katex": "^0.16.7",
     "@types/leaflet": "^1.9.8",
     "@types/lodash": "^4.14.202",
     "@types/react": "^18.2.46"

@@ -318,7 +318,7 @@ def chart_refactor(mytrip, alternative=None, do_alt=False):
             + mytrip["NAME"]
         )  # + ' - ' + mytrip.index.map(str) + '\''
         # Separtating bars
-        mytrip["Mean of Transport"] = "My trip"
+        mytrip["Mean of Transport"] = "MyTrip"
         #mytrip = mytrip[l_var]
 
     if do_alt:
@@ -333,7 +333,7 @@ def chart_refactor(mytrip, alternative=None, do_alt=False):
                 + alternative["NAME"]
                 + " "
             )  # + ' - ' + alternative.index.map(str)
-            alternative["Mean of Transport"] = "Other trip"
+            alternative["Mean of Transport"] = "OtherTrip"
             # Then we return both
             
             return mytrip, alternative#[l_var]

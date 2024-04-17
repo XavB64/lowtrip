@@ -22,6 +22,9 @@ import {
   Flex,
   useDisclosure,
   Text,
+  Alert,
+  AlertIcon,
+  Link,
 } from "@chakra-ui/react";
 import { round, sumBy, uniq, uniqBy } from "lodash";
 import { BiHelpCircle } from "react-icons/bi";
@@ -58,24 +61,41 @@ export function Chart({ response }: ChartProps) {
       ? JSON.parse(response.data.alternative_trip)
       : []),
   ];
+  const myTripEmissions = sumBy(
+    JSON.parse(response.data.my_trip ?? {}) as TripData[],
+    (trip) => trip.kgCO2eq
+  );
+
   return (
     <Box h="100%" w="100%">
-      <Flex
-        align="center"
-        color="#595959"
-        fontSize={["small", "large"]}
-        textAlign="center"
-        justifyContent="center"
-        marginBottom={2}
+      <Text mr={3} align="center" color="#595959" fontSize={["small", "large"]}>
+        {response.data.alternative_trip
+          ? t("results.vsOtherTrip")
+          : response.data.direct_trip
+          ? t("results.vsOtherMeans")
+          : t("results.yourTripEmissions")}
+      </Text>
+      <Alert
+        status="info"
+        my={3}
+        borderRadius={5}
+        fontSize={[8, 12]}
+        p={[2, 3]}
       >
-        <Text mr={3} fontSize={breakpoint === "base" ? 10 : 20}>
-          {response.data.alternative_trip
-            ? t("results.vsOtherTrip")
-            : response.data.direct_trip
-            ? t("results.vsOtherMeans")
-            : t("results.yourTripEmissions")}
+        <AlertIcon boxSize={[4, 5]} />
+        <Text>
+          Ton voyage représente{" "}
+          <Text as="b">{round((myTripEmissions * 100) / 2000)}%</Text> de ton{" "}
+          <Link
+            href="https://www.2tonnes.org/post/objectif-2-tonnes-climat"
+            isExternal
+            textDecoration="underline"
+          >
+            budget carbone annuel
+          </Link>{" "}
+          selon les accords de Paris
         </Text>
-      </Flex>
+      </Alert>
       <ResponsiveContainer
         height={breakpoint === "base" ? 230 : 350}
         width="100%"
@@ -200,8 +220,6 @@ const transportMeansMapper: Record<Transport | string, string> = {
   [Transport.bicycle]: "chart.transportMeans.bicycle",
   [Transport.myTrip]: "chart.transportMeans.myTrip",
   [Transport.otherTrip]: "chart.transportMeans.otherTrip",
-    // "My trip": "chart.transportMeans.myTrip",
-  // "Other trip": "chart.transportMeans.otherTrip",
 };
 
 function getLabel(name: NameType, t: TFunction<"translation", undefined>) {
