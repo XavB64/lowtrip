@@ -15,7 +15,6 @@
 // // You should have received a copy of the GNU General Public License
 // // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-
 import {
   Box,
   Text,
@@ -35,16 +34,12 @@ import "katex/dist/katex.min.css";
 import { FaCheck } from "react-icons/fa";
 import i18n from "i18next";
 import { useEffect } from "react";
-import { checkIsOnMobile } from "../utils";
 
 // Tried to use the language to change the text in french but I couldn't
 // I think we should just write directly 2 pages and not use traduction elements
 
 const MethodView = () => {
   const { t } = useTranslation();
-
-  const isOnMobile = checkIsOnMobile();
-  const horizontalPadding = isOnMobile ? "10%" : "20%";
 
   const equation =
     i18n.language === "fr"
@@ -60,9 +55,8 @@ const MethodView = () => {
     <Box
       h="100%"
       w="100%"
-      paddingLeft={horizontalPadding}
-      paddingRight={horizontalPadding}
-      marginTop={3}
+      paddingX={["10%", "20%"]}
+      paddingY={[3, 16]}
       color="#595959"
       fontSize={["small", "large"]}
       textAlign="left"
@@ -172,42 +166,82 @@ const MethodView = () => {
                 {t("method.emissionFactors.table1.transport_1")}
               </Td>
               <Td>{t("method.emissionFactors.table1.variables_1")}</Td>
-              <Td>{t("method.emissionFactors.table1.why_1").split(';').map((line)=><div>{line}</div>)}</Td>
+              <Td>
+                {t("method.emissionFactors.table1.why_1")
+                  .split(";")
+                  .map((line) => (
+                    <div>{line}</div>
+                  ))}
+              </Td>
             </Tr>
             <Tr>
               <Td bg="blue.100">
                 {t("method.emissionFactors.table1.transport_2")}
               </Td>
               <Td>{t("method.emissionFactors.table1.variables_2")}</Td>
-              <Td>{t("method.emissionFactors.table1.why_2").split(';').map((line)=><div>{line}</div>)}</Td>
+              <Td>
+                {t("method.emissionFactors.table1.why_2")
+                  .split(";")
+                  .map((line) => (
+                    <div>{line}</div>
+                  ))}
+              </Td>
             </Tr>
             <Tr>
               <Td bg="blue.100">
-                {t("method.emissionFactors.table1.transport_3").split(';').map((line)=><div>{line}</div>)}
+                {t("method.emissionFactors.table1.transport_3")
+                  .split(";")
+                  .map((line) => (
+                    <div>{line}</div>
+                  ))}
               </Td>
               <Td>{t("method.emissionFactors.table1.variables_3")}</Td>
-              <Td>{t("method.emissionFactors.table1.why_3").split(';').map((line)=><div>{line}</div>)}</Td>
+              <Td>
+                {t("method.emissionFactors.table1.why_3")
+                  .split(";")
+                  .map((line) => (
+                    <div>{line}</div>
+                  ))}
+              </Td>
             </Tr>
             <Tr>
               <Td bg="blue.100">
                 {t("method.emissionFactors.table1.transport_4")}
               </Td>
               <Td>{t("method.emissionFactors.table1.variables_4")}</Td>
-              <Td>{t("method.emissionFactors.table1.why_4").split(';').map((line)=><div>{line}</div>)}</Td>
+              <Td>
+                {t("method.emissionFactors.table1.why_4")
+                  .split(";")
+                  .map((line) => (
+                    <div>{line}</div>
+                  ))}
+              </Td>
             </Tr>
             <Tr>
               <Td bg="blue.100">
                 {t("method.emissionFactors.table1.transport_5")}
               </Td>
               <Td>{t("method.emissionFactors.table1.variables_5")}</Td>
-              <Td>{t("method.emissionFactors.table1.why_5").split(';').map((line)=><div>{line}</div>)}</Td>
+              <Td>
+                {t("method.emissionFactors.table1.why_5")
+                  .split(";")
+                  .map((line) => (
+                    <div>{line}</div>
+                  ))}
+              </Td>
             </Tr>
             <Tr>
               <Td bg="blue.100">
                 {t("method.emissionFactors.table1.transport_6")}
               </Td>
               <Td>{t("method.emissionFactors.table1.variables_6")}</Td>
-              <Td>{t("method.emissionFactors.table1.why_6").split(';').map((line)=><div>{line}</div>)}</Td>
+              <Td>
+                {t("method.emissionFactors.table1.why_6")
+                  .split(";")
+                  .map((line) => (
+                    <div>{line}</div>
+                  ))}
+              </Td>
             </Tr>
             {/* Add more rows as needed */}
           </Tbody>

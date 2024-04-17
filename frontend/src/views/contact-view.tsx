@@ -57,9 +57,9 @@ const ContactView = () => {
   return (
     <Stack
       w="100%"
-      h="100%"
+      h={"calc(100vh - 64px)"}
       alignItems="center"
-      paddingInline={20}
+      paddingInline={[10, 20]}
       paddingBlock={8}
       backgroundColor="#efefef"
     >
@@ -72,7 +72,7 @@ const ContactView = () => {
           type="email"
           value={emailInput}
           onChange={(e: any) => setEmailInput(e.target.value)}
-          background={"white"}
+          background="white"
           borderRadius="10px"
           border="1px solid lightgrey"
         />
@@ -91,7 +91,7 @@ const ContactView = () => {
           onChange={(e) => setMessageInput(e.target.value)}
           minHeight="200px"
           size="sm"
-          background={"white"}
+          background="white"
           borderRadius="10px"
           border="1px solid lightgrey"
         />

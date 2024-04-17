@@ -20,17 +20,17 @@ import {
   HStack,
   Image,
   Spacer,
-  useBreakpointValue,
-  useBreakpoint,
   VStack,
   Stack,
   ChakraProvider,
-  Menu,
   MenuButton,
   MenuList,
   MenuItem,
   IconButton,
   useDisclosure,
+  Link as ChakraLink,
+  Menu,
+  Box,
 } from "@chakra-ui/react";
 import { GiHamburgerMenu } from "react-icons/gi";
 
@@ -51,8 +51,6 @@ const NavBar = ({
   };
 }) => {
   // Determine the display of the navigation items based on screen size
-  const displayNavItems = useBreakpointValue({ base: "block", md: "block" });
-  const breakpoint = useBreakpoint();
   const { t } = useTranslation();
   const { isOpen, onOpen: openErrorModal, onClose } = useDisclosure();
   const navItems = [
@@ -70,9 +68,16 @@ const NavBar = ({
     },
     {
       name: "Github",
-      component: <Link to="https://github.com/XavB64/lowtrip/" style={{ height: "100%" }}>
-      <Image src={gitLogo} h={breakpoint === "base" ? 6 :  "80%"} />
-    </Link>
+      component: (
+        <ChakraLink
+          href="https://github.com/XavB64/lowtrip/"
+          h="100%"
+          isExternal
+          alignContent="center"
+        >
+          <Image src={gitLogo} h={{ base: 6, md: "80%" }} />
+        </ChakraLink>
+      ),
     },
   ];
 
@@ -81,7 +86,7 @@ const NavBar = ({
       w="100%"
       position="fixed"
       background="#515151"
-      px={breakpoint === "base" ? 3 : 6}
+      px={{ base: 3, md: 6 }}
       py={4}
       boxShadow="md"
       zIndex={3}
@@ -91,51 +96,44 @@ const NavBar = ({
         <Image src={Logo} h="120%" />
       </Link>
       <Spacer />
-      <HStack display={displayNavItems}>
-        {breakpoint !== "base" ? (
-          <>
-            {navItems.map((item) => (
-              <Button
-                key={item.name}
-                fontSize={16}
-                color="#fff"
-                variant="ghost"
-                _hover={{ backgroundColor: "none", color: "#D1D1D1" }}
-                _active={{ backgroundColor: "none", color: "#D1D1D1" }}
-              >
-                {item.component}
-              </Button>
-            ))}
-            <UserSettingsSelector themeSettings={themeSettings} />
-          </>
-        ) : (
-          <>
-            <Menu>
-              <MenuButton
-                as={IconButton}
-                aria-label="Options"
-                icon={<GiHamburgerMenu size={25} />}
-                colorScheme="transparent"
-              />
-              <MenuList>
-                {navItems.map((item) => (
-                  <MenuItem key={item.name}>{item.component}</MenuItem>
-                ))}
-                <MenuItem onClick={openErrorModal}>
-                  {t("navbar.settings")}
-                </MenuItem>
-              </MenuList>
-            </Menu>
-            <UserSettingsModal
-              isOpen={isOpen}
-              onClose={() => {
-                onClose();
-              }}
-              themeSettings={themeSettings}
-            />
-          </>
-        )}
+      <HStack display={{ base: "none", md: "flex" }}>
+        {navItems.map((item) => (
+          <Button
+            key={item.name}
+            fontSize={16}
+            color="#fff"
+            variant="ghost"
+            _hover={{ backgroundColor: "none", color: "#D1D1D1" }}
+            _active={{ backgroundColor: "none", color: "#D1D1D1" }}
+          >
+            {item.component}
+          </Button>
+        ))}
+        <UserSettingsSelector themeSettings={themeSettings} />
       </HStack>
+      <Box display={{ base: "block", md: "none" }}>
+        <Menu>
+          <MenuButton
+            as={IconButton}
+            aria-label="Options"
+            icon={<GiHamburgerMenu size={25} />}
+            colorScheme="transparent"
+          />
+          <MenuList>
+            {navItems.map((item) => (
+              <MenuItem key={item.name}>{item.component}</MenuItem>
+            ))}
+            <MenuItem onClick={openErrorModal}>{t("navbar.settings")}</MenuItem>
+          </MenuList>
+        </Menu>
+        <UserSettingsModal
+          isOpen={isOpen}
+          onClose={() => {
+            onClose();
+          }}
+          themeSettings={themeSettings}
+        />
+      </Box>
     </HStack>
   );
 };
