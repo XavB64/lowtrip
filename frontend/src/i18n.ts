@@ -85,6 +85,13 @@ i18n
               "Plane: the formation of Contrails combined with emissions of nitrogen oxides (NOx) affect the properties of the atmosphere and lead to an increase in radiative forcing. The represented connection might not be currently operated by a flight company. This mode is not displayed by default when the journey length is below 300km.",
           },
           chart: {
+            information: {
+              info_1 : "This trip represents" ,
+              your : "of your",
+              info_2 : "annual carbon budget",
+              info_3 : "according to the Paris agreement",
+              link : "https://en.2tonnes.org/"
+            },
             transportMeans: {
               plane: "Plane",
               car: "Car",
@@ -340,6 +347,13 @@ i18n
               "Avion : la formation de traînées de condensation combinée aux émissions d'oxydes d'azote (NOx) affecte les propriétés de l'atmosphère et entraîne une augmentation du forçage radiatif. Le trajet représenté reste théorique et pourrait ne pas être exploité par une compagnie aérienne. Ce mode n'est pas affiché par défaut lorsque la distance du voyage est inférieure à 300 km.",
           },
           chart: {
+            information: {
+              info_1 : "Ce trajet représente" ,
+              your : "de ton",
+              info_2 : "budget carbone annuel",
+              info_3 : "selon l'accord de Paris",
+              link : "https://www.2tonnes.org/post/objectif-2-tonnes-climat"
+            },
             transportMeans: {
               plane: "Avion",
               car: "Voiture",

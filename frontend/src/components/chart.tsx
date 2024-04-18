@@ -84,16 +84,16 @@ export function Chart({ response }: ChartProps) {
       >
         <AlertIcon boxSize={[4, 5]} />
         <Text>
-          Ton voyage représente{" "}
-          <Text as="b">{round((myTripEmissions * 100) / 2000)}%</Text> de ton{" "}
+          {t("chart.information.info_1")}{" "}
+          <Text as="b">{round((myTripEmissions * 100) / 2000)}%</Text>{" "}{t("chart.information.your")}{" "}
           <Link
-            href="https://www.2tonnes.org/post/objectif-2-tonnes-climat"
+            href={t("chart.information.link")}
             isExternal
             textDecoration="underline"
           >
-            budget carbone annuel
+            {t("chart.information.info_2")}
           </Link>{" "}
-          selon les accords de Paris
+          {t("chart.information.info_3")}
         </Text>
       </Alert>
       <ResponsiveContainer
