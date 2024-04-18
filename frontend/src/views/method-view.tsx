@@ -55,7 +55,9 @@ const MethodView = () => {
     <Box
       h="100%"
       w="100%"
-      paddingX={["10%", "20%"]}
+      overflowX= 'hidden'
+      paddingLeft="10%"
+      paddingRight="10%"
       paddingY={[3, 16]}
       color="#595959"
       fontSize={["small", "large"]}
