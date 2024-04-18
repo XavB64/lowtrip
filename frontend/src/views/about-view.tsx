@@ -15,7 +15,6 @@ const AboutView = () => {
       h="100%"
       w="100%"
       //overflowX= "hidden"
-      overflowY= "hidden"
       
       paddingLeft="10%"
       paddingRight="10%"
