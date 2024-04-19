@@ -28,10 +28,10 @@ import {
   useBreakpoint,
 } from "@chakra-ui/react";
 import { BiSolidPlusCircle } from "react-icons/bi";
-import { API_URL } from "../config";
-import { ApiResponse, Step } from "../types";
-import { formatStepsForApi } from "../utils";
-import { PrimaryButton } from "./primary-button";
+import { API_URL } from "../../config";
+import { ApiResponse, Step } from "../../types";
+import { formatStepsForApi } from "../../utils";
+import { PrimaryButton } from "../primary-button";
 import { StepField } from "./step-field";
 import ErrorModal from "./error-modal";
 import { useTranslation } from "react-i18next";
