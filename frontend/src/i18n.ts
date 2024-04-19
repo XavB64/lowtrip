@@ -81,10 +81,15 @@ i18n
             hitchHiking: "Hitch-hiking",
           },
           about: {
+            introduction_1:
+              "Lowtrip is an independent, free and open-source project. The aim of this application is to provide accurate carbon footprints per passenger for each mode of transport and journey. These results enable users to make informed choices in the context of reducing their carbon footprint to curb the effects of global warming.",
+            introduction_2:
+              "This application has been developed by a team of four young volunteers. We welcome any feedback and suggestions for improvement, which you can send us via the contact page. Thank you in advance for your enthusiasm! :)",
+            inspiringProjects: "Some inspiring projects",
             mollow_1:
               "Traveling sustainably across Europe, without relying on cars or airplanes, presents numerous challenges. The continent's train and bus networks are diverse and sometimes difficult to navigate, making it tricky to find efficient and affordable connections between countries. This is where ",
             mollow_2:
-              "steps in as a comprehensive web platform designed to revolutionize your travel experience.",
+              " steps in as a comprehensive web platform designed to revolutionize your travel experience.",
             mollow_3:
               " Mollow provides a wealth of advice and tested routes to give you inspiration for your next great adventure. The platform is founded on the belief that the journey itself should be a memorable part of your holiday. By embracing this philosophy, Mollow encourages travelers to explore and appreciate the charming cities and breathtaking landscapes that unfold along the way.",
             sailcoop_1:
@@ -145,6 +150,10 @@ i18n
                 "The work presented here is independent, not-for-profit and open source.",
               text2:
                 "The aim of this web app is to present precise carbon inventories per passenger for each mode of transport and each journey. These results enable users to make informed choices in the context of reducing their greenhouse gas emissions to mitigate climate change. To put these results into context, total yearly per-capita net emissions should not exceed 2 tons CO2eq in 2050 to limit global warming below +2°C.",
+              text3:
+                "All assumptions, data and sources used are available in this",
+              text4: "methodology",
+              text5: " document.",
             },
             howEmissionsAreComputed: {
               title: "How the emissions are calculated?",
@@ -208,10 +217,6 @@ i18n
               },
               text1:
                 "Emission factors consider usage (linked to the manufacture and use of energy to move the vehicle) as well as infrastructure and vehicle construction where these are significant. The table below summarizes the types of emissions taken into account by lowtrip. Empty cells mean that the related emissions did not contribute significantly to the result and are therefore excluded to facilitate understanding and readability for the user.",
-              text2:
-                "All assumptions, data and sources used are available in the",
-              text3: "methodology",
-              text4: " document.",
             },
           },
         },
@@ -224,6 +229,10 @@ i18n
               text1: "Ce travail est indépendant, gratuit et open-source.",
               text2:
                 "L'objectif de cette application est de fournir des bilans carbone par passager précis pour chaque mode de transport et trajet. Ces résultats permmettent à l'utilisateur de faire des choix informés dans le contexte de réduction de leur empreinte carbone pour freiner les effets du réchauffement climatique. Pour mettre ces valeurs en contexte, l'empreinte nette annuelle et personnelle ne doit pas dépasser les 2t CO2eq en 2050 afin de rester sous +2°C de réchauffement.",
+              text3:
+                "Toutes les hypothèses, données et sources sont disponibles dans ce document de",
+              text4: "méthodologie",
+              text5: ".",
             },
             howEmissionsAreComputed: {
               title: "Comment les émissions sont-elles calculées ?",
@@ -287,10 +296,6 @@ i18n
               },
               text1:
                 "Les facteurs d'émissions considèrent l'utilisation (en lien avec la production et l'utilisation de l'énergie pour faire avancer le véhicule) ainsi que les infrastructures et la construction du véhicule lorques ces dernières sont significatives. \n La table ci dessous résume les types d'émissions prises en compte dans lowtrip. Les cellules vides signifient que le facteur d'émission correspondant ne contribue pas significativement au résultat, et se retrouve exclu du rendu final afin de faciliter la compréhension et la lecture.",
-              text2:
-                "Toutes les hypothèses, données et sources sont disponibles dans le document de",
-              text3: "méthodologie",
-              text4: ".",
             },
           },
           contact: {
@@ -362,6 +367,11 @@ i18n
             hitchHiking: "Auto-stop",
           },
           about: {
+            introduction_1:
+              "Lowtrip est un projet indépendant, gratuit et open-source. L'objectif de cette application est de fournir des bilans carbone par passager précis pour chaque mode de transport et trajet. Ces résultats permettent à l'utilisateur de faire des choix informés dans le contexte de réduction de leur empreinte carbone pour freiner les effets du réchauffement climatique.",
+            introduction_2:
+              "Cette application a été développée par une équipe de quatre jeunes bénévoles. Nous sommes preneurs de tous vos retours et propositions d'amélioration, que vous pouvez nous transmettre via la page contact. Merci d'avance pour votre enthousiasme ! :)",
+            inspiringProjects: "Quelques projets inspirants",
             mollow_1:
               "Voyager de manière durable à travers l'Europe, sans avoir recours à la voiture ou à l'avion, présente de nombreux défis. Les réseaux de trains et de bus du continent sont divers et parfois difficiles à naviguer, ce qui rend difficile la recherche de connexions efficaces et abordables entre les pays. C'est là qu'intervient ",
             mollow_2:
