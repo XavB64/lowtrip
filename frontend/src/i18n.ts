@@ -36,6 +36,25 @@ i18n
           },
           form: {
             addStep: "Add step",
+            adviceText: {
+              main: "Please select {{missingParams}} and compare with...",
+              departure: "a departure",
+              destination: "a destination",
+              transportMean: "a transport mean",
+              and: "and",
+              missingTransportMean: "the missing transport mean",
+              missingTransportMeans: "the missing transport means",
+              missingLocation: "the missing location",
+              missingLocationAndTransportMean:
+                "the missing location and transport mean",
+              missingLocationAndTransportMeans:
+                "the missing location and transport means",
+              missingLocations: "the missing locations",
+              missingLocationsAndTransportMean:
+                "the missing locations and transport mean",
+              missingLocationsAndTransportMeans:
+                "the missing locations and transport means",
+            },
             tabMyTrip: "My trip",
             tabOtherTrip: "Other trip",
             clearInput: "Clear",
@@ -298,6 +317,25 @@ i18n
           },
           form: {
             addStep: "Ajouter une étape",
+            adviceText: {
+              main: "Renseignez {{missingParams}} puis comparez avec...",
+              departure: "un point de départ",
+              destination: "une destination",
+              transportMean: "un moyen de transport",
+              and: "et",
+              missingTransportMean: "le moyen de transport manquant",
+              missingTransportMeans: "les moyens de transport manquants",
+              missingLocation: "le point d'étape manquant",
+              missingLocationAndTransportMean:
+                "le point d'étape et le moyen de transport manquants",
+              missingLocationAndTransportMeans:
+                "le point d'étape et les moyens de transport manquants",
+              missingLocations: "les points d'étape manquants",
+              missingLocationsAndTransportMean:
+                "les points d'étape et le moyen de transport manquants",
+              missingLocationsAndTransportMeans:
+                "les points d'étapes et les moyens de tranport manquants",
+            },
             tabMyTrip: "Mon voyage",
             tabOtherTrip: "Autre voyage",
             clearInput: "Effacer",
