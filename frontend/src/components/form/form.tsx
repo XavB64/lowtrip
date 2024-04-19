@@ -16,7 +16,7 @@
 // // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import axios from "axios";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 import {
   Button,
@@ -35,6 +35,7 @@ import { PrimaryButton } from "../primary-button";
 import { StepField } from "./step-field";
 import ErrorModal from "./error-modal";
 import { useTranslation } from "react-i18next";
+import { getAdviceTextTranslation } from "./utils";
 
 const getPayload = (steps: Step[], stepsToCompare?: Step[]) => {
   const formData = new FormData();
@@ -118,6 +119,11 @@ export const Form = ({
       });
   };
 
+  const adviceText = useMemo(
+    () => getAdviceTextTranslation(t, steps),
+    [t, steps]
+  );
+
   return (
     <VStack
       paddingY={5}
@@ -154,42 +160,45 @@ export const Form = ({
         my={3}
       />
 
-      {stepsToCompare ? (
-        <PrimaryButton
-          onClick={handleSubmit}
-          isDisabled={formIsNotValid}
-          isLoading={isLoading}
-        >
-          {t("form.compareWithThisTrip")}
-        </PrimaryButton>
-      ) : (
-        <>
-          {steps.length < 3 && (
-            <Text alignSelf="center">{t("form.compareWith")}</Text>
-          )}
-          <Stack w="100%" direction={breakpoint === "base" ? "column" : "row"}>
-            <PrimaryButton
-              onClick={handleSubmit}
-              isDisabled={formIsNotValid}
-              isLoading={isLoading}
+      <VStack w="100%">
+        {adviceText && <Text textAlign="center">{adviceText}</Text>}
+        {stepsToCompare ? (
+          <PrimaryButton
+            onClick={handleSubmit}
+            isDisabled={formIsNotValid}
+            isLoading={isLoading}
+          >
+            {t("form.compareWithThisTrip")}
+          </PrimaryButton>
+        ) : (
+          <>
+            <Stack
+              w="100%"
+              direction={breakpoint === "base" ? "column" : "row"}
             >
-              {steps.length < 3
-                ? t("form.otherTransportMeans")
-                : t("form.computeEmissions")}
-            </PrimaryButton>
-            <PrimaryButton
-              onClick={changeTab}
-              isDisabled={formIsNotValid}
-              isLoading={false}
-              variant="outline"
-            >
-              {steps.length < 3
-                ? t("form.anotherTrip")
-                : t("form.compareToAnotherTrip")}
-            </PrimaryButton>
-          </Stack>
-        </>
-      )}
+              <PrimaryButton
+                onClick={handleSubmit}
+                isDisabled={formIsNotValid}
+                isLoading={isLoading}
+              >
+                {steps.length < 3
+                  ? t("form.otherTransportMeans")
+                  : t("form.computeEmissions")}
+              </PrimaryButton>
+              <PrimaryButton
+                onClick={changeTab}
+                isDisabled={formIsNotValid}
+                isLoading={false}
+                variant="outline"
+              >
+                {steps.length < 3
+                  ? t("form.anotherTrip")
+                  : t("form.compareToAnotherTrip")}
+              </PrimaryButton>
+            </Stack>
+          </>
+        )}
+      </VStack>
 
       <ErrorModal
         isOpen={isOpen}
