@@ -1,6 +1,12 @@
 import { TFunction } from "i18next";
 import { Step } from "../../types";
 
+export const stepsAreInvalid = (steps: Step[]) =>
+  steps.some((step, index) => {
+    const isDeparture = index === 0;
+    return !step.locationCoords || (!isDeparture && !step.transportMean);
+  });
+
 const formatMissingParams = (missingParams: string[], t: TFunction) => {
   if (missingParams.length === 0) return "";
   if (missingParams.length === 1) return missingParams[0];
@@ -49,7 +55,11 @@ const formatMissingParamsForSeveralSteps = (
 //   Renseignez le point d'étape et les modes de transport manquants puis comparez avec...
 //   Renseignez les points d'étape et le mode de transport manquants puis comparez avec...
 //   Renseignez les points d'étape et les modes de transport manquants puis comparez avec...
-export const getAdviceTextTranslation = (t: TFunction, steps: Step[]) => {
+export const getAdviceTextTranslation = (
+  t: TFunction,
+  steps: Step[],
+  isSecondForm: boolean
+) => {
   let missingParamsString = "";
   if (steps.length === 2) {
     const missingParams: string[] = [];
@@ -87,9 +97,12 @@ export const getAdviceTextTranslation = (t: TFunction, steps: Step[]) => {
     );
   }
 
-  return missingParamsString.length
-    ? t("form.adviceText.main", {
-        missingParams: missingParamsString,
-      })
-    : undefined;
+  if (!missingParamsString.length)
+    return isSecondForm ? undefined : t("form.adviceText.compareWith");
+  return t(
+    !isSecondForm ? "form.adviceText.main" : "form.adviceText.mainSecondForm",
+    {
+      missingParams: missingParamsString,
+    }
+  );
 };

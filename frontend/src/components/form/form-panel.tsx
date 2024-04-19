@@ -24,14 +24,11 @@ import {
   TabPanels,
   Tabs,
   VStack,
-  Tooltip as ChakraTooltip,
-  useDisclosure,
 } from "@chakra-ui/react";
 import { Form } from "./form";
 import { Chart } from "../chart";
 import { useRef, useState } from "react";
 import { ApiResponse, StepProps } from "../../types";
-import { BiHelpCircle } from "react-icons/bi";
 import { useTranslation } from "react-i18next";
 
 interface FormPanelProps {
@@ -57,8 +54,6 @@ export function FormPanel({
   const scrollToChart = () =>
     (chartRef.current as any)?.scrollIntoView({ behavior: "smooth" });
 
-  const { isOpen, onOpen, onToggle, onClose } = useDisclosure();
-
   return (
     <VStack
       width={["100%", "45%"]}
@@ -76,16 +71,6 @@ export function FormPanel({
           textAlign="center"
         >
           {t("home.compareTravelEmissions")}
-          <ChakraTooltip label={t("home.toolDescription")} isOpen={isOpen}>
-            <span>
-              <BiHelpCircle
-                style={{ display: "inline-block", marginLeft: "5px" }}
-                onMouseEnter={onOpen}
-                onMouseLeave={onClose}
-                onClick={onToggle}
-              />
-            </span>
-          </ChakraTooltip>
         </Heading>
 
         <Tabs

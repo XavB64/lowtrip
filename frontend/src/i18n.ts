@@ -31,13 +31,14 @@ i18n
           },
           home: {
             compareTravelEmissions: "Compare your travel emissions",
-            toolDescription:
-              "Select departure, destination and means of transport to compare the emissions of your journeys! You can either compare several modes of transport on a specific route, or compare multi-modal routes with steps.",
           },
           form: {
             addStep: "Add step",
             adviceText: {
+              compareWith: "Compare with...",
+              previousFormIsInvalid: "Please fill the previous form first",
               main: "Please select {{missingParams}} and compare with...",
+              mainSecondForm: "Please select {{missingParams}} and...",
               departure: "a departure",
               destination: "a destination",
               transportMean: "a transport mean",
@@ -58,8 +59,7 @@ i18n
             tabMyTrip: "My trip",
             tabOtherTrip: "Other trip",
             clearInput: "Clear",
-            compareWithThisTrip: "Compare with this trip",
-            compareWith: "Compare with...",
+            compareWithThisTrip: "Compare with your first trip",
             otherTransportMeans: "Other transport means",
             computeEmissions: "Compute emissions",
             anotherTrip: "Another trip",
@@ -312,13 +312,14 @@ i18n
           },
           home: {
             compareTravelEmissions: "Compare les émissions de ton voyage",
-            toolDescription:
-              "Choisis un point de départ, un point d'arrivée et un moyen de transport pour comparer les émissions CO2 de ton voyage ! Tu peux soit comparer les émissions d'un même trajet mais avec différents moyens de transport, soit comparer des voyages mutlimodaux à étapes.",
           },
           form: {
             addStep: "Ajouter une étape",
             adviceText: {
+              compareWith: "Comparez avec...",
+              previousFormIsInvalid: "Complétez le premier voyage",
               main: "Renseignez {{missingParams}} puis comparez avec...",
+              mainSecondForm: "Renseignez {{missingParams}} puis...",
               departure: "un point de départ",
               destination: "une destination",
               transportMean: "un moyen de transport",
@@ -339,8 +340,7 @@ i18n
             tabMyTrip: "Mon voyage",
             tabOtherTrip: "Autre voyage",
             clearInput: "Effacer",
-            compareWithThisTrip: "Comparer avec ce voyage",
-            compareWith: "Comparer avec...",
+            compareWithThisTrip: "Comparez avec votre premier voyage",
             otherTransportMeans: "D'autres moyens de transport",
             computeEmissions: "Calculer les émissions",
             anotherTrip: "Un autre voyage",
