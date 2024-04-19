@@ -75,6 +75,18 @@ const MethodView = () => {
       </Heading>
       <Text marginBottom={3}>{t("method.introduction.text1")}</Text>
       <Text marginBottom={3}>{t("method.introduction.text2")}</Text>
+      <Text marginBottom={10}>
+        {t("method.introduction.text3")}{" "}
+        <a
+          href={MethodologyPdf}
+          target="_blank"
+          rel="noreferrer"
+          style={{ color: "blue" }}
+        >
+          {t("method.introduction.text4")}
+        </a>
+        {t("method.introduction.text5")}
+      </Text>
 
       <Heading
         as="h2"
@@ -319,19 +331,6 @@ const MethodView = () => {
           </Tbody>
         </Table>
       </TableContainer>
-
-      <Text marginBottom={10}>
-        {t("method.emissionFactors.text2")}{" "}
-        <a
-          href={MethodologyPdf}
-          target="_blank"
-          rel="noreferrer"
-          style={{ color: "blue" }}
-        >
-          {t("method.emissionFactors.text3")}
-        </a>
-        {t("method.emissionFactors.text4")}
-      </Text>
     </Box>
   );
 };
