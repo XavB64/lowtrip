@@ -35,7 +35,7 @@ import { PrimaryButton } from "../primary-button";
 import { StepField } from "./step-field";
 import ErrorModal from "./error-modal";
 import { useTranslation } from "react-i18next";
-import { getAdviceTextTranslation } from "./utils";
+import { stepsAreInvalid, getAdviceTextTranslation } from "./utils";
 
 const getPayload = (steps: Step[], stepsToCompare?: Step[]) => {
   const formData = new FormData();
@@ -85,10 +85,13 @@ export const Form = ({
   const [isLoading, setIsLoading] = useState(false);
   const breakpoint = useBreakpoint();
 
-  const formIsNotValid = steps.some((step, index) => {
-    const isDeparture = index === 0;
-    return !step.locationCoords || (!isDeparture && !step.transportMean);
-  });
+  const formIsNotValid = useMemo(() => {
+    if (stepsToCompare) {
+      const mainFormIsNotValid = stepsAreInvalid(stepsToCompare);
+      if (mainFormIsNotValid) return true;
+    }
+    return stepsAreInvalid(steps);
+  }, [stepsToCompare, steps]);
 
   const handleSubmit = async () => {
     if (steps.length < 1 || steps.some((step) => !step.locationCoords))
@@ -119,10 +122,12 @@ export const Form = ({
       });
   };
 
-  const adviceText = useMemo(
-    () => getAdviceTextTranslation(t, steps),
-    [t, steps]
-  );
+  const adviceText = useMemo(() => {
+    if (stepsToCompare && stepsAreInvalid(stepsToCompare)) {
+      return t("form.adviceText.previousFormIsInvalid");
+    }
+    return getAdviceTextTranslation(t, steps, !!stepsToCompare);
+  }, [t, steps, stepsToCompare]);
 
   return (
     <VStack
@@ -163,13 +168,15 @@ export const Form = ({
       <VStack w="100%">
         {adviceText && <Text textAlign="center">{adviceText}</Text>}
         {stepsToCompare ? (
-          <PrimaryButton
-            onClick={handleSubmit}
-            isDisabled={formIsNotValid}
-            isLoading={isLoading}
-          >
-            {t("form.compareWithThisTrip")}
-          </PrimaryButton>
+          stepsAreInvalid(stepsToCompare) ? null : (
+            <PrimaryButton
+              onClick={handleSubmit}
+              isDisabled={formIsNotValid}
+              isLoading={isLoading}
+            >
+              {t("form.compareWithThisTrip")}
+            </PrimaryButton>
+          )
         ) : (
           <>
             <Stack
