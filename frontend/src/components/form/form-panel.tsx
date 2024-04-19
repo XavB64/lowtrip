@@ -28,9 +28,9 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 import { Form } from "./form";
-import { Chart } from "./chart";
+import { Chart } from "../chart";
 import { useRef, useState } from "react";
-import { ApiResponse, StepProps } from "../types";
+import { ApiResponse, StepProps } from "../../types";
 import { BiHelpCircle } from "react-icons/bi";
 import { useTranslation } from "react-i18next";
 

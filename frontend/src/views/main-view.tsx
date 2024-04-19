@@ -2,7 +2,7 @@ import { Box, IconButton } from "@chakra-ui/react";
 import { useState } from "react";
 import { BiChevronUp } from "react-icons/bi";
 
-import { FormPanel } from "../components/form-panel";
+import { FormPanel } from "../components/form/form-panel";
 import { useSteps } from "../hooks";
 import { ApiResponse } from "../types";
 import { Map } from "../components/map";

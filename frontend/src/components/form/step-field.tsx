@@ -38,7 +38,7 @@ import {
   MenuList,
   Tooltip as ChakraTooltip,
 } from "@chakra-ui/react";
-import { Step, Transport, thumbUp } from "../types";
+import { Step, Transport, thumbUp } from "../../types";
 import { useTranslation } from "react-i18next";
 
 const TRANSPORTS = [
