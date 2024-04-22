@@ -514,10 +514,14 @@ def gdf_lines(start, end, add_canal = True):
         
     #Combine
    # s = time.time()
+    sea_lines = list(get_sea_lines(start, end).geometry.values)
     full_edge = unary_union(coast_exp0 + canal +
                             [extend_line(get_line_coast(p, coast_lines0)) for p in [start, end]] + 
                             #Extend the lines for the shortest path to the sea
-                            [extend_line(k, start=True) for k in list(get_sea_lines(start, end).geometry.values)]) # get the lines where ferry can navigate
+                            [extend_line(k, start=True) for k in sea_lines[:-1]] +
+                            #Don't extend direct conection
+                            [sea_lines[-1]]
+                            ) # get the lines where ferry can navigate
     #print('Extend line : ', round(time.time() - s, 3))
     return gpd.GeoDataFrame(geometry = gpd.GeoSeries(full_edge)).explode() #, crs='epsg:4326'
 
