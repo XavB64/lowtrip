@@ -42,6 +42,56 @@ import theme from "../../theme";
 import UserSettingsModal from "./user-settings-modal";
 import UserSettingsSelector from "./user-settings-selector";
 
+const navItems = [
+  {
+    name: "About",
+    url: "/about",
+    label: "about",
+  },
+  {
+    name: "Contact",
+    url: "/contact",
+    label: "contact",
+  },
+  {
+    name: "Methods",
+    url: "/method",
+    label: "methodology",
+  },
+];
+
+const GithubItem = () => (
+  <ChakraLink
+    href="https://github.com/XavB64/lowtrip/"
+    h="100%"
+    isExternal
+    alignContent="center"
+  >
+    <Button
+      fontSize={16}
+      color="#fff"
+      variant="ghost"
+      _hover={{ backgroundColor: "none", color: "#D1D1D1" }}
+      _active={{ backgroundColor: "none", color: "#D1D1D1" }}
+    >
+      <Image src={gitLogo} h={{ base: 6, md: "80%" }} />
+    </Button>
+  </ChakraLink>
+);
+
+const GithubMenuItem = () => (
+  <ChakraLink
+    href="https://github.com/XavB64/lowtrip/"
+    h="100%"
+    isExternal
+    alignContent="center"
+  >
+    <MenuItem>
+      <Image src={gitLogo} h={{ base: 6, md: "80%" }} />
+    </MenuItem>
+  </ChakraLink>
+);
+
 const NavBar = ({
   themeSettings,
 }: {
@@ -53,33 +103,6 @@ const NavBar = ({
   // Determine the display of the navigation items based on screen size
   const { t } = useTranslation();
   const { isOpen, onOpen: openErrorModal, onClose } = useDisclosure();
-  const navItems = [
-    {
-      name: "About",
-      component: <Link to="/about">{t("navbar.about")}</Link>,
-    },
-    {
-      name: "Contact",
-      component: <Link to="/contact">{t("navbar.contact")}</Link>,
-    },
-    {
-      name: "Methods",
-      component: <Link to="/method">{t("navbar.methodology")}</Link>,
-    },
-    {
-      name: "Github",
-      component: (
-        <ChakraLink
-          href="https://github.com/XavB64/lowtrip/"
-          h="100%"
-          isExternal
-          alignContent="center"
-        >
-          <Image src={gitLogo} h={{ base: 6, md: "80%" }} />
-        </ChakraLink>
-      ),
-    },
-  ];
 
   return (
     <HStack
@@ -98,17 +121,19 @@ const NavBar = ({
       <Spacer />
       <HStack display={{ base: "none", md: "flex" }}>
         {navItems.map((item) => (
-          <Button
-            key={item.name}
-            fontSize={16}
-            color="#fff"
-            variant="ghost"
-            _hover={{ backgroundColor: "none", color: "#D1D1D1" }}
-            _active={{ backgroundColor: "none", color: "#D1D1D1" }}
-          >
-            {item.component}
-          </Button>
+          <Link to={item.url} key={item.name}>
+            <Button
+              fontSize={16}
+              color="#fff"
+              variant="ghost"
+              _hover={{ backgroundColor: "none", color: "#D1D1D1" }}
+              _active={{ backgroundColor: "none", color: "#D1D1D1" }}
+            >
+              {t(`navbar.${item.label}`)}
+            </Button>
+          </Link>
         ))}
+        <GithubItem />
         <UserSettingsSelector themeSettings={themeSettings} />
       </HStack>
       <Box display={{ base: "block", md: "none" }}>
@@ -121,8 +146,11 @@ const NavBar = ({
           />
           <MenuList>
             {navItems.map((item) => (
-              <MenuItem key={item.name}>{item.component}</MenuItem>
+              <Link to={item.url} key={item.name}>
+                <MenuItem key={item.name}>{t(`navbar.${item.label}`)}</MenuItem>
+              </Link>
             ))}
+            <GithubMenuItem />
             <MenuItem onClick={openErrorModal}>{t("navbar.settings")}</MenuItem>
           </MenuList>
         </Menu>
