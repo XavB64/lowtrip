@@ -15,7 +15,7 @@
 // // You should have received a copy of the GNU General Public License
 // // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   BiSolidBus,
   BiSolidCar,
@@ -88,15 +88,13 @@ export const StepField = ({ removeStep, updateStep, step }: StepFieldProps) => {
 
   const isDeparture = step.index === 1;
 
-  useEffect(() => {
+  const addListenersForAutocompleteFields = useCallback(() => {
     if (inputRef.current) {
       // @ts-ignore
       autoCompleteRef.current = new window.google.maps.places.Autocomplete(
         inputRef.current,
         { fields: ["geometry", "formatted_address"] }
       );
-    }
-    if (autoCompleteRef.current) {
       // @ts-ignore
       autoCompleteRef.current.addListener("place_changed", async function () {
         // @ts-ignore
@@ -115,6 +113,18 @@ export const StepField = ({ removeStep, updateStep, step }: StepFieldProps) => {
       });
     }
   }, [inputRef, updateStep, step.index]);
+
+  useEffect(() => {
+    const googleScript = document.getElementById("google-map-script");
+
+    if (window.google) addListenersForAutocompleteFields();
+
+    if (googleScript) {
+      googleScript.addEventListener("load", () => {
+        addListenersForAutocompleteFields();
+      });
+    }
+  }, [addListenersForAutocompleteFields]);
 
   useEffect(() => {
     if (shoudlReset && step.locationCoords) {
