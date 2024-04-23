@@ -133,9 +133,9 @@ export function Chart({ response }: ChartProps) {
         <ChakraTooltip
           label={t("results.explanation")}
           isOpen={isOpen}
-          fontSize={9}
+          fontSize={10}
         >
-          <span>
+          <span style={{fontSize: breakpoint === "base" ? 8 : 12}}> {t("chart.help")}
             <BiHelpCircle
               style={{ display: "inline-block", marginRight: "5px" }}
               onMouseEnter={onOpen}

@@ -106,7 +106,7 @@ i18n
             vsOtherMeans: "Your trip VS Other means of transport",
             yourTripEmissions: "Your trip emissions",
             explanation:
-              "Plane: the formation of Contrails combined with emissions of nitrogen oxides (NOx) affect the properties of the atmosphere and lead to an increase in radiative forcing. The represented connection might not be currently operated by a flight company. This mode is not displayed by default when the journey length is below 300km.",
+              "The combustion of kerosene at high altitude produces clouds called contrails. Combined with NOx emissions, these non-CO2 effects contribute to global warming. The represented connection might not be currently operated by a flight company. This mode is not displayed by default when the journey length is below 300km.",
           },
           chart: {
             information: {
@@ -116,6 +116,7 @@ i18n
               info_3 : "according to the Paris agreement",
               link : "https://en.2tonnes.org/"
             },
+            help :   "Details about plane ",
             transportMeans: {
               plane: "Plane",
               car: "Car",
@@ -392,7 +393,7 @@ i18n
             vsOtherMeans: "Ton voyage VS Autres moyens de transport",
             yourTripEmissions: "Les émissions de ton voyage",
             explanation:
-              "Avion : la formation de traînées de condensation combinée aux émissions d'oxydes d'azote (NOx) affecte les propriétés de l'atmosphère et entraîne une augmentation du forçage radiatif. Le trajet représenté reste théorique et pourrait ne pas être exploité par une compagnie aérienne. Ce mode n'est pas affiché par défaut lorsque la distance du voyage est inférieure à 300 km.",
+              "La combustion du kérosène à haute altitude entraîne la formation de nuages appelés traînées de condensation. Combiné aux émissions de NOx, ces effets hors CO2 contribuent au réchauffement climatique. Le trajet représenté reste théorique et pourrait ne pas être exploité par une compagnie aérienne. Ce mode n'est pas affiché par défaut lorsque la distance du voyage est inférieure à 300 km.",
           },
           chart: {
             information: {
@@ -402,6 +403,7 @@ i18n
               info_3 : "selon l'accord de Paris",
               link : "https://www.2tonnes.org/post/objectif-2-tonnes-climat"
             },
+            help : "Détails sur l'avion ",
             transportMeans: {
               plane: "Avion",
               car: "Voiture",
