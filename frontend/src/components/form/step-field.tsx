@@ -225,6 +225,7 @@ export const StepField = ({ removeStep, updateStep, step }: StepFieldProps) => {
             {TRANSPORTS.map((item) =>
               item.value === Transport.car || item.value === Transport.ecar ? (
                 <CarButton
+                  key={item.value}
                   updateStep={updateStep}
                   isSelected={item.value === step.transportMean}
                   step={step}
@@ -233,6 +234,7 @@ export const StepField = ({ removeStep, updateStep, step }: StepFieldProps) => {
                 />
               ) : (
                 <TransportButton
+                  key={item.value}
                   updateStep={() =>
                     updateStep(step.index, {
                       transportMean: item.value,

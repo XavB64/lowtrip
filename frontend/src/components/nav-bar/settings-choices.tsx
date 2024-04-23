@@ -23,6 +23,7 @@ const SettingsChoices = ({
           const isSelected = optionIsSelected(option);
           return (
             <PrimaryButton
+              key={option}
               marginRight={1}
               fontSize={breakpoint === "base" ? 14 : 16}
               onClick={() => {
