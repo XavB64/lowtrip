@@ -1,19 +1,19 @@
-// // Lowtrip, a web interface to compute travel CO2eq for different means of transport worldwide.
+// Lowtrip, a web interface to compute travel CO2eq for different means of transport worldwide.
 
-// // Copyright (C) 2024  Bonnemaizon Xavier, Ni Clara, Gres Paola & Pellas Chiara
+// Copyright (C) 2024  Bonnemaizon Xavier, Ni Clara, Gres Paola & Pellas Chiara
 
-// // This program is free software: you can redistribute it and/or modify
-// // it under the terms of the GNU Affero General Public License as published
-// // by the Free Software Foundation, either version 3 of the License, or
-// // (at your option) any later version.
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published
+// by the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
 
-// // This program is distributed in the hope that it will be useful,
-// // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// // GNU Affero General Public License for more details.
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Affero General Public License for more details.
 
-// // You should have received a copy of the GNU Affero General Public License
-// // along with this program.  If not, see <https://www.gnu.org/licenses/>.
+// You should have received a copy of the GNU Affero General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import axios from "axios";
 import { useEffect, useMemo, useState } from "react";
@@ -22,7 +22,13 @@ import "./i18n";
 
 import NavbarWrapper from "./components/nav-bar";
 import { API_URL } from "./config";
-import { ContactView, ErrorView, MainView, MethodView, AboutView } from "./views";
+import {
+  ContactView,
+  ErrorView,
+  MainView,
+  MethodView,
+  AboutView,
+} from "./views";
 
 const App = () => {
   // first API call to wake up the server
