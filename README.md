@@ -24,7 +24,7 @@ $$CO_2eq = \sum_{step} Distance(km) \times Emission \\: Factor(kgCO_2eq / km) $$
 | `Train` | OpenStreetMap network |
 | `Car & Bus & eCar` | OpenStreetMap network |
 | `Bike route` | OpenStreetMap network |
-| `Plane` | Geodesic distance |
+| `Plane` | Geodesic distance and average detour |
 | `Ferry` | Approximation of shortest path |
 
 ### What do emission factors depend on?
@@ -99,5 +99,5 @@ npm start
 
 ## How to cite this work ? 
 
-*Bonnemaizon, Xavier, Ni, Clara, Gres, Paola & Pellas, Chiara. lowtrip (2024). lowtrip-app.onrender.com*
+*Bonnemaizon, Xavier, Ni, Clara, Gres, Paola & Pellas, Chiara. lowtrip (2024). https://lowtrip.fr*
 
