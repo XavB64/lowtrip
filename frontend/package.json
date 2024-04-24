@@ -59,10 +59,16 @@
     ]
   },
   "devDependencies": {
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
+    "@eslint/js": "^9.1.1",
+    "@types/d3-ease": "^3.0.2",
+    "@types/eslint__js": "^8.42.3",
     "@types/google.maps": "^3.54.10",
     "@types/katex": "^0.16.7",
     "@types/leaflet": "^1.9.8",
     "@types/lodash": "^4.14.202",
-    "@types/react": "^18.2.46"
+    "@types/react": "^18.2.46",
+    "eslint": "^8.57.0",
+    "typescript-eslint": "^7.7.1"
   }
 }
