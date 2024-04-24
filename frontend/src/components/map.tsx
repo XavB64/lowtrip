@@ -84,7 +84,7 @@ const MapContent = ({
 
   const theme = useMemo(
     () => (isDarkTheme ? "dark_all" : "rastertiles/voyager"),
-    [isDarkTheme]
+    [isDarkTheme],
   );
 
   useEffect(() => {
@@ -154,7 +154,7 @@ const MapContent = ({
           icon={markerIcon(
             index === 0 || index === stepsCoords.length - 1
               ? "#0097A7"
-              : "#93D3DB"
+              : "#93D3DB",
           )}
         />
       ))}
@@ -165,7 +165,7 @@ const MapContent = ({
           icon={markerIcon(
             index === 0 || index === alternativeStepsCoords.length - 1
               ? "#FF758F"
-              : "#FFBBC7"
+              : "#FFBBC7",
           )}
         />
       ))}
@@ -188,7 +188,7 @@ const Legend = ({ response }: { response?: ApiResponse }) => {
       <VStack align="start">
         {uniqBy(
           (JSON.parse(response.data.gdf) as Gdf).features,
-          (feature) => feature.properties.label
+          (feature) => feature.properties.label,
         ).map((feature) => (
           <HStack key={feature.properties.label}>
             <Box w={5} h={3} backgroundColor={feature.properties.colors} />
