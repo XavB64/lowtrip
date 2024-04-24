@@ -1,4 +1,4 @@
-export const thumbUp: string = "👍";
+export const thumbUp = "👍";
 
 export interface Step {
   index: number;

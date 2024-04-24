@@ -63,7 +63,7 @@ export const Chart = ({ response }: ChartProps) => {
   ];
   const myTripEmissions = sumBy(
     JSON.parse(response.data.my_trip ?? {}) as TripData[],
-    (trip) => trip.kgCO2eq
+    (trip) => trip.kgCO2eq,
   );
 
   return (
@@ -72,8 +72,8 @@ export const Chart = ({ response }: ChartProps) => {
         {response.data.alternative_trip
           ? t("results.vsOtherTrip")
           : response.data.direct_trip
-          ? t("results.vsOtherMeans")
-          : t("results.yourTripEmissions")}
+            ? t("results.vsOtherMeans")
+            : t("results.yourTripEmissions")}
       </Text>
       <Alert
         status="info"
@@ -154,10 +154,10 @@ export const Chart = ({ response }: ChartProps) => {
 
 function getChartData(
   trips: TripData[],
-  t: TFunction<"translation", undefined>
+  t: TFunction<"translation", undefined>,
 ) {
   const transports = uniq(
-    trips.map((tripData) => tripData["Mean of Transport"])
+    trips.map((tripData) => tripData["Mean of Transport"]),
   );
 
   return transports.map((transport) => {
@@ -184,7 +184,7 @@ interface CustomLabelProps extends LabelProps {
 const CustomLabel = ({ trips, tripName, ...props }: CustomLabelProps) => {
   const breakpoint = useBreakpoint();
   const currentTrips = trips.filter(
-    (trip) => trip["Mean of Transport"] === props.value
+    (trip) => trip["Mean of Transport"] === props.value,
   );
   const total = sumBy(currentTrips, "kgCO2eq");
   const shouldDisplay = currentTrips[currentTrips.length - 1].NAME === tripName;
