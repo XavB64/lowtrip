@@ -173,7 +173,7 @@ i18n
                 transport_5: "Ferry",
                 data_openstreetmap: "OpenStreetMap network",
                 data_geodesic: "Geodesic distance + average detour",
-                data_approximation: "Aproximation of shortest path",
+                data_approximation: "Approximation of shortest path",
               },
             },
             emissionFactors: {
@@ -252,7 +252,7 @@ i18n
                 transport_5: "Ferry",
                 data_openstreetmap: "Réseau OpenStreetMap",
                 data_geodesic: "Distance géodésique + déviation moyenne",
-                data_approximation: "Aproximation du plus court chemin",
+                data_approximation: "Approximation du plus court chemin",
               },
             },
             emissionFactors: {
