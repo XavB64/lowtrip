@@ -1,6 +1,6 @@
 import { Step } from "./types";
 
-export function formatStepsForApi(steps: Step[]) {
+export const formatStepsForApi = (steps: Step[]) => {
   const lon = steps.reduce((jsonResult, step, index) => {
     jsonResult[index.toString()] = step.locationCoords![1].toString();
     return jsonResult;
@@ -18,8 +18,8 @@ export function formatStepsForApi(steps: Step[]) {
     return jsonResult;
   }, {} as { [key: string]: number | string });
   return { lon, lat, transp, nb };
-}
+};
 
-export function checkIsOnMobile() {
+export const checkIsOnMobile = () => {
   return window.innerWidth < 600;
-}
+};
