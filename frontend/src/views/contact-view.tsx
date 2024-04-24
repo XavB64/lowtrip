@@ -7,7 +7,7 @@ import {
   Stack,
   Textarea,
 } from "@chakra-ui/react";
-import { useState } from "react";
+import { ChangeEvent, useState } from "react";
 import { useTranslation } from "react-i18next";
 import axios from "axios";
 import {
@@ -34,7 +34,9 @@ async function sendEmail(senderEmail: string, message: string) {
       },
       data: data,
     });
-  } catch (error) {}
+  } catch (error) {
+    console.error("Error sending email", error);
+  }
 }
 
 const ContactView = () => {
@@ -71,7 +73,9 @@ const ContactView = () => {
         <Input
           type="email"
           value={emailInput}
-          onChange={(e: any) => setEmailInput(e.target.value)}
+          onChange={(e: ChangeEvent<HTMLInputElement>) =>
+            setEmailInput(e.target.value)
+          }
           background="white"
           borderRadius="10px"
           border="1px solid lightgrey"

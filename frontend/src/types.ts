@@ -1,5 +1,3 @@
-import React from "react";
-
 export const thumbUp: string = "👍";
 
 export interface Step {
@@ -9,7 +7,6 @@ export interface Step {
   locationCoords?: [number, number];
   transportMean?: Transport;
   passengers?: number | typeof thumbUp;
-  currentInputRef?: React.MutableRefObject<any>;
 }
 
 export interface StepProps {
