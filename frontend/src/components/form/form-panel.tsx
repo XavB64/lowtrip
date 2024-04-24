@@ -38,12 +38,12 @@ interface FormPanelProps {
   alternativeTripSteps: StepProps;
 }
 
-export function FormPanel({
+export const FormPanel = ({
   response,
   setResponse,
   myTripSteps,
   alternativeTripSteps,
-}: FormPanelProps) {
+}: FormPanelProps) => {
   const { t } = useTranslation();
   const [tabIndex, setTabIndex] = useState(0);
   const handleTabsChange = (index: number) => {
@@ -126,4 +126,4 @@ export function FormPanel({
       </VStack>
     </VStack>
   );
-}
+};

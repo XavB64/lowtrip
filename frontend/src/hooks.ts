@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { Step } from "./types";
 import nextId from "react-id-generator";
 
-export function useSteps() {
+export const useSteps = () => {
   const [steps, setSteps] = useState<Step[]>([
     { index: 1, id: nextId() },
     { index: 2, id: nextId() },

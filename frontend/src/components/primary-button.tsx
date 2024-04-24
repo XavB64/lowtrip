@@ -22,12 +22,12 @@ interface PrimaryButtonProps extends ButtonProps {
   isLoading?: boolean;
   isDisabled?: boolean;
 }
-export function PrimaryButton({
+export const PrimaryButton = ({
   onClick,
   isLoading = false,
   isDisabled = false,
   ...props
-}: PrimaryButtonProps) {
+}: PrimaryButtonProps) => {
   return (
     <>
       <Button
@@ -45,4 +45,4 @@ export function PrimaryButton({
       </Button>
     </>
   );
-}
+};

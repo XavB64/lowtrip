@@ -47,7 +47,7 @@ interface ChartProps {
   response?: ApiResponse;
 }
 
-export function Chart({ response }: ChartProps) {
+export const Chart = ({ response }: ChartProps) => {
   const { t } = useTranslation();
   const breakpoint = useBreakpoint();
   const { isOpen, onOpen, onToggle, onClose } = useDisclosure();
@@ -85,7 +85,8 @@ export function Chart({ response }: ChartProps) {
         <AlertIcon boxSize={[4, 5]} />
         <Text>
           {t("chart.information.info_1")}{" "}
-          <Text as="b">{round((myTripEmissions * 100) / 2000)}%</Text>{" "}{t("chart.information.your")}{" "}
+          <Text as="b">{round((myTripEmissions * 100) / 2000)}%</Text>{" "}
+          {t("chart.information.your")}{" "}
           <Link
             href={t("chart.information.link")}
             isExternal
@@ -135,7 +136,9 @@ export function Chart({ response }: ChartProps) {
           isOpen={isOpen}
           fontSize={10}
         >
-          <span style={{fontSize: breakpoint === "base" ? 8 : 12}}> {t("chart.help")}
+          <span style={{ fontSize: breakpoint === "base" ? 8 : 12 }}>
+            {" "}
+            {t("chart.help")}
             <BiHelpCircle
               style={{ display: "inline-block", marginRight: "5px" }}
               onMouseEnter={onOpen}
@@ -147,7 +150,7 @@ export function Chart({ response }: ChartProps) {
       </Flex>
     </Box>
   );
-}
+};
 
 function getChartData(
   trips: TripData[],
