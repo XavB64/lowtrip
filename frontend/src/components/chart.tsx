@@ -108,7 +108,7 @@ export function Chart({ response }: ChartProps) {
           <YAxis padding={{ top: 30 }} hide />
           <Tooltip
             formatter={(value, name) => [
-              `${round(+value, 0)} kg`,
+              `${round(Number(value), 0)} kg`,
               getLabel(name, t),
             ]}
             contentStyle={{ fontSize: "12px" }}
@@ -158,7 +158,7 @@ function getChartData(
   );
 
   return transports.map((transport) => {
-    let result: { [key: string]: string | number } = {
+    const result: { [key: string]: string | number } = {
       name: transport,
       displayedName: getLabel(transport, t),
     };
@@ -191,16 +191,16 @@ const CustomLabel = ({ trips, tripName, ...props }: CustomLabelProps) => {
   return (
     <>
       <text
-        x={+(props.x ?? 0) + +(props.width ?? 0) / 2}
-        y={+(props.y ?? 0) - (breakpoint === "base" ? 15 : 20)}
+        x={Number(props.x ?? 0) + Number(props.width ?? 0) / 2}
+        y={Number(props.y ?? 0) - (breakpoint === "base" ? 15 : 20)}
         textAnchor="middle"
         fontSize={breakpoint === "base" ? 10 : 16}
       >
         {round(total)}
       </text>
       <text
-        x={+(props.x ?? 0) + +(props.width ?? 0) / 2}
-        y={+(props.y ?? 0) - 5}
+        x={Number(props.x ?? 0) + Number(props.width ?? 0) / 2}
+        y={Number(props.y ?? 0) - 5}
         textAnchor="middle"
         fontSize={breakpoint === "base" ? 8 : 12}
       >

@@ -70,6 +70,7 @@ export const StepField = ({ removeStep, updateStep, step }: StepFieldProps) => {
   const isDeparture = step.index === 1;
 
   const selectCity = (city: City) => {
+    if (!city) return;
     setShouldReset(false);
     updateStep(step.index, {
       locationCoords: [parseFloat(city.lat), parseFloat(city.lon)],
@@ -94,7 +95,7 @@ export const StepField = ({ removeStep, updateStep, step }: StepFieldProps) => {
       });
     }
     if (!shoudlReset) setShouldReset(true);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line
   }, [value]);
 
   return (

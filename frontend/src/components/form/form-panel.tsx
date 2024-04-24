@@ -49,10 +49,10 @@ export function FormPanel({
   const handleTabsChange = (index: number) => {
     setTabIndex(index);
   };
-  const chartRef = useRef(null);
+  const chartRef = useRef<null | HTMLDivElement>(null);
 
   const scrollToChart = () =>
-    (chartRef.current as any)?.scrollIntoView({ behavior: "smooth" });
+    chartRef.current?.scrollIntoView({ behavior: "smooth" });
 
   return (
     <VStack

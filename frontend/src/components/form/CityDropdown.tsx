@@ -55,6 +55,13 @@ export type City = {
   lat: string;
 };
 
+type ApiCity = {
+  place_id: number;
+  display_name: string;
+  lon: string;
+  lat: string;
+};
+
 const CityDropdown = ({
   selectCity,
   resetCity,
@@ -86,8 +93,8 @@ const CityDropdown = ({
       const response = await axios.get(
         `https://nominatim.openstreetmap.org/search?city=${newQuery}&format=json&limit=10`
       );
-      const filteredResults = (response.data as any[]).reduce(
-        (acc: City[], city: any) => {
+      const filteredResults = (response.data as ApiCity[]).reduce(
+        (acc: City[], city: ApiCity) => {
           const cityNames = acc.map((item) => item.name);
           const currentCityName = formatCityName(city.display_name);
           if (!cityNames.includes(currentCityName)) {
@@ -115,7 +122,7 @@ const CityDropdown = ({
     } else {
       setResults([]);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line
   }, [query]);
 
   useEffect(() => {
@@ -130,7 +137,7 @@ const CityDropdown = ({
     }
   }, [results]);
 
-  const handleKeyDown = (event: any) => {
+  const handleKeyDown = (event: React.KeyboardEvent) => {
     const isUpKeyCode = event.keyCode === 38;
     const isDownKeyCode = event.keyCode === 40;
     const isEnterKeyCode = event.keyCode === 13;

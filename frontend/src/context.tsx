@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState } from "react";
+import React, { ReactNode, createContext, useContext, useState } from "react";
 import { City } from "./components/form/CityDropdown";
 
 export type Cache = Record<string, City[]>;
@@ -10,7 +10,7 @@ type Context = {
 
 const CacheContext = createContext<Context | null>(null);
 
-export const CacheProvider = ({ children }: { children: any }) => {
+export const CacheProvider = ({ children }: { children: ReactNode }) => {
   const [cache, setCache] = useState<Cache>({});
 
   const addToCache = (key: string, value: City[]) => {

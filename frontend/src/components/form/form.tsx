@@ -42,7 +42,7 @@ import { stepsAreInvalid, getAdviceTextTranslation } from "./utils";
 
 const getPayload = (steps: Step[], stepsToCompare?: Step[]) => {
   const formData = new FormData();
-  if (!!stepsToCompare) {
+  if (stepsToCompare) {
     formData.append("mode", "2");
     formData.append(
       "my-trip",
