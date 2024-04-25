@@ -161,13 +161,15 @@ const NavBar = ({
                 <MenuItem key={item.name}>{t(`navbar.${item.label}`)}</MenuItem>
               </Link>
             ))}
+            <MenuItem>
+              <ChakraLink href="https://fr.tipeee.com/lowtrip-app/">
+                {t("navbar.tipee")}
+              </ChakraLink>
+            </MenuItem>
             <GithubMenuItem />
             <MenuItem onClick={openErrorModal}>{t("navbar.settings")}</MenuItem>
           </MenuList>
         </Menu>
-        <ChakraLink href="https://fr.tipeee.com/lowtrip-app/">
-          Soutenez-nous !
-        </ChakraLink>
         <UserSettingsModal
           isOpen={isOpen}
           onClose={() => {
