@@ -28,6 +28,7 @@ i18n
             theme_dark: "Dark",
             theme_light: "Light",
             about: "About",
+            tipee: "Support us !",
           },
           home: {
             compareTravelEmissions: "Compare your travel emissions",
@@ -79,6 +80,8 @@ i18n
             passengersNb_one: "{{count}} passenger",
             passengersNb_other: "{{count}} passengers",
             hitchHiking: "Hitch-hiking",
+            warning:
+              "Due to heavy traffic and lack of budget, we have to limit the number of requests temporarily.",
           },
           about: {
             introduction_1:
@@ -110,13 +113,13 @@ i18n
           },
           chart: {
             information: {
-              info_1 : "This trip represents" ,
-              your : "of your",
-              info_2 : "yearly carbon budget",
-              info_3 : "according to the Paris agreement",
-              link : "https://en.2tonnes.org/"
+              info_1: "This trip represents",
+              your: "of your",
+              info_2: "yearly carbon budget",
+              info_3: "according to the Paris agreement",
+              link: "https://en.2tonnes.org/",
             },
-            help :   "Details about plane ",
+            help: "Details about plane ",
             transportMeans: {
               plane: "Plane",
               car: "Car",
@@ -315,6 +318,7 @@ i18n
             theme_dark: "Sombre",
             theme_light: "Clair",
             about: "À propos",
+            tipee: "Soutenez-nous !",
           },
           home: {
             compareTravelEmissions: "Compare les émissions de ton voyage",
@@ -366,6 +370,8 @@ i18n
             passengersNb_one: "{{count}} passager",
             passengersNb_other: "{{count}} passagers",
             hitchHiking: "Auto-stop",
+            warning:
+              "En raison du trafic important et d'un manque de budget, nous sommes contraints de limiter le nombre de requêtes temporairement.",
           },
           about: {
             introduction_1:
@@ -397,13 +403,13 @@ i18n
           },
           chart: {
             information: {
-              info_1 : "Ce trajet représente" ,
-              your : "de ton",
-              info_2 : "budget carbone annuel",
-              info_3 : "selon l'accord de Paris",
-              link : "https://www.2tonnes.org/post/objectif-2-tonnes-climat"
+              info_1: "Ce trajet représente",
+              your: "de ton",
+              info_2: "budget carbone annuel",
+              info_3: "selon l'accord de Paris",
+              link: "https://www.2tonnes.org/post/objectif-2-tonnes-climat",
             },
-            help : "Détails sur l'avion ",
+            help: "Détails sur l'avion ",
             transportMeans: {
               plane: "Avion",
               car: "Voiture",
