@@ -82,6 +82,9 @@ i18n
             hitchHiking: "Hitch-hiking",
             warning:
               "Due to heavy traffic and lack of budget, we have to limit the number of requests temporarily.",
+            warning_1:"Due to heavy traffic and ",
+            warning_2:"lack of budget",
+            warning_3: ", we have to limit the number of requests temporarily.",
           },
           about: {
             introduction_1:
@@ -372,7 +375,11 @@ i18n
             hitchHiking: "Auto-stop",
             warning:
               "En raison du trafic important et d'un manque de budget, nous sommes contraints de limiter le nombre de requêtes temporairement.",
-          },
+          
+          warning_1:"En raison du trafic important et ",
+          warning_2:"d'un manque de budget",
+          warning_3: ", nous sommes contraints de limiter le nombre de requêtes temporairement.",
+        },
           about: {
             introduction_1:
               "Lowtrip est un projet indépendant, gratuit et open-source. L'objectif de cette application est de fournir des bilans carbone par passager précis pour chaque mode de transport et trajet. Ces résultats permettent à l'utilisateur de faire des choix informés dans le contexte de réduction de leur empreinte carbone pour freiner les effets du réchauffement climatique.",
