@@ -1,20 +1,3 @@
-// // Lowtrip, a web interface to compute travel CO2eq for different means of transport worldwide.
-
-// // Copyright (C) 2024  Bonnemaizon Xavier, Ni Clara, Gres Paola & Pellas Chiara
-
-// // This program is free software: you can redistribute it and/or modify
-// // it under the terms of the GNU Affero General Public License as published
-// // by the Free Software Foundation, either version 3 of the License, or
-// // (at your option) any later version.
-
-// // This program is distributed in the hope that it will be useful,
-// // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// // GNU Affero General Public License for more details.
-
-// // You should have received a copy of the GNU Affero General Public License
-// // along with this program.  If not, see <https://www.gnu.org/licenses/>.
-
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
   BiSolidBus,
@@ -40,6 +23,7 @@ import {
 } from "@chakra-ui/react";
 import { Step, Transport, thumbUp } from "../../types";
 import { useTranslation } from "react-i18next";
+import CityDropdown, { City } from "./CityDropdown";
 
 const TRANSPORTS = [
   {
@@ -87,6 +71,15 @@ export const StepField = ({ removeStep, updateStep, step }: StepFieldProps) => {
   const [shoudlReset, setShouldReset] = useState(false);
 
   const isDeparture = step.index === 1;
+
+  const selectCity = (city: City) => {
+    setShouldReset(false);
+    updateStep(step.index, {
+      locationCoords: [parseFloat(city.lat), parseFloat(city.lon)],
+      locationName: city.name,
+    });
+    setValue(city.name);
+  };
 
   const addListenersForAutocompleteFields = useCallback(() => {
     if (inputRef.current) {
@@ -146,25 +139,10 @@ export const StepField = ({ removeStep, updateStep, step }: StepFieldProps) => {
             width: "100%",
           }}
         >
-          <input
-            ref={inputRef}
-            value={value}
-            onChange={(e) => {
-              setValue(e.target.value);
-            }}
-            placeholder={
-              isDeparture ? t("form.placeholderFrom") : t("form.placeholderTo")
-            }
-            style={{
-              width: "100%",
-              height: "50px",
-              padding: "9px",
-              border: "1px solid lightgrey",
-              borderRadius: "20px",
-              backgroundColor: "white",
-              marginBottom: 1,
-              fontSize: "16px",
-            }}
+          <CityDropdown
+            selectCity={selectCity}
+            stepIndex={step.index}
+            stepName={step.locationName}
           />
           {value && (
             <button
