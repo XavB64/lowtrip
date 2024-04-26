@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   BiSolidBus,
   BiSolidCar,
@@ -64,9 +64,6 @@ interface StepFieldProps {
 
 export const StepField = ({ removeStep, updateStep, step }: StepFieldProps) => {
   const { t } = useTranslation();
-  const autoCompleteRef = useRef(null);
-  const inputRef = useRef(null);
-
   const [value, setValue] = useState(step.locationName || "");
   const [shoudlReset, setShouldReset] = useState(false);
 
@@ -81,43 +78,13 @@ export const StepField = ({ removeStep, updateStep, step }: StepFieldProps) => {
     setValue(city.name);
   };
 
-  const addListenersForAutocompleteFields = useCallback(() => {
-    if (inputRef.current) {
-      // @ts-ignore
-      autoCompleteRef.current = new window.google.maps.places.Autocomplete(
-        inputRef.current,
-        { fields: ["geometry", "formatted_address"] }
-      );
-      // @ts-ignore
-      autoCompleteRef.current.addListener("place_changed", async function () {
-        // @ts-ignore
-        const place = await autoCompleteRef.current.getPlace();
-        if (place) {
-          setShouldReset(false);
-          updateStep(step.index, {
-            locationCoords: [
-              place.geometry.location.lat(),
-              place.geometry.location.lng(),
-            ],
-            locationName: place.formatted_address,
-          });
-          setValue(place.formatted_address);
-        }
-      });
-    }
-  }, [inputRef, updateStep, step.index]);
-
-  useEffect(() => {
-    const googleScript = document.getElementById("google-map-script");
-
-    if (window.google) addListenersForAutocompleteFields();
-
-    if (googleScript) {
-      googleScript.addEventListener("load", () => {
-        addListenersForAutocompleteFields();
-      });
-    }
-  }, [addListenersForAutocompleteFields]);
+  const resetCity = () => {
+    updateStep(step.index, {
+      locationCoords: undefined,
+      locationName: undefined,
+    });
+    setValue("");
+  };
 
   useEffect(() => {
     if (shoudlReset && step.locationCoords) {
@@ -141,43 +108,10 @@ export const StepField = ({ removeStep, updateStep, step }: StepFieldProps) => {
         >
           <CityDropdown
             selectCity={selectCity}
+            resetCity={resetCity}
             stepIndex={step.index}
             stepName={step.locationName}
           />
-          {value && (
-            <button
-              className="clear-input-button"
-              aria-label="Clear input"
-              title={t("form.clearInput")}
-              onClick={() => {
-                updateStep(step.index, {
-                  locationCoords: undefined,
-                  locationName: undefined,
-                });
-                setValue("");
-              }}
-              style={{
-                position: "absolute",
-                right: "0.5rem",
-                bottom: "1rem",
-                justifyContent: "center",
-                alignItems: "center",
-                width: "1.5rem",
-                height: "1.5rem",
-                appearance: "none",
-                border: "none",
-                borderRadius: "50%",
-                background: "gray",
-                margin: 0,
-                padding: "2px",
-                color: "white",
-                fontSize: "1.5rem",
-                display: "flex",
-              }}
-            >
-              ×
-            </button>
-          )}
         </div>
 
         {step.index > 2 && (

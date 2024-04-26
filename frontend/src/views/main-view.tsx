@@ -7,6 +7,7 @@ import { useSteps } from "../hooks";
 import { ApiResponse } from "../types";
 import { Map } from "../components/map";
 import { checkIsOnMobile } from "../utils";
+import { CacheProvider } from "../context";
 
 const MainView = ({ isDarkTheme }: { isDarkTheme: boolean }) => {
   const [response, setResponse] = useState<ApiResponse>();
@@ -16,7 +17,7 @@ const MainView = ({ isDarkTheme }: { isDarkTheme: boolean }) => {
   const isOnMobile = checkIsOnMobile();
 
   return (
-    <>
+    <CacheProvider>
       <FormPanel
         response={response}
         setResponse={setResponse}
@@ -55,7 +56,7 @@ const MainView = ({ isDarkTheme }: { isDarkTheme: boolean }) => {
           display={["flex", "none"]}
         />
       )}
-    </>
+    </CacheProvider>
   );
 };
 
