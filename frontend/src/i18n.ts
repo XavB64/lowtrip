@@ -14,10 +14,10 @@ i18n
         translation: {
           contact: {
             emailIsRequired: "Email is required",
-            sendEmail: "Send your message",
+            sendEmail: "Send message",
             sendingEmail: "Sending...",
             yourEmail: "Your email",
-            yourMessage: "What do you want to tell us?",
+            yourMessage: "What would you like to say?",
           },
           navbar: {
             contact: "Contact",
@@ -34,7 +34,7 @@ i18n
             compareTravelEmissions: "Compare your travel emissions",
           },
           form: {
-            addStep: "Add step",
+            addStep: "Add stop",
             adviceText: {
               compareWith: "Compare with...",
               previousFormIsInvalid: "Please fill the previous form first",
@@ -42,20 +42,20 @@ i18n
               mainSecondForm: "Please select {{missingParams}} and...",
               departure: "a departure",
               destination: "a destination",
-              transportMean: "a transport mean",
+              transportMean: "a means of transportation",
               and: "and",
-              missingTransportMean: "the missing transport mean",
-              missingTransportMeans: "the missing transport means",
+              missingTransportMean: "the missing means of transportation",
+              missingTransportMeans: "the missing means of transportation",
               missingLocation: "the missing location",
               missingLocationAndTransportMean:
-                "the missing location and transport mean",
+                "the missing location and means of transportation",
               missingLocationAndTransportMeans:
-                "the missing location and transport means",
+                "the missing location and means of transportation",
               missingLocations: "the missing locations",
               missingLocationsAndTransportMean:
-                "the missing locations and transport mean",
+                "the missing locations and means of transportation",
               missingLocationsAndTransportMeans:
-                "the missing locations and transport means",
+                "the missing locations and means of transportation",
             },
             tabMyTrip: "My trip",
             tabOtherTrip: "Other trip",
@@ -105,7 +105,7 @@ i18n
             bonpote:
               "One exemplary project that epitomizes sustainable travel is the journey undertaken by the media Bon Pote to witness the Northern Lights in the Lofoten Islands, traveling entirely by train from Paris. This initiative showcases the feasibility and beauty of overland travel, emphasizing the rewarding experiences that come with reducing reliance on carbon-intensive modes of transportation. They tested our method to estimate their associated carbon footprint.",
             shimla:
-              "The documentary film 'Shimla', named after the Indian city, explores the theme of water and ecology through an ambitious journey from Paris to India and back using a combination of trains, ferries, and hitchhiking (autostop). This innovative approach to travel not only raises awareness about environmental issues but also showcases how diverse modes of transportation can be used to minimize carbon emissions and maximize the richness of the travel experience. Johan and Victoria, the movie makers, trusted lowtrip to estimate the associated carbon footprint of their adventure and subsequent reductions compared to usual means of transportation for such distances.",
+              "The documentary film 'Shimla', named after the Indian city, explores the theme of water and ecology through an ambitious journey from Paris to India and back using a combination of trains, ferries, and hitchhiking ("autostop"). This innovative approach to travel not only raises awareness about environmental issues but also showcases how diverse modes of transportation can be used to minimize carbon emissions and maximize the richness of the travel experience. Johan and Victoria, the movie makers, trusted lowtrip to estimate the associated carbon footprint of their adventure and subsequent reductions compared to usual means of transportation for such distances.",
           },
           results: {
             vsOtherTrip: "Your trip VS Other trip",
@@ -116,9 +116,9 @@ i18n
           },
           chart: {
             information: {
-              info_1: "This trip represents",
+              info_1: "This trip accounts for",
               your: "of your",
-              info_2: "yearly carbon budget",
+              info_2: "yearly carbon budget,",
               info_3: "according to the Paris agreement",
               link: "https://en.2tonnes.org/",
             },
@@ -163,14 +163,14 @@ i18n
               text5: " document.",
             },
             howEmissionsAreComputed: {
-              title: "How the emissions are calculated?",
+              title: "How are emissions calculated?",
               text1:
-                "To calculate CO2 equivalent emissions per person, we multiply the distance of a journey (km) by the corresponding emission factor (mass of CO2 equivalent per person per km) of a mean of transport. For a mutlistep journey, these emissions are summed over the different steps:",
+                "To calculate CO2 equivalent emissions per person, we multiply the distance of a journey (km) by the corresponding emission factor (mass of CO2 equivalent per person per km) of a means of transport. For a mutlistep journey, these emissions are summed over the different steps:",
             },
             distanceEstimation: {
               title: "Estimation of distances",
               table: {
-                title_1: "Mean of Transport",
+                title_1: "Means of Transport",
                 title_2: "Distance source",
                 transport_1: "Train",
                 transport_2: "Car - Bus - eCar",
@@ -185,7 +185,7 @@ i18n
             emissionFactors: {
               title: "What do emission factors depend on?",
               table1: {
-                title_1: "Mean of Transport",
+                title_1: "Means of Transport",
                 title_2: "Variable",
                 title_3: "Why?",
                 transport_1: "Train",
@@ -211,7 +211,7 @@ i18n
                 why_6: "-",
               },
               table2: {
-                title_1: "Mean of Transport",
+                title_1: "Means of Transport",
                 title_2: "Usage",
                 title_3: "Vehicle production",
                 title_4: "Infrastructure construction",
