@@ -61,7 +61,7 @@ i18n
             tabOtherTrip: "Other trip",
             clearInput: "Clear",
             compareWithThisTrip: "Compare with your first trip",
-            otherTransportMeans: "Other transport means",
+            otherTransportMeans: "Other means of transportation",
             computeEmissions: "Compute emissions",
             anotherTrip: "Another trip",
             compareToAnotherTrip: "Compare to another trip",
