@@ -8,12 +8,9 @@ import {
   useBreakpoint,
 } from "@chakra-ui/react";
 import { IoMdSettings } from "react-icons/io";
-import SettingsChoices from "./settings-choices";
+import SettingsChoices, { LANGUAGES, MAP_THEMES } from "./settings-choices";
 
 import i18n from "i18next";
-
-const LANGUAGES = ["fr", "en"];
-const MAP_THEMES = ["light", "dark"];
 
 const UserSettingsSelector = ({
   themeSettings: { isDarkTheme, switchMapTheme },
@@ -47,7 +44,7 @@ const UserSettingsSelector = ({
             options={LANGUAGES}
             onChange={(language) => i18n.changeLanguage(language)}
             optionIsSelected={(language) => i18n.language === language}
-            translationKey="language"
+            isLanguageSelector
           />
           <SettingsChoices
             options={MAP_THEMES}
@@ -58,7 +55,6 @@ const UserSettingsSelector = ({
               (isDarkTheme && theme === "dark") ||
               (!isDarkTheme && theme === "light")
             }
-            translationKey="theme"
           />
         </PopoverBody>
       </PopoverContent>

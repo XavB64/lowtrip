@@ -1,0 +1,196 @@
+{
+  "translation": {
+    "contact": {
+      "emailIsRequired": "Email is required",
+      "sendEmail": "Send message",
+      "sendingEmail": "Sending...",
+      "yourEmail": "Your email",
+      "yourMessage": "What would you like to say?"
+    },
+    "navbar": {
+      "contact": "Contact",
+      "language_en": "English",
+      "language_fr": "French",
+      "language_it": "Italian",
+      "methodology": "Methodology",
+      "settings": "Settings",
+      "theme_dark": "Dark",
+      "theme_light": "Light",
+      "about": "About",
+      "tipee": "Support us !"
+    },
+    "home": {
+      "compareTravelEmissions": "Compare your travel emissions"
+    },
+    "form": {
+      "addStep": "Add stop",
+      "adviceText": {
+        "compareWith": "Compare with...",
+        "previousFormIsInvalid": "Please fill the previous form first",
+        "main": "Please select {{missingParams}} and compare with...",
+        "mainSecondForm": "Please select {{missingParams}} and...",
+        "departure": "a departure",
+        "destination": "a destination",
+        "transportMean": "a means of transportation",
+        "and": "and",
+        "missingTransportMean": "the missing means of transportation",
+        "missingTransportMeans": "the missing means of transportation",
+        "missingLocation": "the missing location",
+        "missingLocationAndTransportMean": "the missing location and means of transportation",
+        "missingLocationAndTransportMeans": "the missing location and means of transportation",
+        "missingLocations": "the missing locations",
+        "missingLocationsAndTransportMean": "the missing locations and means of transportation",
+        "missingLocationsAndTransportMeans": "the missing locations and means of transportation"
+      },
+      "tabMyTrip": "My trip",
+      "tabOtherTrip": "Other trip",
+      "clearInput": "Clear",
+      "compareWithThisTrip": "Compare with your first trip",
+      "otherTransportMeans": "Other means of transportation",
+      "computeEmissions": "Compute emissions",
+      "anotherTrip": "Another trip",
+      "compareToAnotherTrip": "Compare to another trip",
+      "placeholderFrom": "From...",
+      "placeholderTo": "To...",
+      "by": "By",
+      "transportMeans": {
+        "Train": "Train",
+        "Plane": "Plane",
+        "Bus": "Bus",
+        "Car": "Car",
+        "eCar": "Electric car",
+        "Ferry": "Ferry",
+        "Bicycle": "Bicycle"
+      },
+      "passengersNb_one": "{{count}} passenger",
+      "passengersNb_other": "{{count}} passengers",
+      "hitchHiking": "Hitch-hiking",
+      "warning": "Due to heavy traffic and lack of budget, we have to limit the number of requests temporarily.",
+      "warning_1": "Due to heavy traffic and ",
+      "warning_2": "lack of budget",
+      "warning_3": ", we have to limit the number of requests temporarily."
+    },
+    "about": {
+      "introduction_1": "Lowtrip is an independent, free and open-source project. The aim of this application is to provide accurate carbon footprints per passenger for each mode of transport and journey. These results enable users to make informed choices in the context of reducing their carbon footprint to curb the effects of global warming.",
+      "introduction_2": "This application has been developed by a team of four young volunteers. We welcome any feedback and suggestions for improvement, which you can send us via the contact page. Thank you in advance for your enthusiasm! :)",
+      "inspiringProjects": "Some inspiring projects",
+      "mollow_1": "Traveling sustainably across Europe, without relying on cars or airplanes, presents numerous challenges. The continent's train and bus networks are diverse and sometimes difficult to navigate, making it tricky to find efficient and affordable connections between countries. This is where ",
+      "mollow_2": " steps in as a comprehensive web platform designed to revolutionize your travel experience.",
+      "mollow_3": " Mollow provides a wealth of advice and tested routes to give you inspiration for your next great adventure. The platform is founded on the belief that the journey itself should be a memorable part of your holiday. By embracing this philosophy, Mollow encourages travelers to explore and appreciate the charming cities and breathtaking landscapes that unfold along the way.",
+      "sailcoop_1": "Accessing islands without relying on planes often involves taking ferries, which can also contribute significantly to carbon emissions per kilometer traveled. To offer a sustainable alternative to traditional ferry travel, Sailcoop presents a unique and eco-friendly solution: sailing with the wind between the mainland and destinations like Corsica.",
+      "sailcoop_2": "Sailcoop harnesses the power of wind to provide unforgettable journeys across the sea. By opting for sailing trips instead of ferry rides, travelers not only reduce their carbon footprint but also embark on a more immersive and environmentally conscious adventure.",
+      "bonpote": "One exemplary project that epitomizes sustainable travel is the journey undertaken by the media Bon Pote to witness the Northern Lights in the Lofoten Islands, traveling entirely by train from Paris. This initiative showcases the feasibility and beauty of overland travel, emphasizing the rewarding experiences that come with reducing reliance on carbon-intensive modes of transportation. They tested our method to estimate their associated carbon footprint.",
+      "shimla": "The documentary film 'Shimla', named after the Indian city, explores the theme of water and ecology through an ambitious journey from Paris to India and back using a combination of trains, ferries, and hitchhiking ('autostop'). This innovative approach to travel not only raises awareness about environmental issues but also showcases how diverse modes of transportation can be used to minimize carbon emissions and maximize the richness of the travel experience. Johan and Victoria, the movie makers, trusted lowtrip to estimate the associated carbon footprint of their adventure and subsequent reductions compared to usual means of transportation for such distances."
+    },
+    "results": {
+      "vsOtherTrip": "Your trip VS Other trip",
+      "vsOtherMeans": "Your trip VS Other means of transport",
+      "yourTripEmissions": "Your trip emissions",
+      "explanation": "The combustion of kerosene at high altitude produces clouds called contrails. Combined with NOx emissions, these non-CO2 effects contribute to global warming. The represented connection might not be currently operated by a flight company. This mode is not displayed by default when the journey length is below 300km."
+    },
+    "chart": {
+      "information": {
+        "info_1": "This trip accounts for",
+        "your": "of your",
+        "info_2": "yearly carbon budget,",
+        "info_3": "according to the Paris agreement",
+        "link": "https://en.2tonnes.org/"
+      },
+      "help": "Details about plane ",
+      "transportMeans": {
+        "plane": "Plane",
+        "car": "Car",
+        "ecar": "eCar",
+        "bus": "Bus",
+        "train": "Train",
+        "ferry": "Ferry",
+        "bicycle": "Bicycle",
+        "myTrip": "My trip",
+        "otherTrip": "Other trip"
+      },
+      "paths": {
+        "railway": "Railway",
+        "road": "Road",
+        "bike": "Bicycle route",
+        "flight": "Flight path",
+        "ferry": "Ferry route"
+      },
+      "category": {
+        "infra": "Infrastructure",
+        "construction": "Production",
+        "fuel": "Fuel",
+        "kerosene": "Kerosene",
+        "contrails": "Contrails & NOx",
+        "bikeBuild": "Bicycle production"
+      }
+    },
+    "method": {
+      "introduction": {
+        "title": "Introduction",
+        "text1": "The work presented here is independent, not-for-profit and open source.",
+        "text2": "The aim of this web app is to present precise carbon inventories per passenger for each mode of transport and each journey. These results enable users to make informed choices in the context of reducing their greenhouse gas emissions to mitigate climate change. To put these results into context, total yearly per-capita net emissions should not exceed 2 tons CO2eq in 2050 to limit global warming below +2°C.",
+        "text3": "All assumptions, data and sources used are available in this",
+        "text4": "methodology",
+        "text5": " document."
+      },
+      "howEmissionsAreComputed": {
+        "title": "How are emissions calculated?",
+        "text1": "To calculate CO2 equivalent emissions per person, we multiply the distance of a journey (km) by the corresponding emission factor (mass of CO2 equivalent per person per km) of a means of transport. For a mutlistep journey, these emissions are summed over the different steps:"
+      },
+      "distanceEstimation": {
+        "title": "Estimation of distances",
+        "table": {
+          "title_1": "Means of Transport",
+          "title_2": "Distance source",
+          "transport_1": "Train",
+          "transport_2": "Car - Bus - eCar",
+          "transport_3": "Bicycle route",
+          "transport_4": "Plane",
+          "transport_5": "Ferry",
+          "data_openstreetmap": "OpenStreetMap network",
+          "data_geodesic": "Geodesic distance + average detour",
+          "data_approximation": "Approximation of shortest path"
+        }
+      },
+      "emissionFactors": {
+        "title": "What do emission factors depend on?",
+        "table1": {
+          "title_1": "Means of Transport",
+          "title_2": "Variable",
+          "title_3": "Why?",
+          "transport_1": "Train",
+          "transport_2": "Bus - Bicycle",
+          "transport_3": "Car",
+          "transport_4": "eCar",
+          "transport_5": "Plane",
+          "transport_6": "Ferry",
+          "variables_1": "Visited countries",
+          "variables_2": "-",
+          "variables_3": "Number of passengers",
+          "variables_4": "Number of passengers & Visited countries",
+          "variables_5": "Travel distance",
+          "variables_6": "(not yet) user parameters",
+          "why_1": "≠ Electrification rate;≠ Energy carbon intensity;≠ Filling rates",
+          "why_2": "-",
+          "why_3": "Personal footprint allocation;Consumption increases with weight",
+          "why_4": "Idem Car;≠ Energy carbon intensity",
+          "why_5": "Higher proportion of take-off for short-haul routes;Use of generally less efficient planes",
+          "why_6": "-"
+        },
+        "table2": {
+          "title_1": "Means of Transport",
+          "title_2": "Usage",
+          "title_3": "Vehicle production",
+          "title_4": "Infrastructure construction",
+          "transport_1": "Train",
+          "transport_2": "Bus - Car - eCar",
+          "transport_3": "Bicycle",
+          "transport_4": "Plane",
+          "transport_5": "Ferry",
+          "data_not_found": "No found"
+        },
+        "text1": "Emission factors consider usage (linked to the manufacture and use of energy to move the vehicle) as well as infrastructure and vehicle construction where these are significant. The table below summarizes the types of emissions taken into account by lowtrip. Empty cells mean that the related emissions did not contribute significantly to the result and are therefore excluded to facilitate understanding and readability for the user."
+      }
+    }
+  }
+}
