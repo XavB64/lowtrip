@@ -21,7 +21,7 @@ const formatMissingParams = (missingParams: string[], t: TFunction) => {
 const formatMissingParamsForSeveralSteps = (
   t: TFunction,
   missingLocations: number,
-  missingTransportMeans: number
+  missingTransportMeans: number,
 ) => {
   if (missingLocations === 0) {
     if (missingTransportMeans === 0) return "";
@@ -58,7 +58,7 @@ const formatMissingParamsForSeveralSteps = (
 export const getAdviceTextTranslation = (
   t: TFunction,
   steps: Step[],
-  isSecondForm: boolean
+  isSecondForm: boolean,
 ) => {
   let missingParamsString = "";
   if (steps.length === 2) {
@@ -88,12 +88,12 @@ export const getAdviceTextTranslation = (
               : result.missingTransportMeans,
         };
       },
-      { missingLocations: 0, missingTransportMeans: 0 }
+      { missingLocations: 0, missingTransportMeans: 0 },
     );
     missingParamsString = formatMissingParamsForSeveralSteps(
       t,
       missingLocations,
-      missingTransportMeans
+      missingTransportMeans,
     );
   }
 
@@ -103,6 +103,6 @@ export const getAdviceTextTranslation = (
     !isSecondForm ? "form.adviceText.main" : "form.adviceText.mainSecondForm",
     {
       missingParams: missingParamsString,
-    }
+    },
   );
 };

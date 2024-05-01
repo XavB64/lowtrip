@@ -19,7 +19,7 @@ export const formatStepsForApi = (steps: Step[]): StepsForApi =>
       acc.nb[index] = step.passengers ?? 1;
       return acc;
     },
-    { lon: {}, lat: {}, transp: {}, nb: {} } as StepsForApi
+    { lon: {}, lat: {}, transp: {}, nb: {} } as StepsForApi,
   );
 
 export const checkIsOnMobile = () => {

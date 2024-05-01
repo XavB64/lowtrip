@@ -91,7 +91,7 @@ const CityDropdown = ({
     }
     try {
       const response = await axios.get(
-        `https://nominatim.openstreetmap.org/search?city=${newQuery}&format=json&limit=10`
+        `https://nominatim.openstreetmap.org/search?city=${newQuery}&format=json&limit=10`,
       );
       const filteredResults = (response.data as ApiCity[]).reduce(
         (acc: City[], city: ApiCity) => {
@@ -107,7 +107,7 @@ const CityDropdown = ({
           }
           return acc;
         },
-        [] as City[]
+        [] as City[],
       );
       addToCache(newQuery, filteredResults);
       setResults(filteredResults);
