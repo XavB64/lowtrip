@@ -45,7 +45,7 @@ const App = () => {
       isDarkTheme,
       switchMapTheme: () => setIsDarkTheme((prev) => !prev),
     }),
-    [isDarkTheme]
+    [isDarkTheme],
   );
 
   const router = createBrowserRouter([

@@ -1,14 +1,19 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-L04SXCD38Q"></script>
+    <script
+      async
+      src="https://www.googletagmanager.com/gtag/js?id=G-L04SXCD38Q"
+    ></script>
     <script>
       window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
 
-      gtag('config', 'G-L04SXCD38Q');
+      gtag("config", "G-L04SXCD38Q");
     </script>
     <meta charset="utf-8" />
     <link rel="icon" href="%PUBLIC_URL%/lowtrip_icon.ico" />
@@ -38,7 +43,12 @@
       Learn how to configure a non-root public URL by running `npm run build`.
     -->
     <title>lowtrip</title>
-    <script id='google-map-script' src="https://maps.googleapis.com/maps/api/js?key=%REACT_APP_MAPS_API_KEY%&libraries=places,geocoding" async defer></script>
+    <script
+      id="google-map-script"
+      src="https://maps.googleapis.com/maps/api/js?key=%REACT_APP_MAPS_API_KEY%&libraries=places,geocoding"
+      async
+      defer
+    ></script>
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>

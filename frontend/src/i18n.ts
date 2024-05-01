@@ -82,8 +82,8 @@ i18n
             hitchHiking: "Hitch-hiking",
             warning:
               "Due to heavy traffic and lack of budget, we have to limit the number of requests temporarily.",
-            warning_1:"Due to heavy traffic and ",
-            warning_2:"lack of budget",
+            warning_1: "Due to heavy traffic and ",
+            warning_2: "lack of budget",
             warning_3: ", we have to limit the number of requests temporarily.",
           },
           about: {
@@ -105,7 +105,7 @@ i18n
             bonpote:
               "One exemplary project that epitomizes sustainable travel is the journey undertaken by the media Bon Pote to witness the Northern Lights in the Lofoten Islands, traveling entirely by train from Paris. This initiative showcases the feasibility and beauty of overland travel, emphasizing the rewarding experiences that come with reducing reliance on carbon-intensive modes of transportation. They tested our method to estimate their associated carbon footprint.",
             shimla:
-              "The documentary film 'Shimla', named after the Indian city, explores the theme of water and ecology through an ambitious journey from Paris to India and back using a combination of trains, ferries, and hitchhiking ("autostop"). This innovative approach to travel not only raises awareness about environmental issues but also showcases how diverse modes of transportation can be used to minimize carbon emissions and maximize the richness of the travel experience. Johan and Victoria, the movie makers, trusted lowtrip to estimate the associated carbon footprint of their adventure and subsequent reductions compared to usual means of transportation for such distances.",
+              "The documentary film 'Shimla', named after the Indian city, explores the theme of water and ecology through an ambitious journey from Paris to India and back using a combination of trains, ferries, and hitchhiking ('autostop'). This innovative approach to travel not only raises awareness about environmental issues but also showcases how diverse modes of transportation can be used to minimize carbon emissions and maximize the richness of the travel experience. Johan and Victoria, the movie makers, trusted lowtrip to estimate the associated carbon footprint of their adventure and subsequent reductions compared to usual means of transportation for such distances.",
           },
           results: {
             vsOtherTrip: "Your trip VS Other trip",
@@ -375,11 +375,12 @@ i18n
             hitchHiking: "Auto-stop",
             warning:
               "En raison du trafic important et d'un manque de budget, nous sommes contraints de limiter le nombre de requêtes temporairement.",
-          
-          warning_1:"En raison du trafic important et ",
-          warning_2:"d'un manque de budget",
-          warning_3: ", nous sommes contraints de limiter le nombre de requêtes temporairement.",
-        },
+
+            warning_1: "En raison du trafic important et ",
+            warning_2: "d'un manque de budget",
+            warning_3:
+              ", nous sommes contraints de limiter le nombre de requêtes temporairement.",
+          },
           about: {
             introduction_1:
               "Lowtrip est un projet indépendant, gratuit et open-source. L'objectif de cette application est de fournir des bilans carbone par passager précis pour chaque mode de transport et trajet. Ces résultats permettent à l'utilisateur de faire des choix informés dans le contexte de réduction de leur empreinte carbone pour freiner les effets du réchauffement climatique.",

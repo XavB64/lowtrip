@@ -175,7 +175,7 @@ export const StepField = ({ removeStep, updateStep, step }: StepFieldProps) => {
                   icon={item.icon}
                   transport={item.value}
                 />
-              )
+              ),
             )}
           </Box>
         </HStack>

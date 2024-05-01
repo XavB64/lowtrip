@@ -28,7 +28,7 @@ import {
   useBreakpoint,
   Alert,
   AlertIcon,
-  Link
+  Link,
 } from "@chakra-ui/react";
 import { BiSolidPlusCircle } from "react-icons/bi";
 import { API_URL } from "../../config";
@@ -46,11 +46,11 @@ const getPayload = (steps: Step[], stepsToCompare?: Step[]) => {
     formData.append("mode", "2");
     formData.append(
       "my-trip",
-      JSON.stringify(formatStepsForApi(stepsToCompare))
+      JSON.stringify(formatStepsForApi(stepsToCompare)),
     );
     formData.append(
       "alternative-trip",
-      JSON.stringify(formatStepsForApi(steps))
+      JSON.stringify(formatStepsForApi(steps)),
     );
   } else {
     formData.append("mode", "1");
@@ -144,16 +144,16 @@ export const Form = ({
       <Alert status="warning" fontSize={10} p={2}>
         <AlertIcon />
         <Text>
-        {t("form.warning_1")}
-        <Link
+          {t("form.warning_1")}
+          <Link
             href="https://fr.tipeee.com/lowtrip-app"
             target="_blank"
             rel="noreferrer"
             style={{ color: "blue" }}
-            >
-              {t("form.warning_2")}
-        </Link>
-        {t("form.warning_3")}
+          >
+            {t("form.warning_2")}
+          </Link>
+          {t("form.warning_3")}
         </Text>
       </Alert>
       {steps.map((step) => (

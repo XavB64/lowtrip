@@ -10,33 +10,33 @@ export const useSteps = () => {
 
   const addStep = useCallback(
     () => setSteps([...steps, { index: steps.length + 1, id: nextId() }]),
-    [steps, setSteps]
+    [steps, setSteps],
   );
 
   const removeStep = useCallback(
     (index: number) => {
       setSteps(steps.filter((step) => step.index !== index));
     },
-    [steps, setSteps]
+    [steps, setSteps],
   );
 
   const updateStep = useCallback(
     (index: number, data: Partial<Step>) => {
       setSteps(
         steps.map((step) =>
-          step.index === index ? { ...step, ...data } : step
-        )
+          step.index === index ? { ...step, ...data } : step,
+        ),
       );
     },
-    [steps, setSteps]
+    [steps, setSteps],
   );
 
   return { values: steps, addStep, removeStep, updateStep };
-}
+};
 
 export const useDebounce = <T = string | number>(
   value: T,
-  delay: number
+  delay: number,
 ): T => {
   const [debouncedValue, setDebouncedValue] = useState(value);
   useEffect(() => {
