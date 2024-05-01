@@ -8,10 +8,7 @@ import {
 } from "@chakra-ui/react";
 import i18n from "i18next";
 import { useTranslation } from "react-i18next";
-import SettingsChoices from "./settings-choices";
-
-const LANGUAGES = ["fr", "en"];
-const MAP_THEMES = ["light", "dark"];
+import SettingsChoices, { LANGUAGES, MAP_THEMES } from "./settings-choices";
 
 const UserSettingsModal = ({
   onClose,
@@ -37,7 +34,7 @@ const UserSettingsModal = ({
             options={LANGUAGES}
             onChange={(language) => i18n.changeLanguage(language)}
             optionIsSelected={(language) => i18n.language === language}
-            translationKey="language"
+            isLanguageSelector
           />
           <SettingsChoices
             options={MAP_THEMES}
@@ -48,7 +45,6 @@ const UserSettingsModal = ({
               (isDarkTheme && theme === "dark") ||
               (!isDarkTheme && theme === "light")
             }
-            translationKey="theme"
           />
         </ModalBody>
       </ModalContent>
