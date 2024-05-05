@@ -4,7 +4,9 @@ import { initReactI18next } from "react-i18next";
 import {
   englishTranslation,
   frenchTranslation,
+  germanTranslation,
   italianTranslation,
+  spanishTranslation
 } from "./translations";
 
 i18n
@@ -18,6 +20,8 @@ i18n
       en: englishTranslation,
       fr: frenchTranslation,
       it: italianTranslation,
+      es: spanishTranslation,
+      de: germanTranslation
     },
     fallbackLng: "en",
     interpolation: {

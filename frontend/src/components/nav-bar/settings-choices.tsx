@@ -1,10 +1,10 @@
 import { Box, Flex, useBreakpoint } from "@chakra-ui/react";
-import { FR, GB, IT } from "country-flag-icons/react/3x2";
+import { FR, GB, IT, ES, DE} from "country-flag-icons/react/3x2";
 import { useTranslation } from "react-i18next";
 
 import { PrimaryButton } from "../primary-button";
 
-export const LANGUAGES = ["fr", "en", "it"];
+export const LANGUAGES = ["fr", "en", "it", "es", "de"];
 export const MAP_THEMES = ["light", "dark"];
 
 const getFlag = (language: string) => {
@@ -17,6 +17,10 @@ const getFlag = (language: string) => {
       return <FR style={{ width: "50px" }} title={title} />;
     case "it":
       return <IT style={{ width: "50px" }} title={title} />;
+    case "es":
+      return <ES style={{ width: "50px" }} title={title} />;
+    case "de":
+      return <DE style={{ width: "50px" }} title={title} />;
     default:
       return null;
   }

@@ -1,0 +1,196 @@
+{
+  "translation": {
+    "contact": {
+      "emailIsRequired": "E-Mail ist erforderlich",
+      "sendEmail": "Nachricht senden",
+      "sendingEmail": "Senden...",
+      "yourEmail": "Deine E-Mail",
+      "yourMessage": "Was möchtest du sagen?"
+    },
+    "navbar": {
+      "contact": "Kontakt",
+      "language_en": "Englisch",
+      "language_fr": "Französisch",
+      "language_it": "Italienisch",
+      "methodology": "Methodik",
+      "settings": "Einstellungen",
+      "theme_dark": "Dunkel",
+      "theme_light": "Hell",
+      "about": "Über uns",
+      "tipee": "Unterstütze uns!"
+    },
+    "home": {
+      "compareTravelEmissions": "Vergleiche deine Reiseemissionen"
+    },
+    "form": {
+      "addStep": "Schritt hinzufügen",
+      "adviceText": {
+        "compareWith": "Vergleiche mit...",
+        "previousFormIsInvalid": "Bitte fülle das vorherige Formular zuerst aus",
+        "main": "Bitte wähle {{missingParams}} und vergleiche mit...",
+        "mainSecondForm": "Bitte wähle {{missingParams}} und...",
+        "departure": "eine Abreise",
+        "destination": "eine Zielort",
+        "transportMean": "ein Verkehrsmittel",
+        "and": "und",
+        "missingTransportMean": "das fehlende Verkehrsmittel",
+        "missingTransportMeans": "die fehlenden Verkehrsmittel",
+        "missingLocation": "der fehlende Standort",
+        "missingLocationAndTransportMean": "der fehlende Standort und das Verkehrsmittel",
+        "missingLocationAndTransportMeans": "der fehlende Standort und die Verkehrsmittel",
+        "missingLocations": "die fehlenden Standorte",
+        "missingLocationsAndTransportMean": "die fehlenden Standorte und das Verkehrsmittel",
+        "missingLocationsAndTransportMeans": "die fehlenden Standorte und die Verkehrsmittel"
+      },
+      "tabMyTrip": "Meine Reise",
+      "tabOtherTrip": "Andere Reise",
+      "clearInput": "Löschen",
+      "compareWithThisTrip": "Vergleiche mit deiner ersten Reise",
+      "otherTransportMeans": "Andere Verkehrsmittel",
+      "computeEmissions": "Emissionen berechnen",
+      "anotherTrip": "Eine weitere Reise",
+      "compareToAnotherTrip": "Mit einer anderen Reise vergleichen",
+      "placeholderFrom": "Von...",
+      "placeholderTo": "Nach...",
+      "by": "Mit",
+      "transportMeans": {
+        "Train": "Zug",
+        "Plane": "Flugzeug",
+        "Bus": "Bus",
+        "Car": "Auto",
+        "eCar": "Elektroauto",
+        "Ferry": "Fähre",
+        "Bicycle": "Fahrrad"
+      },
+      "passengersNb_one": "{{count}} Passagier",
+      "passengersNb_other": "{{count}} Passagiere",
+      "hitchHiking": "Trampen",
+      "warning": "Aufgrund von starkem Verkehr und fehlendem Budget müssen wir die Anzahl der Anfragen vorübergehend begrenzen.",
+      "warning_1": "Aufgrund von starkem Verkehr und ",
+      "warning_2": "fehlendem Budget",
+      "warning_3": " müssen wir die Anzahl der Anfragen vorübergehend begrenzen."
+    },
+    "about": {
+      "introduction_1": "Lowtrip ist ein unabhängiges, kostenloses und Open-Source-Projekt. Das Ziel dieser Anwendung ist es, genaue Kohlenstoff-Fußabdrücke pro Passagier für jedes Verkehrsmittel und jede Reise bereitzustellen. Diese Ergebnisse ermöglichen es den Benutzern, informierte Entscheidungen im Zusammenhang mit der Reduzierung ihres Kohlenstoff-Fußabdrucks zu treffen, um die Auswirkungen der globalen Erwärmung zu bekämpfen.",
+      "introduction_2": "Diese Anwendung wurde von einem Team von vier jungen Freiwilligen entwickelt. Wir freuen uns über jedes Feedback und Vorschläge zur Verbesserung, die Sie uns über die Kontaktseite senden können. Vielen Dank im Voraus für Ihr Engagement! :)",
+      "inspiringProjects": "Einige inspirierende Projekte",
+      "mollow_1": "Nachhaltiges Reisen durch Europa, ohne auf Autos oder Flugzeuge angewiesen zu sein, birgt zahlreiche Herausforderungen. Die Zug- und Busnetze des Kontinents sind vielfältig und manchmal schwer zu navigieren, was es schwierig macht, effiziente und erschwingliche Verbindungen zwischen den Ländern zu finden. Hier kommt ",
+      "mollow_2": " als umfassende Webplattform ins Spiel, die Ihre Reiseerfahrung revolutionieren soll.",
+      "mollow_3": " Mollow bietet eine Fülle von Ratschlägen und getesteten Routen, um Ihnen Inspiration für Ihr nächstes großes Abenteuer zu geben. Die Plattform basiert auf der Überzeugung, dass die Reise selbst ein unvergesslicher Teil Ihres Urlaubs sein sollte. Indem sie diese Philosophie annimmt, ermutigt Mollow Reisende dazu, die charmanten Städte und atemberaubenden Landschaften zu erkunden und zu schätzen, die sich auf dem Weg entfalten.",
+      "sailcoop_1": "Der Zugang zu Inseln ohne Flugzeuge zu nutzen, erfordert oft die Nutzung von Fähren, die ebenfalls erheblich zu den Kohlenstoffemissionen pro Kilometer beitragen können. Um eine nachhaltige Alternative zum traditionellen Fährverkehr zu bieten, präsentiert Sailcoop eine einzigartige und umweltfreundliche Lösung: Segeln mit dem Wind zwischen dem Festland und Zielen wie Korsika.",
+      "sailcoop_2": "Sailcoop nutzt die Kraft des Windes, um unvergessliche Reisen über das Meer anzubieten. Indem Reisende sich für Segeltouren anstelle von Fährfahrten entscheiden, reduzieren sie nicht nur ihren Kohlenstoff-Fußabdruck, sondern machen sich auch auf ein intensiveres und umweltbewussteres Abenteuer.",
+      "bonpote": "Ein beispielhaftes Projekt, das nachhaltiges Reisen verkörpert, ist die von den Medien Bon Pote unternommene Reise, um die Nordlichter auf den Lofoten-Inseln zu sehen, die ausschließlich mit dem Zug von Paris aus erfolgte. Diese Initiative zeigt die Machbarkeit und Schönheit von Überlandreisen auf und betont die lohnenden Erfahrungen, die mit der Reduzierung der Abhängigkeit von kohlenstoffintensiven Verkehrsmitteln einhergehen. Sie haben unsere Methode getestet, um ihren damit verbundenen Kohlenstoff-Fußabdruck zu schätzen.",
+      "shimla": "Der Dokumentarfilm 'Shimla', benannt nach der indischen Stadt, erkundet das Thema Wasser und Ökologie durch eine ehrgeizige Reise von Paris nach Indien und zurück unter Verwendung einer Kombination aus Zügen, Fähren und Trampen ('autostop'). Dieser innovative Ansatz zum Reisen erhöht nicht nur das Bewusstsein für Umweltfragen, sondern zeigt auch, wie vielfältige Verkehrsmittel eingesetzt werden können, um Kohlenstoffemissionen zu minimieren und die Vielfalt des Reiseerlebnisses zu maximieren. Johan und Victoria, die Filmemacher, haben lowtrip vertraut, um den damit verbundenen Kohlenstoff-Fußabdruck ihres Abenteuers und die anschließenden Reduzierungen im Vergleich zu den üblichen Verkehrsmitteln für solche Entfernungen zu schätzen."
+    },
+    "results": {
+      "vsOtherTrip": "Deine Reise VS Andere Reise",
+      "vsOtherMeans": "Deine Reise VS Andere Verkehrsmittel",
+      "yourTripEmissions": "Deine Reiseemissionen",
+      "explanation": "Die Verbrennung von Kerosin in großer Höhe erzeugt Wolken namens Kondensstreifen. In Kombination mit NOx-Emissionen tragen diese nicht-CO2-Effekte zur globalen Erwärmung bei. Die dargestellte Verbindung wird möglicherweise derzeit nicht von einer Fluggesellschaft betrieben. Dieser Modus wird standardmäßig nicht angezeigt, wenn die Reiselänge unter 300 km liegt."
+    },
+    "chart": {
+      "information": {
+        "info_1": "Diese Reise macht",
+        "your": "deines",
+        "info_2": "jährlichen Kohlenstoffbudgets aus,",
+        "info_3": "gemäß dem Pariser Abkommen",
+        "link": "https://en.2tonnes.org/"
+      },
+      "help": "Details zum Flugzeug ",
+      "transportMeans": {
+        "plane": "Flugzeug",
+        "car": "Auto",
+        "ecar": "Elektroauto",
+        "bus": "Bus",
+        "train": "Zug",
+        "ferry": "Fähre",
+        "bicycle": "Fahrrad",
+        "myTrip": "Meine Reise",
+        "otherTrip": "Andere Reise"
+      },
+      "paths": {
+        "railway": "Eisenbahn",
+        "road": "Straße",
+        "bike": "Fahrradroute",
+        "flight": "Flugroute",
+        "ferry": "Fährroute"
+      },
+      "category": {
+        "infra": "Infrastruktur",
+        "construction": "Produktion",
+        "fuel": "Kraftstoff",
+        "kerosene": "Kerosin",
+        "contrails": "Kondensstreifen & NOx",
+        "bikeBuild": "Fahrradproduktion"
+      }
+    },
+    "method": {
+      "introduction": {
+        "title": "Einleitung",
+        "text1": "Die hier präsentierte Arbeit ist unabhängig, gemeinnützig und Open Source.",
+        "text2": "Das Ziel dieser Webanwendung ist es, genaue Kohlenstoffinventare pro Passagier für jedes Verkehrsmittel und jede Reise zu präsentieren. Diese Ergebnisse ermöglichen es den Benutzern, informierte Entscheidungen im Kontext der Reduzierung ihrer Treibhausgasemissionen zur Minderung des Klimawandels zu treffen. Um diese Ergebnisse in den Kontext zu setzen, sollten die Gesamtjahresnettoemissionen pro Kopf bis 2050 nicht mehr als 2 Tonnen CO2eq betragen, um die globale Erwärmung unter +2°C zu begrenzen.",
+        "text3": "Alle Annahmen, Daten und Quellen, die verwendet wurden, sind in diesem",
+        "text4": "Methodik",
+        "text5": " Dokument verfügbar."
+      },
+      "howEmissionsAreComputed": {
+        "title": "Wie werden Emissionen berechnet?",
+        "text1": "Um die CO2-Äquivalent-Emissionen pro Person zu berechnen, multiplizieren wir die Entfernung einer Reise (km) mit dem entsprechenden Emissionsfaktor (Masse von CO2-Äquivalent pro Person pro km) eines Verkehrsmittels. Bei einer mehrstufigen Reise werden diese Emissionen über die verschiedenen Schritte summiert:"
+      },
+      "distanceEstimation": {
+        "title": "Abschätzung der Entfernungen",
+        "table": {
+          "title_1": "Verkehrsmittel",
+          "title_2": "Entfernungsquelle",
+          "transport_1": "Zug",
+          "transport_2": "Auto - Bus - Elektroauto",
+          "transport_3": "Fahrradroute",
+          "transport_4": "Flugzeug",
+          "transport_5": "Fähre",
+          "data_openstreetmap": "OpenStreetMap-Netzwerk",
+          "data_geodesic": "Geodätische Entfernung + durchschnittlicher Umweg",
+          "data_approximation": "Annäherung des kürzesten Wegs"
+        }
+      },
+      "emissionFactors": {
+        "title": "Wovon hängen Emissionsfaktoren ab?",
+        "table1": {
+          "title_1": "Verkehrsmittel",
+          "title_2": "Variable",
+          "title_3": "Warum?",
+          "transport_1": "Zug",
+          "transport_2": "Bus - Fahrrad",
+          "transport_3": "Auto",
+          "transport_4": "Elektroauto",
+          "transport_5": "Flugzeug",
+          "transport_6": "Fähre",
+          "variables_1": "Besuchte Länder",
+          "variables_2": "-",
+          "variables_3": "Anzahl der Passagiere",
+          "variables_4": "Anzahl der Passagiere & Besuchte Länder",
+          "variables_5": "Reisestrecke",
+          "variables_6": "(noch nicht) Benutzerparameter",
+          "why_1": "≠ Elektrifizierungsrate; ≠ Energie-Kohlenstoffintensität; ≠ Füllraten",
+          "why_2": "-",
+          "why_3": "Persönliche Fußabdruckszuweisung; Verbrauch steigt mit dem Gewicht",
+          "why_4": "Idem Auto; ≠ Energie-Kohlenstoffintensität",
+          "why_5": "Höherer Anteil an Startvorgängen für Kurzstreckenrouten; Verwendung von im Allgemeinen weniger effizienten Flugzeugen",
+          "why_6": "-"
+        },
+        "table2": {
+          "title_1": "Verkehrsmittel",
+          "title_2": "Nutzung",
+          "title_3": "Fahrzeugproduktion",
+          "title_4": "Infrastrukturkonstruktion",
+          "transport_1": "Zug",
+          "transport_2": "Bus - Auto - Elektroauto",
+          "transport_3": "Fahrrad",
+          "transport_4": "Flugzeug",
+          "transport_5": "Fähre",
+          "data_not_found": "Nicht gefunden"
+        },
+        "text1": "Emissionsfaktoren berücksichtigen die Nutzung (verbunden mit der Herstellung und Verwendung von Energie zum Bewegen des Fahrzeugs) sowie Infrastruktur- und Fahrzeugbau, sofern diese signifikant sind. Die Tabelle unten fasst die Arten von Emissionen zusammen, die von lowtrip berücksichtigt werden. Leere Zellen bedeuten, dass die entsprechenden Emissionen nicht signifikant zum Ergebnis beigetragen haben und daher aus Gründen der Benutzerfreundlichkeit und Lesbarkeit ausgeschlossen wurden."
+      }
+    }
+  }
+}
