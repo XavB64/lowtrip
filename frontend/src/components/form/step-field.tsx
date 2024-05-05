@@ -16,63 +16,13 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { useEffect, useState } from "react";
-import {
-  BiSolidBus,
-  BiSolidCar,
-  BiSolidPlaneAlt,
-  BiSolidTrain,
-  BiTrash,
-} from "react-icons/bi";
-import { FaFerry } from "react-icons/fa6";
-import { MdElectricCar } from "react-icons/md";
-import { IoMdBicycle } from "react-icons/io";
+import { BiTrash } from "react-icons/bi";
 
-import {
-  Box,
-  Button,
-  HStack,
-  IconButton,
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuList,
-  Tooltip as ChakraTooltip,
-} from "@chakra-ui/react";
-import { Step, Transport, thumbUp } from "../../types";
-import { useTranslation } from "react-i18next";
+import { HStack, IconButton } from "@chakra-ui/react";
+import { Step } from "../../types";
 import CityDropdown from "./city-dropdown";
 import { City } from "./types";
-
-const TRANSPORTS = [
-  {
-    value: Transport.train,
-    icon: <BiSolidTrain size={20} />,
-  },
-  {
-    value: Transport.plane,
-    icon: <BiSolidPlaneAlt size={20} />,
-  },
-  {
-    value: Transport.bus,
-    icon: <BiSolidBus size={20} />,
-  },
-  {
-    value: Transport.car,
-    icon: <BiSolidCar size={20} />,
-  },
-  {
-    value: Transport.ecar,
-    icon: <MdElectricCar size={20} />,
-  },
-  {
-    value: Transport.ferry,
-    icon: <FaFerry size={20} />,
-  },
-  {
-    value: Transport.bicycle,
-    icon: <IoMdBicycle size={20} />,
-  },
-];
+import TransportSelector from "./transport-selector";
 
 interface StepFieldProps {
   removeStep: (index: number) => void;
@@ -81,7 +31,6 @@ interface StepFieldProps {
 }
 
 export const StepField = ({ removeStep, updateStep, step }: StepFieldProps) => {
-  const { t } = useTranslation();
   const [value, setValue] = useState(step.locationName || "");
   const [shoudlReset, setShouldReset] = useState(false);
 
@@ -143,152 +92,8 @@ export const StepField = ({ removeStep, updateStep, step }: StepFieldProps) => {
         )}
       </HStack>
       {!isDeparture && (
-        <HStack direction="row" marginBottom={2} marginTop={1} gap={0}>
-          <span style={{ paddingRight: 5, textAlign: "end" }}>
-            {t("form.by")}
-          </span>
-          {TRANSPORTS.map((item) =>
-            item.value === Transport.car || item.value === Transport.ecar ? (
-              <CarButton
-                key={item.value}
-                updateStep={updateStep}
-                isSelected={item.value === step.transportMean}
-                step={step}
-                icon={item.icon}
-                transport={item.value}
-              />
-            ) : (
-              <TransportButton
-                key={item.value}
-                updateStep={() =>
-                  updateStep(step.index, {
-                    transportMean: item.value,
-                    passengers: undefined,
-                  })
-                }
-                isSelected={item.value === step.transportMean}
-                icon={item.icon}
-                transport={item.value}
-              />
-            )
-          )}
-        </HStack>
+        <TransportSelector step={step} updateStep={updateStep} />
       )}
     </>
-  );
-};
-
-interface CarButtonProps {
-  updateStep: (index: number, data: Partial<Step>) => void;
-  isSelected: boolean;
-  step: Step;
-  icon: JSX.Element;
-  transport: Transport.car | Transport.ecar;
-}
-
-const CarButton = ({
-  updateStep,
-  isSelected,
-  step,
-  icon,
-  transport,
-}: CarButtonProps) => {
-  const { t } = useTranslation();
-  const passergerChoices =
-    transport === Transport.car
-      ? ([1, 2, 3, 4, 5, thumbUp] as (number | typeof thumbUp)[])
-      : [1, 2, 3, 4, 5];
-  return (
-    <Menu>
-      <ChakraTooltip label={t(`form.transportMeans.${transport}`)}>
-        <MenuButton position="relative">
-          <ChakraTooltip label={t(`form.transportMeans.${transport}`)}>
-            <Box
-              alignItems={"center"}
-              justifyContent={"center"}
-              display="flex"
-              padding={0}
-              width="30px"
-              minWidth="30px"
-              height="30px"
-              borderRadius="100px"
-              backgroundColor={isSelected ? "#474747" : "#b7b7b7"}
-              color="white"
-              marginLeft={2}
-            >
-              {icon}
-            </Box>
-          </ChakraTooltip>
-          {isSelected && step.passengers && (
-            <Box
-              position="absolute"
-              bottom={-1}
-              right={-1}
-              bgColor="#0097a7"
-              color="white"
-              borderRadius="full"
-              fontSize="xs"
-              h={4}
-              w={4}
-            >
-              {step.passengers}
-            </Box>
-          )}
-        </MenuButton>
-      </ChakraTooltip>
-      <MenuList zIndex={3}>
-        {passergerChoices.map((passengerNumber) => (
-          <MenuItem
-            key={passengerNumber}
-            onClick={() =>
-              updateStep(step.index, {
-                transportMean: transport,
-                passengers: passengerNumber,
-              })
-            }
-          >
-            {" "}
-            {typeof passengerNumber !== "number"
-              ? t("form.hitchHiking")
-              : t("form.passengersNb", {
-                  count: passengerNumber,
-                })}
-          </MenuItem>
-        ))}
-      </MenuList>
-    </Menu>
-  );
-};
-
-interface TransportButtonProps {
-  updateStep?: () => void;
-  isSelected: boolean;
-  icon: JSX.Element;
-  transport: Transport;
-}
-
-const TransportButton = ({
-  updateStep,
-  isSelected,
-  icon,
-  transport,
-}: TransportButtonProps) => {
-  const { t } = useTranslation();
-  return (
-    <ChakraTooltip label={t(`form.transportMeans.${transport}`)}>
-      <Button
-        onClick={updateStep}
-        padding={0}
-        width="30px"
-        minWidth="30px"
-        height="30px"
-        borderRadius="100px"
-        backgroundColor={isSelected ? "#474747" : "#b7b7b7"}
-        color="white"
-        marginLeft={2}
-      >
-        {icon}
-      </Button>
-    </ChakraTooltip>
   );
 };
