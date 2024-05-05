@@ -81,8 +81,7 @@
       "sailcoop_2": "Sailcoop aprovecha el poder del viento para ofrecer viajes inolvidables por el mar. Al optar por viajes en velero en lugar de viajes en ferry, los viajeros no solo reducen su huella de carbono, sino que también se embarcan en una aventura más inmersiva y respetuosa con el medio ambiente.",
       "bonpote": "Un proyecto ejemplar que encarna el viaje sostenible es el viaje emprendido por los medios de comunicación Bon Pote para presenciar las Luces del Norte en las Islas Lofoten, viajando completamente en tren desde París. Esta iniciativa muestra la viabilidad y belleza del viaje por tierra, enfatizando las experiencias gratificantes que vienen con la reducción de la dependencia de modos de transporte intensivos en carbono. Probaron nuestro método para estimar su huella de carbono asociada.",
       "shimla": "La película documental 'Shimla', nombrada así por la ciudad india, explora el tema del agua y la ecología a través de un viaje ambicioso desde París hasta la India y de regreso utilizando una combinación de trenes, ferries y autostop. Este enfoque innovador para viajar no solo crea conciencia sobre los problemas ambientales, sino que también muestra cómo se pueden utilizar diversos modos de transporte para minimizar las emisiones de carbono y maximizar la riqueza de la experiencia de viaje. Johan y Victoria, los realizadores de la película, confiaron en lowtrip para estimar la huella de carbono asociada a su aventura y las reducciones posteriores en comparación con los medios de transporte habituales para distancias tan largas."
-    }
-    ,
+    },
     "results": {
       "vsOtherTrip": "Tu viaje vs Otro viaje",
       "vsOtherMeans": "Tu viaje vs Otros medios de transporte",
@@ -191,7 +190,7 @@
           "data_not_found": "No encontrado"
         },
         "text1": "Los factores de emisión consideran el uso (vinculado a la fabricación y uso de energía para mover el vehículo), así como la infraestructura y la construcción de vehículos donde estos son significativos. La tabla a continuación resume los tipos de emisiones tenidos en cuenta por lowtrip. Las celdas vacías significan que las emisiones relacionadas no contribuyeron significativamente al resultado y, por lo tanto, se excluyen para facilitar la comprensión y la legibilidad para el usuario."
+      }
     }
   }
-}
 }
