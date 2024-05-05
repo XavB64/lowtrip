@@ -143,42 +143,35 @@ export const StepField = ({ removeStep, updateStep, step }: StepFieldProps) => {
         )}
       </HStack>
       {!isDeparture && (
-        <HStack
-          direction="row"
-          justifyContent="space-between"
-          marginBottom={2}
-          marginTop={1}
-        >
-          <Box>
-            <span style={{ paddingRight: 5, textAlign: "end" }}>
-              {t("form.by")}
-            </span>
-            {TRANSPORTS.map((item) =>
-              item.value === Transport.car || item.value === Transport.ecar ? (
-                <CarButton
-                  key={item.value}
-                  updateStep={updateStep}
-                  isSelected={item.value === step.transportMean}
-                  step={step}
-                  icon={item.icon}
-                  transport={item.value}
-                />
-              ) : (
-                <TransportButton
-                  key={item.value}
-                  updateStep={() =>
-                    updateStep(step.index, {
-                      transportMean: item.value,
-                      passengers: undefined,
-                    })
-                  }
-                  isSelected={item.value === step.transportMean}
-                  icon={item.icon}
-                  transport={item.value}
-                />
-              ),
-            )}
-          </Box>
+        <HStack direction="row" marginBottom={2} marginTop={1} gap={0}>
+          <span style={{ paddingRight: 5, textAlign: "end" }}>
+            {t("form.by")}
+          </span>
+          {TRANSPORTS.map((item) =>
+            item.value === Transport.car || item.value === Transport.ecar ? (
+              <CarButton
+                key={item.value}
+                updateStep={updateStep}
+                isSelected={item.value === step.transportMean}
+                step={step}
+                icon={item.icon}
+                transport={item.value}
+              />
+            ) : (
+              <TransportButton
+                key={item.value}
+                updateStep={() =>
+                  updateStep(step.index, {
+                    transportMean: item.value,
+                    passengers: undefined,
+                  })
+                }
+                isSelected={item.value === step.transportMean}
+                icon={item.icon}
+                transport={item.value}
+              />
+            )
+          )}
         </HStack>
       )}
     </>
@@ -202,16 +195,30 @@ const CarButton = ({
 }: CarButtonProps) => {
   const { t } = useTranslation();
   const passergerChoices =
-    transport === Transport.car ? [1, 2, 3, 4, 5, thumbUp] : [1, 2, 3, 4, 5];
+    transport === Transport.car
+      ? ([1, 2, 3, 4, 5, thumbUp] as (number | typeof thumbUp)[])
+      : [1, 2, 3, 4, 5];
   return (
     <Menu>
       <ChakraTooltip label={t(`form.transportMeans.${transport}`)}>
         <MenuButton position="relative">
-          <TransportButton
-            icon={icon}
-            isSelected={isSelected}
-            transport={transport}
-          />
+          <ChakraTooltip label={t(`form.transportMeans.${transport}`)}>
+            <Box
+              alignItems={"center"}
+              justifyContent={"center"}
+              display="flex"
+              padding={0}
+              width="30px"
+              minWidth="30px"
+              height="30px"
+              borderRadius="100px"
+              backgroundColor={isSelected ? "#474747" : "#b7b7b7"}
+              color="white"
+              marginLeft={2}
+            >
+              {icon}
+            </Box>
+          </ChakraTooltip>
           {isSelected && step.passengers && (
             <Box
               position="absolute"
