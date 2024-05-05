@@ -5,7 +5,13 @@
       "sendEmail": "Invia messaggio",
       "sendingEmail": "Invio in corso...",
       "yourEmail": "La tua email",
-      "yourMessage": "Cosa vorresti dire?"
+      "yourMessage": "Cosa vorresti dire?",
+      "subjectIsRequired": "Oggetto obbligatorio",
+      "yourSubject": "Il tuo oggetto",
+      "messageSentTitle": "Messaggio inviato!",
+      "messageSentText": "Il tuo messaggio è stato inviato con successo. Ti risponderemo al più presto. Grazie!",
+      "messageNotSentTitle": "Messaggio non inviato...",
+      "messageNotSentText": "Sembra che il tuo messaggio non sia stato inviato. Ti preghiamo di riprovare o di contattarci direttamente via email all'indirizzo lowtrip.contact@gmail.com."
     },
     "navbar": {
       "contact": "Contatto",

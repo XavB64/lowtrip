@@ -6,6 +6,7 @@ import {
   Input,
   Stack,
   Textarea,
+  useDisclosure,
 } from "@chakra-ui/react";
 import { ChangeEvent, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -15,13 +16,18 @@ import {
   EMAIL_API_SERVICE_URL,
   LOWTRIP_MANAGER_EMAIL,
 } from "../config";
+import Modal from "../components/modal";
 
-async function sendEmail(senderEmail: string, message: string) {
+async function sendEmail(
+  senderEmail: string,
+  subject: string,
+  message: string,
+) {
   try {
     const data = {
       sender: { name: "Lowtrip", email: "hello@lowtrip.fr" },
       to: [{ email: LOWTRIP_MANAGER_EMAIL }],
-      subject: "Nouveau message depuis le formulaire de contact",
+      subject,
       htmlContent: `Message envoyé par ${senderEmail}:<br/><br/> ${message}`,
     };
 
@@ -41,19 +47,32 @@ async function sendEmail(senderEmail: string, message: string) {
 
 const ContactView = () => {
   const { t } = useTranslation();
+  const { isOpen, onOpen: openModal, onClose } = useDisclosure();
 
   const [emailInput, setEmailInput] = useState("");
+  const [subjectInput, setSubjectInput] = useState("");
   const [messageInput, setMessageInput] = useState("");
   const [formHasBeenSubmitted, setFormHasBeenSubmitted] = useState(false);
   const [sendingEmail, setSendingEmail] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
 
   const submitForm = () => {
     setFormHasBeenSubmitted(true);
-    if (emailInput === "" || messageInput === "") {
+    if (emailInput === "" || messageInput === "" || subjectInput === "") {
       return;
     }
     setSendingEmail(true);
-    sendEmail(emailInput, messageInput).then(() => setSendingEmail(false));
+    sendEmail(emailInput, subjectInput, messageInput)
+      .then(() => {
+        setIsSuccess(true);
+      })
+      .catch(() => {
+        setIsSuccess(false);
+      })
+      .then(() => {
+        setSendingEmail(false);
+        openModal();
+      });
   };
 
   return (
@@ -85,6 +104,25 @@ const ContactView = () => {
         )}
       </FormControl>
       <FormControl
+        isInvalid={formHasBeenSubmitted && subjectInput === ""}
+        isRequired
+      >
+        <FormLabel>{t("contact.yourSubject")}</FormLabel>
+        <Input
+          type="text"
+          value={subjectInput}
+          onChange={(e: ChangeEvent<HTMLInputElement>) =>
+            setSubjectInput(e.target.value)
+          }
+          background="white"
+          borderRadius="10px"
+          border="1px solid lightgrey"
+        />
+        {formHasBeenSubmitted && subjectInput === "" && (
+          <FormErrorMessage>{t("contact.subjectIsRequired")}</FormErrorMessage>
+        )}
+      </FormControl>
+      <FormControl
         isInvalid={formHasBeenSubmitted && messageInput === ""}
         isRequired
         marginBlock={4}
@@ -109,6 +147,20 @@ const ContactView = () => {
       >
         {t("contact.sendEmail")}
       </Button>
+      <Modal
+        isOpen={isOpen}
+        onClose={() => {
+          onClose();
+        }}
+        headerTitle={t(
+          isSuccess
+            ? "contact.messageSentTitle"
+            : "contact.messageNotSentTitle",
+        )}
+        mainText={t(
+          isSuccess ? "contact.messageSentText" : "contact.messageNotSentText",
+        )}
+      />
     </Stack>
   );
 };
