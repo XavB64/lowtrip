@@ -70,10 +70,16 @@
     },
     "contact": {
       "emailIsRequired": "Email obligatoire",
+      "subjectIsRequired": "Objet obligatoire",
       "sendEmail": "Envoie ton message",
       "sendingEmail": "Envoi en cours...",
       "yourEmail": "Ton email",
-      "yourMessage": "Qu'as-tu à nous dire ?"
+      "yourSubject": "Ton objet",
+      "yourMessage": "Qu'as-tu à nous dire ?",
+      "messageSentTitle": "Message envoyé !",
+      "messageSentText": "Ton message a bien été envoyé. Nous te répondrons dans les plus brefs délais. Merci !",
+      "messageNotSentTitle": "Message non envoyé...",
+      "messageNotSentText": "Il semble que ton message n'ait pas été envoyé. Merci de réessayer ou de nous contacter directement par mail à lowtrip.contact@gmail.com"
     },
     "navbar": {
       "contact": "Contact",

@@ -5,7 +5,13 @@
       "sendEmail": "Nachricht senden",
       "sendingEmail": "Senden...",
       "yourEmail": "Deine E-Mail",
-      "yourMessage": "Was möchtest du sagen?"
+      "subjectIsRequired": "Betreff erforderlich",
+      "yourSubject": "Dein Betreff",
+      "yourMessage": "Was möchtest du sagen?",
+      "messageSentTitle": "Nachricht gesendet!",
+      "messageSentText": "Deine Nachricht wurde erfolgreich gesendet. Wir werden dir so schnell wie möglich antworten. Vielen Dank!",
+      "messageNotSentTitle": "Nachricht nicht gesendet...",
+      "messageNotSentText": "Es scheint, dass deine Nachricht nicht gesendet wurde. Bitte versuche es erneut oder kontaktiere uns direkt per E-Mail unter lowtrip.contact@gmail.com."
     },
     "navbar": {
       "contact": "Kontakt",
