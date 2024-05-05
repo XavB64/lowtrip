@@ -6,7 +6,7 @@ import {
   frenchTranslation,
   germanTranslation,
   italianTranslation,
-  spanishTranslation
+  spanishTranslation,
 } from "./translations";
 
 i18n
@@ -21,7 +21,7 @@ i18n
       fr: frenchTranslation,
       it: italianTranslation,
       es: spanishTranslation,
-      de: germanTranslation
+      de: germanTranslation,
     },
     fallbackLng: "en",
     interpolation: {
