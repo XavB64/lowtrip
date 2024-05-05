@@ -40,7 +40,8 @@ import {
 } from "@chakra-ui/react";
 import { Step, Transport, thumbUp } from "../../types";
 import { useTranslation } from "react-i18next";
-import CityDropdown, { City } from "./CityDropdown";
+import CityDropdown from "./city-dropdown";
+import { City } from "./types";
 
 const TRANSPORTS = [
   {
