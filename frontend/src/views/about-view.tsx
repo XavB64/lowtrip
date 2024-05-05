@@ -23,9 +23,9 @@ const AboutView = () => {
       fontSize={["small", "large"]}
     >
       <Text marginBottom={3} marginTop={isOnMobile ? 3 : 10}>
-        {t("about.introduction_1")}
+        {t("about.introduction1")}
       </Text>
-      <Text marginBottom={3}>{t("about.introduction_2")}</Text>
+      <Text marginBottom={3}>{t("about.introduction2")}</Text>
 
       <Heading
         as="h1"
@@ -48,7 +48,7 @@ const AboutView = () => {
         </a>
         <Box paddingLeft={isOnMobile ? 0 : 5}>
           <Text marginBottom={3}>
-            {t("about.mollow_1")}
+            {t("about.mollow1")}
             <a
               href="https://www.mollow.eu/"
               target="_blank"
@@ -57,9 +57,9 @@ const AboutView = () => {
             >
               Mollow
             </a>
-            {t("about.mollow_2")}
+            {t("about.mollow2")}
           </Text>
-          <Text marginBottom={3}>{t("about.mollow_3")}</Text>
+          <Text marginBottom={3}>{t("about.mollow3")}</Text>
         </Box>
       </Stack>
 
@@ -71,9 +71,9 @@ const AboutView = () => {
       >
         <Box paddingRight={isOnMobile ? 0 : 5}>
           <Text marginBottom={3} marginTop={3}>
-            {t("about.sailcoop_1")}
+            {t("about.sailcoop1")}
           </Text>
-          <Text marginBottom={3}>{t("about.sailcoop_2")}</Text>
+          <Text marginBottom={3}>{t("about.sailcoop2")}</Text>
         </Box>
         <Box width={isOnMobile ? "100%" : "1000px"}>
           <a href="https://www.sailcoop.fr/" target="_blank" rel="noreferrer">

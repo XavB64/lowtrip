@@ -8,19 +8,17 @@ export const LANGUAGES = ["fr", "en", "it", "es", "de"];
 export const MAP_THEMES = ["light", "dark"];
 
 const getFlag = (language: string) => {
-  const { t } = useTranslation();
-  const title = t(`navbar.language_${language}`);
   switch (language) {
     case "en":
-      return <GB style={{ width: "50px" }} title={title} />;
+      return <GB style={{ width: "50px" }} />;
     case "fr":
-      return <FR style={{ width: "50px" }} title={title} />;
+      return <FR style={{ width: "50px" }} />;
     case "it":
-      return <IT style={{ width: "50px" }} title={title} />;
+      return <IT style={{ width: "50px" }} />;
     case "es":
-      return <ES style={{ width: "50px" }} title={title} />;
+      return <ES style={{ width: "50px" }} />;
     case "de":
-      return <DE style={{ width: "50px" }} title={title} />;
+      return <DE style={{ width: "50px" }} />;
     default:
       return null;
   }
@@ -46,7 +44,7 @@ const SettingsChoices = ({
           const isSelected = optionIsSelected(option);
           const content = isLanguageSelector
             ? getFlag(option)
-            : t(`navbar.theme_${option}`);
+            : t(`navbar.${option}`);
           return (
             <PrimaryButton
               key={option}

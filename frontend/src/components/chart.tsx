@@ -63,7 +63,7 @@ export const Chart = ({ response }: ChartProps) => {
   ];
   const myTripEmissions = sumBy(
     JSON.parse(response.data.my_trip ?? {}) as TripData[],
-    (trip) => trip.kgCO2eq,
+    (trip) => trip.kgCO2eq
   );
 
   return (
@@ -84,7 +84,7 @@ export const Chart = ({ response }: ChartProps) => {
       >
         <AlertIcon boxSize={[4, 5]} />
         <Text>
-          {t("chart.information.info_1")}{" "}
+          {t("chart.information.info1")}{" "}
           <Text as="b">{round((myTripEmissions * 100) / 2000)}%</Text>{" "}
           {t("chart.information.your")}{" "}
           <Link
@@ -92,9 +92,9 @@ export const Chart = ({ response }: ChartProps) => {
             isExternal
             textDecoration="underline"
           >
-            {t("chart.information.info_2")}
+            {t("chart.information.info2")}
           </Link>{" "}
-          {t("chart.information.info_3")}
+          {t("chart.information.info3")}
         </Text>
       </Alert>
       <ResponsiveContainer
@@ -154,10 +154,10 @@ export const Chart = ({ response }: ChartProps) => {
 
 function getChartData(
   trips: TripData[],
-  t: TFunction<"translation", undefined>,
+  t: TFunction<"translation", undefined>
 ) {
   const transports = uniq(
-    trips.map((tripData) => tripData["Mean of Transport"]),
+    trips.map((tripData) => tripData["Mean of Transport"])
   );
 
   return transports.map((transport) => {
@@ -184,7 +184,7 @@ interface CustomLabelProps extends LabelProps {
 const CustomLabel = ({ trips, tripName, ...props }: CustomLabelProps) => {
   const breakpoint = useBreakpoint();
   const currentTrips = trips.filter(
-    (trip) => trip["Mean of Transport"] === props.value,
+    (trip) => trip["Mean of Transport"] === props.value
   );
   const total = sumBy(currentTrips, "kgCO2eq");
   const shouldDisplay = currentTrips[currentTrips.length - 1].NAME === tripName;

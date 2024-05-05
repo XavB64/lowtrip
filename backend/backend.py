@@ -77,10 +77,10 @@ def compute_emissions_custom(data,
         arrival_coordinates = (arrival.lon, arrival.lat)
 
         # Mean of transport
-        transport_mean = arrival.transp
+        transportmean = arrival.transp
 
         # Compute depending on the mean of transport
-        if transport_mean == "Train":
+        if transportmean == "Train":
             data_train, geo_train, _train = train_to_gdf(
                 departure_coordinates,
                 arrival_coordinates,
@@ -97,7 +97,7 @@ def compute_emissions_custom(data,
             emissions_data.append(data_train)
             geo.append(geo_train)
 
-        elif transport_mean == "Bus":
+        elif transportmean == "Bus":
             data_bus, geo_bus, _bus = bus_to_gdf(
                 departure_coordinates, arrival_coordinates, 
                 color_usage = cmap["Road"],
@@ -111,7 +111,7 @@ def compute_emissions_custom(data,
             emissions_data.append(data_bus)
             geo.append(geo_bus)
 
-        elif transport_mean == "Car":
+        elif transportmean == "Car":
             # We get the number of passenger
             data_car, geo_car, _car = car_to_gdf(
                 departure_coordinates,
@@ -128,7 +128,7 @@ def compute_emissions_custom(data,
             emissions_data.append(data_car) #gdf_car.copy()
             geo.append(geo_car)
             
-        elif transport_mean == "eCar":
+        elif transportmean == "eCar":
             data_ecar, geo_ecar, _car = ecar_to_gdf(
                 departure_coordinates,
                 arrival_coordinates,
@@ -144,7 +144,7 @@ def compute_emissions_custom(data,
             emissions_data.append(data_ecar)
             geo.append(geo_ecar)
             
-        elif transport_mean == "Bicycle":
+        elif transportmean == "Bicycle":
             # We get the number of passenger
             data_bike, geo_bike, _bike = bicycle_to_gdf(
                 departure_coordinates,
@@ -159,7 +159,7 @@ def compute_emissions_custom(data,
             emissions_data.append(data_bike)
             geo.append(geo_bike)
 
-        elif transport_mean == "Plane":
+        elif transportmean == "Plane":
             data_plane, geo_plane = plane_to_gdf(
                 departure_coordinates,
                 arrival_coordinates,
@@ -170,7 +170,7 @@ def compute_emissions_custom(data,
             emissions_data.append(data_plane)
             geo.append(geo_plane)
 
-        elif transport_mean == "Ferry":
+        elif transportmean == "Ferry":
             data_ferry, geo_ferry = ferry_to_gdf(
                 departure_coordinates, arrival_coordinates, 
                 color_usage = cmap["Ferry"],
