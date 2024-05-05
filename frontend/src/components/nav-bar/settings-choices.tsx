@@ -1,5 +1,5 @@
 import { Box, Flex, useBreakpoint } from "@chakra-ui/react";
-import { FR, GB, IT, ES, DE} from "country-flag-icons/react/3x2";
+import { FR, GB, IT, ES, DE } from "country-flag-icons/react/3x2";
 import { useTranslation } from "react-i18next";
 
 import { PrimaryButton } from "../primary-button";
