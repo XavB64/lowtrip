@@ -1,19 +1,62 @@
-import { useState, useEffect } from "react";
 import axios from "axios";
+import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Box,
   Popover,
   PopoverTrigger,
   PopoverContent,
   Text,
+  Spinner,
 } from "@chakra-ui/react";
-import { useDebounce } from "../../hooks";
-import { useTranslation } from "react-i18next";
+import { PHOTON_API_URL } from "../../config";
 import { useCache } from "../../context";
+import { useDebounce } from "../../hooks";
+import { City, PhotonApiCity } from "./types";
 
-const formatCityName = (city: string) => {
-  const items = city.split(",");
-  return `${items[0]}, ${items[items.length - 1]}`;
+const formatCityName = (
+  duplicates: string[],
+  city: PhotonApiCity["properties"],
+) => {
+  const cityName = `${city.name}, ${city.country}`;
+  if (duplicates.includes(cityName)) {
+    return `${city.name}, ${city.state}, ${city.country}`;
+  }
+  return cityName;
+};
+
+const formatCities = (rawCities: PhotonApiCity[]) => {
+  const { duplicates } = rawCities.reduce(
+    ({ cityNames, duplicates }, { properties: cityProps }) => {
+      const currentCityName = `${cityProps.name}, ${cityProps.country}`;
+      if (cityNames.includes(currentCityName)) {
+        duplicates.push(currentCityName);
+      } else {
+        cityNames.push(currentCityName);
+      }
+      return { cityNames, duplicates };
+    },
+    { cityNames: [] as string[], duplicates: [] as string[] },
+  );
+
+  const { cities } = rawCities.reduce(
+    ({ cityNames, cities }, city) => {
+      const currentCityName = formatCityName(duplicates, city.properties);
+      if (!cityNames.includes(currentCityName)) {
+        cityNames.push(currentCityName);
+        cities.push({
+          id: city.properties.place_id,
+          name: currentCityName,
+          lon: city.geometry.coordinates[0].toString(),
+          lat: city.geometry.coordinates[1].toString(),
+        });
+      }
+      return { cityNames, cities };
+    },
+    { cityNames: [] as string[], cities: [] as City[] },
+  );
+
+  return cities;
 };
 
 const ClearButton = ({ resetCity }: { resetCity: () => void }) => {
@@ -27,7 +70,7 @@ const ClearButton = ({ resetCity }: { resetCity: () => void }) => {
       style={{
         position: "absolute",
         right: "0.5rem",
-        bottom: "1rem",
+        bottom: "0.80rem",
         justifyContent: "center",
         alignItems: "center",
         width: "1.5rem",
@@ -48,18 +91,23 @@ const ClearButton = ({ resetCity }: { resetCity: () => void }) => {
   );
 };
 
-export type City = {
-  id: number;
-  name: string;
-  lon: string;
-  lat: string;
-};
-
-type ApiCity = {
-  place_id: number;
-  display_name: string;
-  lon: string;
-  lat: string;
+const Loader = () => {
+  return (
+    <div
+      style={{
+        position: "absolute",
+        right: "0.5rem",
+        bottom: "0.80rem",
+        justifyContent: "center",
+        alignItems: "center",
+        width: "1.5rem",
+        height: "1.5rem",
+        display: "flex",
+      }}
+    >
+      <Spinner size="sm" />
+    </div>
+  );
 };
 
 const CityDropdown = ({
@@ -78,6 +126,7 @@ const CityDropdown = ({
   const [results, setResults] = useState<City[]>([]);
   const [value, setValue] = useState("");
   const [isOpen, setIsOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [active, setActive] = useState(0);
 
   const query = useDebounce(value, 500);
@@ -90,34 +139,22 @@ const CityDropdown = ({
       return;
     }
     try {
+      setIsLoading(true);
       const response = await axios.get(
-        `https://nominatim.openstreetmap.org/search?city=${newQuery}&format=json&limit=10`,
+        `${PHOTON_API_URL}/api?q=${newQuery}&layer=city&limit=10`,
       );
-      const filteredResults = (response.data as ApiCity[]).reduce(
-        (acc: City[], city: ApiCity) => {
-          const cityNames = acc.map((item) => item.name);
-          const currentCityName = formatCityName(city.display_name);
-          if (!cityNames.includes(currentCityName)) {
-            acc.push({
-              id: city.place_id,
-              name: currentCityName,
-              lon: city.lon,
-              lat: city.lat,
-            });
-          }
-          return acc;
-        },
-        [] as City[],
-      );
-      addToCache(newQuery, filteredResults);
-      setResults(filteredResults);
+      const cities = formatCities(response.data.features as PhotonApiCity[]);
+      addToCache(newQuery, cities);
+      setResults(cities);
     } catch (error) {
       console.error("Error fetching cities:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   useEffect(() => {
-    if (query) {
+    if (query && query !== stepName) {
       handleChange(query);
     } else {
       setResults([]);
@@ -195,7 +232,8 @@ const CityDropdown = ({
           ))}
         </PopoverContent>
       </Popover>
-      {value && <ClearButton resetCity={resetCity} />}
+      {isLoading && <Loader />}
+      {value && !isLoading && <ClearButton resetCity={resetCity} />}
     </>
   );
 };
@@ -212,7 +250,6 @@ const Option = ({
   isActive: boolean;
 }) => {
   const selectOption = () => {
-    console.log("hello");
     onSelectOption(option);
     setIsOpen(false);
   };

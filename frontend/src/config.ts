@@ -1,5 +1,6 @@
 export const API_URL = process.env.REACT_APP_API_URL ?? "";
-export const MAPS_API_KEY = process.env.REACT_APP_MAPS_API_KEY ?? "";
+export const PHOTON_API_URL =
+  process.env.PHOTON_API_URL ?? "https://photon.komoot.io";
 export const EMAIL_API_SERVICE_KEY =
   process.env.REACT_APP_EMAIL_API_SERVICE_KEY ?? "";
 export const EMAIL_API_SERVICE_URL =
