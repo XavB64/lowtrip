@@ -26,6 +26,7 @@ import {
   Th,
   Td,
   Heading,
+  Link,
 } from "@chakra-ui/react";
 import { useTranslation } from "react-i18next";
 import MethodologyPdf from "../assets/lowtrip_methodology.pdf";
@@ -77,14 +78,14 @@ const MethodView = () => {
       <Text marginBottom={3}>{t("method.introduction.text2")}</Text>
       <Text marginBottom={10}>
         {t("method.introduction.text3")}{" "}
-        <a
+        <Link
           href={MethodologyPdf}
           target="_blank"
           rel="noreferrer"
-          style={{ color: "blue" }}
+          color="blue.400"
         >
           {t("method.introduction.text4")}
-        </a>
+        </Link>
         {t("method.introduction.text5")}
       </Text>
 
@@ -115,40 +116,40 @@ const MethodView = () => {
         <Table variant="simple" fontSize={14} marginBottom={3} overflow="auto">
           <Thead>
             <Tr>
-              <Th>{t("method.distanceEstimation.table.title_1")}</Th>
-              <Th>{t("method.distanceEstimation.table.title_2")}</Th>
+              <Th>{t("method.distanceEstimation.table.title1")}</Th>
+              <Th>{t("method.distanceEstimation.table.title2")}</Th>
             </Tr>
           </Thead>
           <Tbody>
             <Tr>
               <Td bg="blue.100">
-                {t("method.distanceEstimation.table.transport_1")}
+                {t("method.distanceEstimation.table.transport1")}
               </Td>
-              <Td>{t("method.distanceEstimation.table.data_openstreetmap")}</Td>
+              <Td>{t("method.distanceEstimation.table.dataOpenstreetmap")}</Td>
             </Tr>
             <Tr>
               <Td bg="blue.100">
-                {t("method.distanceEstimation.table.transport_2")}
+                {t("method.distanceEstimation.table.transport2")}
               </Td>
-              <Td>{t("method.distanceEstimation.table.data_openstreetmap")}</Td>
+              <Td>{t("method.distanceEstimation.table.dataOpenstreetmap")}</Td>
             </Tr>
             <Tr>
               <Td bg="blue.100">
-                {t("method.distanceEstimation.table.transport_3")}
+                {t("method.distanceEstimation.table.transport3")}
               </Td>
-              <Td>{t("method.distanceEstimation.table.data_openstreetmap")}</Td>
+              <Td>{t("method.distanceEstimation.table.dataOpenstreetmap")}</Td>
             </Tr>
             <Tr>
               <Td bg="blue.100">
-                {t("method.distanceEstimation.table.transport_4")}
+                {t("method.distanceEstimation.table.transport4")}
               </Td>
-              <Td>{t("method.distanceEstimation.table.data_geodesic")}</Td>
+              <Td>{t("method.distanceEstimation.table.dataGeodesic")}</Td>
             </Tr>
             <Tr>
               <Td bg="blue.100">
-                {t("method.distanceEstimation.table.transport_5")}
+                {t("method.distanceEstimation.table.transport5")}
               </Td>
-              <Td>{t("method.distanceEstimation.table.data_approximation")}</Td>
+              <Td>{t("method.distanceEstimation.table.dataApproximation")}</Td>
             </Tr>
             {/* Add more rows as needed */}
           </Tbody>
@@ -169,91 +170,91 @@ const MethodView = () => {
         <Table variant="simple" fontSize={14} marginBottom={3} overflow="auto">
           <Thead>
             <Tr>
-              <Th>{t("method.emissionFactors.table1.title_1")}</Th>
-              <Th>{t("method.emissionFactors.table1.title_2")}</Th>
-              <Th>{t("method.emissionFactors.table1.title_3")}</Th>
+              <Th>{t("method.emissionFactors.table1.title1")}</Th>
+              <Th>{t("method.emissionFactors.table1.title2")}</Th>
+              <Th>{t("method.emissionFactors.table1.title3")}</Th>
             </Tr>
           </Thead>
           <Tbody>
             <Tr>
               <Td bg="blue.100">
-                {t("method.emissionFactors.table1.transport_1")}
+                {t("method.emissionFactors.table1.transport1")}
               </Td>
-              <Td>{t("method.emissionFactors.table1.variables_1")}</Td>
+              <Td>{t("method.emissionFactors.table1.variables1")}</Td>
               <Td>
-                {t("method.emissionFactors.table1.why_1")
+                {t("method.emissionFactors.table1.why1")
                   .split(";")
                   .map((line) => (
-                    <div>{line}</div>
+                    <Text key={line}>{line}</Text>
                   ))}
               </Td>
             </Tr>
             <Tr>
               <Td bg="blue.100">
-                {t("method.emissionFactors.table1.transport_2")}
+                {t("method.emissionFactors.table1.transport2")}
               </Td>
-              <Td>{t("method.emissionFactors.table1.variables_2")}</Td>
+              <Td>{t("method.emissionFactors.table1.variables2")}</Td>
               <Td>
-                {t("method.emissionFactors.table1.why_2")
+                {t("method.emissionFactors.table1.why2")
                   .split(";")
                   .map((line) => (
-                    <div>{line}</div>
+                    <Text key={line}>{line}</Text>
                   ))}
               </Td>
             </Tr>
             <Tr>
               <Td bg="blue.100">
-                {t("method.emissionFactors.table1.transport_3")
+                {t("method.emissionFactors.table1.transport3")
                   .split(";")
                   .map((line) => (
-                    <div>{line}</div>
+                    <Text key={line}>{line}</Text>
                   ))}
               </Td>
-              <Td>{t("method.emissionFactors.table1.variables_3")}</Td>
+              <Td>{t("method.emissionFactors.table1.variables3")}</Td>
               <Td>
-                {t("method.emissionFactors.table1.why_3")
+                {t("method.emissionFactors.table1.why3")
                   .split(";")
                   .map((line) => (
-                    <div>{line}</div>
-                  ))}
-              </Td>
-            </Tr>
-            <Tr>
-              <Td bg="blue.100">
-                {t("method.emissionFactors.table1.transport_4")}
-              </Td>
-              <Td>{t("method.emissionFactors.table1.variables_4")}</Td>
-              <Td>
-                {t("method.emissionFactors.table1.why_4")
-                  .split(";")
-                  .map((line) => (
-                    <div>{line}</div>
+                    <Text key={line}>{line}</Text>
                   ))}
               </Td>
             </Tr>
             <Tr>
               <Td bg="blue.100">
-                {t("method.emissionFactors.table1.transport_5")}
+                {t("method.emissionFactors.table1.transport4")}
               </Td>
-              <Td>{t("method.emissionFactors.table1.variables_5")}</Td>
+              <Td>{t("method.emissionFactors.table1.variables4")}</Td>
               <Td>
-                {t("method.emissionFactors.table1.why_5")
+                {t("method.emissionFactors.table1.why4")
                   .split(";")
                   .map((line) => (
-                    <div>{line}</div>
+                    <Text key={line}>{line}</Text>
                   ))}
               </Td>
             </Tr>
             <Tr>
               <Td bg="blue.100">
-                {t("method.emissionFactors.table1.transport_6")}
+                {t("method.emissionFactors.table1.transport5")}
               </Td>
-              <Td>{t("method.emissionFactors.table1.variables_6")}</Td>
+              <Td>{t("method.emissionFactors.table1.variables5")}</Td>
               <Td>
-                {t("method.emissionFactors.table1.why_6")
+                {t("method.emissionFactors.table1.why5")
                   .split(";")
                   .map((line) => (
-                    <div>{line}</div>
+                    <Text key={line}>{line}</Text>
+                  ))}
+              </Td>
+            </Tr>
+            <Tr>
+              <Td bg="blue.100">
+                {t("method.emissionFactors.table1.transport6")}
+              </Td>
+              <Td>{t("method.emissionFactors.table1.variables6")}</Td>
+              <Td>
+                {t("method.emissionFactors.table1.why6")
+                  .split(";")
+                  .map((line) => (
+                    <Text key={line}>{line}</Text>
                   ))}
               </Td>
             </Tr>
@@ -266,16 +267,16 @@ const MethodView = () => {
         <Table variant="simple" fontSize={14} marginBottom={3} overflow="auto">
           <Thead>
             <Tr>
-              <Th>{t("method.emissionFactors.table2.title_1")}</Th>
-              <Th>{t("method.emissionFactors.table2.title_2")}</Th>
-              <Th>{t("method.emissionFactors.table2.title_3")}</Th>
-              <Th>{t("method.emissionFactors.table2.title_4")}</Th>
+              <Th>{t("method.emissionFactors.table2.title1")}</Th>
+              <Th>{t("method.emissionFactors.table2.title2")}</Th>
+              <Th>{t("method.emissionFactors.table2.title3")}</Th>
+              <Th>{t("method.emissionFactors.table2.title4")}</Th>
             </Tr>
           </Thead>
           <Tbody>
             <Tr>
               <Td bg="blue.100">
-                {t("method.emissionFactors.table2.transport_1")}
+                {t("method.emissionFactors.table2.transport1")}
               </Td>
               <Td>
                 <FaCheck color="green" />
@@ -287,7 +288,7 @@ const MethodView = () => {
             </Tr>
             <Tr>
               <Td bg="blue.100">
-                {t("method.emissionFactors.table2.transport_2")}
+                {t("method.emissionFactors.table2.transport2")}
               </Td>
               <Td>
                 <FaCheck color="green" />
@@ -299,17 +300,17 @@ const MethodView = () => {
             </Tr>
             <Tr>
               <Td bg="blue.100">
-                {t("method.emissionFactors.table2.transport_3")}
+                {t("method.emissionFactors.table2.transport3")}
               </Td>
               <Td> - </Td>
               <Td>
                 <FaCheck color="green" />
               </Td>
-              <Td>{t("method.emissionFactors.table2.data_not_found")}</Td>
+              <Td>{t("method.emissionFactors.table2.dataNotFound")}</Td>
             </Tr>
             <Tr>
               <Td bg="blue.100">
-                {t("method.emissionFactors.table2.transport_4")}
+                {t("method.emissionFactors.table2.transport4")}
               </Td>
               <Td>
                 <FaCheck color="green" />
@@ -319,13 +320,13 @@ const MethodView = () => {
             </Tr>
             <Tr>
               <Td bg="blue.100">
-                {t("method.emissionFactors.table2.transport_5")}
+                {t("method.emissionFactors.table2.transport5")}
               </Td>
               <Td>
                 <FaCheck color="green" />
               </Td>
-              <Td>{t("method.emissionFactors.table2.data_not_found")}</Td>
-              <Td>{t("method.emissionFactors.table2.data_not_found")}</Td>
+              <Td>{t("method.emissionFactors.table2.dataNotFound")}</Td>
+              <Td>{t("method.emissionFactors.table2.dataNotFound")}</Td>
             </Tr>
             {/* Add more rows as needed */}
           </Tbody>

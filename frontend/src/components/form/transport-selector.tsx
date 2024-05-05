@@ -84,10 +84,8 @@ const CarButton = ({
   transport,
 }: CarButtonProps) => {
   const { t } = useTranslation();
-  const passergerChoices =
-    transport === Transport.car
-      ? ([1, 2, 3, 4, 5, thumbUp] as (number | typeof thumbUp)[])
-      : [1, 2, 3, 4, 5];
+  const passergerChoices: (number | typeof thumbUp)[] =
+    transport === Transport.car ? [1, 2, 3, 4, 5, thumbUp] : [1, 2, 3, 4, 5];
   return (
     <Menu>
       <Tooltip label={t(`form.transportMeans.${transport}`)}>
