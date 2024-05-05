@@ -7,6 +7,7 @@ export interface Step {
   locationCoords?: [number, number];
   transportMean?: Transport;
   passengers?: number | typeof thumbUp;
+  options?: FerryOptions;
 }
 
 export interface StepProps {
@@ -26,6 +27,13 @@ export enum Transport {
   bicycle = "Bicycle",
   myTrip = "MyTrip",
   otherTrip = "OtherTrip",
+}
+
+export enum FerryOptions {
+  none = "None",
+  cabin = "Cabin",
+  vehicle = "Vehicle",
+  cabinVehicle = "CabinVehicle",
 }
 
 export interface ApiResponse {

@@ -5,6 +5,7 @@ interface StepsForApi {
   lat: { [key: string]: string };
   transp: { [key: string]: string };
   nb: { [key: string]: number | string };
+  options: { [key: string]: string };
 }
 
 export const formatStepsForApi = (steps: Step[]): StepsForApi =>
@@ -17,9 +18,10 @@ export const formatStepsForApi = (steps: Step[]): StepsForApi =>
       }
       acc.transp[index] = step.transportMean ?? "";
       acc.nb[index] = step.passengers ?? 1;
+      acc.options[index] = step.options ?? "";
       return acc;
     },
-    { lon: {}, lat: {}, transp: {}, nb: {} } as StepsForApi,
+    { lon: {}, lat: {}, transp: {}, nb: {}, options: {} } as StepsForApi,
   );
 
 export const checkIsOnMobile = () => {

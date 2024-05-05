@@ -24,18 +24,21 @@ import {
 import { FaFerry } from "react-icons/fa6";
 import { MdElectricCar } from "react-icons/md";
 import { IoMdBicycle } from "react-icons/io";
-import { Step, Transport, thumbUp } from "../../types";
+import { Step, Transport, FerryOptions, thumbUp } from "../../types";
 import { useTranslation } from "react-i18next";
 import {
   Box,
   Button,
-  HStack,
   Menu,
   MenuButton,
   MenuItem,
   MenuList,
   Tooltip,
+  Text,
+  Wrap,
+  Center,
 } from "@chakra-ui/react";
+import { TFunction } from "i18next";
 
 const TRANSPORTS = [
   {
@@ -68,46 +71,114 @@ const TRANSPORTS = [
   },
 ];
 
-type CarButtonProps = {
+const getTransportOptions = (
+  transport: Transport.ecar | Transport.car | Transport.ferry,
+  t: TFunction,
+): { label: string; stepOptions: Partial<Step> }[] => {
+  if (transport === Transport.ferry) {
+    return [
+      {
+        label: t("form.ferryNone"),
+        stepOptions: {
+          options: FerryOptions.none,
+          passengers: undefined,
+        },
+      },
+      {
+        label: t("form.ferryCabin"),
+        stepOptions: {
+          options: FerryOptions.cabin,
+          passengers: undefined,
+        },
+      },
+      {
+        label: t("form.ferryVehicle"),
+        stepOptions: {
+          options: FerryOptions.vehicle,
+          passengers: undefined,
+        },
+      },
+      {
+        label: t("form.ferryCabinVehicle"),
+        stepOptions: {
+          options: FerryOptions.cabinVehicle,
+          passengers: undefined,
+        },
+      },
+    ];
+  }
+  const basicCarOptions = [1, 2, 3, 4, 5].map((count) => ({
+    label: t("form.passengersNb", { count }),
+    stepOptions: { passengers: count, options: undefined },
+  }));
+  return transport === Transport.car
+    ? [
+        ...basicCarOptions,
+        {
+          label: t("form.hitchHiking"),
+          stepOptions: { passengers: thumbUp, options: undefined },
+        },
+      ]
+    : basicCarOptions;
+};
+
+function getIcon(step: Step) {
+  if (step.passengers) return step.passengers;
+  if (step.options) {
+    switch (step.options) {
+      case FerryOptions.none:
+        return "💺";
+      case FerryOptions.cabin:
+        return "🏠";
+      case FerryOptions.vehicle:
+        return "🚗";
+      case FerryOptions.cabinVehicle:
+        return "🏰";
+    }
+  }
+  return "";
+}
+
+const TransportButtonBaseStyle = {
+  padding: 0,
+  width: "30px",
+  minWidth: "30px",
+  height: "30px",
+  borderRadius: "100px",
+  color: "white",
+};
+
+type TransportWithOptionsProps = {
   updateStep: (index: number, data: Partial<Step>) => void;
   isSelected: boolean;
   step: Step;
   icon: JSX.Element;
-  transport: Transport.car | Transport.ecar;
+  transport: Transport.car | Transport.ecar | Transport.ferry;
+  options: { label: string; stepOptions: Partial<Step> }[];
 };
 
-const CarButton = ({
+const TransportWithOptions = ({
   updateStep,
   isSelected,
   step,
   icon,
   transport,
-}: CarButtonProps) => {
+  options,
+}: TransportWithOptionsProps) => {
   const { t } = useTranslation();
-  const passergerChoices: (number | typeof thumbUp)[] =
-    transport === Transport.car ? [1, 2, 3, 4, 5, thumbUp] : [1, 2, 3, 4, 5];
   return (
     <Menu>
       <Tooltip label={t(`form.transportMeans.${transport}`)}>
         <MenuButton position="relative">
           <Tooltip label={t(`form.transportMeans.${transport}`)}>
-            <Box
-              alignItems={"center"}
-              justifyContent={"center"}
-              display="flex"
-              padding={0}
-              width="30px"
-              minWidth="30px"
-              height="30px"
-              borderRadius="100px"
+            <Center
+              {...TransportButtonBaseStyle}
               backgroundColor={isSelected ? "#474747" : "#b7b7b7"}
-              color="white"
-              marginLeft={2}
             >
               {icon}
-            </Box>
+            </Center>
           </Tooltip>
-          {isSelected && step.passengers && (
+          {isSelected && (
             <Box
               position="absolute"
               bottom={-1}
@@ -119,27 +190,23 @@ const CarButton = ({
               h={4}
               w={4}
             >
-              {step.passengers}
+              {getIcon(step)}
             </Box>
           )}
         </MenuButton>
       </Tooltip>
       <MenuList zIndex={3}>
-        {passergerChoices.map((passengerNumber) => (
+        {options.map((option) => (
           <MenuItem
-            key={passengerNumber}
+            key={option.label}
             onClick={() =>
               updateStep(step.index, {
                 transportMean: transport,
-                passengers: passengerNumber,
+                ...option.stepOptions,
               })
             }
           >
-            {typeof passengerNumber !== "number"
-              ? t("form.hitchHiking")
-              : t("form.passengersNb", {
-                  count: passengerNumber,
-                })}
+            {option.label}
           </MenuItem>
         ))}
       </MenuList>
@@ -165,14 +232,8 @@ const TransportButton = ({
     <Tooltip label={t(`form.transportMeans.${transport}`)}>
       <Button
         onClick={updateStep}
-        padding={0}
-        width="30px"
-        minWidth="30px"
-        height="30px"
-        borderRadius="100px"
+        {...TransportButtonBaseStyle}
         backgroundColor={isSelected ? "#474747" : "#b7b7b7"}
-        color="white"
-        marginLeft={2}
       >
         {icon}
       </Button>
@@ -190,17 +251,20 @@ const TransportSelector = ({
   const { t } = useTranslation();
 
   return (
-    <HStack direction="row" marginBottom={2} marginTop={1} gap={0}>
-      <span style={{ paddingRight: 5, textAlign: "end" }}>{t("form.by")}</span>
+    <Wrap direction="row" marginBottom={2} marginTop={1} spacing={[1, 2]}>
+      <Text>{t("form.by")}</Text>
       {TRANSPORTS.map((item) =>
-        item.value === Transport.car || item.value === Transport.ecar ? (
-          <CarButton
+        item.value === Transport.ferry ||
+        item.value === Transport.car ||
+        item.value === Transport.ecar ? (
+          <TransportWithOptions
             key={item.value}
             updateStep={updateStep}
             isSelected={item.value === step.transportMean}
             step={step}
             icon={item.icon}
             transport={item.value}
+            options={getTransportOptions(item.value, t)}
           />
         ) : (
           <TransportButton
@@ -217,7 +281,7 @@ const TransportSelector = ({
           />
         ),
       )}
-    </HStack>
+    </Wrap>
   );
 };
 
