@@ -46,11 +46,11 @@ const getPayload = (steps: Step[], stepsToCompare?: Step[]) => {
     formData.append("mode", "2");
     formData.append(
       "my-trip",
-      JSON.stringify(formatStepsForApi(stepsToCompare))
+      JSON.stringify(formatStepsForApi(stepsToCompare)),
     );
     formData.append(
       "alternative-trip",
-      JSON.stringify(formatStepsForApi(steps))
+      JSON.stringify(formatStepsForApi(steps)),
     );
   } else {
     formData.append("mode", "1");

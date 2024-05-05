@@ -110,43 +110,39 @@ const MapContent = ({
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
       />
       {response &&
-        (JSON.parse(response.data.gdf) as Gdf).features.map((feature) => {
-          return (
-            <>
-              <Polyline
-                key={`${JSON.stringify(feature.geometry.coordinates)}bis`}
-                pathOptions={{ color: feature.properties.colors, opacity: 0.9 }}
-                positions={feature.geometry.coordinates.map((coordinate) => [
-                  coordinate[1],
-                  coordinate[0],
-                ])}
-              />
-              <Polyline
-                key={JSON.stringify(feature.geometry.coordinates)}
-                pathOptions={{ opacity: 0, weight: 20 }}
-                positions={feature.geometry.coordinates.map((coordinate) => [
-                  coordinate[1],
-                  coordinate[0],
-                ])}
-              >
-                <Tooltip sticky>
-                  <HStack>
-                    <Box
-                      h={2}
-                      w={2}
-                      borderRadius={2}
-                      bgColor={feature.properties.colors}
-                    />
-                    <Text>
-                      {t(pathMapper[feature.properties["label"]])} :{" "}
-                      {feature.properties.length}
-                    </Text>
-                  </HStack>
-                </Tooltip>
-              </Polyline>
-            </>
-          );
-        })}
+        (JSON.parse(response.data.gdf) as Gdf).features.map((feature) => (
+          <React.Fragment key={JSON.stringify(feature.geometry.coordinates)}>
+            <Polyline
+              pathOptions={{ color: feature.properties.colors, opacity: 0.9 }}
+              positions={feature.geometry.coordinates.map((coordinate) => [
+                coordinate[1],
+                coordinate[0],
+              ])}
+            />
+            <Polyline
+              pathOptions={{ opacity: 0, weight: 20 }}
+              positions={feature.geometry.coordinates.map((coordinate) => [
+                coordinate[1],
+                coordinate[0],
+              ])}
+            >
+              <Tooltip sticky>
+                <HStack>
+                  <Box
+                    h={2}
+                    w={2}
+                    borderRadius={2}
+                    bgColor={feature.properties.colors}
+                  />
+                  <Text>
+                    {t(pathMapper[feature.properties["label"]])} :{" "}
+                    {feature.properties.length}
+                  </Text>
+                </HStack>
+              </Tooltip>
+            </Polyline>
+          </React.Fragment>
+        ))}
       {stepsCoords.map((coords, index) => (
         <Marker
           key={index}

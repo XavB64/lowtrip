@@ -18,11 +18,11 @@
 import { useEffect, useState } from "react";
 import { BiTrash } from "react-icons/bi";
 
+import TransportSelector from "./transport-selector";
 import { HStack, IconButton } from "@chakra-ui/react";
 import { Step } from "../../types";
 import CityDropdown from "./city-dropdown";
 import { City } from "./types";
-import TransportSelector from "./transport-selector";
 
 interface StepFieldProps {
   removeStep: (index: number) => void;
