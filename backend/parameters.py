@@ -92,6 +92,8 @@ EF_bycicle = .005
 
 EF_ferry = .3
 
+EF_sail = .05
+
 EF_plane = {
     "short": {
         'construction' : .00038,
