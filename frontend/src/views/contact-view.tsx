@@ -25,7 +25,7 @@ async function sendEmail(
 ) {
   try {
     const data = {
-      sender: { name: "Lowtrip", email: "hello@lowtrip.fr" },
+      sender: { name: senderEmail, email: senderEmail },
       to: [{ email: LOWTRIP_MANAGER_EMAIL }],
       subject,
       htmlContent: `Message envoyé par ${senderEmail}:<br/><br/> ${message}`,
