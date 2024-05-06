@@ -86,7 +86,7 @@ def compute_emissions_custom(data, cmap=colors_custom):
                 color_usage=cmap["Train"],
                 color_infra=cmap["Cons_infra"],
             )
-            if not _train:  # One step is not succesful
+            if not _train:  # One step is not successful
                 fail = True
                 ERROR = (
                     "step n°"
@@ -106,7 +106,7 @@ def compute_emissions_custom(data, cmap=colors_custom):
                 color_usage=cmap["Road"],
                 color_cons=cmap["Cons_infra"],
             )
-            if not _bus:  # One step is not succesful
+            if not _bus:  # One step is not successful
                 fail = True
                 ERROR = (
                     "step n°"
@@ -127,7 +127,7 @@ def compute_emissions_custom(data, cmap=colors_custom):
                 color_usage=cmap["Road"],
                 color_cons=cmap["Cons_infra"],
             )
-            if not _car:  # One step is not succesful
+            if not _car:  # One step is not successful
                 fail = True
                 ERROR = (
                     "step n°"
@@ -147,7 +147,7 @@ def compute_emissions_custom(data, cmap=colors_custom):
                 color_usage=cmap["Road"],
                 color_cons=cmap["Cons_infra"],
             )
-            if not _car:  # One step is not succesful
+            if not _car:  # One step is not successful
                 fail = True
                 ERROR = (
                     "step n°"
@@ -164,7 +164,7 @@ def compute_emissions_custom(data, cmap=colors_custom):
             data_bike, geo_bike, _bike = bicycle_to_gdf(
                 departure_coordinates, arrival_coordinates, color=cmap["Bicycle"]
             )
-            if not _bike:  # One step is not succesful
+            if not _bike:  # One step is not successful
                 fail = True
                 ERROR = (
                     "step n°"
@@ -209,7 +209,7 @@ def compute_emissions_custom(data, cmap=colors_custom):
             geo.append(geo_ferry)
 
     if fail:
-        # One or more step weren't succesful, we return nothing
+        # One or more step weren't successful, we return nothing
         data_custom = pd.DataFrame()
         geodata = pd.DataFrame()
     else:

@@ -211,7 +211,7 @@ def extend_search(tag1, tag2, perims):
                 if tag2_new != False:
                     break
 
-            # Verify than we wan try to request the API again
+            # Verify that we want to try to request the API again
             if (tag1_new != False) & (tag2_new != False):
                 gdf, train, train_dist = find_train(tag1_new, tag2_new)
 
@@ -242,7 +242,7 @@ def validate_geom(tag1, tag2, geom, th):
     if geod.geometry_length(ecart) / 1e3 > th:
         print("Arrival is not valid")
         return False
-    # If we arrive here both dep and arr where validated
+    # If we arrive here both dep and arr were validated
     return True
 
 
@@ -424,7 +424,7 @@ def find_bicycle(tag1, tag2):
 # CREATE FERRY ROUTE
 
 
-def create_cost(world=train_intensity, buffer=0):
+def create_coast(world=train_intensity, buffer=0):
     """
     world is the dataset from geopandas, already loaded for trains and ecar
     Return a list of geometries as well as the overall multi geometry
@@ -500,7 +500,7 @@ def get_sea_lines(start, end, world=train_intensity, nb=20, exp=10):
     quadri = []
     for lon in np.linspace(
         min(start[0], end[0]) - exp, max(start[0], end[0]) + exp, nb
-    ):  # limiter au range longitude - latidue +/- 20
+    ):  # limit to range longitude - latidue +/- 20
         quadri.append(
             LineString([
                 (lon, min(start[1], end[1]) - exp - 10),
@@ -518,7 +518,7 @@ def get_sea_lines(start, end, world=train_intensity, nb=20, exp=10):
         )
     # Add also the direct path
     quadri.append(LineString([start, end]))
-    # Cut  the geometries where there is sea
+    # Cut the geometries where there is sea
     sea = gpd.overlay(
         gpd.GeoDataFrame(geometry=gpd.GeoSeries(quadri)),
         world[["geometry"]],
@@ -534,7 +534,7 @@ def get_sea_lines(start, end, world=train_intensity, nb=20, exp=10):
 
 def gdf_lines(start, end, add_canal=True):
     # Get coast lines
-    coast_lines0, coast_exp0 = create_cost(buffer=0)
+    coast_lines0, coast_exp0 = create_coast(buffer=0)
     canal = []
     if add_canal:
         # Panama
