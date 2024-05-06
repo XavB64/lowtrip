@@ -63,7 +63,8 @@
         "Car": "Auto",
         "eCar": "Auto elettrica",
         "Ferry": "Traghetto",
-        "Bicycle": "Bicicletta"
+        "Bicycle": "Bicicletta",
+        "Sail": "Barca a vela"
       },
       "passengersNb_one": "{{count}} passeggero",
       "passengersNb_other": "{{count}} passeggeri",
@@ -112,6 +113,7 @@
         "train": "Treno",
         "ferry": "Traghetto",
         "bicycle": "Bicicletta",
+        "sail": "Barca a vela",
         "myTrip": "Il mio viaggio",
         "otherTrip": "Altro viaggio"
       },
@@ -120,7 +122,8 @@
         "road": "Strada",
         "bike": "Percorso in bicicletta",
         "flight": "Percorso di volo",
-        "ferry": "Percorso traghetto"
+        "ferry": "Percorso marittimo",
+        "sail": "Percorso marittimo"
       },
       "category": {
         "infra": "Infrastruttura",

@@ -21,6 +21,7 @@ from parameters import(
     EF_car,
     EF_ecar,
     EF_ferry,
+    EF_sail,
     EF_plane,
     EF_train,
     search_perimeter,
@@ -520,3 +521,48 @@ def ferry_to_gdf(tag1, tag2, EF=EF_ferry, color_usage="#ffffff"):
     return data_ferry, geo_ferry
 
 
+def sail_to_gdf(tag1, tag2, EF=EF_sail, color_usage="#ffffff"):
+    """
+    parameters:
+        - tag1, tag2
+        - EF : emission factor in gCO2/pkm for ferry
+        - color : color for path and bar chart
+    return:
+        - full dataframe for ferry
+    """
+    # Compute geometry
+    #Convert the inputs in float
+    start = tuple([float(x) for x in tag1])
+    end = tuple([float(x) for x in tag2])
+    # Here new function
+    geom = get_shortest_path(gdf_lines(start, end), start, end)
+    #geom = LineString([tag1, tag2])
+    # Compute the true distance
+    geod = Geod(ellps="WGS84")
+    bird = geod.geometry_length(geom) / 1e3
+    # Compute geodataframe and dataframe
+    # data 
+    data_ferry = pd.DataFrame(
+        pd.Series(
+            {
+                "kgCO2eq": EF * bird,
+                "EF_tot": EF,
+                "path_length": bird,
+                "colors": color_usage,
+                "NAME": "Usage",
+                "Mean of Transport": "Sail",
+            }
+        )
+    ).transpose()
+    geo_ferry = pd.DataFrame(
+        pd.Series(
+            {
+                "colors": color_usage,
+                "label" : "Sail",
+                "length": str(int(bird)) + "km",
+                "geometry": geom,
+            }
+        )
+    ).transpose()
+
+    return data_ferry, geo_ferry

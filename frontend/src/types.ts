@@ -25,6 +25,7 @@ export enum Transport {
   train = "Train",
   ferry = "Ferry",
   bicycle = "Bicycle",
+  sail = "Sail",
   myTrip = "MyTrip",
   otherTrip = "OtherTrip",
 }

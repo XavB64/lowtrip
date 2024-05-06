@@ -204,4 +204,5 @@ const pathMapper: Record<string, string> = {
   Bike: "chart.paths.bike",
   Flight: "chart.paths.flight",
   Ferry: "chart.paths.ferry",
+  Sail: "chart.paths.sail",
 };

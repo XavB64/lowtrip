@@ -63,7 +63,8 @@
         "Car": "Car",
         "eCar": "Electric car",
         "Ferry": "Ferry",
-        "Bicycle": "Bicycle"
+        "Bicycle": "Bicycle",
+        "Sail": "Sailboat"
       },
       "passengersNb_one": "{{count}} passenger",
       "passengersNb_other": "{{count}} passengers",
@@ -112,6 +113,7 @@
         "train": "Train",
         "ferry": "Ferry",
         "bicycle": "Bicycle",
+        "sail": "Sailboat",
         "myTrip": "My trip",
         "otherTrip": "Other trip"
       },
@@ -120,7 +122,8 @@
         "road": "Road",
         "bike": "Bicycle route",
         "flight": "Flight path",
-        "ferry": "Ferry route"
+        "ferry": "Ferry route",
+        "sail": "Sailboat route"
       },
       "category": {
         "infra": "Infrastructure",

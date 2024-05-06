@@ -221,6 +221,7 @@ const transportMeansMapper: Record<Transport | string, string> = {
   [Transport.train]: "chart.transportMeans.train",
   [Transport.ferry]: "chart.transportMeans.ferry",
   [Transport.bicycle]: "chart.transportMeans.bicycle",
+  [Transport.sail]: "chart.transportMeans.sail",
   [Transport.myTrip]: "chart.transportMeans.myTrip",
   [Transport.otherTrip]: "chart.transportMeans.otherTrip",
 };
