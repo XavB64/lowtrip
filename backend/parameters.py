@@ -90,7 +90,12 @@ EF_train = {
 
 EF_bycicle = .005
 
-EF_ferry = .3
+EF_ferry = {
+    'Cabin' : .11,
+    'Seat' : .008,
+    'Base' : .08,
+    'Car' : .114,
+}
 
 EF_sail = .05
 

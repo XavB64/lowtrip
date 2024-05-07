@@ -71,7 +71,7 @@
       "hitchHiking": "Trampen",
       "ferryNone": "Sitzplatz",
       "ferryCabin": "Kabine",
-      "ferryVehicle": "Auto",
+      "ferryVehicle": "Sitzplatz + auto",
       "ferryCabinVehicle": "Kabine + auto",
       "warning": "Aufgrund von starkem Verkehr und fehlendem Budget müssen wir die Anzahl der Anfragen vorübergehend begrenzen.",
       "warning1": "Aufgrund von starkem Verkehr und ",

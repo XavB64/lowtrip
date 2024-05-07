@@ -139,7 +139,7 @@
       "hitchHiking": "Auto-stop",
       "ferryNone": "Place assise",
       "ferryCabin": "Cabine",
-      "ferryVehicle": "Voiture",
+      "ferryVehicle": "Place assise + voiture",
       "ferryCabinVehicle": "Cabine + voiture",
       "warning": "En raison du trafic important et d'un manque de budget, nous sommes contraints de limiter le nombre de requêtes temporairement.",
       "warning1": "En raison du trafic important et ",

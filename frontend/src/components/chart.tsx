@@ -245,4 +245,8 @@ const categoryMapper: Record<EmissionsCategory | string, string> = {
   [EmissionsCategory.kerosene]: "chart.category.kerosene",
   [EmissionsCategory.contrails]: "chart.category.contrails",
   [EmissionsCategory.bikeBuild]: "chart.category.bikeBuild",
+  [EmissionsCategory.none]: "form.ferryNone",
+  [EmissionsCategory.cabin]: "form.ferryCabin",
+  [EmissionsCategory.vehicle]: "form.ferryVehicle",
+  [EmissionsCategory.cabinvehicle]: "form.ferryCabinVehicle",
 };
