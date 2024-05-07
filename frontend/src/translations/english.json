@@ -71,7 +71,7 @@
       "hitchHiking": "Hitch-hiking",
       "ferryNone": "Seat",
       "ferryCabin": "Cabin",
-      "ferryVehicle": "Car",
+      "ferryVehicle": "Seat + car",
       "ferryCabinVehicle": "Cabin + car",
       "warning": "Due to heavy traffic and lack of budget, we have to limit the number of requests temporarily.",
       "warning1": "Due to heavy traffic and ",

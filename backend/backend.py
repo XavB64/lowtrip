@@ -175,6 +175,7 @@ def compute_emissions_custom(data,
             data_ferry, geo_ferry = ferry_to_gdf(
                 departure_coordinates, arrival_coordinates, 
                 color_usage = cmap["Ferry"],
+                options = arrival.options,
             )
             data_ferry["step"] = str(int(idx) + 1)
             emissions_data.append(data_ferry)

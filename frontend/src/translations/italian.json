@@ -71,7 +71,7 @@
       "hitchHiking": "Autostop",
       "ferryNone": "Sedute",
       "ferryCabin": "Cabina",
-      "ferryVehicle": "Macchina",
+      "ferryVehicle": "Sedute + macchina",
       "ferryCabinVehicle": "Cabina + macchina",
       "warning": "A causa del traffico intenso e della mancanza di budget, dobbiamo limitare temporaneamente il numero di richieste.",
       "warning1": "A causa del traffico intenso e ",

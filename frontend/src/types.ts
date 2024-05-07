@@ -75,4 +75,8 @@ export enum EmissionsCategory {
   kerosene = "Kerosene",
   contrails = "Contrails",
   bikeBuild = "Bike-build",
+  none = "None",
+  cabin = "Cabin",
+  vehicle = "Vehicle",
+  cabinvehicle = "CabinVehicle",
 }

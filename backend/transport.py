@@ -474,7 +474,7 @@ def plane_to_gdf(
     return data_plane, geo_plane
 
 
-def ferry_to_gdf(tag1, tag2, EF=EF_ferry, color_usage="#ffffff"):
+def ferry_to_gdf(tag1, tag2, EF=EF_ferry, options = "None" , color_usage="#ffffff"):
     """
     parameters:
         - tag1, tag2
@@ -493,6 +493,16 @@ def ferry_to_gdf(tag1, tag2, EF=EF_ferry, color_usage="#ffffff"):
     # Compute the true distance
     geod = Geod(ellps="WGS84")
     bird = geod.geometry_length(geom) / 1e3
+    #Compute the good emission factor
+    if options == "None":
+        EF = EF['Seat'] + EF['Base']
+    elif options == "Cabin":
+        EF = EF['Cabin'] + EF['Base']
+    elif options == "Vehicle":
+        EF = EF['Car'] + EF['Seat'] + EF['Base']
+    elif options == "CabinVehicle":
+        EF = EF['Car'] + EF['Cabin'] + EF['Base']
+    
     # Compute geodataframe and dataframe
     # data 
     data_ferry = pd.DataFrame(
@@ -502,7 +512,7 @@ def ferry_to_gdf(tag1, tag2, EF=EF_ferry, color_usage="#ffffff"):
                 "EF_tot": EF,
                 "path_length": bird,
                 "colors": color_usage,
-                "NAME": "Usage",
+                "NAME": options,
                 "Mean of Transport": "Ferry",
             }
         )
