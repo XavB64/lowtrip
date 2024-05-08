@@ -37,7 +37,8 @@ $$CO_2eq = \sum_{step} Distance(km) \times Emission \\: Factor(kgCO_2eq / km) $$
 | `Electric car` | Visited countries & Number of passengers |
 | `Bike route` | - |
 | `Plane` | Distance of journey |
-| `Ferry` | (not yet) User-specified parameters |
+| `Ferry` | User-specified parameters based on https://futur.eco/simulateur/transport/ferry/empreinte-du-voyage |
+| `Sailboat` | 50gCO2/pkm ; improvements on the way |
 
 Emissions factors consider usage (linked to the manufacture and use of energy to move the vehicle) as well as infrastructure and vehicle construction where these are significant. The table below summarizes the types of emissions taken into account by lowtrip. Empty cells mean that the related emissions did not contribute significantly to the result and are therefore excluded to facilitate understanding and readability for the user.
 
