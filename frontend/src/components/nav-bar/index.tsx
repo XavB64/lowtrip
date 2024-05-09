@@ -16,28 +16,28 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import {
-  Button,
-  HStack,
-  Image,
-  Spacer,
-  VStack,
-  Stack,
-  ChakraProvider,
-  MenuButton,
-  MenuList,
-  MenuItem,
-  IconButton,
-  useDisclosure,
-  Link as ChakraLink,
-  Menu,
   Box,
+  Button,
+  Link as ChakraLink,
+  ChakraProvider,
+  HStack,
+  IconButton,
+  Image,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuList,
+  Spacer,
+  Stack,
+  VStack,
+  useDisclosure,
 } from "@chakra-ui/react";
 import { GiHamburgerMenu } from "react-icons/gi";
 
-import Logo from "../../assets/lowtrip_logo.png";
-import gitLogo from "../../assets/github.png";
 import { useTranslation } from "react-i18next";
 import { Link, Outlet } from "react-router-dom";
+import gitLogo from "../../assets/github.png";
+import Logo from "../../assets/lowtrip_logo.png";
 import theme from "../../theme";
 import UserSettingsModal from "./user-settings-modal";
 import UserSettingsSelector from "./user-settings-selector";
@@ -189,4 +189,5 @@ const NavbarWrapper = ({
     </VStack>
   </ChakraProvider>
 );
+
 export default NavbarWrapper;
