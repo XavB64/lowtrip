@@ -133,17 +133,6 @@ const NavBar = ({
             </Button>
           </Link>
         ))}
-        <ChakraLink href="https://fr.tipeee.com/lowtrip-app/" isExternal>
-          <Button
-            fontSize={16}
-            color="#fff"
-            variant="ghost"
-            _hover={{ backgroundColor: "none", color: "#D1D1D1" }}
-            _active={{ backgroundColor: "none", color: "#D1D1D1" }}
-          >
-            {t("navbar.tipee")}
-          </Button>
-        </ChakraLink>
         <GithubItem />
         <UserSettingsSelector themeSettings={themeSettings} />
       </HStack>
@@ -161,11 +150,6 @@ const NavBar = ({
                 <MenuItem key={item.name}>{t(`navbar.${item.label}`)}</MenuItem>
               </Link>
             ))}
-            <MenuItem>
-              <ChakraLink href="https://fr.tipeee.com/lowtrip-app/">
-                {t("navbar.tipee")}
-              </ChakraLink>
-            </MenuItem>
             <GithubMenuItem />
             <MenuItem onClick={openErrorModal}>{t("navbar.settings")}</MenuItem>
           </MenuList>

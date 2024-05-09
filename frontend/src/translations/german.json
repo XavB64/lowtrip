@@ -19,8 +19,7 @@
       "settings": "Einstellungen",
       "dark": "Dunkel",
       "light": "Hell",
-      "about": "Über uns",
-      "tipee": "Unterstütze uns!"
+      "about": "Über uns"
     },
     "home": {
       "compareTravelEmissions": "Vergleiche deine Reiseemissionen"
@@ -72,11 +71,7 @@
       "ferryNone": "Sitzplatz",
       "ferryCabin": "Kabine",
       "ferryVehicle": "Sitzplatz + auto",
-      "ferryCabinVehicle": "Kabine + auto",
-      "warning": "Aufgrund von starkem Verkehr und fehlendem Budget müssen wir die Anzahl der Anfragen vorübergehend begrenzen.",
-      "warning1": "Aufgrund von starkem Verkehr und ",
-      "warning2": "fehlendem Budget",
-      "warning3": " müssen wir die Anzahl der Anfragen vorübergehend begrenzen."
+      "ferryCabinVehicle": "Kabine + auto"
     },
     "about": {
       "introduction1": "Lowtrip ist ein unabhängiges, kostenloses und Open-Source-Projekt. Das Ziel dieser Anwendung ist es, genaue Kohlenstoff-Fußabdrücke pro Passagier für jedes Verkehrsmittel und jede Reise bereitzustellen. Diese Ergebnisse ermöglichen es den Benutzern, informierte Entscheidungen im Zusammenhang mit der Reduzierung ihres Kohlenstoff-Fußabdrucks zu treffen, um die Auswirkungen der globalen Erwärmung zu bekämpfen.",

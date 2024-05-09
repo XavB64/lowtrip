@@ -19,8 +19,7 @@
       "settings": "Settings",
       "dark": "Dark",
       "light": "Light",
-      "about": "About",
-      "tipee": "Support us !"
+      "about": "About"
     },
     "home": {
       "compareTravelEmissions": "Compare your travel emissions"
@@ -72,11 +71,7 @@
       "ferryNone": "Seat",
       "ferryCabin": "Cabin",
       "ferryVehicle": "Seat + car",
-      "ferryCabinVehicle": "Cabin + car",
-      "warning": "Due to heavy traffic and lack of budget, we have to limit the number of requests temporarily.",
-      "warning1": "Due to heavy traffic and ",
-      "warning2": "lack of budget",
-      "warning3": ", we have to limit the number of requests temporarily."
+      "ferryCabinVehicle": "Cabin + car"
     },
     "about": {
       "introduction1": "Lowtrip is an independent, free and open-source project. The aim of this application is to provide accurate carbon footprints per passenger for each mode of transport and journey. These results enable users to make informed choices in the context of reducing their carbon footprint to curb the effects of global warming.",
