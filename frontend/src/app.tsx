@@ -29,6 +29,8 @@ import {
   MethodView,
   AboutView,
 } from "./views";
+import theme from "./theme";
+import { ChakraProvider, Stack, VStack } from "@chakra-ui/react";
 
 const App = () => {
   // first API call to wake up the server
@@ -71,6 +73,18 @@ const App = () => {
         },
       ],
       errorElement: <ErrorView />,
+    },
+    {
+      path: "/embed",
+      element: (
+        <ChakraProvider theme={theme}>
+          <VStack w="100vw" h={["100%", "100vh"]} spacing={0}>
+            <Stack direction={["column", "row"]} w="100%" h="100%" spacing={0}>
+              <MainView isDarkTheme={false} withLogo={true} />
+            </Stack>
+          </VStack>
+        </ChakraProvider>
+      ),
     },
   ]);
 

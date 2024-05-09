@@ -9,7 +9,13 @@ import { Map } from "../components/map";
 import { checkIsOnMobile } from "../utils";
 import { CacheProvider } from "../context";
 
-const MainView = ({ isDarkTheme }: { isDarkTheme: boolean }) => {
+const MainView = ({
+  isDarkTheme,
+  withLogo,
+}: {
+  isDarkTheme: boolean;
+  withLogo?: boolean;
+}) => {
   const [response, setResponse] = useState<ApiResponse>();
   const myTripSteps = useSteps();
   const alternativeTripSteps = useSteps();
@@ -23,6 +29,7 @@ const MainView = ({ isDarkTheme }: { isDarkTheme: boolean }) => {
         setResponse={setResponse}
         myTripSteps={myTripSteps}
         alternativeTripSteps={alternativeTripSteps}
+        withLogo={withLogo}
       />
       <Box w="100%" h={["calc(100vh - 64px)", "100%"]} position="relative">
         <Map

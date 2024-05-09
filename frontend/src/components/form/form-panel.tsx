@@ -17,7 +17,9 @@
 
 import {
   Card,
+  Center,
   Heading,
+  Image,
   Tab,
   TabList,
   TabPanel,
@@ -30,12 +32,14 @@ import { Chart } from "../chart";
 import { useRef, useState } from "react";
 import { ApiResponse, StepProps } from "../../types";
 import { useTranslation } from "react-i18next";
+import Logo from "../../assets/lowtrip_logo.png";
 
 interface FormPanelProps {
   response?: ApiResponse;
   setResponse: (response: ApiResponse) => void;
   myTripSteps: StepProps;
   alternativeTripSteps: StepProps;
+  withLogo?: boolean;
 }
 
 export const FormPanel = ({
@@ -43,6 +47,7 @@ export const FormPanel = ({
   setResponse,
   myTripSteps,
   alternativeTripSteps,
+  withLogo,
 }: FormPanelProps) => {
   const { t } = useTranslation();
   const [tabIndex, setTabIndex] = useState(0);
@@ -64,6 +69,11 @@ export const FormPanel = ({
       p={[1, 3]}
     >
       <VStack padding={3} spacing={5} height="100%" width="100%">
+        {withLogo && (
+          <Center bgColor="blue.500" borderRadius={10} p={1}>
+            <Image src={Logo} w={24} />
+          </Center>
+        )}
         <Heading
           color="#595959"
           fontSize="x-large"
