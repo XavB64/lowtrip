@@ -19,8 +19,7 @@
       "settings": "Impostazioni",
       "dark": "Scuro",
       "light": "Chiaro",
-      "about": "Informazioni",
-      "tipee": "Supportaci!"
+      "about": "Informazioni"
     },
     "home": {
       "compareTravelEmissions": "Confronta le tue emissioni di viaggio"
@@ -72,11 +71,7 @@
       "ferryNone": "Sedute",
       "ferryCabin": "Cabina",
       "ferryVehicle": "Sedute + macchina",
-      "ferryCabinVehicle": "Cabina + macchina",
-      "warning": "A causa del traffico intenso e della mancanza di budget, dobbiamo limitare temporaneamente il numero di richieste.",
-      "warning1": "A causa del traffico intenso e ",
-      "warning2": "mancanza di budget",
-      "warning3": ", dobbiamo limitare temporaneamente il numero di richieste."
+      "ferryCabinVehicle": "Cabina + macchina"
     },
     "about": {
       "introduction1": "Lowtrip è un progetto indipendente, gratuito e open source. Lo scopo di questa applicazione è fornire impronte di carbonio accurate per passeggero per ogni mezzo di trasporto e viaggio. Questi risultati consentono agli utenti di fare scelte informate nel contesto della riduzione delle loro impronte di carbonio per contrastare gli effetti del riscaldamento globale.",

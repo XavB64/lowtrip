@@ -26,9 +26,6 @@ import {
   VStack,
   useDisclosure,
   useBreakpoint,
-  Alert,
-  AlertIcon,
-  Link,
 } from "@chakra-ui/react";
 import { BiSolidPlusCircle } from "react-icons/bi";
 import { API_URL } from "../../config";
@@ -141,21 +138,6 @@ export const Form = ({
       justifyContent="right"
       alignItems="start"
     >
-      <Alert status="warning" fontSize={10} p={2}>
-        <AlertIcon />
-        <Text>
-          {t("form.warning1")}
-          <Link
-            href="https://fr.tipeee.com/lowtrip-app"
-            target="_blank"
-            rel="noreferrer"
-            style={{ color: "blue" }}
-          >
-            {t("form.warning2")}
-          </Link>
-          {t("form.warning3")}
-        </Text>
-      </Alert>
       {steps.map((step) => (
         <StepField
           key={`main-form-${step.id}`}
