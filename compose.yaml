@@ -1,0 +1,13 @@
+services:
+  backend:
+    build:
+      context: backend
+    ports:
+      - 8000:8000
+    command: ["gunicorn", "--bind", "0.0.0.0:8000", "app:app"]
+  frontend:
+    build:
+      context: frontend
+    ports:
+      - 3000:3000
+    command: ["npm", "start"]
