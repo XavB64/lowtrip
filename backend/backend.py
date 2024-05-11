@@ -139,7 +139,7 @@ def compute_emissions_custom(data, cmap=colors_custom):
             emissions_data.append(data_car)  # gdf_car.copy()
             geo.append(geo_car)
 
-        elif transport_mean == "eCar":
+        elif transportmean == "eCar":
             data_ecar, geo_ecar, _car = ecar_to_gdf(
                 departure_coordinates,
                 arrival_coordinates,
@@ -159,10 +159,12 @@ def compute_emissions_custom(data, cmap=colors_custom):
             emissions_data.append(data_ecar)
             geo.append(geo_ecar)
 
-        elif transport_mean == "Bicycle":
+        elif transportmean == "Bicycle":
             # We get the number of passenger
             data_bike, geo_bike, _bike = bicycle_to_gdf(
-                departure_coordinates, arrival_coordinates, color=cmap["Bicycle"]
+                departure_coordinates,
+                arrival_coordinates,
+                color=cmap["Bicycle"],
             )
             if not _bike:  # One step is not successful
                 fail = True

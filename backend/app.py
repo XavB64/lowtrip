@@ -105,7 +105,8 @@ def main():
             # Direct data and geo data
             # We change the color to pink
             data_alternative, geo_alternative, error_other = compute_emissions_custom(
-                df2, cmap=colors_alternative
+                df2,
+                cmap=colors_alternative,
             )
             # Error message
             if len(error_other) > 0:
