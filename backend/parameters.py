@@ -93,10 +93,10 @@ EF_train = {
 EF_bycicle = 0.005
 
 EF_ferry = {
-    'Cabin' : 0.11,
-    'Seat' : 0.008,
-    'Base' : 0.08,
-    'Car' : 0.114,
+    "Cabin": 0.11,
+    "Seat": 0.008,
+    "Base": 0.08,
+    "Car": 0.114,
 }
 
 EF_sail = 0.05

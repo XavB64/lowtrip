@@ -190,14 +190,14 @@ def compute_emissions_custom(data, cmap=colors_custom):
         elif transportmean == "Ferry":
             data_ferry, geo_ferry = ferry_to_gdf(
                 departure_coordinates,
-                arrival_coordinates, 
-                color_usage = cmap["Ferry"],
-                options = arrival.options,
+                arrival_coordinates,
+                color_usage=cmap["Ferry"],
+                options=arrival.options,
             )
             data_ferry["step"] = str(int(idx) + 1)
             emissions_data.append(data_ferry)
             geo.append(geo_ferry)
-            
+
         elif transportmean == "Sail":
             data_ferry, geo_ferry = sail_to_gdf(
                 departure_coordinates,

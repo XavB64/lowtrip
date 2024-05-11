@@ -493,7 +493,7 @@ def plane_to_gdf(
     return data_plane, geo_plane
 
 
-def ferry_to_gdf(tag1, tag2, EF=EF_ferry, options = "None" , color_usage="#ffffff"):
+def ferry_to_gdf(tag1, tag2, EF=EF_ferry, options="None", color_usage="#ffffff"):
     """
     parameters:
         - tag1, tag2
@@ -503,48 +503,44 @@ def ferry_to_gdf(tag1, tag2, EF=EF_ferry, options = "None" , color_usage="#fffff
         - full dataframe for ferry
     """
     # Compute geometry
-    #Convert the inputs in float
+    # Convert the inputs in float
     start = tuple([float(x) for x in tag1])
     end = tuple([float(x) for x in tag2])
     # Here new function
     geom = get_shortest_path(gdf_lines(start, end), start, end)
-    #geom = LineString([tag1, tag2])
+    # geom = LineString([tag1, tag2])
     # Compute the true distance
     geod = Geod(ellps="WGS84")
     bird = geod.geometry_length(geom) / 1e3
-    #Compute the good emission factor
+    # Compute the good emission factor
     if options == "None":
-        EF = EF['Seat'] + EF['Base']
+        EF = EF["Seat"] + EF["Base"]
     elif options == "Cabin":
-        EF = EF['Cabin'] + EF['Base']
+        EF = EF["Cabin"] + EF["Base"]
     elif options == "Vehicle":
-        EF = EF['Car'] + EF['Seat'] + EF['Base']
+        EF = EF["Car"] + EF["Seat"] + EF["Base"]
     elif options == "CabinVehicle":
-        EF = EF['Car'] + EF['Cabin'] + EF['Base']
-    
+        EF = EF["Car"] + EF["Cabin"] + EF["Base"]
+
     # Compute geodataframe and dataframe
-    # data 
+    # data
     data_ferry = pd.DataFrame(
-        pd.Series(
-            {
-                "kgCO2eq": EF * bird,
-                "EF_tot": EF,
-                "path_length": bird,
-                "colors": color_usage,
-                "NAME": options,
-                "Mean of Transport": "Ferry",
-            }
-        )
+        pd.Series({
+            "kgCO2eq": EF * bird,
+            "EF_tot": EF,
+            "path_length": bird,
+            "colors": color_usage,
+            "NAME": options,
+            "Mean of Transport": "Ferry",
+        })
     ).transpose()
     geo_ferry = pd.DataFrame(
-        pd.Series(
-            {
-                "colors": color_usage,
-                "label" : "Ferry",
-                "length": str(int(bird)) + "km",
-                "geometry": geom,
-            }
-        )
+        pd.Series({
+            "colors": color_usage,
+            "label": "Ferry",
+            "length": str(int(bird)) + "km",
+            "geometry": geom,
+        })
     ).transpose()
 
     return data_ferry, geo_ferry
@@ -572,26 +568,22 @@ def sail_to_gdf(tag1, tag2, EF=EF_sail, color_usage="#ffffff"):
     # Compute geodataframe and dataframe
     # data
     data_ferry = pd.DataFrame(
-        pd.Series(
-            {
-                "kgCO2eq": EF * bird,
-                "EF_tot": EF,
-                "path_length": bird,
-                "colors": color_usage,
-                "NAME": "Usage",
-                "Mean of Transport": "Sail",
-            }
-        )
+        pd.Series({
+            "kgCO2eq": EF * bird,
+            "EF_tot": EF,
+            "path_length": bird,
+            "colors": color_usage,
+            "NAME": "Usage",
+            "Mean of Transport": "Sail",
+        })
     ).transpose()
     geo_ferry = pd.DataFrame(
-        pd.Series(
-            {
-                "colors": color_usage,
-                "label" : "Sail",
-                "length": str(int(bird)) + "km",
-                "geometry": geom,
-            }
-        )
+        pd.Series({
+            "colors": color_usage,
+            "label": "Sail",
+            "length": str(int(bird)) + "km",
+            "geometry": geom,
+        })
     ).transpose()
 
     return data_ferry, geo_ferry
