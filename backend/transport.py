@@ -137,11 +137,9 @@ def train_to_gdf(
         gdf["path_length"] = l_length
         # Rescale the length with train_dist (especially when simplified = True)
         print("Rescaling factor", train_dist / gdf["path_length"].sum())
-        gdf["path_length"] = gdf["path_length"] * (
-            train_dist / gdf["path_length"].sum()
-        )
+        gdf["path_length"] *= train_dist / gdf["path_length"].sum()
         # Compute emissions : EF * length
-        gdf["EF_tot"] = gdf["EF_tot"] / 1e3  # Conversion in in kg
+        gdf["EF_tot"] /= 1000.0  # Conversion in in kg
         gdf["kgCO2eq"] = gdf["path_length"] * gdf["EF_tot"]
         # Add colors, here discretise the colormap
         gdf["colors"] = color_usage
@@ -212,9 +210,7 @@ def ecar_to_gdf(
         gdf["path_length"] = l_length
         # Rescale the length with route_dist (especially when simplified = True)
         print("Rescaling factor", route_dist / gdf["path_length"].sum())
-        gdf["path_length"] = gdf["path_length"] * (
-            route_dist / gdf["path_length"].sum()
-        )
+        gdf["path_length"] *= route_dist / gdf["path_length"].sum()
         # Handle nb passengers
         nb = int(nb)
         # Compute emissions : EF * length
@@ -470,7 +466,7 @@ def plane_to_gdf(
     else:  # It's > 3500
         trip_category = "long"
     # detour_coeffient
-    bird = bird * detour
+    bird *= detour
 
     data_plane = pd.DataFrame({
         "kgCO2eq": [
