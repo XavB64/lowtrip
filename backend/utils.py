@@ -19,30 +19,35 @@
 ###### Utils ######
 ###################
 
-import numpy as np
-from pyproj import Geod
-from shapely.geometry import LineString, MultiLineString, Point, CAP_STYLE
-from shapely import ops
-from shapely.ops import unary_union, nearest_points
-import pandas as pd
+import os
+
 import geopandas as gpd
 import momepy
 import networkx as nx
-import os
-
-
-from .parameters import (
-    train_s,
-    train_t,
-    route_s,
-    train_intensity,
-    carbon_intensity_electricity,
-    sea_threshold,
-    nb_pts,
-)
+import numpy as np
+import pandas as pd
+from pyproj import Geod
 
 # Web
 import requests
+from shapely import ops
+from shapely.geometry import (
+    CAP_STYLE,
+    LineString,
+    MultiLineString,
+    Point,
+)
+from shapely.ops import nearest_points, unary_union
+
+from .parameters import (
+    carbon_intensity_electricity,
+    nb_pts,
+    route_s,
+    sea_threshold,
+    train_intensity,
+    train_s,
+    train_t,
+)
 
 
 def flatten_list_of_tuples(lst):

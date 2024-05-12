@@ -22,28 +22,26 @@
 # Classic
 import geopandas as gpd
 import pandas as pd
-
+from pyproj import Geod
 
 # Geometry
 from shapely.geometry import LineString
-from pyproj import Geod
 
 from .parameters import (
     colors_custom,
-    min_plane_dist,
     colors_direct,
+    min_plane_dist,
 )
-
 from .transport import (
-    train_to_gdf,
-    plane_to_gdf,
+    bicycle_to_gdf,
+    bus_to_gdf,
     car_bus_to_gdf,
     car_to_gdf,
     ecar_to_gdf,
-    bus_to_gdf,
-    bicycle_to_gdf,
     ferry_to_gdf,
+    plane_to_gdf,
     sail_to_gdf,
+    train_to_gdf,
 )
 
 

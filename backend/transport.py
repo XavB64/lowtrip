@@ -15,41 +15,39 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+# Need for ferry if straight line
+# from shapely.geometry import LineString
+import geopandas as gpd
+import numpy as np
+import pandas as pd
+from pyproj import Geod
+
 from .parameters import (
-    EF_bycicle,
+    cont_coeff,
+    detour,
     EF_bus,
+    EF_bycicle,
     EF_car,
     EF_ecar,
     EF_ferry,
-    EF_sail,
     EF_plane,
+    EF_sail,
     EF_train,
+    hold,
     search_perimeter,
     val_perimeter,
-    hold,
-    cont_coeff,
-    detour,
 )
-
 from .utils import (
-    validate_geom,
     extend_search,
     filter_countries_world,
-    great_circle_geometry,
     find_bicycle,
     find_route,
     find_train,
     gdf_lines,
     get_shortest_path,
+    great_circle_geometry,
+    validate_geom,
 )
-
-import pandas as pd
-import numpy as np
-from pyproj import Geod
-
-# Need for ferry if straight line
-# from shapely.geometry import LineString
-import geopandas as gpd
 
 
 def bicycle_to_gdf(tag1, tag2, EF=EF_bycicle, color="#ffffff", validate=val_perimeter):

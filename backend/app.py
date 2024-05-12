@@ -18,18 +18,21 @@
 import warnings
 
 # Librairies
-from flask import Flask, request, json
+from flask import (
+    Flask,
+    json,
+    request,
+)
 from flask_cors import CORS  # comment this on deployment
 import pandas as pd
 
 from .backend import (
-    compute_emissions_custom,
-    compute_emissions_all,
     chart_refactor,
+    compute_emissions_all,
+    compute_emissions_custom,
 )
-from .parameters import (
-    colors_alternative,
-)
+from .parameters import colors_alternative
+
 
 warnings.filterwarnings("ignore")
 
