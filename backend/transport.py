@@ -395,11 +395,11 @@ def car_to_gdf(
         nb = int(nb)
         EF_fuel = EF_car["fuel"] * (1 + 0.04 * (nb - 1)) / nb
         EF_cons = EF_car["construction"] / nb
-        # EF_infra = EF_car['infra'] /nb
+        # _EF_infra = EF_car['infra'] /nb
         name = str(nb) + "p."
     else:  # Hitch-hiking
         EF_fuel = EF_car["fuel"] * 0.04
-        EF_cons, EF_infra = 0, 0
+        EF_cons, _EF_infra = 0, 0
         name = "👍"  #'HH'
 
     # Validation part for route
