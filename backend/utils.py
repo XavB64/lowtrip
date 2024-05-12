@@ -177,8 +177,7 @@ def filter_countries_world(gdf, method, th=sea_threshold):
             )
         )
     # Rendering result
-    res = gpd.GeoDataFrame(u, geometry="geometry", crs="epsg:4326").reset_index()
-    return res
+    return gpd.GeoDataFrame(u, geometry="geometry", crs="epsg:4326").reset_index()
 
 
 def extend_search(tag1, tag2, perims):
@@ -455,7 +454,7 @@ def get_line_coast(point, coast):
     new_linestring = LineString([Point(point), nearest_point_on_line])
     # print(list(new_linestring.coords))
 
-    return new_linestring
+    return new_linestring  # noqa: RET504
 
 
 def extend_line(line, additional_length=0.001, start=False):  # , start=True
@@ -595,7 +594,6 @@ def get_shortest_path(line_gdf, start, end):
         if "geometry" in graph.get_edge_data(u, v)
     ]
 
-    # Merge the geometries of the edges in the shortest path
-    merged_geometry = unary_union(shortest_path_geometries)
     # print('network : ', round(time.time() - s, 3))
-    return merged_geometry
+    # Merge the geometries of the edges in the shortest path
+    return unary_union(shortest_path_geometries)
