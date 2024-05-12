@@ -51,15 +51,17 @@ from .utils import (
 
 
 def bicycle_to_gdf(tag1, tag2, EF=EF_bicycle, color="#ffffff", validate=val_perimeter):
-    """
-    parameters:
+    """parameters
         - tag1, tag2
         - EF_bus, float emission factor for bike by pkm
         - color, color in hex of path and bar chart
         - validate
         - nb, number of passenger in the car (used only for custom trip)
-    return:
+
+    Return:
+    ------
         - full dataframe for bike
+
     """
     ### Route OSRM - create a separate function
     geom_route, route, route_dist = find_bicycle(tag1, tag2)
@@ -101,14 +103,14 @@ def train_to_gdf(
     color_usage="#ffffff",
     color_infra="#ffffff",
 ):  # charte_mollow
-    """
-    parameters:
+    """parameters
         - tag1, tag2
         - perims
         - validate
         - colormap, list of colors
     return:
         - full dataframe for trains
+
     """
     # First try with coordinates supplied by the user
     gdf, train, train_dist = find_train(tag1, tag2)
@@ -176,14 +178,14 @@ def ecar_to_gdf(
     color_usage="#ffffff",
     color_cons="#ffffff",
 ):  # charte_mollow
-    """
-    parameters:
+    """parameters
         - tag1, tag2
         - perims
         - validate
         - colormap, list of colors
     return:
         - full dataframe for trains
+
     """
     ### Route OSRM - create a separate function
     geom_route, route_dist, route = find_route(tag1, tag2)
@@ -255,9 +257,10 @@ def car_bus_to_gdf(
     color_usage="#ffffff",
     color_cons="#ffffff",
 ):
-    """
-    ONLY FOR FIRST FORM (optimization)
-    parameters:
+    """ONLY FOR FIRST FORM (optimization)
+
+    Parameters
+    ----------
         - tag1, tag2
         - EF_car, float emission factor for one car by km
         - EF_bus, float emission factor for bus by pkm
@@ -266,6 +269,7 @@ def car_bus_to_gdf(
         - nb, number of passenger in the car (used only for custom trip)
     return:
         - full dataframe for car and bus, geometry only on car
+
     """
     ### Route OSRM - create a separate function
     geom_route, route_dist, route = find_route(tag1, tag2)
@@ -322,15 +326,17 @@ def bus_to_gdf(
     color_usage="#ffffff",
     color_cons="#ffffff",
 ):
-    """
-    parameters:
+    """parameters
         - tag1, tag2
         - EF_bus, float emission factor for bus by pkm
         - color, color in hex of path and bar chart
         - validate
         - nb, number of passenger in the car (used only for custom trip)
-    return:
+
+    Return:
+    ------
         - full dataframe for bus
+
     """
     ### Route OSRM - create a separate function
     geom_route, route_dist, route = find_route(tag1, tag2)
@@ -377,15 +383,17 @@ def car_to_gdf(
     color_usage="#ffffff",
     color_cons="#ffffff",
 ):
-    """
-    parameters:
+    """parameters
         - tag1, tag2
         - EF_car, float emission factor for one car by km
         - color, color in hex of path and bar chart
         - validate
         - nb, number of passenger in the car (used only for custom trip)
-    return:
+
+    Return:
+    ------
         - full dataframe for car
+
     """
     ### Route OSRM - create a separate function
     geom_route, route_dist, route = find_route(tag1, tag2)
@@ -442,8 +450,7 @@ def plane_to_gdf(
     color_usage="#ffffff",
     color_cont="#ffffff",
 ):
-    """
-    parameters:
+    """parameters
         - tag1, tag2
         - EF : emission factor in gCO2/pkm for plane depending on journey length
         - contrails : coefficient to apply to take into account non-CO2 effects
@@ -452,6 +459,7 @@ def plane_to_gdf(
         - color_contrails : color for non CO2-effects in bar chart
     return:
         - full dataframe for plane, geometry for CO2 only (optimization)
+
     """
     # Compute geometry and distance (geodesic)
     geom_plane, bird = great_circle_geometry(tag1, tag2)
@@ -492,13 +500,13 @@ def plane_to_gdf(
 
 
 def ferry_to_gdf(tag1, tag2, EF=EF_ferry, options="None", color_usage="#ffffff"):
-    """
-    parameters:
+    """parameters
         - tag1, tag2
         - EF : emission factor in gCO2/pkm for ferry
         - color : color for path and bar chart
     return:
         - full dataframe for ferry
+
     """
     # Compute geometry
     # Convert the inputs in float
@@ -545,13 +553,13 @@ def ferry_to_gdf(tag1, tag2, EF=EF_ferry, options="None", color_usage="#ffffff")
 
 
 def sail_to_gdf(tag1, tag2, EF=EF_sail, color_usage="#ffffff"):
-    """
-    parameters:
+    """parameters
         - tag1, tag2
         - EF : emission factor in gCO2/pkm for ferry
         - color : color for path and bar chart
     return:
         - full dataframe for ferry
+
     """
     # Compute geometry
     # Convert the inputs in float

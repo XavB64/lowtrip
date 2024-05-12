@@ -51,13 +51,15 @@ from .transport import (
 
 
 def compute_emissions_custom(data, cmap=colors_custom):
-    """
-    parameters:
+    """parameters
         - data, pandas dataframe format (will be json)
-    return:
+
+    Return:
+    ------
         - full dataframe for emissions
         - geodataframe for path
         - ERROR : string first step that fails
+
     """
     ERROR = ""
 
@@ -223,14 +225,16 @@ def compute_emissions_custom(data, cmap=colors_custom):
 
 
 def compute_emissions_all(data, cmap=colors_direct):
-    """
-    If data is only one step then we do not compute this mean of transport as it will
+    """If data is only one step then we do not compute this mean of transport as it will
     appear in "my_trip"
     parameters:
         - data, pandas dataframe format (will be json)
-    return:
+
+    Return:
+    ------
         - full dataframe for emissions
         - geodataframe for path
+
     """
     # colors
     # Direct trip
@@ -344,8 +348,7 @@ def compute_emissions_all(data, cmap=colors_direct):
 
 
 def chart_refactor(mytrip, alternative=None, do_alt=False):
-    """
-    This function prepare the data to be displayed in the chart correctly
+    """This function prepare the data to be displayed in the chart correctly
     parameters:
         - mytrip, dataframe of custom trip
         - alternative, dataframe of alternative trip if requested

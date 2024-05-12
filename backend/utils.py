@@ -62,8 +62,7 @@ def kilometer_to_degree(km):
 
 
 def great_circle_geometry(dep, arr, nb=nb_pts):
-    """
-    Create the great circle geometry with pyproj
+    """Create the great circle geometry with pyproj
     parameters:
         - nb : number of points
         - dep, arr : departure and arrival
@@ -103,14 +102,16 @@ def great_circle_geometry(dep, arr, nb=nb_pts):
 
 
 def filter_countries_world(gdf, method, th=sea_threshold):
-    """
-    Filter train path by countries (train_intensity.geojson)
-    parameters:
+    """Filter train path by countries (train_intensity.geojson)
+
+    Parameters
+    ----------
         - gdf : train geometry in geoserie
         - mode : train / ecar
         - th : threshold to remove unmatched gaps between countries that are too small (km)
     return:
         - Geodataframe of train path by countries
+
     """
     if method == "train":
         iso = "ISO2"
@@ -181,15 +182,17 @@ def filter_countries_world(gdf, method, th=sea_threshold):
 
 
 def extend_search(tag1, tag2, perims):
-    """
-    Function to use when the train path is not found directly by the API.
+    """Function to use when the train path is not found directly by the API.
     We search for nearby coordinates and request it again.
-    parameters:
+
+    Parameters
+    ----------
         - tag1, tag2 : list or tuple like with coordinates (lon, lat)
         - perims : list-like ; perimeters to search for with overpass API
     return:
         - gdf (geoseries)
         - train (bool)
+
     """
     # We extend the search progressively
     for perim in perims:
@@ -224,8 +227,7 @@ def extend_search(tag1, tag2, perims):
 
 
 def validate_geom(tag1, tag2, geom, th):
-    """
-    Verify that the departure and arrival of geometries are close enough to the ones requested
+    """Verify that the departure and arrival of geometries are close enough to the ones requested
     parameters:
         - tag1, tag2 : requested coordinates
         - geom : shapely geometry answered
@@ -257,8 +259,7 @@ def validate_geom(tag1, tag2, geom, th):
 
 
 def find_nearest(lon, lat, perim):
-    """
-    This function find the nearest node for train raiway in the OSM network using Overpass API
+    """This function find the nearest node for train raiway in the OSM network using Overpass API
     parameters:
         - lon, lat : coordinates in degree of the point
         - perim : perimeters (m) to look around
@@ -300,14 +301,16 @@ def find_nearest(lon, lat, perim):
 
 
 def find_train(tag1, tag2, method="signal"):
-    """
-    Find train path between 2 points. Can use ntag API or signal.
-    parameters:
+    """Find train path between 2 points. Can use ntag API or signal.
+
+    Parameters
+    ----------
         - tag1, tag2 : list or tuple like (lon, lat)
         - method : signal / trainmap
     return:
         - gdf, a geoserie with the path geometry / None if failure
         - train, boolean
+
     """
     # format lon, lat
     # Build the request url
@@ -359,14 +362,16 @@ def find_train(tag1, tag2, method="signal"):
 
 
 def find_route(tag1, tag2):
-    """
-    Find road path between 2 points
+    """Find road path between 2 points
     parameters:
         - tag1, tag2 : list or tuple like ; (lon, lat)
-    return:
+
+    Return:
+    ------
         - geom_route : shapely geometry linestring
         - route_dist : float, distance in km
         - route : boolean
+
     """
     ### Route OSRM - create a separate function
     url = (
@@ -430,8 +435,7 @@ def find_bicycle(tag1, tag2):
 
 
 def create_coast(world=train_intensity, buffer=0):
-    """
-    world is the dataset from geopandas, already loaded for trains and ecar
+    """World is the dataset from geopandas, already loaded for trains and ecar
     Return a list of geometries as well as the overall multi geometry
     """
     coast_lines = unary_union(
@@ -443,8 +447,7 @@ def create_coast(world=train_intensity, buffer=0):
 
 
 def get_line_coast(point, coast):
-    """
-    coast the full shapely geometry
+    """Coast the full shapely geometry
     """
     # Get linestring to get to the see
     nearest_point_on_line = nearest_points(Point(point), coast)[1]
