@@ -68,7 +68,7 @@ def great_circle_geometry(dep, arr, nb=nb_pts):
         - dep, arr : departure and arrival
     return:
         - shapely geometry (Linestring)
-        - Geodesic distance in km
+        - Geodesic distance in km.
     """
     # projection
     geod = Geod(ellps="WGS84")
@@ -102,7 +102,7 @@ def great_circle_geometry(dep, arr, nb=nb_pts):
 
 
 def filter_countries_world(gdf, method, th=sea_threshold):
-    """Filter train path by countries (train_intensity.geojson)
+    """Filter train path by countries (train_intensity.geojson).
 
     Parameters
     ----------
@@ -233,7 +233,7 @@ def validate_geom(tag1, tag2, geom, th):
         - geom : shapely geometry answered
         - th : threshold (km) for which we reject the geometry
     return:
-        boolean (True valid geometry / False wrong geometry)
+        boolean (True valid geometry / False wrong geometry).
     """
     geod = Geod(ellps="WGS84")
     # To compute distances
@@ -264,7 +264,7 @@ def find_nearest(lon, lat, perim):
         - lon, lat : coordinates in degree of the point
         - perim : perimeters (m) to look around
     return:
-        - new coordinates(lat, lon)
+        - new coordinates(lat, lon).
     """
     # Extend the area around the point
     buff = list(Point(lon, lat).buffer(kilometer_to_degree(perim)).exterior.coords)
@@ -364,7 +364,7 @@ def find_train(tag1, tag2, method="signal"):
 def find_route(tag1, tag2):
     """Find road path between 2 points
     parameters:
-        - tag1, tag2 : list or tuple like ; (lon, lat)
+        - tag1, tag2 : list or tuple like ; (lon, lat).
 
     Return:
     ------
@@ -436,7 +436,7 @@ def find_bicycle(tag1, tag2):
 
 def create_coast(world=train_intensity, buffer=0):
     """World is the dataset from geopandas, already loaded for trains and ecar
-    Return a list of geometries as well as the overall multi geometry
+    Return a list of geometries as well as the overall multi geometry.
     """
     coast_lines = unary_union(
         world.buffer(buffer, cap_style=CAP_STYLE.square).geometry,
@@ -447,8 +447,7 @@ def create_coast(world=train_intensity, buffer=0):
 
 
 def get_line_coast(point, coast):
-    """Coast the full shapely geometry
-    """
+    """Coast the full shapely geometry."""
     # Get linestring to get to the see
     nearest_point_on_line = nearest_points(Point(point), coast)[1]
 

@@ -56,7 +56,7 @@ def bicycle_to_gdf(tag1, tag2, EF=EF_bicycle, color="#ffffff", validate=val_peri
         - EF_bus, float emission factor for bike by pkm
         - color, color in hex of path and bar chart
         - validate
-        - nb, number of passenger in the car (used only for custom trip)
+        - nb, number of passenger in the car (used only for custom trip).
 
     Return:
     ------
@@ -109,7 +109,7 @@ def train_to_gdf(
         - validate
         - colormap, list of colors
     return:
-        - full dataframe for trains
+        - full dataframe for trains.
 
     """
     # First try with coordinates supplied by the user
@@ -184,7 +184,7 @@ def ecar_to_gdf(
         - validate
         - colormap, list of colors
     return:
-        - full dataframe for trains
+        - full dataframe for trains.
 
     """
     ### Route OSRM - create a separate function
@@ -257,7 +257,7 @@ def car_bus_to_gdf(
     color_usage="#ffffff",
     color_cons="#ffffff",
 ):
-    """ONLY FOR FIRST FORM (optimization)
+    """ONLY FOR FIRST FORM (optimization).
 
     Parameters
     ----------
@@ -331,7 +331,7 @@ def bus_to_gdf(
         - EF_bus, float emission factor for bus by pkm
         - color, color in hex of path and bar chart
         - validate
-        - nb, number of passenger in the car (used only for custom trip)
+        - nb, number of passenger in the car (used only for custom trip).
 
     Return:
     ------
@@ -388,7 +388,7 @@ def car_to_gdf(
         - EF_car, float emission factor for one car by km
         - color, color in hex of path and bar chart
         - validate
-        - nb, number of passenger in the car (used only for custom trip)
+        - nb, number of passenger in the car (used only for custom trip).
 
     Return:
     ------
@@ -458,7 +458,7 @@ def plane_to_gdf(
         - color : color for path and bar chart
         - color_contrails : color for non CO2-effects in bar chart
     return:
-        - full dataframe for plane, geometry for CO2 only (optimization)
+        - full dataframe for plane, geometry for CO2 only (optimization).
 
     """
     # Compute geometry and distance (geodesic)
@@ -505,7 +505,7 @@ def ferry_to_gdf(tag1, tag2, EF=EF_ferry, options="None", color_usage="#ffffff")
         - EF : emission factor in gCO2/pkm for ferry
         - color : color for path and bar chart
     return:
-        - full dataframe for ferry
+        - full dataframe for ferry.
 
     """
     # Compute geometry
@@ -558,7 +558,7 @@ def sail_to_gdf(tag1, tag2, EF=EF_sail, color_usage="#ffffff"):
         - EF : emission factor in gCO2/pkm for ferry
         - color : color for path and bar chart
     return:
-        - full dataframe for ferry
+        - full dataframe for ferry.
 
     """
     # Compute geometry
