@@ -18,7 +18,7 @@
 ###################
 ###### Utils ######
 ###################
-
+from http import HTTPStatus
 import os
 
 import geopandas as gpd
@@ -286,8 +286,8 @@ def find_nearest(lon, lat, perim):
     # Make request
     response = requests.get(url, params={"data": query})
 
-    # if response.status_code == 200: not working, looking at size of elements also
-    if (response.status_code == 200) & (len(response.json()["elements"]) > 0):
+    # if response.status_code == HTTPStatus.OK: not working, looking at size of elements also
+    if (response.status_code == HTTPStatus.OK) & (len(response.json()["elements"]) > 0):
         # Extract the first point coordinates we could found
         new_point = (
             pd.json_normalize(response.json()["elements"][0]).loc[0].geometry[0]
@@ -333,7 +333,7 @@ def find_train(tag1, tag2, method="signal"):
     # print(time.time() - s)
 
     # Check if the request was successful (status code 200)
-    if response.status_code == 200:
+    if response.status_code == HTTPStatus.OK:
         print("Path retrieved!")
         if method == "trainmap":
             # Store data in a geodataserie - trainmap
@@ -387,7 +387,7 @@ def find_route(tag1, tag2):
         + "&geometries=geojson"
     )
     response = requests.get(url)
-    if response.status_code == 200:
+    if response.status_code == HTTPStatus.OK:
         geom = response.json()["routes"][0]["geometry"]
         geom_route = LineString(geom["coordinates"])  # convert.decode_polyline(geom)
         route_dist = response.json()["routes"][0]["distance"] / 1e3  # In km
@@ -414,7 +414,7 @@ def find_bicycle(tag1, tag2):
         + str(tag2[1])
     )
     response = requests.get(url)
-    if response.status_code == 200:
+    if response.status_code == HTTPStatus.OK:
         geom = response.json()["features"][0]["geometry"]
         geom_route = LineString(geom["coordinates"]).simplify(
             0.05, preserve_topology=False,
