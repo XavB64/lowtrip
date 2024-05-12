@@ -5,7 +5,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: chartboost/ruff-action@v1
+      - name: Show python linter fixes
+        uses: chartboost/ruff-action@v1
+        with:
+          src: './backend'
+          args: 'check --fix --diff'
+      - name: Show remaining python linter violations
+        uses: chartboost/ruff-action@v1
+        with:
+          src: './backend'
+          args: 'check --fix --show-fixes'
+      - name: Format Python code
+        uses: chartboost/ruff-action@v1
         with:
           src: './backend'
           args: 'format --preview --check'
