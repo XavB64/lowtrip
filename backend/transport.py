@@ -25,8 +25,8 @@ from pyproj import Geod
 from .parameters import (
     cont_coeff,
     detour,
+    EF_bicycle,
     EF_bus,
-    EF_bycicle,
     EF_car,
     EF_ecar,
     EF_ferry,
@@ -50,7 +50,7 @@ from .utils import (
 )
 
 
-def bicycle_to_gdf(tag1, tag2, EF=EF_bycicle, color="#ffffff", validate=val_perimeter):
+def bicycle_to_gdf(tag1, tag2, EF=EF_bicycle, color="#ffffff", validate=val_perimeter):
     """
     parameters:
         - tag1, tag2

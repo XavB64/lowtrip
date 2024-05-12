@@ -91,7 +91,7 @@ EF_train = {
     "infra": 0.0065,
 }
 
-EF_bycicle = 0.005
+EF_bicycle = 0.005
 
 EF_ferry = {
     "Cabin": 0.11,
