@@ -381,12 +381,7 @@ def chart_refactor(mytrip, alternative=None, do_alt=False):
             alternative["Mean of Transport"] = "OtherTrip"
             # Then we return both
 
-            return mytrip, alternative  # [l_var]
-        # If it didnt work we return it (empty)
-
-        else:
-            return mytrip, alternative
+        return mytrip, alternative
 
     # If it didnt work we return it (empty)
-    else:
-        return mytrip
+    return mytrip

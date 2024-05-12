@@ -295,9 +295,9 @@ def find_nearest(lon, lat, perim):
         )  # .columns
         # Return lon, lat
         return (new_point["lon"], new_point["lat"])
-    else:
-        # Couldn't find a node
-        return False
+
+    # Couldn't find a node
+    return False
 
 
 def find_train(tag1, tag2, method="signal"):

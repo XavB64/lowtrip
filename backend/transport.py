@@ -125,49 +125,48 @@ def train_to_gdf(
         if not validate_geom(tag1, tag2, gdf.values[0], validate):
             return pd.DataFrame(), pd.DataFrame(), False
 
-        else:  # We need to filter by country and add length / Emission factors
-            gdf = filter_countries_world(gdf, method="train")
-            # Adding and computing emissions
-            l_length = []
-            # Compute the true distance
-            geod = Geod(ellps="WGS84")
-            for geom in gdf.geometry.values:
-                l_length.append(geod.geometry_length(geom) / 1e3)
-            # Add the distance to the dataframe
-            gdf["path_length"] = l_length
-            # Rescale the length with train_dist (especially when simplified = True)
-            print("Rescaling factor", train_dist / gdf["path_length"].sum())
-            gdf["path_length"] = gdf["path_length"] * (
-                train_dist / gdf["path_length"].sum()
-            )
-            # Compute emissions : EF * length
-            gdf["EF_tot"] = gdf["EF_tot"] / 1e3  # Conversion in in kg
-            gdf["kgCO2eq"] = gdf["path_length"] * gdf["EF_tot"]
-            # Add colors, here discretise the colormap
-            gdf["colors"] = color_usage
-            # Write
-            gdf = pd.concat([
-                pd.DataFrame({
-                    "kgCO2eq": [train_dist * EF_train["infra"]],
-                    "EF_tot": [EF_train["infra"]],
-                    "colors": [color_infra],
-                    "NAME": ["Infra"],
-                }),
-                gdf,
-            ])
+        # We need to filter by country and add length / Emission factors
+        gdf = filter_countries_world(gdf, method="train")
+        # Adding and computing emissions
+        l_length = []
+        # Compute the true distance
+        geod = Geod(ellps="WGS84")
+        for geom in gdf.geometry.values:
+            l_length.append(geod.geometry_length(geom) / 1e3)
+        # Add the distance to the dataframe
+        gdf["path_length"] = l_length
+        # Rescale the length with train_dist (especially when simplified = True)
+        print("Rescaling factor", train_dist / gdf["path_length"].sum())
+        gdf["path_length"] = gdf["path_length"] * (
+            train_dist / gdf["path_length"].sum()
+        )
+        # Compute emissions : EF * length
+        gdf["EF_tot"] = gdf["EF_tot"] / 1e3  # Conversion in in kg
+        gdf["kgCO2eq"] = gdf["path_length"] * gdf["EF_tot"]
+        # Add colors, here discretise the colormap
+        gdf["colors"] = color_usage
+        # Write
+        gdf = pd.concat([
+            pd.DataFrame({
+                "kgCO2eq": [train_dist * EF_train["infra"]],
+                "EF_tot": [EF_train["infra"]],
+                "colors": [color_infra],
+                "NAME": ["Infra"],
+            }),
+            gdf,
+        ])
 
-            # Add infra
-            gdf["Mean of Transport"] = "Train"
-            gdf["label"] = "Railway"
-            gdf["length"] = str(int(train_dist)) + "km (" + gdf["NAME"] + ")"
-            gdf.reset_index(inplace=True)
+        # Add infra
+        gdf["Mean of Transport"] = "Train"
+        gdf["label"] = "Railway"
+        gdf["length"] = str(int(train_dist)) + "km (" + gdf["NAME"] + ")"
+        gdf.reset_index(inplace=True)
 
-            data_train = gdf[["kgCO2eq", "colors", "NAME", "Mean of Transport"]]
-            geo_train = gdf[["colors", "label", "geometry", "length"]].dropna(axis=0)
-            # Returning the result
-            return data_train, geo_train, train
-    else:
-        return pd.DataFrame(), pd.DataFrame(), False
+        data_train = gdf[["kgCO2eq", "colors", "NAME", "Mean of Transport"]]
+        geo_train = gdf[["colors", "label", "geometry", "length"]].dropna(axis=0)
+        # Returning the result
+        return data_train, geo_train, train
+    return pd.DataFrame(), pd.DataFrame(), False
 
 
 def ecar_to_gdf(
@@ -196,56 +195,56 @@ def ecar_to_gdf(
             # gdf, geom_route, route_dist, route = pd.DataFrame(), None, None, False
             return pd.DataFrame(), pd.DataFrame(), False
 
-        else:  # We need to filter by country and add length / Emission factors
-            gdf = filter_countries_world(
-                gpd.GeoSeries(geom_route, crs="epsg:4326"), method="ecar",
-            )
+        # We need to filter by country and add length / Emission factors
+        gdf = filter_countries_world(
+            gpd.GeoSeries(geom_route, crs="epsg:4326"), method="ecar",
+        )
 
-            # Add colors
-            gdf["colors"] = color_usage
+        # Add colors
+        gdf["colors"] = color_usage
 
-            l_length = []
-            # Compute the true distance
-            geod = Geod(ellps="WGS84")
-            for geom in gdf.geometry.values:
-                l_length.append(geod.geometry_length(geom) / 1e3)
-            # Add the distance to the dataframe
-            gdf["path_length"] = l_length
-            # Rescale the length with route_dist (especially when simplified = True)
-            print("Rescaling factor", route_dist / gdf["path_length"].sum())
-            gdf["path_length"] = gdf["path_length"] * (
-                route_dist / gdf["path_length"].sum()
-            )
-            # Handle nb passengers
-            nb = int(nb)
-            # Compute emissions : EF * length
-            gdf["EF_tot"] = (
-                gdf["EF_tot"] * EF_ecar["fuel"] * (1 + 0.04 * (nb - 1)) / (1e3 * nb)
-            )  # g/kWh * kWh/km
-            gdf["kgCO2eq"] = gdf["path_length"] * gdf["EF_tot"]
-            # Add infra and construction
-            gdf = pd.concat([
-                pd.DataFrame({
-                    "kgCO2eq": [route_dist * EF_ecar["construction"] / nb],
-                    "EF_tot": [EF_ecar["construction"]],
-                    "colors": [color_cons],
-                    "NAME": ["Construction"],
-                }),
-                gdf,
-            ])
-            name = str(nb) + "p."
-            gdf["Mean of Transport"] = ["eCar " + name for k in range(gdf.shape[0])]
-            gdf["label"] = "Road"
-            gdf["length"] = str(int(route_dist)) + "km (" + gdf["NAME"] + ")"
-            gdf["NAME"] = " " + gdf["NAME"]
-            gdf.reset_index(inplace=True)
-            #
-            data_ecar = gdf[["kgCO2eq", "colors", "NAME", "Mean of Transport"]]
-            geo_ecar = gdf[["colors", "label", "geometry", "length"]].dropna(axis=0)
-            # Returning the result
-            return data_ecar, geo_ecar, route
-    else:
-        return pd.DataFrame(), pd.DataFrame(), False
+        l_length = []
+        # Compute the true distance
+        geod = Geod(ellps="WGS84")
+        for geom in gdf.geometry.values:
+            l_length.append(geod.geometry_length(geom) / 1e3)
+        # Add the distance to the dataframe
+        gdf["path_length"] = l_length
+        # Rescale the length with route_dist (especially when simplified = True)
+        print("Rescaling factor", route_dist / gdf["path_length"].sum())
+        gdf["path_length"] = gdf["path_length"] * (
+            route_dist / gdf["path_length"].sum()
+        )
+        # Handle nb passengers
+        nb = int(nb)
+        # Compute emissions : EF * length
+        gdf["EF_tot"] = (
+            gdf["EF_tot"] * EF_ecar["fuel"] * (1 + 0.04 * (nb - 1)) / (1e3 * nb)
+        )  # g/kWh * kWh/km
+        gdf["kgCO2eq"] = gdf["path_length"] * gdf["EF_tot"]
+        # Add infra and construction
+        gdf = pd.concat([
+            pd.DataFrame({
+                "kgCO2eq": [route_dist * EF_ecar["construction"] / nb],
+                "EF_tot": [EF_ecar["construction"]],
+                "colors": [color_cons],
+                "NAME": ["Construction"],
+            }),
+            gdf,
+        ])
+        name = str(nb) + "p."
+        gdf["Mean of Transport"] = ["eCar " + name for k in range(gdf.shape[0])]
+        gdf["label"] = "Road"
+        gdf["length"] = str(int(route_dist)) + "km (" + gdf["NAME"] + ")"
+        gdf["NAME"] = " " + gdf["NAME"]
+        gdf.reset_index(inplace=True)
+        #
+        data_ecar = gdf[["kgCO2eq", "colors", "NAME", "Mean of Transport"]]
+        geo_ecar = gdf[["colors", "label", "geometry", "length"]].dropna(axis=0)
+        # Returning the result
+        return data_ecar, geo_ecar, route
+
+    return pd.DataFrame(), pd.DataFrame(), False
 
 
 def car_bus_to_gdf(
