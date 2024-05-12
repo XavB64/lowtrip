@@ -1,3 +1,19 @@
+[tool.isort]
+py_version=312
+profile="black"
+line_length = 88
+lines_after_imports = 2
+
+sections=["FUTURE","STDLIB","THIRDPARTY","FIRSTPARTY","LOCALFOLDER"]
+
+order_by_type = false
+combine_as_imports = true
+force_grid_wrap = 3
+force_sort_within_sections = true
+include_trailing_comma = true
+use_parentheses = true
+
+
 [tool.ruff]
 exclude = [
     ".bzr",
