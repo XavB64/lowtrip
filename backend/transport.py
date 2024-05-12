@@ -196,7 +196,7 @@ def ecar_to_gdf(
 
         else:  # We need to filter by country and add length / Emission factors
             gdf = filter_countries_world(
-                gpd.GeoSeries(geom_route, crs="epsg:4326"), method="ecar"
+                gpd.GeoSeries(geom_route, crs="epsg:4326"), method="ecar",
             )
 
             # Add colors
@@ -295,7 +295,7 @@ def car_bus_to_gdf(
                 "label": "Road",
                 "length": str(int(route_dist)) + "km",
                 "geometry": geom_route,
-            })
+            }),
         ).transpose()
         # data_bus
         data_bus = pd.DataFrame({
@@ -360,7 +360,7 @@ def bus_to_gdf(
                 "label": "Road",
                 "length": str(int(route_dist)) + "km",
                 "geometry": geom_route,
-            })
+            }),
         ).transpose()
 
     else:
@@ -422,7 +422,7 @@ def car_to_gdf(
                 "label": "Road",
                 "length": str(int(route_dist)) + "km",
                 "geometry": geom_route,
-            })
+            }),
         ).transpose()
 
     else:
@@ -486,7 +486,7 @@ def plane_to_gdf(
             "label": "Flight",
             "length": str(int(bird)) + "km",
             "geometry": geom_plane,
-        })
+        }),
     ).transpose()
     return data_plane, geo_plane
 
@@ -530,7 +530,7 @@ def ferry_to_gdf(tag1, tag2, EF=EF_ferry, options="None", color_usage="#ffffff")
             "colors": color_usage,
             "NAME": options,
             "Mean of Transport": "Ferry",
-        })
+        }),
     ).transpose()
     geo_ferry = pd.DataFrame(
         pd.Series({
@@ -538,7 +538,7 @@ def ferry_to_gdf(tag1, tag2, EF=EF_ferry, options="None", color_usage="#ffffff")
             "label": "Ferry",
             "length": str(int(bird)) + "km",
             "geometry": geom,
-        })
+        }),
     ).transpose()
 
     return data_ferry, geo_ferry
@@ -573,7 +573,7 @@ def sail_to_gdf(tag1, tag2, EF=EF_sail, color_usage="#ffffff"):
             "colors": color_usage,
             "NAME": "Usage",
             "Mean of Transport": "Sail",
-        })
+        }),
     ).transpose()
     geo_ferry = pd.DataFrame(
         pd.Series({
@@ -581,7 +581,7 @@ def sail_to_gdf(tag1, tag2, EF=EF_sail, color_usage="#ffffff"):
             "label": "Sail",
             "length": str(int(bird)) + "km",
             "geometry": geom,
-        })
+        }),
     ).transpose()
 
     return data_ferry, geo_ferry
