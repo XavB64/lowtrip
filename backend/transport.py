@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from parameters import (
+from .parameters import (
     EF_bycicle,
     EF_bus,
     EF_car,
@@ -31,7 +31,7 @@ from parameters import (
     detour,
 )
 
-from utils import (
+from .utils import (
     validate_geom,
     extend_search,
     filter_countries_world,

@@ -28,13 +28,13 @@ import pandas as pd
 from shapely.geometry import LineString
 from pyproj import Geod
 
-from parameters import (
+from .parameters import (
     colors_custom,
     min_plane_dist,
     colors_direct,
 )
 
-from transport import (
+from .transport import (
     train_to_gdf,
     plane_to_gdf,
     car_bus_to_gdf,

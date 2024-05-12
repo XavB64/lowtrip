@@ -21,12 +21,12 @@ warnings.filterwarnings("ignore")
 
 # Librairies
 from flask import Flask, request, json
-from backend import (
+from .backend import (
     compute_emissions_custom,
     compute_emissions_all,
     chart_refactor,
 )
-from parameters import (
+from .parameters import (
     colors_alternative,
 )
 from flask_cors import CORS  # comment this on deployment

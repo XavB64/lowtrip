@@ -31,7 +31,7 @@ import networkx as nx
 import os
 
 
-from parameters import (
+from .parameters import (
     train_s,
     train_t,
     route_s,
