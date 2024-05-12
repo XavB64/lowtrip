@@ -416,7 +416,7 @@ def find_bicycle(tag1, tag2):
         )  # km
         print("Bicycle length", round(route_dist, 1))
     else:
-        geom_route, route, route_idst = None, False, None
+        geom_route, route, route_dist = None, False, None
 
     return geom_route, route, route_dist
 
