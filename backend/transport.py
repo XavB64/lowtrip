@@ -238,7 +238,6 @@ def ecar_to_gdf(
         gdf["length"] = str(int(route_dist)) + "km (" + gdf["NAME"] + ")"
         gdf["NAME"] = " " + gdf["NAME"]
         gdf.reset_index(inplace=True)
-        #
         data_ecar = gdf[["kgCO2eq", "colors", "NAME", "Mean of Transport"]]
         geo_ecar = gdf[["colors", "label", "geometry", "length"]].dropna(axis=0)
         # Returning the result
