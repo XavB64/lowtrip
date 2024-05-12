@@ -125,7 +125,9 @@ def main():
 
             # Prepare data for aggregation in the chart -  see frontend
             data_mytrip, data_alternative = chart_refactor(
-                data_mytrip, data_alternative, True,
+                data_mytrip,
+                data_alternative,
+                True,
             )
 
             # Response

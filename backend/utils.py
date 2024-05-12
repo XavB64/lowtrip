@@ -91,7 +91,8 @@ def great_circle_geometry(dep, arr, nb=nb_pts):
         l = [
             [lon, lat]
             for lon, lat in zip(
-                [lon + 360 if lon < 0 else lon for lon in r.lons], r.lats,
+                [lon + 360 if lon < 0 else lon for lon in r.lons],
+                r.lats,
             )
         ]
     else:
@@ -148,7 +149,8 @@ def filter_countries_world(gdf, method, th=sea_threshold):
         diff_2 = diff_2.set_geometry("geometry", crs="epsg:4326")
         # Filter depending is the gap is long enough to be taken into account and join with nearest country
         test = diff_2[diff_2.length > kilometer_to_degree(th)].sjoin_nearest(
-            data, how="left",
+            data,
+            how="left",
         )
         # Aggregation per country and combining geometries
         u = (
@@ -417,7 +419,8 @@ def find_bicycle(tag1, tag2):
     if response.status_code == HTTPStatus.OK:
         geom = response.json()["features"][0]["geometry"]
         geom_route = LineString(geom["coordinates"]).simplify(
-            0.05, preserve_topology=False,
+            0.05,
+            preserve_topology=False,
         )  # convert.decode_polyline(geom)
         route = True
         route_dist = (
@@ -505,7 +508,9 @@ def get_sea_lines(start, end, world=train_intensity, nb=20, exp=10):
     # s = time.time()
     quadri = []
     for lon in np.linspace(
-        min(start[0], end[0]) - exp, max(start[0], end[0]) + exp, nb,
+        min(start[0], end[0]) - exp,
+        max(start[0], end[0]) + exp,
+        nb,
     ):  # limit to range longitude - latidue +/- 20
         quadri.append(
             LineString([
@@ -514,7 +519,9 @@ def get_sea_lines(start, end, world=train_intensity, nb=20, exp=10):
             ]),
         )
     for lat in np.linspace(
-        min(start[1], end[1]) - exp, max(start[1], end[1]) + exp, nb,
+        min(start[1], end[1]) - exp,
+        max(start[1], end[1]) + exp,
+        nb,
     ):
         quadri.append(
             LineString([
