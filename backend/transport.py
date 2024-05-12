@@ -400,7 +400,7 @@ def car_to_gdf(
     else:  # Hitch-hiking
         EF_fuel = EF_car["fuel"] * 0.04
         EF_cons, _EF_infra = 0, 0
-        name = "👍"  #'HH'
+        name = "👍"  # 'HH'
 
     # Validation part for route
     if route:  # We have a geometry
