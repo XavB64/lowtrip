@@ -17,10 +17,11 @@
 
 import warnings
 
-warnings.filterwarnings("ignore")
-
 # Librairies
 from flask import Flask, request, json
+from flask_cors import CORS  # comment this on deployment
+import pandas as pd
+
 from .backend import (
     compute_emissions_custom,
     compute_emissions_all,
@@ -29,9 +30,8 @@ from .backend import (
 from .parameters import (
     colors_alternative,
 )
-from flask_cors import CORS  # comment this on deployment
-import pandas as pd
 
+warnings.filterwarnings("ignore")
 
 # Application
 app = Flask(__name__, static_url_path="", static_folder="frontend/build")
