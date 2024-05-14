@@ -1,5 +1,6 @@
 import axios from "axios";
-import { useState, useEffect } from "react";
+import i18n from "i18next";
+import { useState, useEffect, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import {
   Box,
@@ -122,7 +123,7 @@ const CityDropdown = ({
   stepIndex: number;
 }) => {
   const { t } = useTranslation();
-  const { getCacheValue, addToCache } = useCache();
+  const { getCacheValue, addToCache, resetCache } = useCache();
   const [results, setResults] = useState<City[]>([]);
   const [value, setValue] = useState("");
   const [isOpen, setIsOpen] = useState(false);
@@ -131,6 +132,18 @@ const CityDropdown = ({
 
   const query = useDebounce(value, 500);
   const isDeparture = stepIndex === 1;
+
+  const resultLng = useMemo(() => {
+    resetCache();
+    switch (i18n.language) {
+      case "en":
+      case "fr":
+      case "de":
+        return i18n.language;
+      default:
+        return "en";
+    }
+  }, [i18n.language]);
 
   const handleChange = async (newQuery: string) => {
     const cachedResult = getCacheValue(newQuery);
@@ -141,7 +154,7 @@ const CityDropdown = ({
     try {
       setIsLoading(true);
       const response = await axios.get(
-        `${PHOTON_API_URL}/api?q=${newQuery}&osm_tag=place:city&&osm_tag=place:village&osm_tag=place:town&layer=city&layer=district&limit=10`,
+        `${PHOTON_API_URL}/api?q=${newQuery}&osm_tag=place:city&&osm_tag=place:village&osm_tag=place:town&layer=city&layer=district&limit=10&lang=${resultLng}`,
       );
       const cities = formatCities(response.data.features as PhotonApiCity[]);
       addToCache(newQuery, cities);
