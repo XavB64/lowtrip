@@ -43,7 +43,7 @@ exclude = [
 # Same as Black.
 indent-width = 4
 
-target-version = "py311"
+target-version = "py312"
 
 [tool.ruff.format]
 # Like Black, use double quotes for strings.
