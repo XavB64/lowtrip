@@ -113,10 +113,10 @@
         "otherTrip": "Altro viaggio"
       },
       "paths": {
-        "railway": "Ferrovia",
-        "road": "Strada",
+        "railway": "Treno",
+        "road": "Macchina",
         "bike": "Percorso in bicicletta",
-        "flight": "Percorso di volo",
+        "flight": "Aereo",
         "ferry": "Percorso marittimo",
         "sail": "Percorso marittimo"
       },
