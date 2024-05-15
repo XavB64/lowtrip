@@ -267,10 +267,10 @@ def compute_emissions_all(data, cmap=colors_direct):
     elif transp == "Bus":
         bus = False
     elif (transp == "Ferry") | (transp == "Sail"):
-        train, bus, car, plane = False, False, False, True
+        train, bus, car = False, False, False
 
     # Loop
-    l = []
+    l_data = []
     geo = []
 
     # Train
@@ -281,7 +281,7 @@ def compute_emissions_all(data, cmap=colors_direct):
             color_usage=cmap["Train"],
             color_infra=cmap["Cons_infra"],
         )
-        l.append(data_train)
+        l_data.append(data_train)
         geo.append(geo_train)
 
     # Car & Bus
@@ -297,14 +297,14 @@ def compute_emissions_all(data, cmap=colors_direct):
     )
 
     if bus:
-        l.append(data_bus)
+        l_data.append(data_bus)
     if car:
-        l.append(data_car)
+        l_data.append(data_car)
     # If we have a result for car and bus :
     route_added = False
     if route:  # Adapt and add ecar
         # We check if car or bus was asked for a 1 step
-        if (car == True) & (bus == True) & (transp != "eCar"):
+        if (car) & (bus) & (transp != "eCar"):
             geo.append(geo_car)
             route_added = True
 
@@ -316,22 +316,22 @@ def compute_emissions_all(data, cmap=colors_direct):
             color_usage=cmap["Plane"],
             color_cont=cmap["Contrails"],
         )
-        l.append(data_plane)
+        l_data.append(data_plane)
         geo.append(geo_plane)
 
     # We do not add the ferry in the general case
 
-    if (route == False) & (train == False) & (plane == False):
+    if (not car) & (not bus) & (not train) & (not plane):
         # Only happens when plane was asked and the API failed
         data, geodata = pd.DataFrame(), pd.DataFrame()
     else:
         # Data for bar chart
-        data = pd.concat(l).reset_index(drop=True)
+        data = pd.concat(l_data).reset_index(drop=True)
         if (
-            (route == True)
-            & (route_added == False)
-            & (train == False)
-            & (plane == False)
+            (route)
+            & (not route_added)
+            & (not train)
+            & (not plane)
         ):
             geodata = pd.DataFrame()
         else:
