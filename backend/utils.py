@@ -21,7 +21,7 @@
 
 import numpy as np
 from pyproj import Geod
-from shapely.geometry import Point, LineString, MultiLineString, Point, CAP_STYLE
+from shapely.geometry import LineString, MultiLineString, Point, CAP_STYLE
 from shapely import ops
 from shapely.ops import unary_union, nearest_points
 import pandas as pd

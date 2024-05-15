@@ -20,7 +20,7 @@ import warnings
 warnings.filterwarnings("ignore")
 
 # Librairies
-from flask import Flask, request, send_from_directory, json
+from flask import Flask, request, json
 from backend import (
     compute_emissions_custom,
     compute_emissions_all,
