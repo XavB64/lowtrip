@@ -221,7 +221,7 @@ def extend_search(tag1, tag2, perims):
                     break
 
             # Verify that we want to try to request the API again
-            if (tag1_new != False) & (tag2_new != False):
+            if tag1_new and tag2_new:
                 gdf, train, train_dist = find_train(tag1_new, tag2_new)
 
     return gdf, train, train_dist
@@ -289,7 +289,7 @@ def find_nearest(lon, lat, perim):
     response = requests.get(url, params={"data": query})
 
     # if response.status_code == HTTPStatus.OK: not working, looking at size of elements also
-    if (response.status_code == HTTPStatus.OK) & (len(response.json()["elements"]) > 0):
+    if response.status_code == HTTPStatus.OK and len(response.json()["elements"]) > 0:
         # Extract the first point coordinates we could found
         new_point = (
             pd.json_normalize(response.json()["elements"][0]).loc[0].geometry[0]

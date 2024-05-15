@@ -116,7 +116,7 @@ def main():
                 error_other = "Other trip: " + error_other
 
             # Check if we have geo data :
-            if (len(error) > 0) & (len(error_other) > 0):
+            if len(error) > 0 and len(error_other) > 0:
                 gdf = None
             else:
                 gdf = (
