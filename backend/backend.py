@@ -335,12 +335,7 @@ def compute_emissions_all(data, cmap=colors_direct):
     else:
         # Data for bar chart
         data = pd.concat(l_data).reset_index(drop=True)
-        if (
-            route
-            and not route_added
-            and not train
-            and not plane
-        ):
+        if route and not route_added and not train and not plane:
             geodata = pd.DataFrame()
         else:
             geodata = gpd.GeoDataFrame(

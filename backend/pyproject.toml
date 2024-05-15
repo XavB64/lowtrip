@@ -72,6 +72,8 @@ docstring-code-format = true
 # enabled.
 docstring-code-line-length = "dynamic"
 
+preview = true
+
 [tool.ruff.lint]
 preview = true
 ignore = [
