@@ -1,7 +1,7 @@
 
 <img src="https://github.com/XavB64/lowtrip/blob/main/frontend/src/assets/lowtrip_color.png" alt="lowtrip" width="400"/>
 
-## a web app to compute travel CO2eq for different means of transport worldwide 
+## a web app to compute travel CO2eq for different means of transport worldwide
 
 The work presented here is independent and not-for-profit. This work has been carried out on a
 voluntary basis.
@@ -99,7 +99,6 @@ Launch :
 npm start
 ```
 
-## How to cite this work ? 
+## How to cite this work ?
 
 *Bonnemaizon, Xavier, Ni, Clara, Gres, Paola & Pellas, Chiara. lowtrip (2024). https://lowtrip.fr*
-
