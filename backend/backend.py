@@ -249,6 +249,12 @@ def compute_emissions_all(data, cmap=colors_direct):
     train, plane, car, bus = True, True, True, True
     # Sea modes - to do later : similar behavior than bus / car --> Custom function to get the route only once
     # ferry, sail = False, False
+    
+    # Check distance for plane
+    geod = Geod(ellps="WGS84")
+    if geod.geometry_length(LineString([tag1, tag2])) / 1e3 < min_plane_dist:
+        # Then we do not suggest the plane solution
+        plane = False
 
     # Retrieve the mean of transport: Car/Bus/Train/Plane
     transp = data.loc["1"].transp
@@ -261,13 +267,8 @@ def compute_emissions_all(data, cmap=colors_direct):
     elif transp == "Bus":
         bus = False
     elif (transp == "Ferry") | (transp == "Sail"):
-        train, bus, car = False, False, False
+        train, bus, car, plane = False, False, False, True
 
-    # Check distance for plane
-    geod = Geod(ellps="WGS84")
-    if geod.geometry_length(LineString([tag1, tag2])) / 1e3 < min_plane_dist:
-        # Then we do not suggest the plane solution
-        plane = False
     # Loop
     l = []
     geo = []
