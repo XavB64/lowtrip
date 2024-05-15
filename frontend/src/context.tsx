@@ -6,6 +6,7 @@ export type Cache = Record<string, City[]>;
 type Context = {
   addToCache: (key: string, value: City[]) => void;
   getCacheValue: (key: string) => City[] | undefined;
+  resetCache: () => void;
 };
 
 const CacheContext = createContext<Context | null>(null);
@@ -24,8 +25,12 @@ export const CacheProvider = ({ children }: { children: ReactNode }) => {
     return cache[key];
   };
 
+  const resetCache = () => {
+    setCache({});
+  };
+
   return (
-    <CacheContext.Provider value={{ addToCache, getCacheValue }}>
+    <CacheContext.Provider value={{ addToCache, getCacheValue, resetCache }}>
       {children}
     </CacheContext.Provider>
   );
