@@ -66,7 +66,7 @@ export const FormPanel = ({
       height="100%"
       minHeight={["calc(100vh - 64px)", "none"]}
       overflow="auto"
-      p={[1, 3]}
+      p={1}
     >
       <VStack padding={3} spacing={5} height="100%" width="100%">
         {withLogo && (

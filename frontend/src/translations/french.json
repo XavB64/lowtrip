@@ -196,6 +196,10 @@
         "contrails": "Trainées & NOx",
         "bikeBuild": "Construction du vélo"
       }
+    },
+    "cookieBanner": {
+      "message": "Nous utilisons des cookies uniquement pour comptabiliser le nombre de visiteurs. En continuant à naviguer, vous les acceptez.",
+      "ok": "Ok"
     }
   }
 }

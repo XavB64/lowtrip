@@ -196,6 +196,10 @@
         },
         "text1": "Emissionsfaktoren berücksichtigen die Nutzung (verbunden mit der Herstellung und Verwendung von Energie zum Bewegen des Fahrzeugs) sowie Infrastruktur- und Fahrzeugbau, sofern diese signifikant sind. Die Tabelle unten fasst die Arten von Emissionen zusammen, die von lowtrip berücksichtigt werden. Leere Zellen bedeuten, dass die entsprechenden Emissionen nicht signifikant zum Ergebnis beigetragen haben und daher aus Gründen der Benutzerfreundlichkeit und Lesbarkeit ausgeschlossen wurden."
       }
+    },
+    "cookieBanner": {
+      "message": "Wir verwenden Cookies nur, um die Anzahl der Besucher zu zählen. Indem Sie weiter surfen, akzeptieren Sie diese.",
+      "ok": "Ok"
     }
   }
 }

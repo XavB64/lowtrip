@@ -41,6 +41,8 @@ import Logo from "../../assets/lowtrip_logo.png";
 import theme from "../../theme";
 import UserSettingsModal from "./user-settings-modal";
 import UserSettingsSelector from "./user-settings-selector";
+import CookieBanner from "../cookie-banner";
+import { ConsentContextProvider } from "../../context";
 
 const navItems = [
   {
@@ -107,12 +109,10 @@ const NavBar = ({
   return (
     <HStack
       w="100%"
-      position="fixed"
       background="#515151"
       px={{ base: 3, md: 6 }}
       py={4}
       boxShadow="md"
-      zIndex={3}
       h="64px"
     >
       <Link to="/" style={{ height: "120%" }}>
@@ -175,18 +175,22 @@ const NavbarWrapper = ({
   };
 }) => (
   <ChakraProvider theme={theme}>
-    <VStack w="100vw" h={["100%", "100vh"]} spacing={0}>
-      <NavBar themeSettings={themeSettings} />
-      <Stack
-        direction={["column", "row"]}
-        w="100%"
-        h="100%"
-        pt="64px"
-        spacing={0}
-      >
-        <Outlet />
-      </Stack>
-    </VStack>
+    <ConsentContextProvider>
+      <VStack w="100vw" h={["100%", "100vh"]} spacing={0}>
+        <NavBar themeSettings={themeSettings} />
+        <Stack
+          direction={["column", "row"]}
+          w="100%"
+          spacing={0}
+          height="calc(100vh - 64px)"
+          overflowY="auto"
+          id="main-body"
+        >
+          <Outlet />
+        </Stack>
+        <CookieBanner />
+      </VStack>
+    </ConsentContextProvider>
   </ChakraProvider>
 );
 
