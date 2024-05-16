@@ -196,6 +196,10 @@
         },
         "text1": "Los factores de emisión consideran el uso (vinculado a la fabricación y uso de energía para mover el vehículo), así como la infraestructura y la construcción de vehículos donde estos son significativos. La tabla a continuación resume los tipos de emisiones tenidos en cuenta por lowtrip. Las celdas vacías significan que las emisiones relacionadas no contribuyeron significativamente al resultado y, por lo tanto, se excluyen para facilitar la comprensión y la legibilidad para el usuario."
       }
+    },
+    "cookieBanner": {
+      "message": "Usamos cookies únicamente para contabilizar el número de visitantes. Al continuar navegando, los aceptas.",
+      "ok": "ok"
     }
   }
 }
