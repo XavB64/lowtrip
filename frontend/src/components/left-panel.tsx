@@ -27,14 +27,15 @@ import {
   Tabs,
   VStack,
 } from "@chakra-ui/react";
-import { Form } from "./form";
-import { Chart } from "../chart";
-import { useRef, useState } from "react";
-import { ApiResponse, StepProps } from "../../types";
+import { Form } from "./form/form";
+import { Chart } from "./chart";
+import { useEffect, useState } from "react";
+import { ApiResponse, StepProps } from "../types";
 import { useTranslation } from "react-i18next";
-import Logo from "../../assets/lowtrip_logo.png";
+import Logo from "../assets/lowtrip_logo.png";
+import { checkIsOnMobile } from "../utils";
 
-interface FormPanelProps {
+interface LeftPanelProps {
   response?: ApiResponse;
   setResponse: (response: ApiResponse) => void;
   myTripSteps: StepProps;
@@ -42,22 +43,35 @@ interface FormPanelProps {
   withLogo?: boolean;
 }
 
-export const FormPanel = ({
+export const LeftPanel = ({
   response,
   setResponse,
   myTripSteps,
   alternativeTripSteps,
   withLogo,
-}: FormPanelProps) => {
+}: LeftPanelProps) => {
   const { t } = useTranslation();
   const [tabIndex, setTabIndex] = useState(0);
   const handleTabsChange = (index: number) => {
     setTabIndex(index);
   };
-  const chartRef = useRef<null | HTMLDivElement>(null);
+  const isOnMobile = checkIsOnMobile();
 
-  const scrollToChart = () =>
-    chartRef.current?.scrollIntoView({ behavior: "smooth" });
+  useEffect(() => {
+    const scrollToChart = () => {
+      const mainContainer = isOnMobile
+        ? document.getElementById("main-body")
+        : document.getElementById("left-panel");
+      if (mainContainer)
+        mainContainer.scrollTo({
+          top: mainContainer.scrollHeight,
+          left: 0,
+          behavior: "smooth",
+        });
+    };
+
+    if (response) scrollToChart();
+  }, [response]);
 
   return (
     <VStack
@@ -67,6 +81,7 @@ export const FormPanel = ({
       minHeight={["calc(100vh - 64px)", "none"]}
       overflow="auto"
       p={1}
+      id="left-panel"
     >
       <VStack padding={3} spacing={5} height="100%" width="100%">
         {withLogo && (
@@ -104,7 +119,6 @@ export const FormPanel = ({
                 key="main-form"
                 setResponse={setResponse}
                 stepsProps={myTripSteps}
-                afterSubmit={scrollToChart}
                 changeTab={() => setTabIndex((tabIndex + 1) % 2)}
               />
             </TabPanel>
@@ -114,18 +128,16 @@ export const FormPanel = ({
                 setResponse={setResponse}
                 stepsProps={alternativeTripSteps}
                 stepsToCompare={myTripSteps.values}
-                afterSubmit={scrollToChart}
               />
             </TabPanel>
           </TabPanels>
         </Tabs>
-        {response && (
+        {response && !isOnMobile && (
           <Card
-            ref={chartRef}
-            position={["absolute", "static"]}
-            w={[200, "100%"]}
-            bottom={[3, "auto"]}
-            right={[3, "auto"]}
+            position="static"
+            w="100%"
+            bottom="auto"
+            right="auto"
             zIndex={2}
             p="10px"
             shadow="none"

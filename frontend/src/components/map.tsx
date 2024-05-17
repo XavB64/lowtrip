@@ -15,7 +15,9 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import React, { useEffect, useMemo } from "react";
+import React, { useEffect, useMemo, useRef } from "react";
+import { useTranslation } from "react-i18next";
+import { uniqBy } from "lodash";
 import {
   MapContainer,
   Marker,
@@ -25,7 +27,6 @@ import {
   useMap,
 } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
-import { ApiResponse, Gdf } from "../types";
 import {
   Box,
   Card,
@@ -34,9 +35,11 @@ import {
   VStack,
   useBreakpointValue,
 } from "@chakra-ui/react";
+
 import { markerIcon } from "../assets/marker-icon";
-import { useTranslation } from "react-i18next";
-import { uniqBy } from "lodash";
+import { checkIsOnMobile } from "../utils";
+import { ApiResponse, Gdf } from "../types";
+import { Chart } from "./chart";
 
 interface MapProps {
   isDarkTheme: boolean;
@@ -51,11 +54,13 @@ export const Map = ({
   stepsCoords,
   alternativeStepsCoords,
 }: MapProps) => {
+  const chartRef = useRef<null | HTMLDivElement>(null);
   const allowScrollToZoom = useBreakpointValue([false, true], { ssr: false });
+  const isOnMobile = checkIsOnMobile();
 
   return (
     <>
-      <Legend response={response} />
+      {!isOnMobile && <Legend response={response} />}
       <MapContainer
         center={[48, 10]}
         zoom={5}
@@ -69,6 +74,20 @@ export const Map = ({
           alternativeStepsCoords={alternativeStepsCoords}
         />
       </MapContainer>
+      {response && isOnMobile && (
+        <Card
+          ref={chartRef}
+          position="absolute"
+          w={200}
+          bottom={3}
+          right={3}
+          zIndex={2}
+          p="10px"
+          shadow="none"
+        >
+          <Chart response={response} />
+        </Card>
+      )}
     </>
   );
 };
@@ -173,14 +192,7 @@ const Legend = ({ response }: { response?: ApiResponse }) => {
   const { t } = useTranslation();
   if (!response) return null;
   return (
-    <Card
-      display={["none", "none", "flex"]}
-      position="absolute"
-      zIndex={2}
-      top={5}
-      right={5}
-      p={3}
-    >
+    <Card display="flex" position="absolute" zIndex={2} top={5} right={5} p={3}>
       <VStack align="start">
         {uniqBy(
           (JSON.parse(response.data.gdf) as Gdf).features,
