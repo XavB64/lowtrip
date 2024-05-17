@@ -2,7 +2,7 @@ import { Box, IconButton, Stack } from "@chakra-ui/react";
 import { useState } from "react";
 import { BiChevronUp } from "react-icons/bi";
 
-import { FormPanel } from "../components/form/form-panel";
+import { LeftPanel } from "../components/left-panel";
 import { useSteps } from "../hooks";
 import { ApiResponse } from "../types";
 import { Map } from "../components/map";
@@ -26,14 +26,19 @@ const MainView = ({
   return (
     <CacheProvider>
       <Stack direction={["column", "row"]} width="100%">
-        <FormPanel
+        <LeftPanel
           response={response}
           setResponse={setResponse}
           myTripSteps={myTripSteps}
           alternativeTripSteps={alternativeTripSteps}
           withLogo={withLogo}
         />
-        <Box w="100%" height="100%" minHeight={["calc(100vh - 64px)", "none"]}>
+        <Box
+          w="100%"
+          height="100%"
+          minHeight={["calc(100vh - 64px)", "none"]}
+          position="relative"
+        >
           <Map
             isDarkTheme={isDarkTheme}
             response={response}
