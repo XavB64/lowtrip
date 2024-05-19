@@ -99,7 +99,7 @@ EF_ferry = {
     "Car": 0.114,
 }
 
-EF_sail = 0.05
+EF_sail = 0.069
 
 EF_plane = {
     "short": {
