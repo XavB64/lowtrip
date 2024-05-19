@@ -151,7 +151,7 @@
           "transport2": "Auto - Autobús - Auto eléctrico",
           "transport3": "Ruta en bicicleta",
           "transport4": "Avión",
-          "transport5": "Ferry",
+          "transport5": "Ferry - Velero",
           "dataOpenstreetmap": "Red de OpenStreetMap",
           "dataGeodesic": "Distancia geodésica + desvío promedio",
           "dataApproximation": "Aproximación de la ruta más corta"
@@ -174,7 +174,7 @@
           "variables3": "Número de pasajeros",
           "variables4": "Número de pasajeros y países visitados",
           "variables5": "Distancia de viaje",
-          "variables6": "(todavía no) parámetros del usuario",
+          "variables6": "Parámetros del usuario",
           "why1": "≠ Tasa de electrificación; ≠ Intensidad de carbono de energía; ≠ Tasas de llenado",
           "why2": "-",
           "why3": "Asignación personal de huella; El consumo aumenta con el peso",

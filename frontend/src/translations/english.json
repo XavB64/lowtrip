@@ -151,7 +151,7 @@
           "transport2": "Car - Bus - eCar",
           "transport3": "Bicycle route",
           "transport4": "Plane",
-          "transport5": "Ferry",
+          "transport5": "Ferry - Sailboat",
           "dataOpenstreetmap": "OpenStreetMap network",
           "dataGeodesic": "Geodesic distance + average detour",
           "dataApproximation": "Approximation of shortest path"
@@ -174,7 +174,7 @@
           "variables3": "Number of passengers",
           "variables4": "Number of passengers & Visited countries",
           "variables5": "Travel distance",
-          "variables6": "(not yet) user parameters",
+          "variables6": "User parameters",
           "why1": "≠ Electrification rate;≠ Energy carbon intensity;≠ Filling rates",
           "why2": "-",
           "why3": "Personal footprint allocation;Consumption increases with weight",

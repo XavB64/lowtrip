@@ -151,7 +151,7 @@
           "transport2": "Auto - Autobus - Auto elettrica",
           "transport3": "Percorso in bicicletta",
           "transport4": "Aereo",
-          "transport5": "Traghetto",
+          "transport5": "Traghetto - Barca a vela",
           "dataOpenstreetmap": "Rete OpenStreetMap",
           "dataGeodesic": "Distanza geodetica + deviazione media",
           "dataApproximation": "Approssimazione del percorso più breve"
@@ -174,7 +174,7 @@
           "variables3": "Numero di passeggeri",
           "variables4": "Numero di passeggeri e paesi visitati",
           "variables5": "Distanza di viaggio",
-          "variables6": "(non ancora) parametri dell'utente",
+          "variables6": "Parametri dell'utente",
           "why1": "≠ Tasso di elettrificazione; ≠ Intensità carbonica dell'energia; ≠ Tassi di riempimento",
           "why2": "-",
           "why3": "Assegnazione personale dell'impronta; Il consumo aumenta con il peso",

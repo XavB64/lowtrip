@@ -22,7 +22,7 @@
           "transport2": "Voiture - Bus - VE",
           "transport3": "Voie cyclable",
           "transport4": "Avion",
-          "transport5": "Ferry",
+          "transport5": "Ferry - Voilier",
           "dataOpenstreetmap": "Réseau OpenStreetMap",
           "dataGeodesic": "Distance géodésique + déviation moyenne",
           "dataApproximation": "Approximation du plus court chemin"
@@ -45,7 +45,7 @@
           "variables3": "Nombre de passagers",
           "variables4": "Nombre de passagers & Pays traversés",
           "variables5": "Distance du trajet",
-          "variables6": "(en cours) Paramètres utilisateur",
+          "variables6": "Paramètres utilisateur",
           "why1": "≠ Taux d'éléctrification;≠ Intensité carbone de l'énergie;≠ Taux de remplissage",
           "why2": "-",
           "why3": "Attribution de l'empreinte personnelle;Augmentation de la consommation avec le poids",

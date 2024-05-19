@@ -325,7 +325,7 @@ const MethodView = () => {
               <Td>
                 <FaCheck color="green" />
               </Td>
-              <Td>{t("method.emissionFactors.table2.dataNotFound")}</Td>
+              <Td> - </Td>
               <Td>{t("method.emissionFactors.table2.dataNotFound")}</Td>
             </Tr>
             {/* Add more rows as needed */}

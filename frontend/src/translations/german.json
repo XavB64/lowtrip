@@ -151,7 +151,7 @@
           "transport2": "Auto - Bus - Elektroauto",
           "transport3": "Fahrradroute",
           "transport4": "Flugzeug",
-          "transport5": "Fähre",
+          "transport5": "Fähre - SegelBoot",
           "dataOpenstreetmap": "OpenStreetMap-Netzwerk",
           "dataGeodesic": "Geodätische Entfernung + durchschnittlicher Umweg",
           "dataApproximation": "Annäherung des kürzesten Wegs"
@@ -174,7 +174,7 @@
           "variables3": "Anzahl der Passagiere",
           "variables4": "Anzahl der Passagiere & Besuchte Länder",
           "variables5": "Reisestrecke",
-          "variables6": "(noch nicht) Benutzerparameter",
+          "variables6": "Benutzerparameter",
           "why1": "≠ Elektrifizierungsrate; ≠ Energie-Kohlenstoffintensität; ≠ Füllraten",
           "why2": "-",
           "why3": "Persönliche Fußabdruckszuweisung; Verbrauch steigt mit dem Gewicht",
