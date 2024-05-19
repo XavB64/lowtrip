@@ -249,7 +249,7 @@ def compute_emissions_all(data, cmap=colors_direct):
     train, plane, car, bus = True, True, True, True
     # Sea modes - to do later : similar behavior than bus / car --> Custom function to get the route only once
     # ferry, sail = False, False
-    
+
     # Check distance for plane
     geod = Geod(ellps="WGS84")
     if geod.geometry_length(LineString([tag1, tag2])) / 1e3 < min_plane_dist:
@@ -327,12 +327,7 @@ def compute_emissions_all(data, cmap=colors_direct):
     else:
         # Data for bar chart
         data = pd.concat(l_data).reset_index(drop=True)
-        if (
-            (route)
-            & (not route_added)
-            & (not train)
-            & (not plane)
-        ):
+        if (route) & (not route_added) & (not train) & (not plane):
             geodata = pd.DataFrame()
         else:
             geodata = gpd.GeoDataFrame(
