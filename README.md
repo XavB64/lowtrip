@@ -25,7 +25,7 @@ $$CO_2eq = \sum_{step} Distance(km) \times Emission \\: Factor(kgCO_2eq / km) $$
 | `Car & Bus & eCar` | OpenStreetMap network |
 | `Bike route` | OpenStreetMap network |
 | `Plane` | Geodesic distance and average detour |
-| `Ferry` | Approximation of shortest path |
+| `Ferry & Sailboat` | Approximation of shortest path |
 
 ### What do emission factors depend on?
 
@@ -37,8 +37,8 @@ $$CO_2eq = \sum_{step} Distance(km) \times Emission \\: Factor(kgCO_2eq / km) $$
 | `Electric car` | Visited countries & Number of passengers |
 | `Bike route` | - |
 | `Plane` | Distance of journey |
-| `Ferry` | User-specified parameters based on https://futur.eco/simulateur/transport/ferry/empreinte-du-voyage |
-| `Sailboat` | 50gCO2/pkm ; improvements on the way |
+| `Ferry` | User-specified parameters |
+| `Sailboat` | - ; improvements on the way |
 
 Emissions factors consider usage (linked to the manufacture and use of energy to move the vehicle) as well as infrastructure and vehicle construction where these are significant. The table below summarizes the types of emissions taken into account by lowtrip. Empty cells mean that the related emissions did not contribute significantly to the result and are therefore excluded to facilitate understanding and readability for the user.
 
@@ -48,7 +48,8 @@ Emissions factors consider usage (linked to the manufacture and use of energy to
 | `Car & Bus & eCar` | :white_check_mark: | :white_check_mark: |  |
 | `Bike route` | | :white_check_mark: | Not found |
 | `Plane` |  :white_check_mark: |  |  |
-| `Ferry` |  :white_check_mark: | Not found | Not found |
+| `Ferry` |  :white_check_mark: | | Not found |
+| `Sailboat` | :white_check_mark: | | Not found |
 
 All assumptions, data and sources used are available in the [methodology](https://github.com/XavB64/lowtrip/blob/main/frontend/src/assets/lowtrip_methodology.pdf) document.
 
