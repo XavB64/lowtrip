@@ -285,28 +285,34 @@ def compute_emissions_all(data, cmap=colors_direct):
         geo.append(geo_train)
 
     # Car & Bus
-    if transp == "eCar":  # we use custom colors
-        cmap_road = colors_custom
-    else:
-        cmap_road = cmap
-    data_car, geo_car, data_bus, route = car_bus_to_gdf(
-        tag1,
-        tag2,
-        color_usage=cmap_road["Road"],
-        color_cons=cmap_road["Cons_infra"],
-    )
+    if (car | bus):
+        if transp == "eCar":  # we use custom colors
+            cmap_road = colors_custom
+        else:
+            cmap_road = cmap
+        data_car, geo_car, data_bus, route = car_bus_to_gdf(
+            tag1,
+            tag2,
+            color_usage=cmap_road["Road"],
+            color_cons=cmap_road["Cons_infra"],
+        )
 
-    if bus:
-        l_data.append(data_bus)
-    if car:
-        l_data.append(data_car)
-    # If we have a result for car and bus :
-    route_added = False
-    if route:  # Adapt and add ecar
-        # We check if car or bus was asked for a 1 step
-        if (car) & (bus) & (transp != "eCar"):
-            geo.append(geo_car)
-            route_added = True
+        if bus:
+            l_data.append(data_bus)
+        if car:
+            l_data.append(data_car)
+        # If we have a result for car and bus :
+        route_added = False
+        if route:  # Adapt and add ecar
+            # We check if car or bus was asked for a 1 step
+            if (car) & (bus) & (transp != "eCar"):
+                geo.append(geo_car)
+                route_added = True
+
+        if data_car.empty:
+            car = False
+        if data_bus.empty:
+            bus = False
 
     # Plane
     if plane:
