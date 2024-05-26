@@ -5,6 +5,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Sort python imports
+        uses: isort/isort-action@v1
+        with:
+          sort-paths: './backend'
       - name: Show python linter fixes
         uses: chartboost/ruff-action@v1
         with:
