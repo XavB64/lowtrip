@@ -23,4 +23,4 @@ jobs:
         uses: chartboost/ruff-action@v1
         with:
           src: './backend'
-          args: 'format --preview --check'
+          args: 'format --preview --check --diff'
