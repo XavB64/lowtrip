@@ -287,7 +287,7 @@ def compute_emissions_all(data, cmap=colors_direct):
         geo.append(geo_train)
 
     # Car or Bus
-    if (car or bus):
+    if car or bus:
         if transp == "eCar":  # we use custom colors
             cmap_road = colors_custom
         else:
