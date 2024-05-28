@@ -139,7 +139,7 @@ def train_to_gdf(
         print("Rescaling factor", train_dist / gdf["path_length"].sum())
         gdf["path_length"] *= train_dist / gdf["path_length"].sum()
         # Compute emissions : EF * length
-        gdf["EF_tot"] /= 1000.0  # Conversion in in kg
+        gdf["EF_tot"] /= 1000.0  # Conversion in kg
         gdf["kgCO2eq"] = gdf["path_length"] * gdf["EF_tot"]
         # Add colors, here discretise the colormap
         gdf["colors"] = color_usage
