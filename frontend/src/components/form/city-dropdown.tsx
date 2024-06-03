@@ -20,7 +20,7 @@ const formatCityName = (
   city: PhotonApiCity["properties"],
 ) => {
   const cityName = `${city.name}, ${city.country}`;
-  if (duplicates.includes(cityName)) {
+  if (duplicates.includes(cityName) && city.state) {
     return `${city.name}, ${city.state}, ${city.country}`;
   }
   return cityName;
