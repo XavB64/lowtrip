@@ -1,5 +1,5 @@
 [tool.isort]
-py_version=3117
+py_version=311
 profile="black"
 line_length = 88
 lines_after_imports = 2
@@ -43,7 +43,7 @@ exclude = [
 # Same as Black.
 indent-width = 4
 
-target-version = "py3117"
+target-version = "py311"
 
 [tool.ruff.format]
 # Like Black, use double quotes for strings.
