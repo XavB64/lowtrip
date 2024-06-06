@@ -81,8 +81,6 @@ ignore = [
     "ANN001",  # Missing type annotation for function argument `EF_bus`
     "ANN201",  # Missing return type annotation for public function `bicycle_to_gdf`
 
-    "B905",  # `zip()` without an explicit `strict=` parameter
-
     # Copyright, documentation, todos
     "CPY001",  # Missing copyright notice at top of file
     "D100",  # Missing docstring in public module
