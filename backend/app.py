@@ -17,21 +17,24 @@
 
 import warnings
 
-warnings.filterwarnings("ignore")
-
 # Librairies
-from flask import Flask, request, json
-from backend import (
-    compute_emissions_custom,
-    compute_emissions_all,
-    chart_refactor,
-)
-from parameters import (
-    colors_alternative,
+from flask import (
+    Flask,
+    json,
+    request,
 )
 from flask_cors import CORS  # comment this on deployment
 import pandas as pd
 
+from .backend import (
+    chart_refactor,
+    compute_emissions_all,
+    compute_emissions_custom,
+)
+from .parameters import colors_alternative
+
+
+warnings.filterwarnings("ignore")
 
 # Application
 app = Flask(__name__, static_url_path="", static_folder="frontend/build")
@@ -113,7 +116,7 @@ def main():
                 error_other = "Other trip: " + error_other
 
             # Check if we have geo data :
-            if (len(error) > 0) & (len(error_other) > 0):
+            if len(error) > 0 and len(error_other) > 0:
                 gdf = None
             else:
                 gdf = (
@@ -122,7 +125,9 @@ def main():
 
             # Prepare data for aggregation in the chart -  see frontend
             data_mytrip, data_alternative = chart_refactor(
-                data_mytrip, data_alternative, True
+                data_mytrip,
+                data_alternative,
+                True,
             )
 
             # Response

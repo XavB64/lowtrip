@@ -22,28 +22,26 @@
 # Classic
 import geopandas as gpd
 import pandas as pd
-
+from pyproj import Geod
 
 # Geometry
 from shapely.geometry import LineString
-from pyproj import Geod
 
-from parameters import (
+from .parameters import (
     colors_custom,
-    min_plane_dist,
     colors_direct,
+    min_plane_dist,
 )
-
-from transport import (
-    train_to_gdf,
-    plane_to_gdf,
+from .transport import (
+    bicycle_to_gdf,
+    bus_to_gdf,
     car_bus_to_gdf,
     car_to_gdf,
     ecar_to_gdf,
-    bus_to_gdf,
-    bicycle_to_gdf,
     ferry_to_gdf,
+    plane_to_gdf,
     sail_to_gdf,
+    train_to_gdf,
 )
 
 
@@ -53,13 +51,15 @@ from transport import (
 
 
 def compute_emissions_custom(data, cmap=colors_custom):
-    """
-    parameters:
-        - data, pandas dataframe format (will be json)
-    return:
+    """parameters
+        - data, pandas dataframe format (will be json).
+
+    Return:
+    ------
         - full dataframe for emissions
         - geodataframe for path
         - ERROR : string first step that fails
+
     """
     ERROR = ""
 
@@ -225,14 +225,16 @@ def compute_emissions_custom(data, cmap=colors_custom):
 
 
 def compute_emissions_all(data, cmap=colors_direct):
-    """
-    If data is only one step then we do not compute this mean of transport as it will
+    """If data is only one step then we do not compute this mean of transport as it will
     appear in "my_trip"
     parameters:
-        - data, pandas dataframe format (will be json)
-    return:
+        - data, pandas dataframe format (will be json).
+
+    Return:
+    ------
         - full dataframe for emissions
         - geodataframe for path
+
     """
     # colors
     # Direct trip
@@ -284,8 +286,8 @@ def compute_emissions_all(data, cmap=colors_direct):
         l_data.append(data_train)
         geo.append(geo_train)
 
-    # Car & Bus
-    if (car | bus):
+    # Car or Bus
+    if car or bus:
         if transp == "eCar":  # we use custom colors
             cmap_road = colors_custom
         else:
@@ -305,7 +307,7 @@ def compute_emissions_all(data, cmap=colors_direct):
         route_added = False
         if route:  # Adapt and add ecar
             # We check if car or bus was asked for a 1 step
-            if (car) & (bus) & (transp != "eCar"):
+            if car and bus and transp != "eCar":
                 geo.append(geo_car)
                 route_added = True
 
@@ -327,13 +329,13 @@ def compute_emissions_all(data, cmap=colors_direct):
 
     # We do not add the ferry in the general case
 
-    if (not car) & (not bus) & (not train) & (not plane):
+    if not car and not bus and not train and not plane:
         # Only happens when plane was asked and the API failed
         data, geodata = pd.DataFrame(), pd.DataFrame()
     else:
         # Data for bar chart
         data = pd.concat(l_data).reset_index(drop=True)
-        if (route) & (not route_added) & (not train) & (not plane):
+        if route and not route_added and not train and not plane:
             geodata = pd.DataFrame()
         else:
             geodata = gpd.GeoDataFrame(
@@ -346,14 +348,13 @@ def compute_emissions_all(data, cmap=colors_direct):
 
 
 def chart_refactor(mytrip, alternative=None, do_alt=False):
-    """
-    This function prepare the data to be displayed in the chart correctly
+    """This function prepare the data to be displayed in the chart correctly
     parameters:
         - mytrip, dataframe of custom trip
         - alternative, dataframe of alternative trip if requested
         - do_alt (bool), is there an alternative trip ?
     return:
-        - data with changed fields for bar chart
+        - data with changed fields for bar chart.
     """
     # Check if my trip worked
     if mytrip.shape[0] > 0:
@@ -380,12 +381,7 @@ def chart_refactor(mytrip, alternative=None, do_alt=False):
             alternative["Mean of Transport"] = "OtherTrip"
             # Then we return both
 
-            return mytrip, alternative  # [l_var]
-        # If it didnt work we return it (empty)
-
-        else:
-            return mytrip, alternative
+        return mytrip, alternative
 
     # If it didnt work we return it (empty)
-    else:
-        return mytrip
+    return mytrip

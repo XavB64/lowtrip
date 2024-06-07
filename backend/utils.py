@@ -18,31 +18,36 @@
 ###################
 ###### Utils ######
 ###################
+from http import HTTPStatus
+import os
 
-import numpy as np
-from pyproj import Geod
-from shapely.geometry import LineString, MultiLineString, Point, CAP_STYLE
-from shapely import ops
-from shapely.ops import unary_union, nearest_points
-import pandas as pd
 import geopandas as gpd
 import momepy
 import networkx as nx
-import os
-
-
-from parameters import (
-    train_s,
-    train_t,
-    route_s,
-    train_intensity,
-    carbon_intensity_electricity,
-    sea_threshold,
-    nb_pts,
-)
+import numpy as np
+import pandas as pd
+from pyproj import Geod
 
 # Web
 import requests
+from shapely import ops
+from shapely.geometry import (
+    CAP_STYLE,
+    LineString,
+    MultiLineString,
+    Point,
+)
+from shapely.ops import nearest_points, unary_union
+
+from .parameters import (
+    carbon_intensity_electricity,
+    nb_pts,
+    route_s,
+    sea_threshold,
+    train_intensity,
+    train_s,
+    train_t,
+)
 
 
 def flatten_list_of_tuples(lst):
@@ -57,14 +62,13 @@ def kilometer_to_degree(km):
 
 
 def great_circle_geometry(dep, arr, nb=nb_pts):
-    """
-    Create the great circle geometry with pyproj
+    """Create the great circle geometry with pyproj
     parameters:
         - nb : number of points
         - dep, arr : departure and arrival
     return:
         - shapely geometry (Linestring)
-        - Geodesic distance in km
+        - Geodesic distance in km.
     """
     # projection
     geod = Geod(ellps="WGS84")
@@ -87,7 +91,8 @@ def great_circle_geometry(dep, arr, nb=nb_pts):
         l = [
             [lon, lat]
             for lon, lat in zip(
-                [lon + 360 if lon < 0 else lon for lon in r.lons], r.lats
+                [lon + 360 if lon < 0 else lon for lon in r.lons],
+                r.lats,
             )
         ]
     else:
@@ -98,14 +103,16 @@ def great_circle_geometry(dep, arr, nb=nb_pts):
 
 
 def filter_countries_world(gdf, method, th=sea_threshold):
-    """
-    Filter train path by countries (train_intensity.geojson)
-    parameters:
+    """Filter train path by countries (train_intensity.geojson).
+
+    Parameters
+    ----------
         - gdf : train geometry in geoserie
         - mode : train / ecar
         - th : threshold to remove unmatched gaps between countries that are too small (km)
     return:
         - Geodataframe of train path by countries
+
     """
     if method == "train":
         iso = "ISO2"
@@ -142,7 +149,8 @@ def filter_countries_world(gdf, method, th=sea_threshold):
         diff_2 = diff_2.set_geometry("geometry", crs="epsg:4326")
         # Filter depending is the gap is long enough to be taken into account and join with nearest country
         test = diff_2[diff_2.length > kilometer_to_degree(th)].sjoin_nearest(
-            data, how="left"
+            data,
+            how="left",
         )
         # Aggregation per country and combining geometries
         u = (
@@ -171,20 +179,21 @@ def filter_countries_world(gdf, method, th=sea_threshold):
             )
         )
     # Rendering result
-    res = gpd.GeoDataFrame(u, geometry="geometry", crs="epsg:4326").reset_index()
-    return res
+    return gpd.GeoDataFrame(u, geometry="geometry", crs="epsg:4326").reset_index()
 
 
 def extend_search(tag1, tag2, perims):
-    """
-    Function to use when the train path is not found directly by the API.
+    """Function to use when the train path is not found directly by the API.
     We search for nearby coordinates and request it again.
-    parameters:
+
+    Parameters
+    ----------
         - tag1, tag2 : list or tuple like with coordinates (lon, lat)
         - perims : list-like ; perimeters to search for with overpass API
     return:
         - gdf (geoseries)
         - train (bool)
+
     """
     # We extend the search progressively
     for perim in perims:
@@ -212,21 +221,20 @@ def extend_search(tag1, tag2, perims):
                     break
 
             # Verify that we want to try to request the API again
-            if (tag1_new != False) & (tag2_new != False):
+            if tag1_new and tag2_new:
                 gdf, train, train_dist = find_train(tag1_new, tag2_new)
 
     return gdf, train, train_dist
 
 
 def validate_geom(tag1, tag2, geom, th):
-    """
-    Verify that the departure and arrival of geometries are close enough to the ones requested
+    """Verify that the departure and arrival of geometries are close enough to the ones requested
     parameters:
         - tag1, tag2 : requested coordinates
         - geom : shapely geometry answered
         - th : threshold (km) for which we reject the geometry
     return:
-        boolean (True valid geometry / False wrong geometry)
+        boolean (True valid geometry / False wrong geometry).
     """
     geod = Geod(ellps="WGS84")
     # To compute distances
@@ -252,13 +260,12 @@ def validate_geom(tag1, tag2, geom, th):
 
 
 def find_nearest(lon, lat, perim):
-    """
-    This function find the nearest node for train raiway in the OSM network using Overpass API
+    """This function find the nearest node for train raiway in the OSM network using Overpass API
     parameters:
         - lon, lat : coordinates in degree of the point
         - perim : perimeters (m) to look around
     return:
-        - new coordinates(lat, lon)
+        - new coordinates(lat, lon).
     """
     # Extend the area around the point
     buff = list(Point(lon, lat).buffer(kilometer_to_degree(perim)).exterior.coords)
@@ -281,28 +288,30 @@ def find_nearest(lon, lat, perim):
     # Make request
     response = requests.get(url, params={"data": query})
 
-    # if response.status_code == 200: not working, looking at size of elements also
-    if (response.status_code == 200) & (len(response.json()["elements"]) > 0):
+    # if response.status_code == HTTPStatus.OK: not working, looking at size of elements also
+    if response.status_code == HTTPStatus.OK and len(response.json()["elements"]) > 0:
         # Extract the first point coordinates we could found
         new_point = (
             pd.json_normalize(response.json()["elements"][0]).loc[0].geometry[0]
         )  # .columns
         # Return lon, lat
         return (new_point["lon"], new_point["lat"])
-    else:
-        # Couldn't find a node
-        return False
+
+    # Couldn't find a node
+    return False
 
 
 def find_train(tag1, tag2, method="signal"):
-    """
-    Find train path between 2 points. Can use ntag API or signal.
-    parameters:
+    """Find train path between 2 points. Can use ntag API or signal.
+
+    Parameters
+    ----------
         - tag1, tag2 : list or tuple like (lon, lat)
         - method : signal / trainmap
     return:
         - gdf, a geoserie with the path geometry / None if failure
         - train, boolean
+
     """
     # format lon, lat
     # Build the request url
@@ -326,7 +335,7 @@ def find_train(tag1, tag2, method="signal"):
     # print(time.time() - s)
 
     # Check if the request was successful (status code 200)
-    if response.status_code == 200:
+    if response.status_code == HTTPStatus.OK:
         print("Path retrieved!")
         if method == "trainmap":
             # Store data in a geodataserie - trainmap
@@ -354,14 +363,16 @@ def find_train(tag1, tag2, method="signal"):
 
 
 def find_route(tag1, tag2):
-    """
-    Find road path between 2 points
+    """Find road path between 2 points
     parameters:
-        - tag1, tag2 : list or tuple like ; (lon, lat)
-    return:
+        - tag1, tag2 : list or tuple like ; (lon, lat).
+
+    Return:
+    ------
         - geom_route : shapely geometry linestring
         - route_dist : float, distance in km
         - route : boolean
+
     """
     ### Route OSRM - create a separate function
     url = (
@@ -378,7 +389,7 @@ def find_route(tag1, tag2):
         + "&geometries=geojson"
     )
     response = requests.get(url)
-    if response.status_code == 200:
+    if response.status_code == HTTPStatus.OK:
         geom = response.json()["routes"][0]["geometry"]
         geom_route = LineString(geom["coordinates"])  # convert.decode_polyline(geom)
         route_dist = response.json()["routes"][0]["distance"] / 1e3  # In km
@@ -405,10 +416,11 @@ def find_bicycle(tag1, tag2):
         + str(tag2[1])
     )
     response = requests.get(url)
-    if response.status_code == 200:
+    if response.status_code == HTTPStatus.OK:
         geom = response.json()["features"][0]["geometry"]
         geom_route = LineString(geom["coordinates"]).simplify(
-            0.05, preserve_topology=False
+            0.05,
+            preserve_topology=False,
         )  # convert.decode_polyline(geom)
         route = True
         route_dist = (
@@ -416,7 +428,7 @@ def find_bicycle(tag1, tag2):
         )  # km
         print("Bicycle length", round(route_dist, 1))
     else:
-        geom_route, route, route_idst = None, False, None
+        geom_route, route, route_dist = None, False, None
 
     return geom_route, route, route_dist
 
@@ -425,12 +437,11 @@ def find_bicycle(tag1, tag2):
 
 
 def create_coast(world=train_intensity, buffer=0):
-    """
-    world is the dataset from geopandas, already loaded for trains and ecar
-    Return a list of geometries as well as the overall multi geometry
+    """World is the dataset from geopandas, already loaded for trains and ecar
+    Return a list of geometries as well as the overall multi geometry.
     """
     coast_lines = unary_union(
-        world.buffer(buffer, cap_style=CAP_STYLE.square).geometry
+        world.buffer(buffer, cap_style=CAP_STYLE.square).geometry,
     ).boundary
     # To shapely list
     coast_exp = list(gpd.GeoSeries(coast_lines).explode().values)
@@ -438,9 +449,7 @@ def create_coast(world=train_intensity, buffer=0):
 
 
 def get_line_coast(point, coast):
-    """
-    coast the full shapely geometry
-    """
+    """Coast the full shapely geometry."""
     # Get linestring to get to the see
     nearest_point_on_line = nearest_points(Point(point), coast)[1]
 
@@ -448,7 +457,7 @@ def get_line_coast(point, coast):
     new_linestring = LineString([Point(point), nearest_point_on_line])
     # print(list(new_linestring.coords))
 
-    return new_linestring
+    return new_linestring  # noqa: RET504
 
 
 def extend_line(line, additional_length=0.001, start=False):  # , start=True
@@ -499,22 +508,26 @@ def get_sea_lines(start, end, world=train_intensity, nb=20, exp=10):
     # s = time.time()
     quadri = []
     for lon in np.linspace(
-        min(start[0], end[0]) - exp, max(start[0], end[0]) + exp, nb
+        min(start[0], end[0]) - exp,
+        max(start[0], end[0]) + exp,
+        nb,
     ):  # limit to range longitude - latidue +/- 20
         quadri.append(
             LineString([
                 (lon, min(start[1], end[1]) - exp - 10),
                 (lon, max(start[1], end[1]) + exp + 10),
-            ])
+            ]),
         )
     for lat in np.linspace(
-        min(start[1], end[1]) - exp, max(start[1], end[1]) + exp, nb
+        min(start[1], end[1]) - exp,
+        max(start[1], end[1]) + exp,
+        nb,
     ):
         quadri.append(
             LineString([
                 (min(start[0], end[0]) - exp - 10, lat),
                 (max(start[0], end[0]) + exp + 10, lat),
-            ])
+            ]),
         )
     # Add also the direct path
     quadri.append(LineString([start, end]))
@@ -542,7 +555,7 @@ def gdf_lines(start, end, add_canal=True):
             LineString([
                 (-79.51006995072298, 8.872893100443669),
                 (-80.05324567583347, 9.517999845306024),
-            ])
+            ]),
         )
         # Suez
         canal.append(
@@ -550,7 +563,7 @@ def gdf_lines(start, end, add_canal=True):
                 (33.91896382986125, 27.263740326941672),
                 (32.505571710241114, 29.64748606563672),
                 (32.42803964605657, 32.58754502651166),
-            ])
+            ]),
         )
 
     # Combine
@@ -565,11 +578,11 @@ def gdf_lines(start, end, add_canal=True):
         [extend_line(k, start=True) for k in sea_lines[:-1]]
         +
         # Don't extend direct conection
-        [sea_lines[-1]]
+        [sea_lines[-1]],
     )  # get the lines where ferry can navigate
     # print('Extend line : ', round(time.time() - s, 3))
     return gpd.GeoDataFrame(
-        geometry=gpd.GeoSeries(full_edge)
+        geometry=gpd.GeoSeries(full_edge),
     ).explode()  # , crs='epsg:4326'
 
 
@@ -588,7 +601,6 @@ def get_shortest_path(line_gdf, start, end):
         if "geometry" in graph.get_edge_data(u, v)
     ]
 
-    # Merge the geometries of the edges in the shortest path
-    merged_geometry = unary_union(shortest_path_geometries)
     # print('network : ', round(time.time() - s, 3))
-    return merged_geometry
+    # Merge the geometries of the edges in the shortest path
+    return unary_union(shortest_path_geometries)

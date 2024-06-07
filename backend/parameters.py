@@ -4,10 +4,11 @@
 
 import geopandas as gpd
 
+
 # Load  world datasets
 train_intensity = gpd.read_file("static/train_intensity.geojson")
 carbon_intensity_electricity = gpd.read_file(
-    "static/carbon_intensity_electricity.geojson"
+    "static/carbon_intensity_electricity.geojson",
 )
 
 
@@ -90,7 +91,7 @@ EF_train = {
     "infra": 0.0065,
 }
 
-EF_bycicle = 0.005
+EF_bicycle = 0.005
 
 EF_ferry = {
     "Cabin": 0.11,
