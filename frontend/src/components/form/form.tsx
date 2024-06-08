@@ -29,13 +29,14 @@ import {
 } from "@chakra-ui/react";
 import { BiSolidPlusCircle } from "react-icons/bi";
 import { API_URL } from "../../config";
-import { ApiResponse, Step } from "../../types";
+import { ApiResponse, SimulationResults, Step } from "../../types";
 import { formatStepsForApi } from "../../utils";
 import { PrimaryButton } from "../primary-button";
 import { StepField } from "./step-field";
 import ErrorModal from "./error-modal";
 import { useTranslation } from "react-i18next";
 import { stepsAreInvalid, getAdviceTextTranslation } from "./utils";
+import { formatResponse } from "../../helpers/formatResponse";
 
 const getPayload = (steps: Step[], stepsToCompare?: Step[]) => {
   const formData = new FormData();
@@ -56,8 +57,8 @@ const getPayload = (steps: Step[], stepsToCompare?: Step[]) => {
   return formData;
 };
 
-interface FormProps {
-  setResponse: (response: ApiResponse) => void;
+type FormProps = {
+  setSimulationResults: (response: SimulationResults) => void;
   stepsProps: {
     values: Step[];
     addStep: () => void;
@@ -66,13 +67,13 @@ interface FormProps {
   };
   stepsToCompare?: Step[];
   changeTab?: () => void;
-}
+};
 
 export const Form = ({
-  setResponse,
   stepsProps,
   stepsToCompare,
   changeTab,
+  setSimulationResults,
 }: FormProps) => {
   const { t } = useTranslation();
   const { values: steps, addStep, removeStep, updateStep } = stepsProps;
@@ -104,7 +105,8 @@ export const Form = ({
           setErrorMessage(response.data.error);
           openErrorModal();
         } else {
-          setResponse(response);
+          const formattedSimulation = formatResponse(response.data);
+          setSimulationResults(formattedSimulation);
         }
       })
       .catch((err) => {

@@ -38,19 +38,19 @@ import {
 
 import { markerIcon } from "../assets/marker-icon";
 import { checkIsOnMobile } from "../utils";
-import { ApiResponse, Gdf } from "../types";
+import { SimulationResults } from "../types";
 import { Chart } from "./chart";
 
 interface MapProps {
   isDarkTheme: boolean;
-  response?: ApiResponse;
+  simulationResults?: SimulationResults;
   stepsCoords: [number, number][];
   alternativeStepsCoords: [number, number][];
 }
 
 export const Map = ({
   isDarkTheme,
-  response,
+  simulationResults,
   stepsCoords,
   alternativeStepsCoords,
 }: MapProps) => {
@@ -60,7 +60,9 @@ export const Map = ({
 
   return (
     <>
-      {!isOnMobile && <Legend response={response} />}
+      {!isOnMobile && simulationResults && (
+        <Legend tripGeometries={simulationResults.tripGeometries} />
+      )}
       <MapContainer
         center={[48, 10]}
         zoom={5}
@@ -69,12 +71,12 @@ export const Map = ({
       >
         <MapContent
           isDarkTheme={isDarkTheme}
-          response={response}
+          simulationResults={simulationResults}
           stepsCoords={stepsCoords}
           alternativeStepsCoords={alternativeStepsCoords}
         />
       </MapContainer>
-      {response && isOnMobile && (
+      {simulationResults && isOnMobile && (
         <Card
           ref={chartRef}
           position="absolute"
@@ -85,7 +87,10 @@ export const Map = ({
           p="10px"
           shadow="none"
         >
-          <Chart response={response} />
+          <Chart
+            trips={simulationResults.trips}
+            simulationType={simulationResults.simulationType}
+          />
         </Card>
       )}
     </>
@@ -94,12 +99,14 @@ export const Map = ({
 
 const MapContent = ({
   isDarkTheme,
-  response,
+  simulationResults: simulationResults,
   stepsCoords,
   alternativeStepsCoords,
 }: MapProps) => {
   const map = useMap();
   const { t } = useTranslation();
+
+  const tripGeometries = simulationResults?.tripGeometries;
 
   const theme = useMemo(
     () => (isDarkTheme ? "dark_all" : "rastertiles/voyager"),
@@ -128,19 +135,19 @@ const MapContent = ({
         url={`https://a.basemaps.cartocdn.com/${theme}/{z}/{x}/{y}@2x.png`}
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
       />
-      {response &&
-        (JSON.parse(response.data.gdf) as Gdf).features.map((feature) => (
-          <React.Fragment key={JSON.stringify(feature.geometry.coordinates)}>
+      {tripGeometries &&
+        tripGeometries.map((tripGeometry) => (
+          <React.Fragment key={JSON.stringify(tripGeometry.coordinates)}>
             <Polyline
-              pathOptions={{ color: feature.properties.colors, opacity: 0.9 }}
-              positions={feature.geometry.coordinates.map((coordinate) => [
+              pathOptions={{ color: tripGeometry.color, opacity: 0.9 }}
+              positions={tripGeometry.coordinates.map((coordinate) => [
                 coordinate[1],
                 coordinate[0],
               ])}
             />
             <Polyline
               pathOptions={{ opacity: 0, weight: 20 }}
-              positions={feature.geometry.coordinates.map((coordinate) => [
+              positions={tripGeometry.coordinates.map((coordinate) => [
                 coordinate[1],
                 coordinate[0],
               ])}
@@ -151,11 +158,10 @@ const MapContent = ({
                     h={2}
                     w={2}
                     borderRadius={2}
-                    bgColor={feature.properties.colors}
+                    bgColor={tripGeometry.color}
                   />
                   <Text>
-                    {t(pathMapper[feature.properties["label"]])} :{" "}
-                    {feature.properties.length}
+                    {t(pathMapper[tripGeometry.label])} : {tripGeometry.length}
                   </Text>
                 </HStack>
               </Tooltip>
@@ -188,21 +194,24 @@ const MapContent = ({
   );
 };
 
-const Legend = ({ response }: { response?: ApiResponse }) => {
+const Legend = ({
+  tripGeometries,
+}: {
+  tripGeometries: SimulationResults["tripGeometries"];
+}) => {
   const { t } = useTranslation();
-  if (!response) return null;
+  const trips = useMemo(
+    () => uniqBy(tripGeometries, (trip) => trip.label),
+    [tripGeometries],
+  );
+
   return (
     <Card display="flex" position="absolute" zIndex={2} top={5} right={5} p={3}>
       <VStack align="start">
-        {uniqBy(
-          (JSON.parse(response.data.gdf) as Gdf).features,
-          (feature) => feature.properties.label,
-        ).map((feature) => (
-          <HStack key={feature.properties.label}>
-            <Box w={5} h={3} backgroundColor={feature.properties.colors} />
-            <Text fontSize="sm">
-              {t(pathMapper[feature.properties["label"]])}
-            </Text>
+        {trips.map((trip) => (
+          <HStack key={trip.label}>
+            <Box w={5} h={3} backgroundColor={trip.color} />
+            <Text fontSize="sm">{t(pathMapper[trip.label])}</Text>
           </HStack>
         ))}
       </VStack>
