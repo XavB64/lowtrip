@@ -24,11 +24,11 @@ import { Step } from "../../types";
 import CityDropdown from "./city-dropdown";
 import { City } from "./types";
 
-interface StepFieldProps {
+type StepFieldProps = {
   removeStep: (index: number) => void;
   updateStep: (index: number, data: Partial<Step>) => void;
   step: Step;
-}
+};
 
 export const StepField = ({ removeStep, updateStep, step }: StepFieldProps) => {
   const [value, setValue] = useState(step.locationName || "");

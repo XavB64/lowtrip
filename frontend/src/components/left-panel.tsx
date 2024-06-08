@@ -27,21 +27,21 @@ import {
   Tabs,
   VStack,
 } from "@chakra-ui/react";
-import { Form } from "./form/form";
-import { Chart } from "./chart";
+import Form from "./form";
+import Chart from "./chart";
 import { useEffect, useState } from "react";
 import { SimulationResults, StepProps } from "../types";
 import { useTranslation } from "react-i18next";
 import Logo from "../assets/lowtrip_logo.png";
 import { checkIsOnMobile } from "../utils";
 
-interface LeftPanelProps {
+type LeftPanelProps = {
   simulationResults?: SimulationResults;
   setSimulationResults: (response: SimulationResults) => void;
   myTripSteps: StepProps;
   alternativeTripSteps: StepProps;
   withLogo?: boolean;
-}
+};
 
 export const LeftPanel = ({
   myTripSteps,

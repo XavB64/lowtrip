@@ -1,6 +1,6 @@
 export const thumbUp = "👍";
 
-export interface Step {
+export type Step = {
   index: number;
   id: string;
   locationName?: string;
@@ -8,14 +8,14 @@ export interface Step {
   transportMean?: Transport;
   passengers?: number | typeof thumbUp;
   options?: FerryOptions;
-}
+};
 
-export interface StepProps {
+export type StepProps = {
   values: Step[];
   addStep: () => void;
   removeStep: (index: number) => void;
   updateStep: (index: number, data: Partial<Step>) => void;
-}
+};
 
 export enum Transport {
   plane = "Plane",
@@ -37,7 +37,7 @@ export enum FerryOptions {
   cabinVehicle = "CabinVehicle",
 }
 
-export interface ApiResponse {
+export type ApiResponse = {
   data: {
     gdf: string;
     my_trip: string;
@@ -45,9 +45,9 @@ export interface ApiResponse {
     alternative_trip?: string;
     error: string;
   };
-}
+};
 
-export interface Gdf {
+export type Gdf = {
   type: string;
   features: {
     id: string;
@@ -55,7 +55,7 @@ export interface Gdf {
     properties: { colors: string; label: string; length: string };
     geometry: { type: string; coordinates: [number, number][] };
   }[];
-}
+};
 
 export type MyTripData = {
   NAME: string;
@@ -65,7 +65,7 @@ export type MyTripData = {
   step: number;
 };
 
-export interface DirectTripData {
+export type DirectTripData = {
   ISO2: string;
   NAME: string;
   EF_tot: number;
@@ -74,7 +74,7 @@ export interface DirectTripData {
   kgCO2eq: number;
   "Mean of Transport": Transport;
   Type: string;
-}
+};
 
 export enum EmissionsCategory {
   infra = "Infra",

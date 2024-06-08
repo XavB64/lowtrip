@@ -5,7 +5,7 @@ import { BiChevronUp } from "react-icons/bi";
 import { LeftPanel } from "../components/left-panel";
 import { useSteps } from "../hooks";
 import { SimulationResults } from "../types";
-import { Map } from "../components/map";
+import Map from "../components/map";
 import { checkIsOnMobile } from "../utils";
 import { CacheProvider, useConsentContext } from "../context";
 

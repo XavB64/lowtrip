@@ -30,32 +30,13 @@ import {
 import { BiSolidPlusCircle } from "react-icons/bi";
 import { API_URL } from "../../config";
 import { ApiResponse, SimulationResults, Step } from "../../types";
-import { formatStepsForApi } from "../../utils";
 import { PrimaryButton } from "../primary-button";
 import { StepField } from "./step-field";
 import ErrorModal from "./error-modal";
 import { useTranslation } from "react-i18next";
-import { stepsAreInvalid, getAdviceTextTranslation } from "./utils";
+import { stepsAreInvalid, getPayload } from "./helpers/utils";
 import { formatResponse } from "../../helpers/formatResponse";
-
-const getPayload = (steps: Step[], stepsToCompare?: Step[]) => {
-  const formData = new FormData();
-  if (stepsToCompare) {
-    formData.append("mode", "2");
-    formData.append(
-      "my-trip",
-      JSON.stringify(formatStepsForApi(stepsToCompare)),
-    );
-    formData.append(
-      "alternative-trip",
-      JSON.stringify(formatStepsForApi(steps)),
-    );
-  } else {
-    formData.append("mode", "1");
-    formData.append("my-trip", JSON.stringify(formatStepsForApi(steps)));
-  }
-  return formData;
-};
+import { getAdviceTextTranslation } from "./helpers/translationHelper";
 
 type FormProps = {
   setSimulationResults: (response: SimulationResults) => void;
@@ -69,7 +50,7 @@ type FormProps = {
   changeTab?: () => void;
 };
 
-export const Form = ({
+const Form = ({
   stepsProps,
   stepsToCompare,
   changeTab,
@@ -214,3 +195,5 @@ export const Form = ({
     </VStack>
   );
 };
+
+export default Form;

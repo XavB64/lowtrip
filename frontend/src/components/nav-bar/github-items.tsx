@@ -15,34 +15,38 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Button, ButtonProps, Spinner } from "@chakra-ui/react";
+import { Button, Link as ChakraLink, Image, MenuItem } from "@chakra-ui/react";
 
-type PrimaryButtonProps = ButtonProps & {
-  onClick?: () => void;
-  isLoading?: boolean;
-  isDisabled?: boolean;
-};
-export const PrimaryButton = ({
-  onClick,
-  isLoading = false,
-  isDisabled = false,
-  ...props
-}: PrimaryButtonProps) => {
-  return (
-    <>
-      <Button
-        onClick={onClick}
-        isDisabled={isLoading || isDisabled}
-        borderRadius="20px"
-        colorScheme="blue"
-        width="100%"
-        height="50px"
-        cursor={isDisabled ? "not-allowed" : "pointer"}
-        whiteSpace="break-spaces"
-        {...props}
-      >
-        {isLoading ? <Spinner /> : props.children}
-      </Button>
-    </>
-  );
-};
+import gitLogo from "../../assets/github.png";
+
+export const GithubItem = () => (
+  <ChakraLink
+    href="https://github.com/XavB64/lowtrip/"
+    h="100%"
+    isExternal
+    alignContent="center"
+  >
+    <Button
+      fontSize={16}
+      color="#fff"
+      variant="ghost"
+      _hover={{ backgroundColor: "none", color: "#D1D1D1" }}
+      _active={{ backgroundColor: "none", color: "#D1D1D1" }}
+    >
+      <Image src={gitLogo} h={{ base: 6, md: "80%" }} />
+    </Button>
+  </ChakraLink>
+);
+
+export const GithubMenuItem = () => (
+  <ChakraLink
+    href="https://github.com/XavB64/lowtrip/"
+    h="100%"
+    isExternal
+    alignContent="center"
+  >
+    <MenuItem>
+      <Image src={gitLogo} h={{ base: 6, md: "80%" }} />
+    </MenuItem>
+  </ChakraLink>
+);

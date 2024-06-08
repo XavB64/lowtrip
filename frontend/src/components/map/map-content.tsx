@@ -15,86 +15,20 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import React, { useEffect, useMemo, useRef } from "react";
+import React, { useEffect, useMemo } from "react";
 import { useTranslation } from "react-i18next";
-import { uniqBy } from "lodash";
-import {
-  MapContainer,
-  Marker,
-  Polyline,
-  TileLayer,
-  Tooltip,
-  useMap,
-} from "react-leaflet";
-import "leaflet/dist/leaflet.css";
-import {
-  Box,
-  Card,
-  HStack,
-  Text,
-  VStack,
-  useBreakpointValue,
-} from "@chakra-ui/react";
+import { Marker, Polyline, TileLayer, Tooltip, useMap } from "react-leaflet";
+import { Box, HStack, Text } from "@chakra-ui/react";
 
-import { markerIcon } from "../assets/marker-icon";
-import { checkIsOnMobile } from "../utils";
-import { SimulationResults } from "../types";
-import { Chart } from "./chart";
+import { markerIcon } from "../../assets/marker-icon";
+import { SimulationResults } from "../../types";
+import { pathMapper } from "./const";
 
-interface MapProps {
+type MapProps = {
   isDarkTheme: boolean;
   simulationResults?: SimulationResults;
   stepsCoords: [number, number][];
   alternativeStepsCoords: [number, number][];
-}
-
-export const Map = ({
-  isDarkTheme,
-  simulationResults,
-  stepsCoords,
-  alternativeStepsCoords,
-}: MapProps) => {
-  const chartRef = useRef<null | HTMLDivElement>(null);
-  const allowScrollToZoom = useBreakpointValue([false, true], { ssr: false });
-  const isOnMobile = checkIsOnMobile();
-
-  return (
-    <>
-      {!isOnMobile && simulationResults && (
-        <Legend tripGeometries={simulationResults.tripGeometries} />
-      )}
-      <MapContainer
-        center={[48, 10]}
-        zoom={5}
-        scrollWheelZoom={allowScrollToZoom}
-        style={{ width: "100%", position: "relative" }}
-      >
-        <MapContent
-          isDarkTheme={isDarkTheme}
-          simulationResults={simulationResults}
-          stepsCoords={stepsCoords}
-          alternativeStepsCoords={alternativeStepsCoords}
-        />
-      </MapContainer>
-      {simulationResults && isOnMobile && (
-        <Card
-          ref={chartRef}
-          position="absolute"
-          w={200}
-          bottom={3}
-          right={3}
-          zIndex={2}
-          p="10px"
-          shadow="none"
-        >
-          <Chart
-            trips={simulationResults.trips}
-            simulationType={simulationResults.simulationType}
-          />
-        </Card>
-      )}
-    </>
-  );
 };
 
 const MapContent = ({
@@ -194,36 +128,4 @@ const MapContent = ({
   );
 };
 
-const Legend = ({
-  tripGeometries,
-}: {
-  tripGeometries: SimulationResults["tripGeometries"];
-}) => {
-  const { t } = useTranslation();
-  const trips = useMemo(
-    () => uniqBy(tripGeometries, (trip) => trip.label),
-    [tripGeometries],
-  );
-
-  return (
-    <Card display="flex" position="absolute" zIndex={2} top={5} right={5} p={3}>
-      <VStack align="start">
-        {trips.map((trip) => (
-          <HStack key={trip.label}>
-            <Box w={5} h={3} backgroundColor={trip.color} />
-            <Text fontSize="sm">{t(pathMapper[trip.label])}</Text>
-          </HStack>
-        ))}
-      </VStack>
-    </Card>
-  );
-};
-
-const pathMapper: Record<string, string> = {
-  Railway: "chart.paths.railway",
-  Road: "chart.paths.road",
-  Bike: "chart.paths.bike",
-  Flight: "chart.paths.flight",
-  Ferry: "chart.paths.ferry",
-  Sail: "chart.paths.sail",
-};
+export default MapContent;
