@@ -1,13 +1,5 @@
 import { TFunction } from "i18next";
-import { Step } from "../../types";
-
-export const stepsAreInvalid = (steps: Step[]) =>
-  steps.some((step, index) => {
-    const isDeparture = index === 0;
-    return !step.locationCoords || (!isDeparture && !step.transportMean);
-  });
-
-// Translation utils
+import { Step } from "../../../types";
 
 const formatMissingParams = (missingParams: string[], t: TFunction) => {
   if (missingParams.length === 0) return "";

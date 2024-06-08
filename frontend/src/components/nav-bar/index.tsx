@@ -18,7 +18,6 @@
 import {
   Box,
   Button,
-  Link as ChakraLink,
   ChakraProvider,
   HStack,
   IconButton,
@@ -36,13 +35,13 @@ import { GiHamburgerMenu } from "react-icons/gi";
 
 import { useTranslation } from "react-i18next";
 import { Link, Outlet } from "react-router-dom";
-import gitLogo from "../../assets/github.png";
 import Logo from "../../assets/lowtrip_logo.png";
 import theme from "../../theme";
 import UserSettingsModal from "./user-settings-modal";
 import UserSettingsSelector from "./user-settings-selector";
 import CookieBanner from "../cookie-banner";
 import { ConsentContextProvider } from "../../context";
+import { GithubItem, GithubMenuItem } from "./github-items";
 
 const navItems = [
   {
@@ -61,38 +60,6 @@ const navItems = [
     label: "methodology",
   },
 ];
-
-const GithubItem = () => (
-  <ChakraLink
-    href="https://github.com/XavB64/lowtrip/"
-    h="100%"
-    isExternal
-    alignContent="center"
-  >
-    <Button
-      fontSize={16}
-      color="#fff"
-      variant="ghost"
-      _hover={{ backgroundColor: "none", color: "#D1D1D1" }}
-      _active={{ backgroundColor: "none", color: "#D1D1D1" }}
-    >
-      <Image src={gitLogo} h={{ base: 6, md: "80%" }} />
-    </Button>
-  </ChakraLink>
-);
-
-const GithubMenuItem = () => (
-  <ChakraLink
-    href="https://github.com/XavB64/lowtrip/"
-    h="100%"
-    isExternal
-    alignContent="center"
-  >
-    <MenuItem>
-      <Image src={gitLogo} h={{ base: 6, md: "80%" }} />
-    </MenuItem>
-  </ChakraLink>
-);
 
 const NavBar = ({
   themeSettings,

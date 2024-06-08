@@ -32,17 +32,16 @@ import {
   Bar,
   BarChart,
   LabelList,
-  LabelProps,
   ResponsiveContainer,
   Tooltip,
   XAxis,
   YAxis,
 } from "recharts";
-import { EmissionsCategory, SimulationType, Transport, Trip } from "../types";
+import { EmissionsCategory, SimulationType, Trip } from "../../types";
 import { useTranslation } from "react-i18next";
-import { TFunction } from "i18next";
-import { NameType } from "recharts/types/component/DefaultTooltipContent";
 import { useMemo } from "react";
+import { getChartData, getLabel } from "./helpers";
+import CustomLabel from "./custom-label";
 
 /**
  * Corresponds to 2kg of CO2 emissions per year per person
@@ -56,7 +55,7 @@ type ChartProps = {
   simulationType: SimulationType;
 };
 
-export const Chart = ({ trips, simulationType }: ChartProps) => {
+const Chart = ({ trips, simulationType }: ChartProps) => {
   const { t } = useTranslation();
   const breakpoint = useBreakpoint();
   const { isOpen, onOpen, onToggle, onClose } = useDisclosure();
@@ -187,101 +186,4 @@ export const Chart = ({ trips, simulationType }: ChartProps) => {
   );
 };
 
-const getChartData = (
-  trips: Trip[],
-  t: TFunction<"translation", undefined>,
-) => {
-  return trips.map((trip) => {
-    const tripEmissionsByStep = trip.steps.reduce(
-      (acc, tripStep) => {
-        tripStep.emissionParts.forEach((emissionPart) => {
-          acc[emissionPart.emissionSource] = emissionPart.emissions;
-        });
-        return acc;
-      },
-      {} as Record<string, number>,
-    );
-
-    return {
-      displayedName: getLabel(trip.label, t),
-      name: trip.label,
-      ...tripEmissionsByStep,
-    };
-  });
-};
-
-type CustomLabelProps = {
-  trip: Trip;
-  isLastEmissionPart: boolean;
-} & LabelProps;
-
-/** Only display the custom label of the last emission part of the trip */
-const CustomLabel = ({
-  trip,
-  isLastEmissionPart,
-  ...props
-}: CustomLabelProps) => {
-  const breakpoint = useBreakpoint();
-
-  const shouldDisplay = trip.label === props.value && isLastEmissionPart;
-  if (!shouldDisplay) return null;
-
-  return (
-    <>
-      <text
-        x={Number(props.x ?? 0) + Number(props.width ?? 0) / 2}
-        y={Number(props.y ?? 0) - (breakpoint === "base" ? 15 : 20)}
-        textAnchor="middle"
-        fontSize={breakpoint === "base" ? 10 : 16}
-      >
-        {round(trip.totalEmissions)}
-      </text>
-      <text
-        x={Number(props.x ?? 0) + Number(props.width ?? 0) / 2}
-        y={Number(props.y ?? 0) - 5}
-        textAnchor="middle"
-        fontSize={breakpoint === "base" ? 8 : 12}
-      >
-        kgCO2eq
-      </text>
-    </>
-  );
-};
-
-const transportMeansMapper: Record<Transport | string, string> = {
-  [Transport.plane]: "chart.transportMeans.plane",
-  [Transport.car]: "chart.transportMeans.car",
-  [Transport.ecar]: "chart.transportMeans.ecar",
-  [Transport.bus]: "chart.transportMeans.bus",
-  [Transport.train]: "chart.transportMeans.train",
-  [Transport.ferry]: "chart.transportMeans.ferry",
-  [Transport.bicycle]: "chart.transportMeans.bicycle",
-  [Transport.sail]: "chart.transportMeans.sail",
-  [Transport.myTrip]: "chart.transportMeans.myTrip",
-  [Transport.otherTrip]: "chart.transportMeans.otherTrip",
-};
-
-function getLabel(name: NameType, t: TFunction<"translation", undefined>) {
-  return name
-    .toString()
-    .split(" ")
-    .map((substring) => {
-      const transport = transportMeansMapper[substring];
-      const category = categoryMapper[substring];
-      return t(transport ?? category ?? substring);
-    })
-    .join(" ");
-}
-
-const categoryMapper: Record<EmissionsCategory | string, string> = {
-  [EmissionsCategory.infra]: "chart.category.infra",
-  [EmissionsCategory.construction]: "chart.category.construction",
-  [EmissionsCategory.fuel]: "chart.category.fuel",
-  [EmissionsCategory.kerosene]: "chart.category.kerosene",
-  [EmissionsCategory.contrails]: "chart.category.contrails",
-  [EmissionsCategory.bikeBuild]: "chart.category.bikeBuild",
-  [EmissionsCategory.none]: "form.ferryNone",
-  [EmissionsCategory.cabin]: "form.ferryCabin",
-  [EmissionsCategory.vehicle]: "form.ferryVehicle",
-  [EmissionsCategory.cabinvehicle]: "form.ferryCabinVehicle",
-};
+export default Chart;
