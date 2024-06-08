@@ -4,7 +4,7 @@ import { BiChevronUp } from "react-icons/bi";
 
 import { LeftPanel } from "../components/left-panel";
 import { useSteps } from "../hooks";
-import { ApiResponse } from "../types";
+import { SimulationResults } from "../types";
 import { Map } from "../components/map";
 import { checkIsOnMobile } from "../utils";
 import { CacheProvider, useConsentContext } from "../context";
@@ -17,7 +17,8 @@ const MainView = ({
   withLogo?: boolean;
 }) => {
   const { consentGiven } = useConsentContext();
-  const [response, setResponse] = useState<ApiResponse>();
+  const [simulationResults, setSimulationResults] =
+    useState<SimulationResults>();
   const myTripSteps = useSteps();
   const alternativeTripSteps = useSteps();
 
@@ -27,8 +28,8 @@ const MainView = ({
     <CacheProvider>
       <Stack direction={["column", "row"]} width="100%">
         <LeftPanel
-          response={response}
-          setResponse={setResponse}
+          simulationResults={simulationResults}
+          setSimulationResults={setSimulationResults}
           myTripSteps={myTripSteps}
           alternativeTripSteps={alternativeTripSteps}
           withLogo={withLogo}
@@ -41,7 +42,7 @@ const MainView = ({
         >
           <Map
             isDarkTheme={isDarkTheme}
-            response={response}
+            simulationResults={simulationResults}
             stepsCoords={
               myTripSteps.values
                 .filter((step) => !!step.locationCoords)

@@ -30,25 +30,25 @@ import {
 import { Form } from "./form/form";
 import { Chart } from "./chart";
 import { useEffect, useState } from "react";
-import { ApiResponse, StepProps } from "../types";
+import { SimulationResults, StepProps } from "../types";
 import { useTranslation } from "react-i18next";
 import Logo from "../assets/lowtrip_logo.png";
 import { checkIsOnMobile } from "../utils";
 
 interface LeftPanelProps {
-  response?: ApiResponse;
-  setResponse: (response: ApiResponse) => void;
+  simulationResults?: SimulationResults;
+  setSimulationResults: (response: SimulationResults) => void;
   myTripSteps: StepProps;
   alternativeTripSteps: StepProps;
   withLogo?: boolean;
 }
 
 export const LeftPanel = ({
-  response,
-  setResponse,
   myTripSteps,
   alternativeTripSteps,
   withLogo,
+  simulationResults,
+  setSimulationResults,
 }: LeftPanelProps) => {
   const { t } = useTranslation();
   const [tabIndex, setTabIndex] = useState(0);
@@ -70,8 +70,8 @@ export const LeftPanel = ({
         });
     };
 
-    if (response) scrollToChart();
-  }, [response]);
+    if (simulationResults) scrollToChart();
+  }, [simulationResults]);
 
   return (
     <VStack
@@ -117,7 +117,7 @@ export const LeftPanel = ({
             <TabPanel padding={0}>
               <Form
                 key="main-form"
-                setResponse={setResponse}
+                setSimulationResults={setSimulationResults}
                 stepsProps={myTripSteps}
                 changeTab={() => setTabIndex((tabIndex + 1) % 2)}
               />
@@ -125,14 +125,14 @@ export const LeftPanel = ({
             <TabPanel padding={0}>
               <Form
                 key="alternative-form"
-                setResponse={setResponse}
+                setSimulationResults={setSimulationResults}
                 stepsProps={alternativeTripSteps}
                 stepsToCompare={myTripSteps.values}
               />
             </TabPanel>
           </TabPanels>
         </Tabs>
-        {response && !isOnMobile && (
+        {simulationResults && !isOnMobile && (
           <Card
             position="static"
             w="100%"
@@ -142,7 +142,10 @@ export const LeftPanel = ({
             p="10px"
             shadow="none"
           >
-            <Chart response={response} />
+            <Chart
+              trips={simulationResults.trips}
+              simulationType={simulationResults.simulationType}
+            />
           </Card>
         )}
       </VStack>

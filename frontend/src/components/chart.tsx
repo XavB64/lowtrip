@@ -26,7 +26,7 @@ import {
   AlertIcon,
   Link,
 } from "@chakra-ui/react";
-import { round, sumBy, uniq, uniqBy } from "lodash";
+import { round } from "lodash";
 import { BiHelpCircle } from "react-icons/bi";
 import {
   Bar,
@@ -38,42 +38,64 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { ApiResponse, EmissionsCategory, Transport, TripData } from "../types";
+import { EmissionsCategory, SimulationType, Transport, Trip } from "../types";
 import { useTranslation } from "react-i18next";
 import { TFunction } from "i18next";
 import { NameType } from "recharts/types/component/DefaultTooltipContent";
+import { useMemo } from "react";
 
-interface ChartProps {
-  response?: ApiResponse;
-}
+/**
+ * Corresponds to 2kg of CO2 emissions per year per person
+ * in order to limit global warming to 1.5°C
+ * See Paris Agreement and IPCC report
+ */
+const ANNUAL_CO2_EMISSIONS_BUDGET = 2000;
 
-export const Chart = ({ response }: ChartProps) => {
+type ChartProps = {
+  trips: Trip[];
+  simulationType: SimulationType;
+};
+
+export const Chart = ({ trips, simulationType }: ChartProps) => {
   const { t } = useTranslation();
   const breakpoint = useBreakpoint();
   const { isOpen, onOpen, onToggle, onClose } = useDisclosure();
 
-  if (!response) return null;
+  const mainTrip = trips.find((trip) => trip.isMainTrip) as Trip;
 
-  const trips: TripData[] = [
-    ...JSON.parse(response.data.my_trip ?? {}),
-    ...(response.data.direct_trip ? JSON.parse(response.data.direct_trip) : []),
-    ...(response.data.alternative_trip
-      ? JSON.parse(response.data.alternative_trip)
-      : []),
-  ];
-  const myTripEmissions = sumBy(
-    JSON.parse(response.data.my_trip ?? {}) as TripData[],
-    (trip) => trip.kgCO2eq,
+  const chartTitle = useMemo(() => {
+    if (simulationType === "mainTripVsOtherTrip") {
+      return t("results.vsOtherTrip");
+    }
+    if (simulationType === "mainTripVsOtherTransportMeans") {
+      return t("results.vsOtherMeans");
+    }
+    return t("results.yourTripEmissions");
+  }, [simulationType, t]);
+
+  const chartData = useMemo(() => getChartData(trips, t), [trips, t]);
+
+  const emissionPartsByTrip = trips.reduce(
+    (result, trip) => {
+      const emissionParts = trip.steps.flatMap((step) =>
+        step.emissionParts.map((emissionPart) => ({
+          color: emissionPart.color,
+          emissionSource: emissionPart.emissionSource,
+        })),
+      );
+      result.push({ trip, emissionParts });
+      return result;
+    },
+    [] as {
+      trip: Trip;
+      emissionParts: { color: string; emissionSource: EmissionsCategory }[];
+    }[],
   );
 
   return (
     <Box h="100%" w="100%">
       <Text mr={3} align="center" color="#595959" fontSize={["small", "large"]}>
-        {response.data.alternative_trip
-          ? t("results.vsOtherTrip")
-          : response.data.direct_trip
-            ? t("results.vsOtherMeans")
-            : t("results.yourTripEmissions")}
+        {chartTitle}
       </Text>
       <Alert
         status="info"
@@ -85,7 +107,12 @@ export const Chart = ({ response }: ChartProps) => {
         <AlertIcon boxSize={[4, 5]} />
         <Text>
           {t("chart.information.info1")}{" "}
-          <Text as="b">{round((myTripEmissions * 100) / 2000)}%</Text>{" "}
+          <Text as="b">
+            {round(
+              (mainTrip.totalEmissions / ANNUAL_CO2_EMISSIONS_BUDGET) * 100,
+            )}
+            %
+          </Text>{" "}
           {t("chart.information.your")}{" "}
           <Link
             href={t("chart.information.link")}
@@ -97,16 +124,17 @@ export const Chart = ({ response }: ChartProps) => {
           {t("chart.information.info3")}
         </Text>
       </Alert>
+
       <ResponsiveContainer
-        height={breakpoint === "base" ? 230 : 350}
+        height={breakpoint === "base" ? 230 : 400}
         width="100%"
       >
-        <BarChart data={getChartData(trips, t)} margin={{ bottom: 0 }}>
+        <BarChart data={chartData} margin={{ bottom: 0 }}>
           <XAxis
             dataKey="displayedName"
             fontSize={breakpoint === "base" ? 8 : 14}
           />
-          <YAxis padding={{ top: 30 }} hide />
+          <YAxis padding={{ top: 50 }} hide />
           <Tooltip
             formatter={(value, name) => [
               `${round(Number(value), 0)} kg`,
@@ -114,19 +142,26 @@ export const Chart = ({ response }: ChartProps) => {
             ]}
             contentStyle={{ fontSize: "12px" }}
           />
-          {uniqBy(trips, "NAME").map((trip) => (
-            <Bar
-              key={trip.NAME}
-              dataKey={trip.NAME}
-              fill={trip.colors}
-              stackId="a"
-            >
-              <LabelList
-                dataKey="name"
-                content={<CustomLabel trips={trips} tripName={trip.NAME} />}
-              />
-            </Bar>
-          ))}
+          {emissionPartsByTrip.map(({ trip, emissionParts }) =>
+            emissionParts.map((emissionPart, index) => (
+              <Bar
+                key={emissionPart.emissionSource}
+                dataKey={emissionPart.emissionSource}
+                fill={emissionPart.color}
+                stackId="a"
+              >
+                <LabelList
+                  dataKey="name"
+                  content={
+                    <CustomLabel
+                      trip={trip}
+                      isLastEmissionPart={index === emissionParts.length - 1}
+                    />
+                  }
+                />
+              </Bar>
+            )),
+          )}
         </BarChart>
       </ResponsiveContainer>
 
@@ -152,43 +187,43 @@ export const Chart = ({ response }: ChartProps) => {
   );
 };
 
-function getChartData(
-  trips: TripData[],
+const getChartData = (
+  trips: Trip[],
   t: TFunction<"translation", undefined>,
-) {
-  const transports = uniq(
-    trips.map((tripData) => tripData["Mean of Transport"]),
-  );
+) => {
+  return trips.map((trip) => {
+    const tripEmissionsByStep = trip.steps.reduce(
+      (acc, tripStep) => {
+        tripStep.emissionParts.forEach((emissionPart) => {
+          acc[emissionPart.emissionSource] = emissionPart.emissions;
+        });
+        return acc;
+      },
+      {} as Record<string, number>,
+    );
 
-  return transports.map((transport) => {
-    const result: { [key: string]: string | number } = {
-      name: transport,
-      displayedName: getLabel(transport, t),
+    return {
+      displayedName: getLabel(trip.label, t),
+      name: trip.label,
+      ...tripEmissionsByStep,
     };
-    if ((transport as string) === "Alternative") {
-      result.displayedName = "Other";
-    }
-    trips.forEach((trip) => {
-      if (trip["Mean of Transport"] === transport)
-        result[trip.NAME] = trip.kgCO2eq;
-    });
-    return result;
   });
-}
+};
 
-interface CustomLabelProps extends LabelProps {
-  trips: TripData[];
-  tripName: string;
-}
+type CustomLabelProps = {
+  trip: Trip;
+  isLastEmissionPart: boolean;
+} & LabelProps;
 
-const CustomLabel = ({ trips, tripName, ...props }: CustomLabelProps) => {
+/** Only display the custom label of the last emission part of the trip */
+const CustomLabel = ({
+  trip,
+  isLastEmissionPart,
+  ...props
+}: CustomLabelProps) => {
   const breakpoint = useBreakpoint();
-  const currentTrips = trips.filter(
-    (trip) => trip["Mean of Transport"] === props.value,
-  );
-  const total = sumBy(currentTrips, "kgCO2eq");
-  const shouldDisplay = currentTrips[currentTrips.length - 1].NAME === tripName;
 
+  const shouldDisplay = trip.label === props.value && isLastEmissionPart;
   if (!shouldDisplay) return null;
 
   return (
@@ -199,7 +234,7 @@ const CustomLabel = ({ trips, tripName, ...props }: CustomLabelProps) => {
         textAnchor="middle"
         fontSize={breakpoint === "base" ? 10 : 16}
       >
-        {round(total)}
+        {round(trip.totalEmissions)}
       </text>
       <text
         x={Number(props.x ?? 0) + Number(props.width ?? 0) / 2}

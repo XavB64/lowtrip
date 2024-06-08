@@ -7,6 +7,8 @@ export const stepsAreInvalid = (steps: Step[]) =>
     return !step.locationCoords || (!isDeparture && !step.transportMean);
   });
 
+// Translation utils
+
 const formatMissingParams = (missingParams: string[], t: TFunction) => {
   if (missingParams.length === 0) return "";
   if (missingParams.length === 1) return missingParams[0];
