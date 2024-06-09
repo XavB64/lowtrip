@@ -1,0 +1,74 @@
+name: backend
+
+on:
+  pull_request:
+  workflow_dispatch:
+  merge_group:
+    types: [checks_requested]
+  push:
+    branches:
+      - main
+
+jobs:
+  check_backend_style:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Sort python imports
+        uses: isort/isort-action@v1
+        with:
+          sort-paths: './backend'
+
+      - name: Show python linter fixes
+        uses: chartboost/ruff-action@v1
+        with:
+          src: './backend'
+          args: 'check --fix --diff'
+
+      - name: Show remaining python linter violations
+        uses: chartboost/ruff-action@v1
+        with:
+          src: './backend'
+          args: 'check --fix --show-fixes'
+
+      - name: Format Python code
+        uses: chartboost/ruff-action@v1
+        with:
+          src: './backend'
+          args: 'format --preview --check --diff'
+
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+        working-directory: ./backend
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11.7'
+
+      - name: Install dependencies
+        run: |
+          python -m venv lowtrip-venv
+          source lowtrip-venv/bin/activate
+          pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Build and run with Gunicorn
+        run: |
+          source lowtrip-venv/bin/activate
+          gunicorn app:app --bind 0.0.0.0:8000 --daemon
+          sleep 10
+          curl -f http://localhost:8000
+
+      - name: Stop Gunicorn
+        run: |
+          pkill gunicorn
