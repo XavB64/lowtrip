@@ -26,12 +26,12 @@ from flask import (
 from flask_cors import CORS  # comment this on deployment
 import pandas as pd
 
-from .backend import (
+from backend import (
     chart_refactor,
     compute_emissions_all,
     compute_emissions_custom,
 )
-from .parameters import colors_alternative
+from parameters import colors_alternative
 
 
 warnings.filterwarnings("ignore")
