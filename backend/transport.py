@@ -22,7 +22,7 @@ import numpy as np
 import pandas as pd
 from pyproj import Geod
 
-from .parameters import (
+from parameters import (
     cont_coeff,
     detour,
     EF_bicycle,
@@ -37,7 +37,7 @@ from .parameters import (
     search_perimeter,
     val_perimeter,
 )
-from .utils import (
+from utils import (
     extend_search,
     filter_countries_world,
     find_bicycle,

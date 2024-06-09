@@ -27,12 +27,12 @@ from pyproj import Geod
 # Geometry
 from shapely.geometry import LineString
 
-from .parameters import (
+from parameters import (
     colors_custom,
     colors_direct,
     min_plane_dist,
 )
-from .transport import (
+from transport import (
     bicycle_to_gdf,
     bus_to_gdf,
     car_bus_to_gdf,

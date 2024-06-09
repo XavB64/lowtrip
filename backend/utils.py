@@ -39,7 +39,7 @@ from shapely.geometry import (
 )
 from shapely.ops import nearest_points, unary_union
 
-from .parameters import (
+from parameters import (
     carbon_intensity_electricity,
     nb_pts,
     route_s,
