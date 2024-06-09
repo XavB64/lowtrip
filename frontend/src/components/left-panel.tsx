@@ -70,7 +70,8 @@ export const LeftPanel = ({
         });
     };
 
-    if (simulationResults) scrollToChart();
+    // wait for the chart to render before scrolling
+    if (simulationResults) setTimeout(() => scrollToChart(), 200);
   }, [simulationResults]);
 
   return (
