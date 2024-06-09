@@ -1,7 +1,7 @@
 
-<img src="https://github.com/XavB64/lowtrip/blob/main/frontend/src/assets/lowtrip_color.png" alt="lowtrip" width="400"/>
+<img src="./frontend/src/assets/lowtrip_color.png" alt="lowtrip" width="400"/>
 
-## a web app to compute travel CO2eq for different means of transport worldwide
+# a web app to compute travel CO2eq for different means of transport worldwide
 
 The work presented here is independent and not-for-profit. This work has been carried out on a
 voluntary basis.
@@ -11,7 +11,9 @@ transport and each journey. These results enable users to make informed choices 
 reducing their greenhouse gas emissions to mitigate climate change. To put these results into context, total net yearly
 per-capita emissions should not exceed 2 tons CO2eq in 2050 to limit global warming below +2°C.
 
-## How the emissions are calculated?
+You can have a look at https://lowtrip.fr/.
+
+# How the emissions are calculated?
 
 To calculate CO2 equivalent emissions per person, we multiply the distance of a journey (km) by the corresponding emission factor (mass of CO2 equivalent per person per km) of a mean of transport. For a mutlistep journey, these emissions are summed over the different steps:
 
@@ -53,7 +55,7 @@ Emissions factors consider usage (linked to the manufacture and use of energy to
 
 All assumptions, data and sources used are available in the [methodology](https://github.com/XavB64/lowtrip/blob/main/frontend/src/assets/lowtrip_methodology.pdf) document.
 
-## How to launch the app?
+# How to launch the app?
 
 ### Prerequisites
 
@@ -61,44 +63,39 @@ Have python & node installed
 
 ### Launch the backend
 
-Go in backend folder :
-
 ```bash
 cd backend
-```
 
-Install the dependencies :
+# create a python environment and activate it
+python -m venv lowtrip-venv
+source lowtrip-venv/bin/activate
 
-```bash
+# install the dependencies
 pip install -r requirements.txt
+
+# launch the app
+gunicorn app:app
 ```
 
-Launch :
-
+You can format the code with ruff:
 ```bash
-gunicorn app:app
+pip install ruff
+ruff format
 ```
 
 ### Launch the frontend
 
-Go in frontend folder :
 
 ```bash
 cd frontend
-```
 
-Install the dependencies :
-
-```bash
+# install the dependencies
 npm install
-```
 
-Launch :
-
-```bash
+# launch the app
 npm start
 ```
 
-## How to cite this work ?
+# How to cite this work ?
 
 *Bonnemaizon, Xavier, Ni, Clara, Gres, Paola & Pellas, Chiara. lowtrip (2024). https://lowtrip.fr*
