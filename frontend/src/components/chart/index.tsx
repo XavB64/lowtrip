@@ -100,7 +100,7 @@ const Chart = ({ trips, simulationType }: ChartProps) => {
         status="info"
         my={3}
         borderRadius={5}
-        fontSize={[8, 12]}
+        fontSize={[10, 12]}
         p={[2, 3]}
       >
         <AlertIcon boxSize={[4, 5]} />
@@ -168,9 +168,9 @@ const Chart = ({ trips, simulationType }: ChartProps) => {
         <ChakraTooltip
           label={t("results.explanation")}
           isOpen={isOpen}
-          fontSize={10}
+          fontSize={breakpoint === "base" ? 11 : 12}
         >
-          <span style={{ fontSize: breakpoint === "base" ? 8 : 12 }}>
+          <span style={{ fontSize: breakpoint === "base" ? 10 : 12 }}>
             {" "}
             {t("chart.help")}
             <BiHelpCircle
