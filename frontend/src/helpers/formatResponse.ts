@@ -174,7 +174,10 @@ export const formatResponse = (
           tripGeometry.label === feature.properties.label &&
           tripGeometry.length === feature.properties.length,
       );
-      if (!duplicatedElement) {
+      if (
+        !duplicatedElement ||
+        ["Ferry", "Sail"].includes(feature.properties.label)
+      ) {
         const newGeometry = {
           label: feature.properties.label,
           length: feature.properties.length,
