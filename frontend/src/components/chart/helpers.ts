@@ -15,7 +15,6 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { NameType } from "recharts/types/component/DefaultTooltipContent";
 import { EmissionsCategory, Transport, Trip } from "../../types";
 import { TFunction } from "i18next";
 
@@ -46,11 +45,24 @@ const categoryMapper: Record<EmissionsCategory | string, string> = {
 };
 
 export const getLabel = (
-  name: NameType,
+  name: string,
   t: TFunction<"translation", undefined>,
 ) => {
+  if (name.includes("Direct trip")) {
+    const nameParts = name.split(" ");
+    if (nameParts.length < 3) {
+      console.error("Failed to parse trip name: ", name);
+      return name;
+    }
+    const transport = nameParts[2] as Transport;
+    if ([Transport.car, Transport.ecar].includes(transport)) {
+      return `${t("chart.transportMeans.car")} ${nameParts[3]}`;
+    }
+
+    return t(transportMeansMapper[transport]);
+  }
+
   return name
-    .toString()
     .split(" ")
     .map((substring) => {
       const transport = transportMeansMapper[substring];

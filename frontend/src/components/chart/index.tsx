@@ -26,7 +26,7 @@ import {
   AlertIcon,
   Link,
 } from "@chakra-ui/react";
-import { round } from "lodash";
+import { round, uniqBy } from "lodash";
 import { BiHelpCircle } from "react-icons/bi";
 import {
   Bar,
@@ -91,6 +91,22 @@ const Chart = ({ trips, simulationType }: ChartProps) => {
     }[],
   );
 
+  const bars = useMemo(
+    () =>
+      uniqBy(
+        trips.flatMap((trip) =>
+          trip.steps.flatMap((step) =>
+            step.emissionParts.flatMap((emissionPart) => ({
+              color: emissionPart.color,
+              emissionSource: emissionPart.emissionSource,
+            })),
+          ),
+        ),
+        "emissionSource",
+      ),
+    [trips],
+  );
+
   return (
     <Box h="100%" w="100%">
       <Text mr={3} align="center" color="#595959" fontSize={["small", "large"]}>
@@ -135,32 +151,30 @@ const Chart = ({ trips, simulationType }: ChartProps) => {
           />
           <YAxis padding={{ top: 50 }} hide />
           <Tooltip
-            formatter={(value, name) => [
+            formatter={(value, name: string) => [
               `${round(Number(value), 0)} kg`,
               getLabel(name, t),
             ]}
             contentStyle={{ fontSize: "12px" }}
           />
-          {emissionPartsByTrip.map(({ trip, emissionParts }) =>
-            emissionParts.map((emissionPart, index) => (
-              <Bar
-                key={emissionPart.emissionSource}
-                dataKey={emissionPart.emissionSource}
-                fill={emissionPart.color}
-                stackId="a"
-              >
-                <LabelList
-                  dataKey="name"
-                  content={
-                    <CustomLabel
-                      trip={trip}
-                      isLastEmissionPart={index === emissionParts.length - 1}
-                    />
-                  }
-                />
-              </Bar>
-            )),
-          )}
+          {bars.map((emissionPart, index) => (
+            <Bar
+              key={emissionPart.emissionSource}
+              dataKey={emissionPart.emissionSource}
+              fill={emissionPart.color}
+              stackId="a"
+            >
+              <LabelList
+                dataKey="name"
+                content={
+                  <CustomLabel
+                    emissionPartsByTrip={emissionPartsByTrip}
+                    index={index}
+                  />
+                }
+              />
+            </Bar>
+          ))}
         </BarChart>
       </ResponsiveContainer>
 
