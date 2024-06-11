@@ -287,6 +287,7 @@ def compute_emissions_all(data, cmap=colors_direct):
         geo.append(geo_train)
 
     # Car or Bus
+    route_added = False
     if car or bus:
         if transp == "eCar":  # we use custom colors
             cmap_road = colors_custom
@@ -304,7 +305,6 @@ def compute_emissions_all(data, cmap=colors_direct):
         if car:
             l_data.append(data_car)
         # If we have a result for car and bus :
-        route_added = False
         if route:  # Adapt and add ecar
             # We check if car or bus was asked for a 1 step
             if car and bus and transp != "eCar":
@@ -335,7 +335,7 @@ def compute_emissions_all(data, cmap=colors_direct):
     else:
         # Data for bar chart
         data = pd.concat(l_data).reset_index(drop=True)
-        if route and not route_added and not train and not plane:
+        if not route_added and not train and not plane:
             geodata = pd.DataFrame()
         else:
             geodata = gpd.GeoDataFrame(
