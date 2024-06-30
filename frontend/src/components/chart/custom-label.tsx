@@ -25,13 +25,13 @@ type CustomLabelProps = {
     trip: Trip;
     emissionParts: { color: string; emissionSource: EmissionsCategory }[];
   }[];
-  index: number;
+  emissionSource: EmissionsCategory;
 } & LabelProps;
 
 /** Only display the custom label of the last emission part of the trip */
 const CustomLabel = ({
   emissionPartsByTrip,
-  index,
+  emissionSource,
   ...props
 }: CustomLabelProps) => {
   const breakpoint = useBreakpoint();
@@ -43,7 +43,8 @@ const CustomLabel = ({
     emissionParts: { color: string; emissionSource: EmissionsCategory }[];
   };
 
-  const shouldDisplay = index === emissionParts.length - 1;
+  const shouldDisplay =
+    emissionParts.slice(-1)[0].emissionSource === emissionSource;
   if (!shouldDisplay) return null;
 
   return (

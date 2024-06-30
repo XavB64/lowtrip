@@ -157,7 +157,7 @@ const Chart = ({ trips, simulationType }: ChartProps) => {
             ]}
             contentStyle={{ fontSize: "12px" }}
           />
-          {bars.map((emissionPart, index) => (
+          {bars.map((emissionPart) => (
             <Bar
               key={emissionPart.emissionSource}
               dataKey={emissionPart.emissionSource}
@@ -169,7 +169,7 @@ const Chart = ({ trips, simulationType }: ChartProps) => {
                 content={
                   <CustomLabel
                     emissionPartsByTrip={emissionPartsByTrip}
-                    index={index}
+                    emissionSource={emissionPart.emissionSource}
                   />
                 }
               />
