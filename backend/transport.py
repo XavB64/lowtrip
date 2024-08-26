@@ -479,8 +479,8 @@ def plane_to_gdf(
             bird * non_CO2_factors,
         ],
         "EF_tot": [
-            non_combustion_factors,
-            combustion_factor * contrails,
+            CO2_factors,
+            non_CO2_factors,
         ],
         "colors": [color_usage, color_cont],
         "NAME": ["Kerosene", "Contrails"],
