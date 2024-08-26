@@ -470,7 +470,7 @@ def plane_to_gdf(
     bird *= detour
 
     emissions_factors = EF_plane[trip_category]
-    CO2_factors = emissions_factors["combustion"] +  emissions_factors["upstream"]
+    CO2_factors = emissions_factors["combustion"] + emissions_factors["upstream"]
     non_CO2_factors = emissions_factors["combustion"] * contrails
 
     data_plane = pd.DataFrame({
