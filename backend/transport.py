@@ -63,7 +63,7 @@ def bicycle_to_gdf(tag1, tag2, EF=EF_bicycle, color="#ffffff", validate=val_peri
         - full dataframe for bike
 
     """
-    ### Route OSRM - create a separate function
+    # Route OSRM - create a separate function
     geom_route, route, route_dist = find_bicycle(tag1, tag2)
 
     # Validation part for route
@@ -184,7 +184,7 @@ def ecar_to_gdf(
         - full dataframe for trains.
 
     """
-    ### Route OSRM - create a separate function
+    # Route OSRM - create a separate function
     geom_route, route_dist, route = find_route(tag1, tag2)
 
     # Validation part for route
@@ -266,7 +266,7 @@ def car_bus_to_gdf(
         - full dataframe for car and bus, geometry only on car
 
     """
-    ### Route OSRM - create a separate function
+    # Route OSRM - create a separate function
     geom_route, route_dist, route = find_route(tag1, tag2)
 
     # Validation part for route
@@ -333,7 +333,7 @@ def bus_to_gdf(
         - full dataframe for bus
 
     """
-    ### Route OSRM - create a separate function
+    # Route OSRM - create a separate function
     geom_route, route_dist, route = find_route(tag1, tag2)
 
     # Validation part for route
@@ -390,7 +390,7 @@ def car_to_gdf(
         - full dataframe for car
 
     """
-    ### Route OSRM - create a separate function
+    # Route OSRM - create a separate function
     geom_route, route_dist, route = find_route(tag1, tag2)
     if nb != "👍":
         nb = int(nb)
@@ -469,14 +469,18 @@ def plane_to_gdf(
     # detour_coeffient
     bird *= detour
 
+    emissions_factors = EF_plane[trip_category]
+    CO2_factors = emissions_factors["combustion"] + emissions_factors["upstream"]
+    non_CO2_factors = emissions_factors["combustion"] * contrails
+
     data_plane = pd.DataFrame({
         "kgCO2eq": [
-            bird * np.sum(list(EF_plane[trip_category].values())[1:3]) + holding,
-            bird * EF_plane[trip_category]["combustion"] * contrails,
+            bird * CO2_factors + holding,
+            bird * non_CO2_factors,
         ],
         "EF_tot": [
-            np.sum(list(EF_plane[trip_category].values())[1:3]),
-            EF_plane[trip_category]["combustion"] * contrails,
+            CO2_factors,
+            non_CO2_factors,
         ],
         "colors": [color_usage, color_cont],
         "NAME": ["Kerosene", "Contrails"],
