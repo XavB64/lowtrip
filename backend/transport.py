@@ -18,7 +18,6 @@
 # Need for ferry if straight line
 # from shapely.geometry import LineString
 import geopandas as gpd
-import numpy as np
 import pandas as pd
 from pyproj import Geod
 
