@@ -77,6 +77,8 @@ preview = true
 [tool.ruff.lint]
 preview = true
 ignore = [
+    "DOC201", # Checks for functions with explicit returns missing a "returns" section in their docstring.
+    "C409", # Checks for tuple calls that take unnecessary list or tuple literals as arguments. In preview, this also includes unnecessary list comprehensions within tuple calls.
     # Typing issues
     "ANN001",  # Missing type annotation for function argument `EF_bus`
     "ANN201",  # Missing return type annotation for public function `bicycle_to_gdf`
