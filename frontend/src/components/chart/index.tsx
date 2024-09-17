@@ -42,6 +42,7 @@ import { useTranslation } from "react-i18next";
 import { useMemo } from "react";
 import { getChartData, getLabel } from "./helpers";
 import CustomLabel from "./custom-label";
+import { generateUrlToShare } from "../../helpers/generateUrlToShare";
 
 /**
  * Corresponds to 2kg of CO2 emissions per year per person
@@ -80,7 +81,7 @@ const Chart = ({ trips, simulationType }: ChartProps) => {
         step.emissionParts.map((emissionPart) => ({
           color: emissionPart.color,
           emissionSource: emissionPart.emissionSource,
-        })),
+        }))
       );
       result.push({ trip, emissionParts });
       return result;
@@ -88,7 +89,7 @@ const Chart = ({ trips, simulationType }: ChartProps) => {
     [] as {
       trip: Trip;
       emissionParts: { color: string; emissionSource: EmissionsCategory }[];
-    }[],
+    }[]
   );
 
   const bars = useMemo(
@@ -99,12 +100,12 @@ const Chart = ({ trips, simulationType }: ChartProps) => {
             step.emissionParts.flatMap((emissionPart) => ({
               color: emissionPart.color,
               emissionSource: emissionPart.emissionSource,
-            })),
-          ),
+            }))
+          )
         ),
-        "emissionSource",
+        "emissionSource"
       ),
-    [trips],
+    [trips]
   );
 
   return (
@@ -124,7 +125,7 @@ const Chart = ({ trips, simulationType }: ChartProps) => {
           {t("chart.information.info1")}{" "}
           <Text as="b">
             {round(
-              (mainTrip.totalEmissions / ANNUAL_CO2_EMISSIONS_BUDGET) * 100,
+              (mainTrip.totalEmissions / ANNUAL_CO2_EMISSIONS_BUDGET) * 100
             )}
             %
           </Text>{" "}

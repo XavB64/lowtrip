@@ -1,6 +1,7 @@
 import { Box, IconButton, Stack } from "@chakra-ui/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { BiChevronUp } from "react-icons/bi";
+import { useSearchParams } from "react-router-dom";
 
 import { LeftPanel } from "../components/left-panel";
 import { useSteps } from "../hooks";
@@ -23,6 +24,13 @@ const MainView = ({
   const alternativeTripSteps = useSteps();
 
   const isOnMobile = checkIsOnMobile();
+
+  const [searchParams] = useSearchParams();
+
+  useEffect(() => {
+    const mainTrip = searchParams.get("main-trip");
+    if (mainTrip) console.log(JSON.parse(mainTrip));
+  }, [searchParams]);
 
   return (
     <CacheProvider>

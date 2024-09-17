@@ -19,6 +19,7 @@ import {
   Card,
   Center,
   Heading,
+  IconButton,
   Image,
   Tab,
   TabList,
@@ -27,6 +28,7 @@ import {
   Tabs,
   VStack,
 } from "@chakra-ui/react";
+import { FaShareAlt } from "react-icons/fa";
 import Form from "./form";
 import Chart from "./chart";
 import { useEffect, useState } from "react";
@@ -34,6 +36,7 @@ import { SimulationResults, StepProps } from "../types";
 import { useTranslation } from "react-i18next";
 import Logo from "../assets/lowtrip_logo.png";
 import { checkIsOnMobile } from "../utils";
+import { generateUrlToShare } from "../helpers/generateUrlToShare";
 
 type LeftPanelProps = {
   simulationResults?: SimulationResults;
@@ -134,20 +137,33 @@ export const LeftPanel = ({
           </TabPanels>
         </Tabs>
         {simulationResults && !isOnMobile && (
-          <Card
-            position="static"
-            w="100%"
-            bottom="auto"
-            right="auto"
-            zIndex={2}
-            p="10px"
-            shadow="none"
-          >
-            <Chart
-              trips={simulationResults.trips}
-              simulationType={simulationResults.simulationType}
+          <>
+            <IconButton
+              onClick={() =>
+                generateUrlToShare({
+                  mainTrip: myTripSteps.values,
+                  alternativeTrip: alternativeTripSteps.values,
+                })
+              }
+              aria-label="delete"
+              borderRadius="20px"
+              icon={<FaShareAlt size={20} />}
             />
-          </Card>
+            <Card
+              position="static"
+              w="100%"
+              bottom="auto"
+              right="auto"
+              zIndex={2}
+              p="10px"
+              shadow="none"
+            >
+              <Chart
+                trips={simulationResults.trips}
+                simulationType={simulationResults.simulationType}
+              />
+            </Card>
+          </>
         )}
       </VStack>
     </VStack>

@@ -31,7 +31,7 @@ export const useSteps = () => {
     [steps, setSteps],
   );
 
-  return { values: steps, addStep, removeStep, updateStep };
+  return { values: steps, addStep, removeStep, updateStep, setSteps };
 };
 
 export const useDebounce = <T = string | number>(
