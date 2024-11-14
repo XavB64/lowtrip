@@ -12,3 +12,4 @@ Werkzeug == 2.2.2
 gunicorn
 openrouteservice
 flask_cors
+pyogrio
