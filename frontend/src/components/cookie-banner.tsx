@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { Button, Center, Text } from "@chakra-ui/react";
-import { useConsentContext } from "../context";
+import { useConsentContext } from "../context/consentContext";
 import { useTranslation } from "react-i18next";
 
 const CookieBanner = () => {
