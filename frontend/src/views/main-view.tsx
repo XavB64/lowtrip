@@ -7,7 +7,8 @@ import { useSteps } from "../hooks";
 import { SimulationResults } from "../types";
 import Map from "../components/map";
 import { checkIsOnMobile } from "../utils";
-import { CacheProvider, useConsentContext } from "../context";
+import { useConsentContext } from "../context/consentContext";
+import { CacheProvider } from "../context/cacheContext";
 
 const MainView = ({
   isDarkTheme,

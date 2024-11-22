@@ -40,8 +40,8 @@ import theme from "../../theme";
 import UserSettingsModal from "./user-settings-modal";
 import UserSettingsSelector from "./user-settings-selector";
 import CookieBanner from "../cookie-banner";
-import { ConsentContextProvider } from "../../context";
 import { GithubItem, GithubMenuItem } from "./github-items";
+import { ConsentContextProvider } from "../../context/consentContext";
 
 const navItems = [
   {

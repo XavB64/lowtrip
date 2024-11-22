@@ -11,7 +11,7 @@ import {
   Spinner,
 } from "@chakra-ui/react";
 import { PHOTON_API_URL } from "../../config";
-import { useCache } from "../../context";
+import { useCache } from "../../context/cacheContext";
 import { useDebounce } from "../../hooks";
 import { City, PhotonApiCity } from "./types";
 
