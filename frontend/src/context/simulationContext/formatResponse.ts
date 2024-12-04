@@ -9,7 +9,7 @@ import {
   TripStep,
   Geometry,
   SimulationType,
-} from "../types";
+} from "../../types";
 
 const extractTransportMeans = (emissionPartName: string) => {
   if (emissionPartName.includes("Train")) {
@@ -74,7 +74,7 @@ const formatMultiStepsTrip = (trip: MyTripData[], isMainTrip = false): Trip => {
       extractTransportMeans(trip[0]["Mean of Transport"]);
     if (!transportMeans) {
       console.error(
-        `Unknown transport means: ${tripData.NAME} or ${trip[0]["Mean of Transport"]}`,
+        `Unknown transport means: ${tripData.NAME} or ${trip[0]["Mean of Transport"]}`
       );
     }
     return [
@@ -95,7 +95,7 @@ const formatMultiStepsTrip = (trip: MyTripData[], isMainTrip = false): Trip => {
 
   const totalEmissions = steps.reduce(
     (total, step) => total + step.emissions,
-    0,
+    0
   );
 
   return {
@@ -130,7 +130,7 @@ const formatDirectTrips = (trips: DirectTripData[]): Trip[] => {
         },
       };
     },
-    {} as Record<Transport, TripStep>,
+    {} as Record<Transport, TripStep>
   );
 
   return Object.values(tripsByTransportMeans).map((trip) => ({
@@ -141,7 +141,7 @@ const formatDirectTrips = (trips: DirectTripData[]): Trip[] => {
 };
 
 export const formatResponse = (
-  data: ApiResponse["data"],
+  data: ApiResponse["data"]
 ): SimulationResults => {
   let simulationType = SimulationType.mainTripOnly;
   const trips: Trip[] = [];
@@ -149,7 +149,7 @@ export const formatResponse = (
   const isMainTrip = true;
   const myTrip = formatMultiStepsTrip(
     JSON.parse(data.my_trip) as MyTripData[],
-    isMainTrip,
+    isMainTrip
   );
   trips.push(myTrip);
 
@@ -162,7 +162,7 @@ export const formatResponse = (
   if (data.alternative_trip) {
     simulationType = SimulationType.mainTripVsOtherTrip;
     const alternativeTrip = formatMultiStepsTrip(
-      JSON.parse(data.alternative_trip),
+      JSON.parse(data.alternative_trip)
     );
     trips.push(alternativeTrip);
   }
@@ -172,7 +172,7 @@ export const formatResponse = (
       const duplicatedElement = acc.find(
         (tripGeometry) =>
           tripGeometry.label === feature.properties.label &&
-          tripGeometry.length === feature.properties.length,
+          tripGeometry.length === feature.properties.length
       );
       if (
         !duplicatedElement ||
@@ -189,7 +189,7 @@ export const formatResponse = (
 
       return acc;
     },
-    [] as Geometry[],
+    [] as Geometry[]
   );
 
   return {
