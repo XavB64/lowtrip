@@ -1,10 +1,7 @@
 import { Box, IconButton, Stack } from "@chakra-ui/react";
-import { useState } from "react";
 import { BiChevronUp } from "react-icons/bi";
 
 import { LeftPanel } from "../components/left-panel";
-import { useSteps } from "../hooks";
-import { SimulationResults } from "../types";
 import Map from "../components/map";
 import { checkIsOnMobile } from "../utils";
 import { useConsentContext } from "../context/consentContext";
@@ -18,43 +15,20 @@ const MainView = ({
   withLogo?: boolean;
 }) => {
   const { consentGiven } = useConsentContext();
-  const [simulationResults, setSimulationResults] =
-    useState<SimulationResults>();
-  const myTripSteps = useSteps();
-  const alternativeTripSteps = useSteps();
 
   const isOnMobile = checkIsOnMobile();
 
   return (
     <CacheProvider>
       <Stack direction={["column", "row"]} width="100%">
-        <LeftPanel
-          simulationResults={simulationResults}
-          setSimulationResults={setSimulationResults}
-          myTripSteps={myTripSteps}
-          alternativeTripSteps={alternativeTripSteps}
-          withLogo={withLogo}
-        />
+        <LeftPanel withLogo={withLogo} />
         <Box
           w="100%"
           height="100%"
           minHeight={["calc(100vh - 64px)", "none"]}
           position="relative"
         >
-          <Map
-            isDarkTheme={isDarkTheme}
-            simulationResults={simulationResults}
-            stepsCoords={
-              myTripSteps.values
-                .filter((step) => !!step.locationCoords)
-                .map((step) => step.locationCoords) as [number, number][]
-            }
-            alternativeStepsCoords={
-              alternativeTripSteps.values
-                .filter((step) => !!step.locationCoords)
-                .map((step) => step.locationCoords) as [number, number][]
-            }
-          />
+          <Map isDarkTheme={isDarkTheme} />
         </Box>
         {isOnMobile && (
           <IconButton
