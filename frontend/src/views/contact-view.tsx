@@ -16,7 +16,7 @@ import {
   EMAIL_API_SERVICE_URL,
   LOWTRIP_MANAGER_EMAIL,
 } from "../config";
-import Modal from "../components/modal";
+import Modal from "../common/components/modal";
 
 async function sendEmail(
   senderEmail: string,

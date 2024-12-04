@@ -20,12 +20,12 @@ import { MapContainer } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import { Card, useBreakpointValue } from "@chakra-ui/react";
 
-import { checkIsOnMobile } from "../../utils";
-import type { Step } from "../../types";
+import { checkIsOnMobile } from "../../../../common/utils";
+import type { Step } from "../../../../types";
 import Chart from "../chart";
 import Legend from "./map-legend";
 import MapContent from "./map-content";
-import { useSimulationContext } from "../../context/simulationContext";
+import { useSimulationContext } from "../../../../common/context/simulationContext";
 
 const extractCoords = (steps?: Step[]) =>
   (steps || [])

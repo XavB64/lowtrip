@@ -20,7 +20,7 @@ import { useEffect, useMemo, useState } from "react";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import "./i18n";
 
-import NavbarWrapper from "./components/nav-bar";
+import NavbarWrapper from "./common/components/nav-bar";
 import { API_URL } from "./config";
 import {
   ContactView,
@@ -31,7 +31,7 @@ import {
 } from "./views";
 import theme from "./theme";
 import { ChakraProvider, Stack, VStack } from "@chakra-ui/react";
-import { SimulationProvider } from "./context/simulationContext/simulationContext";
+import { SimulationProvider } from "./common/context/simulationContext";
 
 const App = () => {
   // first API call to wake up the server

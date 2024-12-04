@@ -35,8 +35,8 @@ import { GiHamburgerMenu } from "react-icons/gi";
 
 import { useTranslation } from "react-i18next";
 import { Link, Outlet } from "react-router-dom";
-import Logo from "../../assets/lowtrip_logo.png";
-import theme from "../../theme";
+import Logo from "../../../assets/lowtrip_logo.png";
+import theme from "../../../theme";
 import UserSettingsModal from "./user-settings-modal";
 import UserSettingsSelector from "./user-settings-selector";
 import CookieBanner from "../cookie-banner";

@@ -17,7 +17,7 @@
 
 import { Button, Link as ChakraLink, Image, MenuItem } from "@chakra-ui/react";
 
-import gitLogo from "../../assets/github.png";
+import gitLogo from "../../../assets/github.png";
 
 export const GithubItem = () => (
   <ChakraLink

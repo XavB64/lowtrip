@@ -26,14 +26,14 @@ import {
   useBreakpoint,
 } from "@chakra-ui/react";
 import { BiSolidPlusCircle } from "react-icons/bi";
-import { TRIP_TYPE } from "../../types";
-import { PrimaryButton } from "../primary-button";
+import { TRIP_TYPE } from "../../../../types";
+import { PrimaryButton } from "../../../../common/components/primary-button";
 import { StepField } from "./step-field";
 import ErrorModal from "./error-modal";
 import { useTranslation } from "react-i18next";
 import { stepsAreInvalid } from "./helpers/utils";
 import { getAdviceTextTranslation } from "./helpers/translationHelper";
-import { useSimulationContext } from "../../context/simulationContext";
+import { useSimulationContext } from "../../../../common/context/simulationContext";
 
 type FormProps = {
   displayedTrip: TRIP_TYPE;

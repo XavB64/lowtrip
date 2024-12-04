@@ -20,8 +20,8 @@ import { useTranslation } from "react-i18next";
 import { Marker, Polyline, TileLayer, Tooltip, useMap } from "react-leaflet";
 import { Box, HStack, Text } from "@chakra-ui/react";
 
-import { markerIcon } from "../../assets/marker-icon";
-import { SimulationResults } from "../../types";
+import { markerIcon } from "../../../../assets/marker-icon";
+import { SimulationResults } from "../../../../types";
 import { pathMapper } from "./const";
 
 type MapProps = {

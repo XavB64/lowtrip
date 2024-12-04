@@ -1,11 +1,11 @@
 import { Box, IconButton, Stack } from "@chakra-ui/react";
 import { BiChevronUp } from "react-icons/bi";
 
-import { LeftPanel } from "../components/left-panel";
-import Map from "../components/map";
-import { checkIsOnMobile } from "../utils";
-import { useConsentContext } from "../context/consentContext";
-import { CacheProvider } from "../context/cacheContext";
+import { LeftPanel } from "./components/left-panel";
+import Map from "./components/map";
+import { checkIsOnMobile } from "../../common/utils";
+import { useConsentContext } from "../../common/context/consentContext";
+import { CacheProvider } from "../../common/context/cacheContext";
 
 const MainView = ({
   isDarkTheme,
