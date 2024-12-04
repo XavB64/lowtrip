@@ -30,32 +30,31 @@ import {
 import Form from "./form";
 import Chart from "./chart";
 import { useEffect, useState } from "react";
-import { SimulationResults, StepProps } from "../types";
 import { useTranslation } from "react-i18next";
 import Logo from "../assets/lowtrip_logo.png";
 import { checkIsOnMobile } from "../utils";
+import { useSimulationContext } from "../context/simulationContext";
+import { TRIP_TYPE } from "../types";
 
 type LeftPanelProps = {
-  simulationResults?: SimulationResults;
-  setSimulationResults: (response: SimulationResults) => void;
-  myTripSteps: StepProps;
-  alternativeTripSteps: StepProps;
   withLogo?: boolean;
 };
 
-export const LeftPanel = ({
-  myTripSteps,
-  alternativeTripSteps,
-  withLogo,
-  simulationResults,
-  setSimulationResults,
-}: LeftPanelProps) => {
+export const LeftPanel = ({ withLogo }: LeftPanelProps) => {
   const { t } = useTranslation();
-  const [tabIndex, setTabIndex] = useState(0);
-  const handleTabsChange = (index: number) => {
-    setTabIndex(index);
-  };
+  const { simulationResults } = useSimulationContext();
+
+  const [displayedTrip, setDisplayedTrip] = useState<TRIP_TYPE>(TRIP_TYPE.MAIN);
+
   const isOnMobile = checkIsOnMobile();
+
+  const handleTabsChange = () => {
+    if (displayedTrip === TRIP_TYPE.MAIN) {
+      setDisplayedTrip(TRIP_TYPE.ALTERNATIVE);
+    } else {
+      setDisplayedTrip(TRIP_TYPE.MAIN);
+    }
+  };
 
   useEffect(() => {
     const scrollToChart = () => {
@@ -100,7 +99,7 @@ export const LeftPanel = ({
         </Heading>
 
         <Tabs
-          index={tabIndex}
+          index={displayedTrip === TRIP_TYPE.MAIN ? 0 : 1}
           onChange={handleTabsChange}
           isFitted
           variant="enclosed"
@@ -117,22 +116,18 @@ export const LeftPanel = ({
           <TabPanels>
             <TabPanel padding={0}>
               <Form
-                key="main-form"
-                setSimulationResults={setSimulationResults}
-                stepsProps={myTripSteps}
-                changeTab={() => setTabIndex((tabIndex + 1) % 2)}
+                displayedTrip={displayedTrip}
+                showAlternativeForm={() =>
+                  setDisplayedTrip(TRIP_TYPE.ALTERNATIVE)
+                }
               />
             </TabPanel>
             <TabPanel padding={0}>
-              <Form
-                key="alternative-form"
-                setSimulationResults={setSimulationResults}
-                stepsProps={alternativeTripSteps}
-                stepsToCompare={myTripSteps.values}
-              />
+              <Form displayedTrip={displayedTrip} />
             </TabPanel>
           </TabPanels>
         </Tabs>
+
         {simulationResults && !isOnMobile && (
           <Card
             position="static"

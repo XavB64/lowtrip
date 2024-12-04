@@ -29,7 +29,7 @@ export const useConsentContext = () => {
   const context = useContext(ConsentContext);
   if (!context) {
     throw new Error(
-      "useCache must be used within a ConsentContextProvider.Provider"
+      "useCache must be used within a ConsentContextProvider.Provider",
     );
   }
   return context;

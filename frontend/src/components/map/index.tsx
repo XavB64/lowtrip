@@ -15,33 +15,40 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import React, { useRef } from "react";
+import React, { useMemo, useRef } from "react";
 import { MapContainer } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import { Card, useBreakpointValue } from "@chakra-ui/react";
 
 import { checkIsOnMobile } from "../../utils";
-import { SimulationResults } from "../../types";
+import type { Step } from "../../types";
 import Chart from "../chart";
 import Legend from "./map-legend";
 import MapContent from "./map-content";
+import { useSimulationContext } from "../../context/simulationContext";
+
+const extractCoords = (steps?: Step[]) =>
+  (steps || [])
+    .filter((step) => !!step.locationCoords)
+    .map((step) => step.locationCoords as [number, number]);
 
 type MapProps = {
   isDarkTheme: boolean;
-  simulationResults?: SimulationResults;
-  stepsCoords: [number, number][];
-  alternativeStepsCoords: [number, number][];
 };
 
-const Map = ({
-  isDarkTheme,
-  simulationResults,
-  stepsCoords,
-  alternativeStepsCoords,
-}: MapProps) => {
+const Map = ({ isDarkTheme }: MapProps) => {
   const chartRef = useRef<null | HTMLDivElement>(null);
   const allowScrollToZoom = useBreakpointValue([false, true], { ssr: false });
   const isOnMobile = checkIsOnMobile();
+
+  const { steps, alternativeSteps, simulationResults } = useSimulationContext();
+
+  const stepsCoords = useMemo(() => extractCoords(steps), [steps]);
+
+  const alternativeStepsCoords = useMemo(
+    () => extractCoords(alternativeSteps),
+    [alternativeSteps],
+  );
 
   return (
     <>

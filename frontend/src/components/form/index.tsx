@@ -15,8 +15,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import axios from "axios";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 
 import {
   Button,
@@ -24,108 +23,82 @@ import {
   Stack,
   Text,
   VStack,
-  useDisclosure,
   useBreakpoint,
 } from "@chakra-ui/react";
 import { BiSolidPlusCircle } from "react-icons/bi";
-import { API_URL } from "../../config";
-import { ApiResponse, SimulationResults, Step } from "../../types";
+import { TRIP_TYPE } from "../../types";
 import { PrimaryButton } from "../primary-button";
 import { StepField } from "./step-field";
 import ErrorModal from "./error-modal";
 import { useTranslation } from "react-i18next";
-import { stepsAreInvalid, getPayload } from "./helpers/utils";
-import { formatResponse } from "../../helpers/formatResponse";
+import { stepsAreInvalid } from "./helpers/utils";
 import { getAdviceTextTranslation } from "./helpers/translationHelper";
+import { useSimulationContext } from "../../context/simulationContext";
 
 type FormProps = {
-  setSimulationResults: (response: SimulationResults) => void;
-  stepsProps: {
-    values: Step[];
-    addStep: () => void;
-    removeStep: (index: number) => void;
-    updateStep: (index: number, data: Partial<Step>) => void;
-  };
-  stepsToCompare?: Step[];
-  changeTab?: () => void;
+  displayedTrip: TRIP_TYPE;
+  showAlternativeForm?: () => void;
 };
 
-const Form = ({
-  stepsProps,
-  stepsToCompare,
-  changeTab,
-  setSimulationResults,
-}: FormProps) => {
+const Form = ({ displayedTrip, showAlternativeForm }: FormProps) => {
   const { t } = useTranslation();
-  const { values: steps, addStep, removeStep, updateStep } = stepsProps;
-  const { isOpen, onOpen: openErrorModal, onClose } = useDisclosure();
-  const [errorMessage, setErrorMessage] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+
+  const {
+    steps,
+    alternativeSteps,
+    errorMessage,
+    isLoading,
+    modalContext: { isOpen, onClose },
+    addStep,
+    updateStep,
+    removeStep,
+    submitForm,
+  } = useSimulationContext();
+
   const breakpoint = useBreakpoint();
 
   const formIsNotValid = useMemo(() => {
-    if (stepsToCompare) {
-      const mainFormIsNotValid = stepsAreInvalid(stepsToCompare);
+    if (displayedTrip === TRIP_TYPE.ALTERNATIVE) {
+      const mainFormIsNotValid = stepsAreInvalid(alternativeSteps);
       if (mainFormIsNotValid) return true;
     }
     return stepsAreInvalid(steps);
-  }, [stepsToCompare, steps]);
-
-  const handleSubmit = async () => {
-    if (steps.length < 1 || steps.some((step) => !step.locationCoords))
-      throw new Error("At least one step required");
-    setIsLoading(true);
-
-    const payload = getPayload(steps, stepsToCompare);
-    axios
-      .post(API_URL, payload, {
-        headers: { "Access-Contol-Allow-Origin": "*" },
-      })
-      .then((response: ApiResponse) => {
-        if (response.data.error) {
-          setErrorMessage(response.data.error);
-          openErrorModal();
-        } else {
-          const formattedSimulation = formatResponse(response.data);
-          setSimulationResults(formattedSimulation);
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-        openErrorModal();
-      })
-      .finally(async () => {
-        setIsLoading(false);
-      });
-  };
+  }, [displayedTrip, alternativeSteps, steps]);
 
   const adviceText = useMemo(() => {
-    if (stepsToCompare && stepsAreInvalid(stepsToCompare)) {
+    if (
+      displayedTrip === TRIP_TYPE.ALTERNATIVE &&
+      stepsAreInvalid(alternativeSteps)
+    ) {
       return t("form.adviceText.previousFormIsInvalid");
     }
-    return getAdviceTextTranslation(t, steps, !!stepsToCompare);
-  }, [t, steps, stepsToCompare]);
+    return getAdviceTextTranslation(t, steps, !!alternativeSteps);
+  }, [t, displayedTrip, steps, alternativeSteps]);
 
   return (
     <VStack
       paddingY={5}
       paddingX={[3, 5]}
       backgroundColor="#efefef"
-      borderRadius={`${stepsToCompare ? "12px 0" : "0 12px"} 12px 12px`}
+      borderRadius={`${displayedTrip === TRIP_TYPE.ALTERNATIVE ? "12px 0" : "0 12px"} 12px 12px`}
       justifyContent="right"
       alignItems="start"
     >
-      {steps.map((step) => (
-        <StepField
-          key={`main-form-${step.id}`}
-          step={step}
-          updateStep={updateStep}
-          removeStep={removeStep}
-        />
-      ))}
+      {(displayedTrip === TRIP_TYPE.MAIN ? steps : alternativeSteps).map(
+        (step) => (
+          <StepField
+            key={`main-form-${step.id}`}
+            step={step}
+            updateStep={(index, data) =>
+              updateStep(displayedTrip, step.index, data)
+            }
+            removeStep={(index) => removeStep(displayedTrip, index)}
+          />
+        ),
+      )}
 
       <Button
-        onClick={addStep}
+        onClick={() => addStep(displayedTrip)}
         colorScheme="lightgrey"
         borderRadius="20px"
         color="black"
@@ -144,10 +117,10 @@ const Form = ({
 
       <VStack w="100%">
         {adviceText && <Text textAlign="center">{adviceText}</Text>}
-        {stepsToCompare ? (
-          stepsAreInvalid(stepsToCompare) ? null : (
+        {displayedTrip === TRIP_TYPE.ALTERNATIVE ? (
+          stepsAreInvalid(steps) ? null : (
             <PrimaryButton
-              onClick={handleSubmit}
+              onClick={() => submitForm(TRIP_TYPE.ALTERNATIVE)}
               isDisabled={formIsNotValid}
               isLoading={isLoading}
             >
@@ -161,7 +134,7 @@ const Form = ({
               direction={breakpoint === "base" ? "column" : "row"}
             >
               <PrimaryButton
-                onClick={handleSubmit}
+                onClick={() => submitForm(TRIP_TYPE.MAIN)}
                 isDisabled={formIsNotValid}
                 isLoading={isLoading}
               >
@@ -170,7 +143,7 @@ const Form = ({
                   : t("form.computeEmissions")}
               </PrimaryButton>
               <PrimaryButton
-                onClick={changeTab}
+                onClick={showAlternativeForm}
                 isDisabled={formIsNotValid}
                 isLoading={false}
                 variant="outline"
@@ -186,10 +159,7 @@ const Form = ({
 
       <ErrorModal
         isOpen={isOpen}
-        onClose={() => {
-          onClose();
-          setErrorMessage("");
-        }}
+        onClose={onClose}
         errorMessage={errorMessage}
       />
     </VStack>

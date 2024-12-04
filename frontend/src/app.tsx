@@ -31,6 +31,7 @@ import {
 } from "./views";
 import theme from "./theme";
 import { ChakraProvider, Stack, VStack } from "@chakra-ui/react";
+import { SimulationProvider } from "./context/simulationContext/simulationContext";
 
 const App = () => {
   // first API call to wake up the server
@@ -57,7 +58,11 @@ const App = () => {
       children: [
         {
           path: "/",
-          element: <MainView isDarkTheme={isDarkTheme} />,
+          element: (
+            <SimulationProvider>
+              <MainView isDarkTheme={isDarkTheme} />
+            </SimulationProvider>
+          ),
         },
         {
           path: "/contact",
@@ -78,11 +83,18 @@ const App = () => {
       path: "/embed",
       element: (
         <ChakraProvider theme={theme}>
-          <VStack w="100vw" h={["100%", "100vh"]} spacing={0}>
-            <Stack direction={["column", "row"]} w="100%" h="100%" spacing={0}>
-              <MainView isDarkTheme={false} withLogo={true} />
-            </Stack>
-          </VStack>
+          <SimulationProvider>
+            <VStack w="100vw" h={["100%", "100vh"]} spacing={0}>
+              <Stack
+                direction={["column", "row"]}
+                w="100%"
+                h="100%"
+                spacing={0}
+              >
+                <MainView isDarkTheme={false} withLogo={true} />
+              </Stack>
+            </VStack>
+          </SimulationProvider>
         </ChakraProvider>
       ),
     },
