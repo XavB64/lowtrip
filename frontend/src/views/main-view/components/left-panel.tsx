@@ -31,10 +31,10 @@ import Form from "./form";
 import Chart from "./chart";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import Logo from "../assets/lowtrip_logo.png";
-import { checkIsOnMobile } from "../utils";
-import { useSimulationContext } from "../context/simulationContext";
-import { TRIP_TYPE } from "../types";
+import Logo from "../../../assets/lowtrip_logo.png";
+import { checkIsOnMobile } from "../../../common/utils";
+import { useSimulationContext } from "../../../common/context/simulationContext";
+import { TRIP_TYPE } from "../../../types";
 
 type LeftPanelProps = {
   withLogo?: boolean;

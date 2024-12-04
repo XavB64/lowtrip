@@ -9,7 +9,7 @@ import {
   TripStep,
   Geometry,
   SimulationType,
-} from "../../types";
+} from "../../../types";
 
 const extractTransportMeans = (emissionPartName: string) => {
   if (emissionPartName.includes("Train")) {

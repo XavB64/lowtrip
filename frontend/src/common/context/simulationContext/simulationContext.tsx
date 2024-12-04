@@ -8,9 +8,14 @@ import {
   useState,
 } from "react";
 import nextId from "react-id-generator";
-import { ApiResponse, SimulationResults, Step, TRIP_TYPE } from "../../types";
+import {
+  ApiResponse,
+  SimulationResults,
+  Step,
+  TRIP_TYPE,
+} from "../../../types";
 import { useDisclosure } from "@chakra-ui/react";
-import { API_URL } from "../../config";
+import { API_URL } from "../../../config";
 import { getPayload } from "./getPayload";
 import { formatResponse } from "./formatResponse";
 

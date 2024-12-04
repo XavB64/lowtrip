@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { EmissionsCategory, Transport, Trip } from "../../types";
+import { EmissionsCategory, Transport, Trip } from "../../../../types";
 import { TFunction } from "i18next";
 
 const transportMeansMapper: Record<Transport | string, string> = {

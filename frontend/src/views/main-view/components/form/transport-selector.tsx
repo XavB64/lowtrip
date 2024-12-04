@@ -24,7 +24,7 @@ import {
 import { FaFerry } from "react-icons/fa6";
 import { MdElectricCar, MdSailing } from "react-icons/md";
 import { IoMdBicycle } from "react-icons/io";
-import { Step, Transport, FerryOptions, thumbUp } from "../../types";
+import { Step, Transport, FerryOptions, thumbUp } from "../../../../types";
 import { useTranslation } from "react-i18next";
 import {
   Box,
