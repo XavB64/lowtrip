@@ -1,5 +1,10 @@
 export const thumbUp = "👍";
 
+export enum TRIP_TYPE {
+  MAIN = "main",
+  ALTERNATIVE = "alternative",
+}
+
 export type Step = {
   index: number;
   id: string;
@@ -8,13 +13,6 @@ export type Step = {
   transportMean?: Transport;
   passengers?: number | typeof thumbUp;
   options?: FerryOptions;
-};
-
-export type StepProps = {
-  values: Step[];
-  addStep: () => void;
-  removeStep: (index: number) => void;
-  updateStep: (index: number, data: Partial<Step>) => void;
 };
 
 export enum Transport {
