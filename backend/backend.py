@@ -80,13 +80,13 @@ def compute_emissions_custom(data, cmap=colors_custom):
 
         # Compute depending on the mean of transport
         if transportmean == "Train":
-            data_train, geo_train, _train = train_to_gdf(
+            data_train, geo_train, train = train_to_gdf(
                 departure_coordinates,
                 arrival_coordinates,
                 color_usage=cmap["Train"],
                 color_infra=cmap["Cons_infra"],
             )
-            if not _train:  # One step is not successful
+            if not train:  # One step is not successful
                 fail = True
                 ERROR = (
                     "step n°"
@@ -100,13 +100,13 @@ def compute_emissions_custom(data, cmap=colors_custom):
             geo.append(geo_train)
 
         elif transportmean == "Bus":
-            data_bus, geo_bus, _bus = bus_to_gdf(
+            data_bus, geo_bus, bus = bus_to_gdf(
                 departure_coordinates,
                 arrival_coordinates,
                 color_usage=cmap["Road"],
                 color_cons=cmap["Cons_infra"],
             )
-            if not _bus:  # One step is not successful
+            if not bus:  # One step is not successful
                 fail = True
                 ERROR = (
                     "step n°"
@@ -120,14 +120,14 @@ def compute_emissions_custom(data, cmap=colors_custom):
 
         elif transportmean == "Car":
             # We get the number of passenger
-            data_car, geo_car, _car = car_to_gdf(
+            data_car, geo_car, car = car_to_gdf(
                 departure_coordinates,
                 arrival_coordinates,
                 nb=arrival.nb,
                 color_usage=cmap["Road"],
                 color_cons=cmap["Cons_infra"],
             )
-            if not _car:  # One step is not successful
+            if not car:  # One step is not successful
                 fail = True
                 ERROR = (
                     "step n°"
@@ -140,14 +140,14 @@ def compute_emissions_custom(data, cmap=colors_custom):
             geo.append(geo_car)
 
         elif transportmean == "eCar":
-            data_ecar, geo_ecar, _car = ecar_to_gdf(
+            data_ecar, geo_ecar, ecar = ecar_to_gdf(
                 departure_coordinates,
                 arrival_coordinates,
                 nb=arrival.nb,
                 color_usage=cmap["Road"],
                 color_cons=cmap["Cons_infra"],
             )
-            if not _car:  # One step is not successful
+            if not ecar:  # One step is not successful
                 fail = True
                 ERROR = (
                     "step n°"
@@ -161,12 +161,12 @@ def compute_emissions_custom(data, cmap=colors_custom):
 
         elif transportmean == "Bicycle":
             # We get the number of passenger
-            data_bike, geo_bike, _bike = bicycle_to_gdf(
+            data_bike, geo_bike, bike = bicycle_to_gdf(
                 departure_coordinates,
                 arrival_coordinates,
                 color=cmap["Bicycle"],
             )
-            if not _bike:  # One step is not successful
+            if not bike:  # One step is not successful
                 fail = True
                 ERROR = (
                     "step n°"
