@@ -120,7 +120,7 @@ const Form = ({ displayedTrip, showAlternativeForm }: FormProps) => {
         {displayedTrip === TRIP_TYPE.ALTERNATIVE ? (
           stepsAreInvalid(steps) ? null : (
             <PrimaryButton
-              onClick={() => submitForm(TRIP_TYPE.ALTERNATIVE)}
+              onClick={() => submitForm(steps, alternativeSteps)}
               isDisabled={formIsNotValid}
               isLoading={isLoading}
             >
@@ -134,7 +134,7 @@ const Form = ({ displayedTrip, showAlternativeForm }: FormProps) => {
               direction={breakpoint === "base" ? "column" : "row"}
             >
               <PrimaryButton
-                onClick={() => submitForm(TRIP_TYPE.MAIN)}
+                onClick={() => submitForm(steps)}
                 isDisabled={formIsNotValid}
                 isLoading={isLoading}
               >
