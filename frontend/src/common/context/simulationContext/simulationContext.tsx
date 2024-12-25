@@ -31,7 +31,7 @@ type Context = {
   updateStep: (trip: TRIP_TYPE, index: number, data: Partial<Step>) => void;
   setSteps: (steps: Step[]) => void;
   setAlternativeSteps: (steps: Step[]) => void;
-  submitForm: (trip: TRIP_TYPE) => void;
+  submitForm: (mainSteps: Step[], alternativeSteps?: Step[]) => void;
 };
 
 const SimulationContext = createContext<Context | null>(null);
@@ -99,15 +99,12 @@ export const SimulationProvider = ({ children }: { children: ReactNode }) => {
     [steps, alternativeSteps, setSteps, setAlternativeSteps],
   );
 
-  const submitForm = async (tripDisplayed: TRIP_TYPE) => {
-    if (steps.length < 1 || steps.some((step) => !step.locationCoords))
+  const submitForm = async (mainSteps: Step[], altSteps?: Step[]) => {
+    if (mainSteps.length < 1 || mainSteps.some((step) => !step.locationCoords))
       throw new Error("At least one step required");
     setIsLoading(true);
 
-    const payload = getPayload(
-      steps,
-      tripDisplayed === TRIP_TYPE.ALTERNATIVE ? alternativeSteps : undefined,
-    );
+    const payload = getPayload(mainSteps, altSteps);
     axios
       .post(API_URL, payload, {
         headers: { "Access-Contol-Allow-Origin": "*" },
