@@ -6,6 +6,11 @@ import Map from "./components/map";
 import { checkIsOnMobile } from "../../common/utils";
 import { useConsentContext } from "../../common/context/consentContext";
 import { CacheProvider } from "../../common/context/cacheContext";
+import { useSearchParams } from "react-router-dom";
+import { useEffect } from "react";
+import { useSimulationContext } from "../../common/context/simulationContext";
+import { stepsAreInvalid } from "./components/form/helpers/utils";
+import { extractPathStepsFromSimplifiedSteps } from "./helpers/shareableLink";
 
 const MainView = ({
   isDarkTheme,
@@ -16,7 +21,39 @@ const MainView = ({
 }) => {
   const { consentGiven } = useConsentContext();
 
+  const { setSteps, setAlternativeSteps, submitForm } = useSimulationContext();
+
   const isOnMobile = checkIsOnMobile();
+
+  const [searchParams] = useSearchParams();
+
+  useEffect(() => {
+    const mainTrip = searchParams.get("main-trip");
+    if (!mainTrip) {
+      return;
+    }
+
+    const steps = extractPathStepsFromSimplifiedSteps(JSON.parse(mainTrip));
+    setSteps(steps);
+
+    let alternativeSteps;
+    const alternativeTrip = searchParams.get("alternative-trip");
+    if (alternativeTrip) {
+      alternativeSteps = extractPathStepsFromSimplifiedSteps(
+        JSON.parse(alternativeTrip),
+      );
+      setAlternativeSteps(alternativeSteps);
+    }
+
+    if (!stepsAreInvalid(steps)) {
+      submitForm(
+        steps,
+        alternativeSteps && !stepsAreInvalid(alternativeSteps)
+          ? alternativeSteps
+          : undefined,
+      );
+    }
+  }, [searchParams]);
 
   return (
     <CacheProvider>
