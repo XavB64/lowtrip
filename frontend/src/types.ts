@@ -11,7 +11,7 @@ export type Step = {
   locationName?: string;
   locationCoords?: [number, number];
   transportMean?: Transport;
-  passengers?: number | typeof thumbUp;
+  passengers?: "1" | "2" | "3" | "4" | "5" | "6" | "7" | typeof thumbUp;
   options?: FerryOptions;
 };
 

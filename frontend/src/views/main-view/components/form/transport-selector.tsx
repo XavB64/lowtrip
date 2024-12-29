@@ -113,7 +113,10 @@ const getTransportOptions = (
   }
   const basicCarOptions = [1, 2, 3, 4, 5, 6, 7].map((count) => ({
     label: t("form.passengersNb", { count }),
-    stepOptions: { passengers: count, options: undefined },
+    stepOptions: {
+      passengers: `${count}` as Step["passengers"],
+      options: undefined,
+    },
   }));
   return transport === Transport.car
     ? [
