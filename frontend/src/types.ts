@@ -140,6 +140,7 @@ export enum SimulationType {
 }
 
 export type SimulationResults = {
+  inputs: { mainTrip: Step[]; alternativeTrip?: Step[] };
   trips: Trip[];
   tripGeometries: Geometry[];
   simulationType: SimulationType;

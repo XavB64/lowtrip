@@ -92,6 +92,7 @@
       "explanation": "The combustion of kerosene at high altitude produces clouds called contrails. Combined with NOx emissions, these non-CO2 effects contribute to global warming. The represented connection might not be currently operated by a flight company. This mode is not displayed by default when the journey length is below 300km."
     },
     "chart": {
+      "copied-link": "Link copied!",
       "information": {
         "info1": "This trip accounts for",
         "your": "of your",

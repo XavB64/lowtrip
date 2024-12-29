@@ -25,6 +25,8 @@ import {
   Alert,
   AlertIcon,
   Link,
+  IconButton,
+  keyframes,
 } from "@chakra-ui/react";
 import { round, uniqBy } from "lodash";
 import { BiHelpCircle } from "react-icons/bi";
@@ -37,11 +39,27 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { EmissionsCategory, SimulationType, Trip } from "../../types";
+import {
+  EmissionsCategory,
+  Trip,
+  type SimulationResults,
+} from "../../../../types";
 import { useTranslation } from "react-i18next";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { getChartData, getLabel } from "./helpers";
 import CustomLabel from "./custom-label";
+import { FaShareAlt } from "react-icons/fa";
+import { generateUrlToShare } from "../../helpers/shareableLink";
+
+const fadeIn = keyframes`
+  from { opacity: 0; }
+  to { opacity: 1; }
+`;
+
+const fadeOut = keyframes`
+  from { opacity: 1; }
+  to { opacity: 0; }
+`;
 
 /**
  * Corresponds to 2kg of CO2 emissions per year per person
@@ -51,14 +69,18 @@ import CustomLabel from "./custom-label";
 const ANNUAL_CO2_EMISSIONS_BUDGET = 2000;
 
 type ChartProps = {
-  trips: Trip[];
-  simulationType: SimulationType;
+  simulationResults: SimulationResults;
 };
 
-const Chart = ({ trips, simulationType }: ChartProps) => {
+const Chart = ({
+  simulationResults: { trips, simulationType, inputs },
+}: ChartProps) => {
   const { t } = useTranslation();
   const breakpoint = useBreakpoint();
   const { isOpen, onOpen, onToggle, onClose } = useDisclosure();
+
+  const [showCopiedLinkNotification, setShowCopiedLinkNotification] =
+    useState(false);
 
   const mainTrip = trips.find((trip) => trip.isMainTrip) as Trip;
 
@@ -110,7 +132,33 @@ const Chart = ({ trips, simulationType }: ChartProps) => {
   return (
     <Box h="100%" w="100%">
       <Text mr={3} align="center" color="#595959" fontSize={["small", "large"]}>
-        {chartTitle}
+        {chartTitle}{" "}
+        <IconButton
+          onClick={() =>
+            generateUrlToShare(inputs, setShowCopiedLinkNotification)
+          }
+          aria-label="delete"
+          borderRadius="20px"
+          icon={<FaShareAlt size={20} />}
+        />
+        {showCopiedLinkNotification && (
+          <Box
+            position="fixed"
+            bottom="20px"
+            left="50%"
+            transform="translateX(-50%)"
+            bg="green.500"
+            color="white"
+            p="10px"
+            borderRadius="md"
+            boxShadow="md"
+            textAlign="center"
+            zIndex="1000"
+            animation={`${fadeIn} 0.5s, ${fadeOut} 0.5s 2.5s`}
+          >
+            {t("chart.copied-link")}
+          </Box>
+        )}
       </Text>
       <Alert
         status="info"

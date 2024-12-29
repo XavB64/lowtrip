@@ -142,7 +142,7 @@ const formatDirectTrips = (trips: DirectTripData[]): Trip[] => {
 
 export const formatResponse = (
   data: ApiResponse["data"],
-): SimulationResults => {
+): Omit<SimulationResults, "inputs"> => {
   let simulationType = SimulationType.mainTripOnly;
   const trips: Trip[] = [];
 

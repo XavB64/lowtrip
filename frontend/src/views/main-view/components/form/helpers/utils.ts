@@ -1,4 +1,4 @@
-import { Step } from "../../../types";
+import { Step } from "../../../../../types";
 
 export const stepsAreInvalid = (steps: Step[]) =>
   steps.some((step, index) => {

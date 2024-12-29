@@ -115,7 +115,10 @@ export const SimulationProvider = ({ children }: { children: ReactNode }) => {
           openErrorModal();
         } else {
           const formattedSimulation = formatResponse(response.data);
-          setSimulationResults(formattedSimulation);
+          setSimulationResults({
+            ...formattedSimulation,
+            inputs: { mainTrip: mainSteps, alternativeTrip: altSteps },
+          });
         }
       })
       .catch((err) => {

@@ -79,10 +79,7 @@ const Map = ({ isDarkTheme }: MapProps) => {
           p="10px"
           shadow="none"
         >
-          <Chart
-            trips={simulationResults.trips}
-            simulationType={simulationResults.simulationType}
-          />
+          <Chart simulationResults={simulationResults} />
         </Card>
       )}
     </>

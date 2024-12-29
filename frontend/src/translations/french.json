@@ -160,6 +160,7 @@
       "explanation": "La combustion du kérosène à haute altitude entraîne la formation de nuages appelés traînées de condensation. Combiné aux émissions de NOx, ces effets hors CO2 contribuent au réchauffement climatique. Le trajet représenté reste théorique et pourrait ne pas être exploité par une compagnie aérienne. Ce mode n'est pas affiché par défaut lorsque la distance du voyage est inférieure à 300 km."
     },
     "chart": {
+      "copied-link": "Lien copié !",
       "information": {
         "info1": "Ce trajet représente",
         "your": "de ton",
