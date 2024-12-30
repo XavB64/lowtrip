@@ -23,7 +23,7 @@ export const extractPathStepsFromSimplifiedSteps = (
 ): Step[] =>
   simplifiedSteps.map((step, index) => {
     const baseStep: Step = {
-      index,
+      index: index + 1,
       id: nextId(),
       locationName: step[0],
       locationCoords: step[1],
@@ -53,8 +53,7 @@ export const generateUrlToShare = (
   },
   setShowCopiedLinkNotification: (showCopiedLinkNotification: boolean) => void,
 ) => {
-  // let url = `https://www.lowtrip.fr?main-trip=${JSON.stringify(mainTrip)}`;
-  let url = `localhost:3000?main-trip=${JSON.stringify(simplifySteps(mainTrip))}`;
+  let url = `https://www.lowtrip.fr?main-trip=${JSON.stringify(mainTrip)}`;
   if (alternativeTrip && !stepsAreInvalid(alternativeTrip)) {
     url += `&alternative-trip=${JSON.stringify(simplifySteps(alternativeTrip))}`;
   }
