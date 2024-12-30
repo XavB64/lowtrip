@@ -53,7 +53,7 @@ export const generateUrlToShare = (
   },
   setShowCopiedLinkNotification: (showCopiedLinkNotification: boolean) => void,
 ) => {
-  let url = `https://www.lowtrip.fr?main-trip=${JSON.stringify(mainTrip)}`;
+  let url = `https://www.lowtrip.fr?main-trip=${JSON.stringify(simplifySteps(mainTrip))}`;
   if (alternativeTrip && !stepsAreInvalid(alternativeTrip)) {
     url += `&alternative-trip=${JSON.stringify(simplifySteps(alternativeTrip))}`;
   }
