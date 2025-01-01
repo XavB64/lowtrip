@@ -28,13 +28,10 @@ export const getPayload = (steps: Step[], alternativeSteps?: Step[]) => {
   const formData = new FormData();
   if (alternativeSteps) {
     formData.append("mode", "2");
-    formData.append(
-      "my-trip",
-      JSON.stringify(formatStepsForApi(alternativeSteps)),
-    );
+    formData.append("my-trip", JSON.stringify(formatStepsForApi(steps)));
     formData.append(
       "alternative-trip",
-      JSON.stringify(formatStepsForApi(steps)),
+      JSON.stringify(formatStepsForApi(alternativeSteps)),
     );
   } else {
     formData.append("mode", "1");
