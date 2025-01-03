@@ -105,9 +105,13 @@ export const SimulationProvider = ({ children }: { children: ReactNode }) => {
     setIsLoading(true);
 
     const payload = getPayload(mainSteps, altSteps);
+
     axios
-      .post(API_URL, payload, {
-        headers: { "Access-Contol-Allow-Origin": "*" },
+      .post(API_URL, JSON.stringify(payload), {
+        headers: {
+          "Access-Contol-Allow-Origin": "*",
+          "Content-Type": "application/json",
+        },
       })
       .then((response: ApiResponse) => {
         if (response.data.error) {

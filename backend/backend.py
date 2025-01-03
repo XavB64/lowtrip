@@ -72,7 +72,7 @@ def compute_emissions_custom(data, cmap=colors_custom):
         departure_coordinates = (depature.lon, depature.lat)
 
         # Arrival coordinates
-        arrival = data.loc[str(int(idx) + 1)]
+        arrival = data.loc[idx + 1]
         arrival_coordinates = (arrival.lon, arrival.lat)
 
         # Mean of transport
@@ -239,12 +239,12 @@ def compute_emissions_all(data, cmap=colors_direct):
     # colors
     # Direct trip
     # Departure coordinates
-    lon = data.loc["0"].lon
-    lat = data.loc["0"].lat
+    lon = data.loc[0].lon
+    lat = data.loc[0].lat
     tag1 = (lon, lat)
     # Arrival coordinates
-    lon = data.loc[str(data.shape[0] - 1)].lon
-    lat = data.loc[str(data.shape[0] - 1)].lat
+    lon = data.loc[data.shape[0] - 1].lon
+    lat = data.loc[data.shape[0] - 1].lat
     tag2 = (lon, lat)
 
     # Check if we should compute it or not
@@ -259,7 +259,7 @@ def compute_emissions_all(data, cmap=colors_direct):
         plane = False
 
     # Retrieve the mean of transport: Car/Bus/Train/Plane
-    transp = data.loc["1"].transp
+    transp = data.loc[1].transp
     if transp == "Train":
         train = False
     elif transp == "Plane":

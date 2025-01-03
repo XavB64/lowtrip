@@ -18,12 +18,8 @@
 import warnings
 
 # Librairies
-from flask import (
-    Flask,
-    json,
-    request,
-)
-from flask_cors import CORS  # comment this on deployment
+from flask import Flask, request
+from flask_cors import CORS
 import pandas as pd
 
 from backend import (
@@ -41,17 +37,16 @@ app = Flask(__name__, static_url_path="", static_folder="frontend/build")
 CORS(app)  # comment this on deployment
 # app.config["DEBUG"] = True
 app.config["APPLICATION_ROOT"] = "/"
-# Geometry - To send to the frontend
 
 
 @app.route("/", methods=["GET", "POST"])
 def main():
     if request.method == "POST":
-        #### NEW FORM ####
+        data = request.get_json()
 
-        if request.form["mode"] == "1":  # My trip vs direct trips
-            # Convert json into pandas
-            df = pd.DataFrame.from_dict(json.loads(request.form["my-trip"]))
+        if data["mode"] == 1:  # My trip vs direct trips
+            df = pd.DataFrame.from_dict(data["my-trip"])
+
             # My trip data and geo data
             data_mytrip, geo_mytrip, error = compute_emissions_custom(df)
 
@@ -95,10 +90,10 @@ def main():
                     "error": error,
                 }
 
-        if request.form["mode"] == "2":  # My trip vs custom trip
+        else:  # My trip vs custom trip
             # Convert json into pandas
-            df = pd.DataFrame.from_dict(json.loads(request.form["my-trip"]))
-            df2 = pd.DataFrame.from_dict(json.loads(request.form["alternative-trip"]))
+            df = pd.DataFrame.from_dict(data["my-trip"])
+            df2 = pd.DataFrame.from_dict(data["alternative-trip"])
 
             # My trip data and geo data
             data_mytrip, geo_mytrip, error = compute_emissions_custom(df)
