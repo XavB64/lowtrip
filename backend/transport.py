@@ -50,7 +50,7 @@ from utils import (
 
 
 def bicycle_to_gdf(tag1, tag2, EF=EF_bicycle, color="#ffffff", validate=val_perimeter):
-    """parameters
+    """Parameters
         - tag1, tag2
         - EF_bus, float emission factor for bike by pkm
         - color, color in hex of path and bar chart
@@ -102,7 +102,7 @@ def train_to_gdf(
     color_usage="#ffffff",
     color_infra="#ffffff",
 ):  # charte_mollow
-    """parameters
+    """Parameters
         - tag1, tag2
         - perims
         - validate
@@ -174,7 +174,7 @@ def ecar_to_gdf(
     color_usage="#ffffff",
     color_cons="#ffffff",
 ):  # charte_mollow
-    """parameters
+    """Parameters
         - tag1, tag2
         - perims
         - validate
@@ -320,7 +320,7 @@ def bus_to_gdf(
     color_usage="#ffffff",
     color_cons="#ffffff",
 ):
-    """parameters
+    """Parameters
         - tag1, tag2
         - EF_bus, float emission factor for bus by pkm
         - color, color in hex of path and bar chart
@@ -377,7 +377,7 @@ def car_to_gdf(
     color_usage="#ffffff",
     color_cons="#ffffff",
 ):
-    """parameters
+    """Parameters
         - tag1, tag2
         - EF_car, float emission factor for one car by km
         - color, color in hex of path and bar chart
@@ -444,7 +444,7 @@ def plane_to_gdf(
     color_usage="#ffffff",
     color_cont="#ffffff",
 ):
-    """parameters
+    """Parameters
         - tag1, tag2
         - EF : emission factor in gCO2/pkm for plane depending on journey length
         - contrails : coefficient to apply to take into account non-CO2 effects
@@ -498,7 +498,7 @@ def plane_to_gdf(
 
 
 def ferry_to_gdf(tag1, tag2, EF=EF_ferry, options="None", color_usage="#ffffff"):
-    """parameters
+    """Parameters
         - tag1, tag2
         - EF : emission factor in gCO2/pkm for ferry
         - color : color for path and bar chart
@@ -551,7 +551,7 @@ def ferry_to_gdf(tag1, tag2, EF=EF_ferry, options="None", color_usage="#ffffff")
 
 
 def sail_to_gdf(tag1, tag2, EF=EF_sail, color_usage="#ffffff"):
-    """parameters
+    """Parameters
         - tag1, tag2
         - EF : emission factor in gCO2/pkm for ferry
         - color : color for path and bar chart
