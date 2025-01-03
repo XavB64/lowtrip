@@ -51,7 +51,7 @@ from transport import (
 
 
 def compute_emissions_custom(data, cmap=colors_custom):
-    """parameters
+    """Parameters
         - data, pandas dataframe format (will be json).
 
     Return:
