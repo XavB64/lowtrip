@@ -184,6 +184,21 @@ def get_bus_emissions(
     })[::-1]
 
 
+def get_road_geometry_data(
+    route_length: float,
+    route_geometry: LineString,
+    color_usage: str,
+):
+    return pd.DataFrame(
+        pd.Series({
+            "colors": color_usage,
+            "label": "Road",
+            "length": f"{int(route_length)}km",
+            "geometry": route_geometry,
+        }),
+    ).transpose()
+
+
 def car_bus_to_gdf(
     departure_coords: tuple[float, float],
     arrival_coords: tuple[float, float],
@@ -224,15 +239,8 @@ def car_bus_to_gdf(
         color_cons,
         "1p.",
     )
-    # geo_car
-    geo_car = pd.DataFrame(
-        pd.Series({
-            "colors": color_usage,
-            "label": "Road",
-            "length": str(int(route_length)) + "km",
-            "geometry": route_geometry,
-        }),
-    ).transpose()
+
+    road_geometry = get_road_geometry_data(route_length, route_geometry, color_usage)
 
     data_bus = get_bus_emissions(
         route_length,
@@ -242,7 +250,7 @@ def car_bus_to_gdf(
         color_cons,
     )
 
-    return data_car, geo_car, data_bus, success
+    return data_car, road_geometry, data_bus, success
 
 
 def bus_to_gdf(
@@ -282,17 +290,9 @@ def bus_to_gdf(
         color_cons,
     )
 
-    # geo_bus
-    geo_bus = pd.DataFrame(
-        pd.Series({
-            "colors": color_usage,
-            "label": "Road",
-            "length": str(int(route_length)) + "km",
-            "geometry": route_geometry,
-        }),
-    ).transpose()
+    road_geometry = get_road_geometry_data(route_length, route_geometry, color_usage)
 
-    return data_bus, geo_bus, success
+    return data_bus, road_geometry, success
 
 
 def car_to_gdf(
@@ -344,14 +344,7 @@ def car_to_gdf(
         color_cons,
         name,
     )
-    # geo_car
-    geo_car = pd.DataFrame(
-        pd.Series({
-            "colors": color_usage,
-            "label": "Road",
-            "length": str(int(route_length)) + "km",
-            "geometry": route_geometry,
-        }),
-    ).transpose()
 
-    return data_car, geo_car, success
+    road_geometry = get_road_geometry_data(route_length, route_geometry, color_usage)
+
+    return data_car, road_geometry, success
