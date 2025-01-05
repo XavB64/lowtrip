@@ -76,81 +76,74 @@ def ecar_to_gdf(
     validate=val_perimeter,
     color_usage="#ffffff",
     color_cons="#ffffff",
-):  # charte_mollow
+):
     """Parameters
         - departure_coords, arrival_coords
-        - perims
         - validate
         - colormap, list of colors
     return:
         - full dataframe for trains.
 
     """
-    # Route OSRM - create a separate function
     route_geometry, route_length, success = find_route(departure_coords, arrival_coords)
 
-    # Validation part for route
-    if success:  # We have a geometry
-        if not validate_geometry(
-            departure_coords,
-            arrival_coords,
-            route_geometry,
-            validate,
-        ):
-            # gdf, geom_route, route_dist, route = pd.DataFrame(), None, None, False
-            return pd.DataFrame(), pd.DataFrame(), False
+    if not success or not validate_geometry(
+        departure_coords,
+        arrival_coords,
+        route_geometry,
+        validate,
+    ):
+        return pd.DataFrame(), pd.DataFrame(), False
 
-        # We need to filter by country and add length / Emission factors
-        gdf = filter_countries_world(
-            gpd.GeoSeries(route_geometry, crs="epsg:4326"),
-            method="ecar",
-        )
+    # We need to filter by country and add length / Emission factors
+    gdf = filter_countries_world(
+        gpd.GeoSeries(route_geometry, crs="epsg:4326"),
+        method="ecar",
+    )
 
-        # Add colors
-        gdf["colors"] = color_usage
+    # Add colors
+    gdf["colors"] = color_usage
 
-        l_length = []
-        # Compute the true distance
-        geod = Geod(ellps="WGS84")
-        for geom in gdf.geometry.values:
-            l_length.append(geod.geometry_length(geom) / 1e3)
-        # Add the distance to the dataframe
-        gdf["path_length"] = l_length
-        # Rescale the length with route_dist (especially when simplified = True)
-        print("Rescaling factor", route_length / gdf["path_length"].sum())
-        gdf["path_length"] *= route_length / gdf["path_length"].sum()
-        # Handle nb passengers
-        passengers_nb = int(passengers_nb)
-        # Compute emissions : EF * length
-        gdf["EF_tot"] = (
-            gdf["EF_tot"]
-            * EF_ecar["fuel"]
-            * (1 + 0.04 * (passengers_nb - 1))
-            / (1e3 * passengers_nb)
-        )  # g/kWh * kWh/km
-        gdf["kgCO2eq"] = gdf["path_length"] * gdf["EF_tot"]
-        # Add infra and construction
-        gdf = pd.concat([
-            pd.DataFrame({
-                "kgCO2eq": [route_length * EF_ecar["construction"] / passengers_nb],
-                "EF_tot": [EF_ecar["construction"]],
-                "colors": [color_cons],
-                "NAME": ["Construction"],
-            }),
-            gdf,
-        ])
-        name = str(passengers_nb) + "p."
-        gdf["Mean of Transport"] = ["eCar " + name for k in range(gdf.shape[0])]
-        gdf["label"] = "Road"
-        gdf["length"] = str(int(route_length)) + "km (" + gdf["NAME"] + ")"
-        gdf["NAME"] = " " + gdf["NAME"]
-        gdf.reset_index(inplace=True)
-        data_ecar = gdf[["kgCO2eq", "colors", "NAME", "Mean of Transport"]]
-        geo_ecar = gdf[["colors", "label", "geometry", "length"]].dropna(axis=0)
-        # Returning the result
-        return data_ecar, geo_ecar, success
+    l_length = []
+    # Compute the true distance
+    geod = Geod(ellps="WGS84")
+    for geom in gdf.geometry.values:
+        l_length.append(geod.geometry_length(geom) / 1e3)
+    # Add the distance to the dataframe
+    gdf["path_length"] = l_length
+    # Rescale the length with route_dist (especially when simplified = True)
+    # print("Rescaling factor", route_length / gdf["path_length"].sum())
+    gdf["path_length"] *= route_length / gdf["path_length"].sum()
+    # Handle nb passengers
+    passengers_nb = int(passengers_nb)
+    # Compute emissions : EF * length
+    gdf["EF_tot"] = (
+        gdf["EF_tot"]
+        * EF_ecar["fuel"]
+        * (1 + 0.04 * (passengers_nb - 1))
+        / (1e3 * passengers_nb)
+    )  # g/kWh * kWh/km
+    gdf["kgCO2eq"] = gdf["path_length"] * gdf["EF_tot"]
+    # Add infra and construction
+    gdf = pd.concat([
+        pd.DataFrame({
+            "kgCO2eq": [route_length * EF_ecar["construction"] / passengers_nb],
+            "EF_tot": [EF_ecar["construction"]],
+            "colors": [color_cons],
+            "NAME": ["Construction"],
+        }),
+        gdf,
+    ])
+    name = str(passengers_nb) + "p."
+    gdf["Mean of Transport"] = ["eCar " + name for k in range(gdf.shape[0])]
+    gdf["label"] = "Road"
+    gdf["length"] = str(int(route_length)) + "km (" + gdf["NAME"] + ")"
+    gdf["NAME"] = " " + gdf["NAME"]
+    gdf.reset_index(inplace=True)
+    data_ecar = gdf[["kgCO2eq", "colors", "NAME", "Mean of Transport"]]
+    geo_ecar = gdf[["colors", "label", "geometry", "length"]].dropna(axis=0)
 
-    return pd.DataFrame(), pd.DataFrame(), False
+    return data_ecar, geo_ecar, success
 
 
 def car_bus_to_gdf(
@@ -171,60 +164,54 @@ def car_bus_to_gdf(
         - EF_bus, float emission factor for bus by pkm
         - color, color in hex of path and bar chart
         - validate
-        - nb, number of passenger in the car (used only for custom trip)
     return:
         - full dataframe for car and bus, geometry only on car
 
     """
-    # Route OSRM - create a separate function
     route_geometry, route_length, success = find_route(departure_coords, arrival_coords)
 
-    # Validation part for route
-    if success:  # We have a geometry
-        if not validate_geometry(
-            departure_coords,
-            arrival_coords,
-            route_geometry,
-            validate,
-        ):
-            route_geometry, route_length, success = None, None, False
+    if not success or not validate_geometry(
+        departure_coords,
+        arrival_coords,
+        route_geometry,
+        validate,
+    ):
+        return pd.DataFrame(), pd.DataFrame(), pd.DataFrame(), False
 
-    if success:
-        # data_car
-        data_car = pd.DataFrame({
-            "kgCO2eq": [
-                route_length * EF_car["fuel"],
-                route_length * EF_car["construction"],
-            ],
-            "EF_tot": [EF_car["fuel"], EF_car["construction"]],
-            "path_length": [route_length, route_length],
-            "colors": [color_usage, color_cons],
-            "NAME": ["Fuel", "Construction"],
-            "Mean of Transport": ["Car 1p." for k in range(2)],
-        })[::-1]
-        # geo_car
-        geo_car = pd.DataFrame(
-            pd.Series({
-                "colors": color_usage,
-                "label": "Road",
-                "length": str(int(route_length)) + "km",
-                "geometry": route_geometry,
-            }),
-        ).transpose()
-        # data_bus
-        data_bus = pd.DataFrame({
-            "kgCO2eq": [
-                route_length * EF_bus["fuel"],
-                route_length * EF_bus["construction"],
-            ],
-            "EF_tot": [EF_bus["fuel"], EF_bus["construction"]],
-            "path_length": [route_length, route_length],
-            "colors": [color_usage, color_cons],
-            "NAME": ["Fuel", "Construction"],
-            "Mean of Transport": ["Bus" for k in range(2)],
-        })[::-1]
-    else:
-        data_car, geo_car, data_bus = pd.DataFrame(), pd.DataFrame(), pd.DataFrame()
+    # data_car
+    data_car = pd.DataFrame({
+        "kgCO2eq": [
+            route_length * EF_car["fuel"],
+            route_length * EF_car["construction"],
+        ],
+        "EF_tot": [EF_car["fuel"], EF_car["construction"]],
+        "path_length": [route_length, route_length],
+        "colors": [color_usage, color_cons],
+        "NAME": ["Fuel", "Construction"],
+        "Mean of Transport": ["Car 1p." for k in range(2)],
+    })[::-1]
+    # geo_car
+    geo_car = pd.DataFrame(
+        pd.Series({
+            "colors": color_usage,
+            "label": "Road",
+            "length": str(int(route_length)) + "km",
+            "geometry": route_geometry,
+        }),
+    ).transpose()
+    # data_bus
+    data_bus = pd.DataFrame({
+        "kgCO2eq": [
+            route_length * EF_bus["fuel"],
+            route_length * EF_bus["construction"],
+        ],
+        "EF_tot": [EF_bus["fuel"], EF_bus["construction"]],
+        "path_length": [route_length, route_length],
+        "colors": [color_usage, color_cons],
+        "NAME": ["Fuel", "Construction"],
+        "Mean of Transport": ["Bus" for k in range(2)],
+    })[::-1]
+
     return data_car, geo_car, data_bus, success
 
 
@@ -241,51 +228,44 @@ def bus_to_gdf(
         - EF_bus, float emission factor for bus by pkm
         - color, color in hex of path and bar chart
         - validate
-        - nb, number of passenger in the car (used only for custom trip).
 
     Return:
     ------
         - full dataframe for bus
 
     """
-    # Route OSRM - create a separate function
     route_geometry, route_length, success = find_route(departure_coords, arrival_coords)
 
-    # Validation part for route
-    if success:  # We have a geometry
-        if not validate_geometry(
-            departure_coords,
-            arrival_coords,
-            route_geometry,
-            validate,
-        ):
-            route_geometry, route_length, success = None, None, False
+    if not success or not validate_geometry(
+        departure_coords,
+        arrival_coords,
+        route_geometry,
+        validate,
+    ):
+        return pd.DataFrame(), pd.DataFrame(), False
 
-    if success:
-        # data_bus
-        data_bus = pd.DataFrame({
-            "kgCO2eq": [
-                route_length * EF_bus["fuel"],
-                route_length * EF_bus["construction"],
-            ],
-            "EF_tot": [EF_bus["fuel"], EF_bus["construction"]],
-            "path_length": [route_length, route_length],
-            "colors": [color_usage, color_cons],
-            "NAME": ["Fuel", "Construction"],
-            "Mean of Transport": ["Bus" for k in range(2)],
-        })[::-1]
-        # geo_bus
-        geo_bus = pd.DataFrame(
-            pd.Series({
-                "colors": color_usage,
-                "label": "Road",
-                "length": str(int(route_length)) + "km",
-                "geometry": route_geometry,
-            }),
-        ).transpose()
+    # data_bus
+    data_bus = pd.DataFrame({
+        "kgCO2eq": [
+            route_length * EF_bus["fuel"],
+            route_length * EF_bus["construction"],
+        ],
+        "EF_tot": [EF_bus["fuel"], EF_bus["construction"]],
+        "path_length": [route_length, route_length],
+        "colors": [color_usage, color_cons],
+        "NAME": ["Fuel", "Construction"],
+        "Mean of Transport": ["Bus" for k in range(2)],
+    })[::-1]
+    # geo_bus
+    geo_bus = pd.DataFrame(
+        pd.Series({
+            "colors": color_usage,
+            "label": "Road",
+            "length": str(int(route_length)) + "km",
+            "geometry": route_geometry,
+        }),
+    ).transpose()
 
-    else:
-        data_bus, geo_bus = pd.DataFrame(), pd.DataFrame()
     return data_bus, geo_bus, success
 
 
@@ -310,51 +290,43 @@ def car_to_gdf(
         - full dataframe for car
 
     """
-    # Route OSRM - create a separate function
     route_geometry, route_length, success = find_route(departure_coords, arrival_coords)
+
+    if not success or not validate_geometry(
+        departure_coords,
+        arrival_coords,
+        route_geometry,
+        validate,
+    ):
+        return pd.DataFrame(), pd.DataFrame(), False
+
     if passengers_nb != "👍":
         passengers_nb = int(passengers_nb)
         EF_fuel = EF_car["fuel"] * (1 + 0.04 * (passengers_nb - 1)) / passengers_nb
         EF_cons = EF_car["construction"] / passengers_nb
-        # _EF_infra = EF_car['infra'] /nb
         name = str(passengers_nb) + "p."
     else:  # Hitch-hiking
         EF_fuel = EF_car["fuel"] * 0.04
-        EF_cons, _EF_infra = 0, 0
-        name = "👍"  # 'HH'
+        EF_cons = 0
+        name = "👍"
 
-    # Validation part for route
-    if success:  # We have a geometry
-        if not validate_geometry(
-            departure_coords,
-            arrival_coords,
-            route_geometry,
-            validate,
-        ):
-            route_geometry, route_length, success = None, None, False
+    # data car
+    data_car = pd.DataFrame({
+        "kgCO2eq": [route_length * EF_fuel, route_length * EF_cons],
+        "EF_tot": [EF_fuel, EF_cons],
+        "path_length": [route_length, route_length],
+        "colors": [color_usage, color_cons],
+        "NAME": ["Fuel", "Construction"],
+        "Mean of Transport": ["Car " + name for k in range(2)],
+    })[::-1]
+    # geo_car
+    geo_car = pd.DataFrame(
+        pd.Series({
+            "colors": color_usage,
+            "label": "Road",
+            "length": str(int(route_length)) + "km",
+            "geometry": route_geometry,
+        }),
+    ).transpose()
 
-    if success:
-        # data car
-        data_car = pd.DataFrame({
-            "kgCO2eq": [route_length * EF_fuel, route_length * EF_cons],
-            "EF_tot": [EF_fuel, EF_cons],
-            "path_length": [route_length, route_length],
-            "colors": [color_usage, color_cons],
-            "NAME": ["Fuel", "Construction"],
-            "Mean of Transport": ["Car " + name for k in range(2)],
-        })[::-1]
-        # geo_car
-        geo_car = pd.DataFrame(
-            pd.Series({
-                "colors": color_usage,
-                "label": "Road",
-                "length": str(int(route_length)) + "km",
-                "geometry": route_geometry,
-            }),
-        ).transpose()
-
-    else:
-        data_car, geo_car = pd.DataFrame(), pd.DataFrame()
-
-    # Return the result
     return data_car, geo_car, success
