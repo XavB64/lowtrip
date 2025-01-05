@@ -33,6 +33,9 @@ from parameters import (
 from utils import filter_countries_world, validate_geom as validate_geometry
 
 
+OSM_ROUTER_URL = "http://router.project-osrm.org/route/v1/driving"
+
+
 def find_route(
     departure_coords: tuple[float, float],
     arrival_coords: tuple[float, float],
@@ -48,30 +51,20 @@ def find_route(
         - success : boolean
 
     """
-    ### Route OSRM - create a separate function
-    url = (
-        "http://router.project-osrm.org/route/v1/driving/"
-        + str(departure_coords[0])
-        + ","
-        + str(departure_coords[1])
-        + ";"
-        + str(arrival_coords[0])
-        + ","
-        + str(arrival_coords[1])
-        + "?overview="
-        + route_s
-        + "&geometries=geojson"
+    response = requests.get(
+        f"{OSM_ROUTER_URL}/{departure_coords[0]},{departure_coords[1]};{arrival_coords[0]},{arrival_coords[1]}?overview={route_s}&geometries=geojson",
     )
-    response = requests.get(url)
-    if response.status_code == HTTPStatus.OK:
-        geometry = response.json()["routes"][0]["geometry"]
-        route_geometry = LineString(
-            geometry["coordinates"],
-        )  # convert.decode_polyline(geom)
-        route_length = response.json()["routes"][0]["distance"] / 1e3  # In km
-        success = True
-    else:
+
+    if response.status_code != HTTPStatus.OK:
         route_geometry, route_length, success = None, None, False
+        return route_geometry, route_length, success
+
+    route = response.json()["routes"][0]
+    route_geometry = LineString(
+        route["geometry"]["coordinates"],
+    )
+    route_length = route["distance"] / 1e3  # In km
+    success = True
 
     return route_geometry, route_length, success
 
