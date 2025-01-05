@@ -326,15 +326,15 @@ def car_to_gdf(
     ):
         return pd.DataFrame(), pd.DataFrame(), False
 
-    if passengers_nb != "👍":
+    if passengers_nb == "👍":  # Hitch-hiking
+        EF_fuel = EF_car["fuel"] * 0.04
+        EF_cons = 0
+        passengers_label = "👍"
+    else:
         passengers_nb = int(passengers_nb)
         EF_fuel = EF_car["fuel"] * (1 + 0.04 * (passengers_nb - 1)) / passengers_nb
         EF_cons = EF_car["construction"] / passengers_nb
-        name = str(passengers_nb) + "p."
-    else:  # Hitch-hiking
-        EF_fuel = EF_car["fuel"] * 0.04
-        EF_cons = 0
-        name = "👍"
+        passengers_label = f"{passengers_nb}p."
 
     data_car = get_car_emissions(
         route_length,
@@ -342,7 +342,7 @@ def car_to_gdf(
         EF_cons,
         color_usage,
         color_cons,
-        name,
+        passengers_label,
     )
 
     road_geometry = get_road_geometry_data(route_length, route_geometry, color_usage)
