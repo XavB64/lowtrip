@@ -17,6 +17,7 @@
 
 from http import HTTPStatus
 import os
+from typing import Tuple
 
 import pandas as pd
 import requests
@@ -26,46 +27,55 @@ from parameters import EF_bicycle, val_perimeter
 from utils import validate_geom
 
 
-def find_bicycle(tag1, tag2):
-    ### Openrouteservie
-    api_key = os.environ.get("BICYCLE_API_KEY")
+API_KEY = os.environ.get("BICYCLE_API_KEY")
+
+
+def find_bicycle(
+    departure_coords: Tuple[float, float], arrival_coords: Tuple[float, float]
+):
+    ### Open route service
     url = (
         "https://api.openrouteservice.org/v2/directions/cycling-regular?api_key="
-        + api_key
+        + API_KEY
         + "&start="
-        + str(tag1[0])
+        + str(departure_coords[0])
         + ","
-        + str(tag1[1])
+        + str(departure_coords[1])
         + "&end="
-        + str(tag2[0])
+        + str(arrival_coords[0])
         + ","
-        + str(tag2[1])
+        + str(arrival_coords[1])
     )
     response = requests.get(url)
     if response.status_code == HTTPStatus.OK:
-        geom = response.json()["features"][0]["geometry"]
-        geom_route = LineString(geom["coordinates"]).simplify(
+        geometry = response.json()["features"][0]["geometry"]
+        route_geometry = LineString(geometry["coordinates"]).simplify(
             0.05,
             preserve_topology=False,
         )  # convert.decode_polyline(geom)
-        route = True
-        route_dist = (
+        success = True
+        route_length = (
             response.json()["features"][0]["properties"]["summary"]["distance"] / 1e3
         )  # km
-        print("Bicycle length", round(route_dist, 1))
+        print("Bicycle length", round(route_length, 1))
     else:
-        geom_route, route, route_dist = None, False, None
+        route_geometry, success, route_length = None, False, None
 
-    return geom_route, route, route_dist
+    return route_geometry, success, route_length
 
 
-def bicycle_to_gdf(tag1, tag2, EF=EF_bicycle, color="#ffffff", validate=val_perimeter):
+def bicycle_to_gdf(
+    departure_coords: Tuple[float, float],
+    arrival_coords: Tuple[float, float],
+    EF=EF_bicycle,
+    color="#ffffff",
+    validate=val_perimeter,
+):
     """Parameters
-        - tag1, tag2
+        - departure_coords, arrival_coords
         - EF_bus, float emission factor for bike by pkm
         - color, color in hex of path and bar chart
         - validate
-        - nb, number of passenger in the car (used only for custom trip).
 
     Return:
     ------
@@ -73,19 +83,23 @@ def bicycle_to_gdf(tag1, tag2, EF=EF_bicycle, color="#ffffff", validate=val_peri
 
     """
     # Route OSRM - create a separate function
-    geom_route, route, route_dist = find_bicycle(tag1, tag2)
+    route_geometry, success, route_length = find_bicycle(
+        departure_coords, arrival_coords
+    )
 
     # Validation part for route
-    if route:  # We have a geometry
-        if not validate_geom(tag1, tag2, geom_route, validate):
-            geom_route, route, route_dist = None, False, None
+    if success:  # We have a geometry
+        if not validate_geom(
+            departure_coords, arrival_coords, route_geometry, validate
+        ):
+            route_geometry, success, route_length = None, False, None
 
-    if route:
+    if success:
         # Chart data
         data_bike = pd.DataFrame({
-            "kgCO2eq": [EF * route_dist],
+            "kgCO2eq": [EF * route_length],
             "EF_tot": [EF],
-            "path_length": [route_dist],
+            "path_length": [route_length],
             "colors": [color],
             "NAME": ["Bike-build"],
             "Mean of Transport": ["Bicycle"],
@@ -94,10 +108,10 @@ def bicycle_to_gdf(tag1, tag2, EF=EF_bicycle, color="#ffffff", validate=val_peri
         gdf_bike = pd.DataFrame({
             "colors": [color],
             "label": ["Bike"],
-            "length": str(int(route_dist)) + "km",
-            "geometry": [geom_route],
+            "length": str(int(route_length)) + "km",
+            "geometry": [route_geometry],
         })
 
     else:
         data_bike, gdf_bike = pd.DataFrame(), pd.DataFrame()
-    return data_bike, gdf_bike, route
+    return data_bike, gdf_bike, success
