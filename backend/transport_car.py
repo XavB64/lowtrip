@@ -146,6 +146,44 @@ def ecar_to_gdf(
     return data_ecar, geo_ecar, success
 
 
+def get_car_emissions(
+    route_length: float,
+    EF_fuel: float,
+    EF_construction: float,
+    color_usage: str,
+    color_construction: str,
+    passengers_label: str,
+):
+    return pd.DataFrame({
+        "kgCO2eq": [route_length * EF_fuel, route_length * EF_construction],
+        "EF_tot": [EF_fuel, EF_construction],
+        "path_length": [route_length, route_length],
+        "colors": [color_usage, color_construction],
+        "NAME": ["Fuel", "Construction"],
+        "Mean of Transport": [f"Car {passengers_label}", f"Car {passengers_label}"],
+    })[::-1]
+
+
+def get_bus_emissions(
+    route_length: float,
+    EF_fuel: float,
+    EF_construction: float,
+    color_usage: str,
+    color_construction: str,
+):
+    return pd.DataFrame({
+        "kgCO2eq": [
+            route_length * EF_fuel,
+            route_length * EF_construction,
+        ],
+        "EF_tot": [EF_fuel, EF_construction],
+        "path_length": [route_length, route_length],
+        "colors": [color_usage, color_construction],
+        "NAME": ["Fuel", "Construction"],
+        "Mean of Transport": ["Bus", "Bus"],
+    })[::-1]
+
+
 def car_bus_to_gdf(
     departure_coords: tuple[float, float],
     arrival_coords: tuple[float, float],
@@ -178,18 +216,14 @@ def car_bus_to_gdf(
     ):
         return pd.DataFrame(), pd.DataFrame(), pd.DataFrame(), False
 
-    # data_car
-    data_car = pd.DataFrame({
-        "kgCO2eq": [
-            route_length * EF_car["fuel"],
-            route_length * EF_car["construction"],
-        ],
-        "EF_tot": [EF_car["fuel"], EF_car["construction"]],
-        "path_length": [route_length, route_length],
-        "colors": [color_usage, color_cons],
-        "NAME": ["Fuel", "Construction"],
-        "Mean of Transport": ["Car 1p." for k in range(2)],
-    })[::-1]
+    data_car = get_car_emissions(
+        route_length,
+        EF_car["fuel"],
+        EF_car["construction"],
+        color_usage,
+        color_cons,
+        "1p.",
+    )
     # geo_car
     geo_car = pd.DataFrame(
         pd.Series({
@@ -199,18 +233,14 @@ def car_bus_to_gdf(
             "geometry": route_geometry,
         }),
     ).transpose()
-    # data_bus
-    data_bus = pd.DataFrame({
-        "kgCO2eq": [
-            route_length * EF_bus["fuel"],
-            route_length * EF_bus["construction"],
-        ],
-        "EF_tot": [EF_bus["fuel"], EF_bus["construction"]],
-        "path_length": [route_length, route_length],
-        "colors": [color_usage, color_cons],
-        "NAME": ["Fuel", "Construction"],
-        "Mean of Transport": ["Bus" for k in range(2)],
-    })[::-1]
+
+    data_bus = get_bus_emissions(
+        route_length,
+        EF_bus["fuel"],
+        EF_bus["construction"],
+        color_usage,
+        color_cons,
+    )
 
     return data_car, geo_car, data_bus, success
 
@@ -244,18 +274,14 @@ def bus_to_gdf(
     ):
         return pd.DataFrame(), pd.DataFrame(), False
 
-    # data_bus
-    data_bus = pd.DataFrame({
-        "kgCO2eq": [
-            route_length * EF_bus["fuel"],
-            route_length * EF_bus["construction"],
-        ],
-        "EF_tot": [EF_bus["fuel"], EF_bus["construction"]],
-        "path_length": [route_length, route_length],
-        "colors": [color_usage, color_cons],
-        "NAME": ["Fuel", "Construction"],
-        "Mean of Transport": ["Bus" for k in range(2)],
-    })[::-1]
+    data_bus = get_bus_emissions(
+        route_length,
+        EF_bus["fuel"],
+        EF_bus["construction"],
+        color_usage,
+        color_cons,
+    )
+
     # geo_bus
     geo_bus = pd.DataFrame(
         pd.Series({
@@ -310,15 +336,14 @@ def car_to_gdf(
         EF_cons = 0
         name = "👍"
 
-    # data car
-    data_car = pd.DataFrame({
-        "kgCO2eq": [route_length * EF_fuel, route_length * EF_cons],
-        "EF_tot": [EF_fuel, EF_cons],
-        "path_length": [route_length, route_length],
-        "colors": [color_usage, color_cons],
-        "NAME": ["Fuel", "Construction"],
-        "Mean of Transport": ["Car " + name for k in range(2)],
-    })[::-1]
+    data_car = get_car_emissions(
+        route_length,
+        EF_fuel,
+        EF_cons,
+        color_usage,
+        color_cons,
+        name,
+    )
     # geo_car
     geo_car = pd.DataFrame(
         pd.Series({
