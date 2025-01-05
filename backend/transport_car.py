@@ -15,155 +15,60 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-# Need for ferry if straight line
-# from shapely.geometry import LineString
+from http import HTTPStatus
+
 import geopandas as gpd
 import pandas as pd
 from pyproj import Geod
+import requests
+from shapely.geometry import LineString
 
 from parameters import (
-    cont_coeff,
-    detour,
-    EF_bicycle,
     EF_bus,
     EF_car,
     EF_ecar,
-    EF_ferry,
-    EF_plane,
-    EF_sail,
-    EF_train,
-    hold,
-    search_perimeter,
+    route_s,
     val_perimeter,
 )
-from utils import (
-    extend_search,
-    filter_countries_world,
-    find_bicycle,
-    find_route,
-    find_train,
-    gdf_lines,
-    get_shortest_path,
-    great_circle_geometry,
-    validate_geom,
-)
+from utils import filter_countries_world, validate_geom
 
 
-def bicycle_to_gdf(tag1, tag2, EF=EF_bicycle, color="#ffffff", validate=val_perimeter):
-    """Parameters
-        - tag1, tag2
-        - EF_bus, float emission factor for bike by pkm
-        - color, color in hex of path and bar chart
-        - validate
-        - nb, number of passenger in the car (used only for custom trip).
+def find_route(tag1, tag2):
+    """Find road path between 2 points
+    parameters:
+        - tag1, tag2 : list or tuple like ; (lon, lat).
 
     Return:
     ------
-        - full dataframe for bike
+        - geom_route : shapely geometry linestring
+        - route_dist : float, distance in km
+        - route : boolean
 
     """
-    # Route OSRM - create a separate function
-    geom_route, route, route_dist = find_bicycle(tag1, tag2)
-
-    # Validation part for route
-    if route:  # We have a geometry
-        if not validate_geom(tag1, tag2, geom_route, validate):
-            geom_route, route, route_dist = None, False, None
-
-    if route:
-        # Chart data
-        data_bike = pd.DataFrame({
-            "kgCO2eq": [EF * route_dist],
-            "EF_tot": [EF],
-            "path_length": [route_dist],
-            "colors": [color],
-            "NAME": ["Bike-build"],
-            "Mean of Transport": ["Bicycle"],
-        })
-        # Geo_data
-        gdf_bike = pd.DataFrame({
-            "colors": [color],
-            "label": ["Bike"],
-            "length": str(int(route_dist)) + "km",
-            "geometry": [geom_route],
-        })
-
+    ### Route OSRM - create a separate function
+    url = (
+        "http://router.project-osrm.org/route/v1/driving/"
+        + str(tag1[0])
+        + ","
+        + str(tag1[1])
+        + ";"
+        + str(tag2[0])
+        + ","
+        + str(tag2[1])
+        + "?overview="
+        + route_s
+        + "&geometries=geojson"
+    )
+    response = requests.get(url)
+    if response.status_code == HTTPStatus.OK:
+        geom = response.json()["routes"][0]["geometry"]
+        geom_route = LineString(geom["coordinates"])  # convert.decode_polyline(geom)
+        route_dist = response.json()["routes"][0]["distance"] / 1e3  # In km
+        route = True
     else:
-        data_bike, gdf_bike = pd.DataFrame(), pd.DataFrame()
-    return data_bike, gdf_bike, route
+        geom_route, route_dist, route = None, None, False
 
-
-def train_to_gdf(
-    tag1,
-    tag2,
-    perims=search_perimeter,
-    EF_train=EF_train,
-    validate=val_perimeter,
-    color_usage="#ffffff",
-    color_infra="#ffffff",
-):  # charte_mollow
-    """Parameters
-        - tag1, tag2
-        - perims
-        - validate
-        - colormap, list of colors
-    return:
-        - full dataframe for trains.
-
-    """
-    # First try with coordinates supplied by the user
-    gdf, train, train_dist = find_train(tag1, tag2)
-
-    # If failure then we try to find a better spot nearby - Put in another function
-    if train == False:
-        # We try to search nearby the coordinates and request again
-        gdf, train, train_dist = extend_search(tag1, tag2, perims)
-
-    # Validation part for train
-    if train:  # We have a geometry
-        if not validate_geom(tag1, tag2, gdf.values[0], validate):
-            return pd.DataFrame(), pd.DataFrame(), False
-
-        # We need to filter by country and add length / Emission factors
-        gdf = filter_countries_world(gdf, method="train")
-        # Adding and computing emissions
-        l_length = []
-        # Compute the true distance
-        geod = Geod(ellps="WGS84")
-        for geom in gdf.geometry.values:
-            l_length.append(geod.geometry_length(geom) / 1e3)
-        # Add the distance to the dataframe
-        gdf["path_length"] = l_length
-        # Rescale the length with train_dist (especially when simplified = True)
-        print("Rescaling factor", train_dist / gdf["path_length"].sum())
-        gdf["path_length"] *= train_dist / gdf["path_length"].sum()
-        # Compute emissions : EF * length
-        gdf["EF_tot"] /= 1000.0  # Conversion in kg
-        gdf["kgCO2eq"] = gdf["path_length"] * gdf["EF_tot"]
-        # Add colors, here discretise the colormap
-        gdf["colors"] = color_usage
-        # Write
-        gdf = pd.concat([
-            pd.DataFrame({
-                "kgCO2eq": [train_dist * EF_train["infra"]],
-                "EF_tot": [EF_train["infra"]],
-                "colors": [color_infra],
-                "NAME": ["Infra"],
-            }),
-            gdf,
-        ])
-
-        # Add infra
-        gdf["Mean of Transport"] = "Train"
-        gdf["label"] = "Railway"
-        gdf["length"] = str(int(train_dist)) + "km (" + gdf["NAME"] + ")"
-        gdf.reset_index(inplace=True)
-
-        data_train = gdf[["kgCO2eq", "colors", "NAME", "Mean of Transport"]]
-        geo_train = gdf[["colors", "label", "geometry", "length"]].dropna(axis=0)
-        # Returning the result
-        return data_train, geo_train, train
-    return pd.DataFrame(), pd.DataFrame(), False
+    return geom_route, route_dist, route
 
 
 def ecar_to_gdf(
@@ -432,162 +337,3 @@ def car_to_gdf(
 
     # Return the result
     return data_car, geo_car, route
-
-
-def plane_to_gdf(
-    tag1,
-    tag2,
-    EF_plane=EF_plane,
-    contrails=cont_coeff,
-    holding=hold,
-    detour=detour,
-    color_usage="#ffffff",
-    color_cont="#ffffff",
-):
-    """Parameters
-        - tag1, tag2
-        - EF : emission factor in gCO2/pkm for plane depending on journey length
-        - contrails : coefficient to apply to take into account non-CO2 effects
-        - holding : additional CO2 emissions (kg) due to holding patterns
-        - color : color for path and bar chart
-        - color_contrails : color for non CO2-effects in bar chart
-    return:
-        - full dataframe for plane, geometry for CO2 only (optimization).
-
-    """
-    # Compute geometry and distance (geodesic)
-    geom_plane, bird = great_circle_geometry(tag1, tag2)
-
-    # Different emission factors depending on the trip length
-    if bird < 1000:
-        trip_category = "short"
-    elif bird < 3500:
-        trip_category = "medium"
-    else:  # It's > 3500
-        trip_category = "long"
-    # detour_coeffient
-    bird *= detour
-
-    emissions_factors = EF_plane[trip_category]
-    CO2_factors = emissions_factors["combustion"] + emissions_factors["upstream"]
-    non_CO2_factors = emissions_factors["combustion"] * contrails
-
-    data_plane = pd.DataFrame({
-        "kgCO2eq": [
-            bird * CO2_factors + holding,
-            bird * non_CO2_factors,
-        ],
-        "EF_tot": [
-            CO2_factors,
-            non_CO2_factors,
-        ],
-        "colors": [color_usage, color_cont],
-        "NAME": ["Kerosene", "Contrails"],
-        "Mean of Transport": ["Plane", "Plane"],
-    })
-    # Geo plane
-    geo_plane = pd.DataFrame(
-        pd.Series({
-            "colors": color_usage,
-            "label": "Flight",
-            "length": str(int(bird)) + "km",
-            "geometry": geom_plane,
-        }),
-    ).transpose()
-    return data_plane, geo_plane
-
-
-def ferry_to_gdf(tag1, tag2, EF=EF_ferry, options="None", color_usage="#ffffff"):
-    """Parameters
-        - tag1, tag2
-        - EF : emission factor in gCO2/pkm for ferry
-        - color : color for path and bar chart
-    return:
-        - full dataframe for ferry.
-
-    """
-    # Compute geometry
-    # Convert the inputs in float
-    start = tuple([float(x) for x in tag1])
-    end = tuple([float(x) for x in tag2])
-    # Here new function
-    geom = get_shortest_path(gdf_lines(start, end), start, end)
-    # geom = LineString([tag1, tag2])
-    # Compute the true distance
-    geod = Geod(ellps="WGS84")
-    bird = geod.geometry_length(geom) / 1e3
-    # Compute the good emission factor
-    if options == "None":
-        EF = EF["Seat"] + EF["Base"]
-    elif options == "Cabin":
-        EF = EF["Cabin"] + EF["Base"]
-    elif options == "Vehicle":
-        EF = EF["Car"] + EF["Seat"] + EF["Base"]
-    elif options == "CabinVehicle":
-        EF = EF["Car"] + EF["Cabin"] + EF["Base"]
-
-    # Compute geodataframe and dataframe
-    # data
-    data_ferry = pd.DataFrame(
-        pd.Series({
-            "kgCO2eq": EF * bird,
-            "EF_tot": EF,
-            "path_length": bird,
-            "colors": color_usage,
-            "NAME": options,
-            "Mean of Transport": "Ferry",
-        }),
-    ).transpose()
-    geo_ferry = pd.DataFrame(
-        pd.Series({
-            "colors": color_usage,
-            "label": "Ferry",
-            "length": str(int(bird)) + "km",
-            "geometry": geom,
-        }),
-    ).transpose()
-
-    return data_ferry, geo_ferry
-
-
-def sail_to_gdf(tag1, tag2, EF=EF_sail, color_usage="#ffffff"):
-    """Parameters
-        - tag1, tag2
-        - EF : emission factor in gCO2/pkm for ferry
-        - color : color for path and bar chart
-    return:
-        - full dataframe for ferry.
-
-    """
-    # Compute geometry
-    # Convert the inputs in float
-    start = tuple([float(x) for x in tag1])
-    end = tuple([float(x) for x in tag2])
-    # Here new function
-    geom = get_shortest_path(gdf_lines(start, end), start, end)
-    # geom = LineString([tag1, tag2])
-    # Compute the true distance
-    geod = Geod(ellps="WGS84")
-    bird = geod.geometry_length(geom) / 1e3
-    # Compute geodataframe and dataframe
-    # data
-    data_ferry = pd.DataFrame(
-        pd.Series({
-            "kgCO2eq": EF * bird,
-            "EF_tot": EF,
-            "path_length": bird,
-            "colors": color_usage,
-            "NAME": "Usage",
-            "Mean of Transport": "Sail",
-        }),
-    ).transpose()
-    geo_ferry = pd.DataFrame(
-        pd.Series({
-            "colors": color_usage,
-            "label": "Sail",
-            "length": str(int(bird)) + "km",
-            "geometry": geom,
-        }),
-    ).transpose()
-
-    return data_ferry, geo_ferry
