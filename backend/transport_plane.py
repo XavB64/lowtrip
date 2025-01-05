@@ -19,34 +19,61 @@ import pandas as pd
 from pyproj import Geod
 from shapely.geometry import LineString
 
-from parameters import (
-    cont_coeff,
-    detour,
-    EF_plane,
-    hold,
-    nb_pts,
-)
+
+EF_plane = {
+    "short": {
+        "construction": 0.00038,
+        "upstream": 0.0242,
+        "combustion": 0.117,
+        "infra": 0.0003,
+    },
+    "medium": {
+        "construction": 0.00036,
+        "upstream": 0.0176,
+        "combustion": 0.0848,
+        "infra": 0.0003,
+    },
+    "long": {
+        "construction": 0.00026,
+        "upstream": 0.0143,
+        "combustion": 0.0687,
+        "infra": 0.0003,
+    },
+}
 
 
-def great_circle_geometry(dep, arr, nb=nb_pts):
-    """Create the great circle geometry with pyproj
-    parameters:
-        - nb : number of points
-        - dep, arr : departure and arrival
-    return:
+# Number of points in plane geometry
+POINTS_NB = 100
+
+# Additional emissions from plane
+CONTRAILS_COEFF = 2
+HOLD = 3.81  # kg/p
+DETOUR_COEFF = 1.076
+
+
+def great_circle_geometry(
+    departure_coords: tuple[float, float],
+    arrival_coords: tuple[float, float],
+):
+    """Create the great circle geometry with pyproj.
+
+    parameters: departure_coords, arrival_coords
+
+    Return:
         - shapely geometry (Linestring)
-        - Geodesic distance in km.
+        - Geodesic distance in km
+
     """
-    # projection
     geod = Geod(ellps="WGS84")
-    # returns a list of longitude/latitude pairs describing npts equally spaced
+
+    # returns a list of longitude/latitude pairs describing n points equally spaced
     # intermediate points along the geodesic between the initial and terminus points.
     r = geod.inv_intermediate(
-        lon1=float(dep[0]),
-        lat1=float(dep[1]),
-        lon2=float(arr[0]),
-        lat2=float(arr[1]),
-        npts=nb,
+        lon1=float(departure_coords[0]),
+        lat1=float(departure_coords[1]),
+        lon2=float(arrival_coords[0]),
+        lat2=float(arrival_coords[1]),
+        npts=POINTS_NB,
         initial_idx=0,
         terminus_idx=0,
     )
@@ -65,22 +92,21 @@ def great_circle_geometry(dep, arr, nb=nb_pts):
     else:
         l = [[lon, lat] for lon, lat in zip(r.lons, r.lats)]
 
-    # Return geometry and distance
     return LineString(l), r.dist / 1e3  # in km
 
 
 def plane_to_gdf(
-    tag1,
-    tag2,
+    departure_coords: tuple[float, float],
+    arrival_coords: tuple[float, float],
     EF_plane=EF_plane,
-    contrails=cont_coeff,
-    holding=hold,
-    detour=detour,
+    contrails=CONTRAILS_COEFF,
+    holding=HOLD,
+    detour=DETOUR_COEFF,
     color_usage="#ffffff",
-    color_cont="#ffffff",
+    color_contrails="#ffffff",
 ):
     """Parameters
-        - tag1, tag2
+        - departure_coords, arrival_coords
         - EF : emission factor in gCO2/pkm for plane depending on journey length
         - contrails : coefficient to apply to take into account non-CO2 effects
         - holding : additional CO2 emissions (kg) due to holding patterns
@@ -91,17 +117,21 @@ def plane_to_gdf(
 
     """
     # Compute geometry and distance (geodesic)
-    geom_plane, bird = great_circle_geometry(tag1, tag2)
+    plane_geometry, route_length = great_circle_geometry(
+        departure_coords,
+        arrival_coords,
+    )
 
     # Different emission factors depending on the trip length
-    if bird < 1000:
+    if route_length < 1000:
         trip_category = "short"
-    elif bird < 3500:
+    elif route_length < 3500:
         trip_category = "medium"
-    else:  # It's > 3500
+    else:
         trip_category = "long"
-    # detour_coeffient
-    bird *= detour
+
+    # detour coeffient
+    route_length *= detour
 
     emissions_factors = EF_plane[trip_category]
     CO2_factors = emissions_factors["combustion"] + emissions_factors["upstream"]
@@ -109,24 +139,25 @@ def plane_to_gdf(
 
     data_plane = pd.DataFrame({
         "kgCO2eq": [
-            bird * CO2_factors + holding,
-            bird * non_CO2_factors,
+            route_length * CO2_factors + holding,
+            route_length * non_CO2_factors,
         ],
         "EF_tot": [
             CO2_factors,
             non_CO2_factors,
         ],
-        "colors": [color_usage, color_cont],
+        "colors": [color_usage, color_contrails],
         "NAME": ["Kerosene", "Contrails"],
         "Mean of Transport": ["Plane", "Plane"],
     })
-    # Geo plane
-    geo_plane = pd.DataFrame(
+
+    geometry_data = pd.DataFrame(
         pd.Series({
             "colors": color_usage,
             "label": "Flight",
-            "length": str(int(bird)) + "km",
-            "geometry": geom_plane,
+            "length": f"{route_length}km",
+            "geometry": plane_geometry,
         }),
     ).transpose()
-    return data_plane, geo_plane
+
+    return data_plane, geometry_data
