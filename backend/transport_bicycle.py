@@ -17,7 +17,6 @@
 
 from http import HTTPStatus
 import os
-from typing import Tuple
 
 import pandas as pd
 import requests
@@ -28,45 +27,39 @@ from utils import validate_geom
 
 
 API_KEY = os.environ.get("BICYCLE_API_KEY")
+OPEN_ROUTE_SERVICE = "https://api.openrouteservice.org/v2/directions/cycling-regular"
 
 
 def find_bicycle(
-    departure_coords: Tuple[float, float], arrival_coords: Tuple[float, float]
+    departure_coords: tuple[float, float],
+    arrival_coords: tuple[float, float],
 ):
     ### Open route service
-    url = (
-        "https://api.openrouteservice.org/v2/directions/cycling-regular?api_key="
-        + API_KEY
-        + "&start="
-        + str(departure_coords[0])
-        + ","
-        + str(departure_coords[1])
-        + "&end="
-        + str(arrival_coords[0])
-        + ","
-        + str(arrival_coords[1])
+    response = requests.get(
+        f"{OPEN_ROUTE_SERVICE}?api_key={API_KEY}&start={departure_coords[0]},{departure_coords[1]}&end={arrival_coords[0]},{arrival_coords[1]}",
     )
-    response = requests.get(url)
-    if response.status_code == HTTPStatus.OK:
-        geometry = response.json()["features"][0]["geometry"]
-        route_geometry = LineString(geometry["coordinates"]).simplify(
-            0.05,
-            preserve_topology=False,
-        )  # convert.decode_polyline(geom)
-        success = True
-        route_length = (
-            response.json()["features"][0]["properties"]["summary"]["distance"] / 1e3
-        )  # km
-        print("Bicycle length", round(route_length, 1))
-    else:
-        route_geometry, success, route_length = None, False, None
 
-    return route_geometry, success, route_length
+    if response.status_code != HTTPStatus.OK:
+        route_geometry, route, route_length = None, False, None
+        return route_geometry, route, route_length
+
+    # Simplify the geometry
+    route = response.json()["features"][0]
+    geometry = route["geometry"]
+    route_geometry = LineString(geometry["coordinates"]).simplify(
+        0.05,
+        preserve_topology=False,
+    )
+    route_length = route["properties"]["summary"]["distance"] / 1e3  # km
+
+    # print(f"Bicycle length: {round(route_length, 1)}km")
+
+    return route_geometry, True, route_length
 
 
 def bicycle_to_gdf(
-    departure_coords: Tuple[float, float],
-    arrival_coords: Tuple[float, float],
+    departure_coords: tuple[float, float],
+    arrival_coords: tuple[float, float],
     EF=EF_bicycle,
     color="#ffffff",
     validate=val_perimeter,
@@ -84,34 +77,32 @@ def bicycle_to_gdf(
     """
     # Route OSRM - create a separate function
     route_geometry, success, route_length = find_bicycle(
-        departure_coords, arrival_coords
+        departure_coords,
+        arrival_coords,
     )
 
+    if not success:
+        return pd.DataFrame(), pd.DataFrame(), False
+
     # Validation part for route
-    if success:  # We have a geometry
-        if not validate_geom(
-            departure_coords, arrival_coords, route_geometry, validate
-        ):
-            route_geometry, success, route_length = None, False, None
+    if not validate_geom(departure_coords, arrival_coords, route_geometry, validate):
+        return pd.DataFrame(), pd.DataFrame(), False
 
-    if success:
-        # Chart data
-        data_bike = pd.DataFrame({
-            "kgCO2eq": [EF * route_length],
-            "EF_tot": [EF],
-            "path_length": [route_length],
-            "colors": [color],
-            "NAME": ["Bike-build"],
-            "Mean of Transport": ["Bicycle"],
-        })
-        # Geo_data
-        gdf_bike = pd.DataFrame({
-            "colors": [color],
-            "label": ["Bike"],
-            "length": str(int(route_length)) + "km",
-            "geometry": [route_geometry],
-        })
+    # Chart data
+    data_bike = pd.DataFrame({
+        "kgCO2eq": [EF * route_length],
+        "EF_tot": [EF],
+        "path_length": [route_length],
+        "colors": [color],
+        "NAME": ["Bike-build"],
+        "Mean of Transport": ["Bicycle"],
+    })
+    # Geo_data
+    gdf_bike = pd.DataFrame({
+        "colors": [color],
+        "label": ["Bike"],
+        "length": str(int(route_length)) + "km",
+        "geometry": [route_geometry],
+    })
 
-    else:
-        data_bike, gdf_bike = pd.DataFrame(), pd.DataFrame()
     return data_bike, gdf_bike, success
