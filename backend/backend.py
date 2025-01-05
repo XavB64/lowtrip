@@ -122,7 +122,7 @@ def compute_emissions_custom(data, cmap=colors_custom):
             data_car, geo_car, car = car_to_gdf(
                 departure_coordinates,
                 arrival_coordinates,
-                nb=arrival.nb,
+                passengers_nb=arrival.nb,
                 color_usage=cmap["Road"],
                 color_cons=cmap["Cons_infra"],
             )
@@ -142,7 +142,7 @@ def compute_emissions_custom(data, cmap=colors_custom):
             data_ecar, geo_ecar, ecar = ecar_to_gdf(
                 departure_coordinates,
                 arrival_coordinates,
-                nb=arrival.nb,
+                passengers_nb=arrival.nb,
                 color_usage=cmap["Road"],
                 color_cons=cmap["Cons_infra"],
             )
