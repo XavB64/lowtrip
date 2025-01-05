@@ -27,7 +27,6 @@ from shapely.geometry import LineString, Point
 
 from parameters import (
     EF_train,
-    search_perimeter,
     train_s,
     train_t,
     val_perimeter,
@@ -39,21 +38,33 @@ from utils import (
 )
 
 
+# Search areas
+SEARCH_PERIMETER = [0.2, 5]  # km
+
+
 def flatten_list_of_tuples(lst):
     # We reverse the geometry so the latitude are written before the longitude (Overpass API nomenclature)
     return [item for tup in lst for item in tup[::-1]]
 
 
-def find_nearest(lon, lat, perim):
-    """This function find the nearest node for train raiway in the OSM network using Overpass API
-    parameters:
-        - lon, lat : coordinates in degree of the point
-        - perim : perimeters (m) to look around
-    return:
-        - new coordinates(lat, lon).
+def find_nearest(point: tuple[float, float], search_perimeter):
+    """This function find the nearest node for train raiway in the OSM network using Overpass API.
+
+    Parameters
+    ----------
+    - lon, lat : coordinates in degree of the point
+    - search_perimeter : perimeters (m) to look around
+
+    Return:
+    - new coordinates(lat, lon)
+
     """
     # Extend the area around the point
-    buff = list(Point(lon, lat).buffer(kilometer_to_degree(perim)).exterior.coords)
+    buff = list(
+        Point(point[0], point[1])
+        .buffer(kilometer_to_degree(search_perimeter))
+        .exterior.coords,
+    )
     # Request Overpass API turbo data :
     l = flatten_list_of_tuples(buff)
 
@@ -86,13 +97,17 @@ def find_nearest(lon, lat, perim):
     return False
 
 
-def extend_search(tag1, tag2, perims):
+def extend_search(
+    departure_coords: tuple[float, float],
+    arrival_coords: tuple[float, float],
+    search_perimeters,
+):
     """Function to use when the train path is not found directly by the API.
     We search for nearby coordinates and request it again.
 
     Parameters
     ----------
-        - tag1, tag2 : list or tuple like with coordinates (lon, lat)
+        - departure_coords, arrival_coords : list or tuple like with coordinates (lon, lat)
         - perims : list-like ; perimeters to search for with overpass API
     return:
         - gdf (geoseries)
@@ -100,43 +115,52 @@ def extend_search(tag1, tag2, perims):
 
     """
     # We extend the search progressively
-    for perim in perims:
+    for search_perimeter in search_perimeters:
         # Departure
-        tag1_new = find_nearest(tag1[0], tag1[1], perim)
-        if tag1_new != False:
+        new_departure = find_nearest(departure_coords, search_perimeter)
+        if new_departure != False:
             # Then we found a better place, we can stop the loop
             break
+
     # Maybe here try to check if the API is not already working
-    if tag1_new == False:
+    if new_departure == False:
         # Then we will find nothing
         gdf = pd.DataFrame()
         train = False
-        train_dist = None
-    # return None, False
+        path_length = None
     else:
         # We can retry the API
-        gdf, train, train_dist = find_train(tag1_new, tag2)
+        gdf, train, path_length = find_train(new_departure, arrival_coords)
         if train == False:
-            # We can change tag2
-            for perim in perims:  # Could be up to 10k  ~ size of Bdx
-                # Arrival
-                tag2_new = find_nearest(tag2[0], tag2[1], perim)
-                if tag2_new != False:
+            # We can change arrival_coords
+            for (
+                search_perimeter
+            ) in search_perimeters:  # Could be up to 10k  ~ size of Bdx
+                new_arrival = find_nearest(
+                    arrival_coords[0],
+                    arrival_coords[1],
+                    search_perimeter,
+                )
+                if new_arrival != False:
                     break
 
             # Verify that we want to try to request the API again
-            if tag1_new and tag2_new:
-                gdf, train, train_dist = find_train(tag1_new, tag2_new)
+            if new_departure and new_arrival:
+                gdf, train, path_length = find_train(new_departure, new_arrival)
 
-    return gdf, train, train_dist
+    return gdf, train, path_length
 
 
-def find_train(tag1, tag2, method="signal"):
+def find_train(
+    departure_coords: tuple[float, float],
+    arrival_coords: tuple[float, float],
+    method="signal",
+):
     """Find train path between 2 points. Can use ntag API or signal.
 
     Parameters
     ----------
-        - tag1, tag2 : list or tuple like (lon, lat)
+        - departure_coords, arrival_coords : list or tuple like (lon, lat)
         - method : signal / trainmap
     return:
         - gdf, a geoserie with the path geometry / None if failure
@@ -148,13 +172,13 @@ def find_train(tag1, tag2, method="signal"):
     if method == "trainmap":
         # trainmap
         url = (
-            f"https://trainmap.ntag.fr/api/route?dep={tag1[0]},{tag1[1]}&arr={tag2[0]},{tag2[1]}&simplify="
+            f"https://trainmap.ntag.fr/api/route?dep={departure_coords[0]},{departure_coords[1]}&arr={arrival_coords[0]},{arrival_coords[1]}&simplify="
             + train_t
         )  # 1 to simplify it
     else:
         # signal
         url = (
-            f"https://signal.eu.org/osm/eu/route/v1/train/{tag1[0]},{tag1[1]};{tag2[0]},{tag2[1]}?overview="
+            f"https://signal.eu.org/osm/eu/route/v1/train/{departure_coords[0]},{departure_coords[1]};{arrival_coords[0]},{arrival_coords[1]}?overview="
             + train_s
             + "&geometries=geojson"
         )  # simplified
@@ -177,7 +201,7 @@ def find_train(tag1, tag2, method="signal"):
         # geod = Geod(ellps="WGS84")
         # print('Train intial', geod.geometry_length(geom) / 1e3)
         else:
-            train_dist = response.json()["routes"][0]["distance"] / 1e3  # km
+            path_length = response.json()["routes"][0]["distance"] / 1e3  # km
             # Store data - signal
             gdf = gpd.GeoSeries(
                 LineString(response.json()["routes"][0]["geometry"]["coordinates"]),
@@ -187,23 +211,23 @@ def find_train(tag1, tag2, method="signal"):
     else:
         # Error message
         print(f"Failed to retrieve data. Status code: {response.status_code}")
-        gdf, train, train_dist = pd.DataFrame(), False, 0
+        gdf, train, path_length = pd.DataFrame(), False, 0
         # We will try to request again with overpass
-    return gdf, train, train_dist
+    return gdf, train, path_length
 
 
 def train_to_gdf(
-    tag1,
-    tag2,
-    perims=search_perimeter,
+    departure_coords: tuple[float, float],
+    arrival_coords: tuple[float, float],
+    search_perimeter=SEARCH_PERIMETER,
     EF_train=EF_train,
     validate=val_perimeter,
     color_usage="#ffffff",
     color_infra="#ffffff",
 ):  # charte_mollow
     """Parameters
-        - tag1, tag2
-        - perims
+        - departure_coords, arrival_coords
+        - search_perimeter
         - validate
         - colormap, list of colors
     return:
@@ -211,16 +235,20 @@ def train_to_gdf(
 
     """
     # First try with coordinates supplied by the user
-    gdf, train, train_dist = find_train(tag1, tag2)
+    gdf, train, train_dist = find_train(departure_coords, arrival_coords)
 
     # If failure then we try to find a better spot nearby - Put in another function
     if train == False:
         # We try to search nearby the coordinates and request again
-        gdf, train, train_dist = extend_search(tag1, tag2, perims)
+        gdf, train, train_dist = extend_search(
+            departure_coords,
+            arrival_coords,
+            search_perimeter,
+        )
 
     # Validation part for train
     if train:  # We have a geometry
-        if not validate_geom(tag1, tag2, gdf.values[0], validate):
+        if not validate_geom(departure_coords, arrival_coords, gdf.values[0], validate):
             return pd.DataFrame(), pd.DataFrame(), False
 
         # We need to filter by country and add length / Emission factors
