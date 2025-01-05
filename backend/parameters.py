@@ -102,37 +102,10 @@ EF_ferry = {
 
 EF_sail = 0.069
 
-EF_plane = {
-    "short": {
-        "construction": 0.00038,
-        "upstream": 0.0242,
-        "combustion": 0.117,
-        "infra": 0.0003,
-    },
-    "medium": {
-        "construction": 0.00036,
-        "upstream": 0.0176,
-        "combustion": 0.0848,
-        "infra": 0.0003,
-    },
-    "long": {
-        "construction": 0.00026,
-        "upstream": 0.0143,
-        "combustion": 0.0687,
-        "infra": 0.0003,
-    },
-}
-
 ##########
 ## Plane##
 ##########
 
-# Number of points in plane geometry
-nb_pts = 100
+
 # Min distance for plane comparison
 min_plane_dist = 300  # km
-
-# Additional emissions from plane
-cont_coeff = 2
-hold = 3.81  # kg/p
-detour = 1.076

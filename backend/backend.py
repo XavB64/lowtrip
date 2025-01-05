@@ -182,7 +182,7 @@ def compute_emissions_custom(data, cmap=colors_custom):
                 departure_coordinates,
                 arrival_coordinates,
                 color_usage=cmap["Plane"],
-                color_cont=cmap["Contrails"],
+                color_contrails=cmap["Contrails"],
             )
             data_plane["step"] = str(int(idx) + 1)
             emissions_data.append(data_plane)
@@ -321,7 +321,7 @@ def compute_emissions_all(data, cmap=colors_direct):
             tag1,
             tag2,
             color_usage=cmap["Plane"],
-            color_cont=cmap["Contrails"],
+            color_contrails=cmap["Contrails"],
         )
         l_data.append(data_plane)
         geo.append(geo_plane)
