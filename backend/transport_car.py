@@ -33,10 +33,13 @@ from parameters import (
 from utils import filter_countries_world, validate_geom
 
 
-def find_route(tag1, tag2):
+def find_route(
+    departure_coords: tuple[float, float],
+    arrival_coords: tuple[float, float],
+):
     """Find road path between 2 points
     parameters:
-        - tag1, tag2 : list or tuple like ; (lon, lat).
+        - departure_coords, arrival_coords : list or tuple like ; (lon, lat).
 
     Return:
     ------
@@ -48,13 +51,13 @@ def find_route(tag1, tag2):
     ### Route OSRM - create a separate function
     url = (
         "http://router.project-osrm.org/route/v1/driving/"
-        + str(tag1[0])
+        + str(departure_coords[0])
         + ","
-        + str(tag1[1])
+        + str(departure_coords[1])
         + ";"
-        + str(tag2[0])
+        + str(arrival_coords[0])
         + ","
-        + str(tag2[1])
+        + str(arrival_coords[1])
         + "?overview="
         + route_s
         + "&geometries=geojson"
@@ -72,15 +75,15 @@ def find_route(tag1, tag2):
 
 
 def ecar_to_gdf(
-    tag1,
-    tag2,
+    departure_coords: tuple[float, float],
+    arrival_coords: tuple[float, float],
     nb=1,
     validate=val_perimeter,
     color_usage="#ffffff",
     color_cons="#ffffff",
 ):  # charte_mollow
     """Parameters
-        - tag1, tag2
+        - departure_coords, arrival_coords
         - perims
         - validate
         - colormap, list of colors
@@ -89,11 +92,11 @@ def ecar_to_gdf(
 
     """
     # Route OSRM - create a separate function
-    geom_route, route_dist, route = find_route(tag1, tag2)
+    geom_route, route_dist, route = find_route(departure_coords, arrival_coords)
 
     # Validation part for route
     if route:  # We have a geometry
-        if not validate_geom(tag1, tag2, geom_route, validate):
+        if not validate_geom(departure_coords, arrival_coords, geom_route, validate):
             # gdf, geom_route, route_dist, route = pd.DataFrame(), None, None, False
             return pd.DataFrame(), pd.DataFrame(), False
 
@@ -148,8 +151,8 @@ def ecar_to_gdf(
 
 
 def car_bus_to_gdf(
-    tag1,
-    tag2,
+    departure_coords: tuple[float, float],
+    arrival_coords: tuple[float, float],
     EF_car=EF_car,
     EF_bus=EF_bus,
     validate=val_perimeter,
@@ -160,7 +163,7 @@ def car_bus_to_gdf(
 
     Parameters
     ----------
-        - tag1, tag2
+        - departure_coords, arrival_coords
         - EF_car, float emission factor for one car by km
         - EF_bus, float emission factor for bus by pkm
         - color, color in hex of path and bar chart
@@ -171,11 +174,11 @@ def car_bus_to_gdf(
 
     """
     # Route OSRM - create a separate function
-    geom_route, route_dist, route = find_route(tag1, tag2)
+    geom_route, route_dist, route = find_route(departure_coords, arrival_coords)
 
     # Validation part for route
     if route:  # We have a geometry
-        if not validate_geom(tag1, tag2, geom_route, validate):
+        if not validate_geom(departure_coords, arrival_coords, geom_route, validate):
             geom_route, route_dist, route = None, None, False
 
     if route:
@@ -218,15 +221,15 @@ def car_bus_to_gdf(
 
 
 def bus_to_gdf(
-    tag1,
-    tag2,
+    departure_coords: tuple[float, float],
+    arrival_coords: tuple[float, float],
     EF_bus=EF_bus,
     validate=val_perimeter,
     color_usage="#ffffff",
     color_cons="#ffffff",
 ):
     """Parameters
-        - tag1, tag2
+        - departure_coords, arrival_coords
         - EF_bus, float emission factor for bus by pkm
         - color, color in hex of path and bar chart
         - validate
@@ -238,11 +241,11 @@ def bus_to_gdf(
 
     """
     # Route OSRM - create a separate function
-    geom_route, route_dist, route = find_route(tag1, tag2)
+    geom_route, route_dist, route = find_route(departure_coords, arrival_coords)
 
     # Validation part for route
     if route:  # We have a geometry
-        if not validate_geom(tag1, tag2, geom_route, validate):
+        if not validate_geom(departure_coords, arrival_coords, geom_route, validate):
             geom_route, route_dist, route = None, None, False
 
     if route:
@@ -274,8 +277,8 @@ def bus_to_gdf(
 
 
 def car_to_gdf(
-    tag1,
-    tag2,
+    departure_coords: tuple[float, float],
+    arrival_coords: tuple[float, float],
     EF_car=EF_car,
     validate=val_perimeter,
     nb=1,
@@ -283,7 +286,7 @@ def car_to_gdf(
     color_cons="#ffffff",
 ):
     """Parameters
-        - tag1, tag2
+        - departure_coords, arrival_coords
         - EF_car, float emission factor for one car by km
         - color, color in hex of path and bar chart
         - validate
@@ -295,7 +298,7 @@ def car_to_gdf(
 
     """
     # Route OSRM - create a separate function
-    geom_route, route_dist, route = find_route(tag1, tag2)
+    geom_route, route_dist, route = find_route(departure_coords, arrival_coords)
     if nb != "👍":
         nb = int(nb)
         EF_fuel = EF_car["fuel"] * (1 + 0.04 * (nb - 1)) / nb
@@ -309,7 +312,7 @@ def car_to_gdf(
 
     # Validation part for route
     if route:  # We have a geometry
-        if not validate_geom(tag1, tag2, geom_route, validate):
+        if not validate_geom(departure_coords, arrival_coords, geom_route, validate):
             geom_route, route_dist, route = None, None, False
 
     if route:
