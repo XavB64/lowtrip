@@ -73,28 +73,20 @@ def find_nearest(point: tuple[float, float], search_perimeter):
     for k in l:
         st += str(k) + " "
 
-    # Prepare the request
-    url = "http://overpass-api.de/api/interpreter"  # To avoid the natural space at the end
-    query = (
-        '[out:json][timeout:300];(way(poly : "'
-        + st[:-1]
-        + '")["railway"="rail"];);out geom;'
-    )  # ;convert item ::=::,::geom=geom(),_osm_type=type()
+    response = requests.get(
+        "http://overpass-api.de/api/interpreter",
+        params={
+            "data": f'[out:json][timeout:300];(way(poly : "{st[:-1]}")["railway"="rail"];);out geom;'
+        },
+    )
 
-    # Make request
-    response = requests.get(url, params={"data": query})
+    if response.status_code != HTTPStatus.OK or len(response.json()["elements"]) == 0:
+        # Couldn't find a node
+        return False
 
-    # if response.status_code == HTTPStatus.OK: not working, looking at size of elements also
-    if response.status_code == HTTPStatus.OK and len(response.json()["elements"]) > 0:
-        # Extract the first point coordinates we could found
-        new_point = (
-            pd.json_normalize(response.json()["elements"][0]).loc[0].geometry[0]
-        )  # .columns
-        # Return lon, lat
-        return (new_point["lon"], new_point["lat"])
-
-    # Couldn't find a node
-    return False
+    # Extract the first point coordinates we could found
+    new_point = pd.json_normalize(response.json()["elements"][0]).loc[0].geometry[0]
+    return (new_point["lon"], new_point["lat"])
 
 
 def extend_search(
