@@ -34,6 +34,7 @@ from parameters import (
 )
 from transport_bicycle import bicycle_to_gdf
 from transport_car import (
+    bus_emissions_to_pd_objects,
     bus_to_gdf,
     car_bus_to_gdf,
     car_to_gdf,
@@ -99,13 +100,13 @@ def compute_emissions_custom(data, cmap=colors_custom):
             geo.append(geo_train)
 
         elif transportmean == "Bus":
-            data_bus, geo_bus, bus = bus_to_gdf(
+            results = bus_to_gdf(
                 departure_coordinates,
                 arrival_coordinates,
                 color_usage=cmap["Road"],
                 color_cons=cmap["Cons_infra"],
             )
-            if not bus:  # One step is not successful
+            if results is None:
                 fail = True
                 ERROR = (
                     "step n°"
@@ -113,6 +114,7 @@ def compute_emissions_custom(data, cmap=colors_custom):
                     + " failed with Bus, please change mean of transport or locations. "
                 )
                 break
+            data_bus, geo_bus = bus_emissions_to_pd_objects(results)
             data_bus["step"] = str(int(idx) + 1)
             emissions_data.append(data_bus)
             geo.append(geo_bus)
@@ -293,14 +295,15 @@ def compute_emissions_all(data, cmap=colors_direct):
             cmap_road = colors_custom
         else:
             cmap_road = cmap
-        data_car, geo_car, data_bus, route = car_bus_to_gdf(
+        data_car, geo_car, bus_results, route = car_bus_to_gdf(
             tag1,
             tag2,
             color_usage=cmap_road["Road"],
             color_cons=cmap_road["Cons_infra"],
         )
 
-        if bus:
+        if bus and bus_results is not None:
+            data_bus, _ = bus_emissions_to_pd_objects(bus_results)
             l_data.append(data_bus)
         if car:
             l_data.append(data_car)
@@ -313,7 +316,7 @@ def compute_emissions_all(data, cmap=colors_direct):
 
         if data_car.empty:
             car = False
-        if data_bus.empty:
+        if bus_results is None:
             bus = False
 
     # Plane

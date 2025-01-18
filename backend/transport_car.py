@@ -15,6 +15,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+from dataclasses import dataclass
 from http import HTTPStatus
 
 import geopandas as gpd
@@ -31,6 +32,58 @@ from parameters import (
     val_perimeter,
 )
 from utils import filter_countries_world, validate_geom as validate_geometry
+
+
+@dataclass
+class Emission:
+    """Emission dataclass."""
+
+    kg_co2_eq: float
+    ef_tot: float
+    color: str
+
+
+@dataclass
+class CarEmissions:
+    """Car and bus have two sources of emissions: construction and fuel."""
+
+    fuel: Emission
+    construction: Emission
+
+
+@dataclass
+class BusStepResults:
+    """Dataclass for bus emissions and geometry."""
+
+    geometry: pd.DataFrame
+    emissions: CarEmissions
+    path_length: float
+
+
+def bus_emissions_to_pd_objects(
+    busStep: BusStepResults,
+) -> (pd.DataFrame, pd.DataFrame):
+    bus_data = pd.DataFrame({
+        "kgCO2eq": [
+            busStep.emissions.construction.kg_co2_eq,
+            busStep.emissions.fuel.kg_co2_eq,
+        ],
+        "EF_tot": [
+            busStep.emissions.construction.ef_tot,
+            busStep.emissions.fuel.ef_tot,
+        ],
+        "path_length": [busStep.path_length, busStep.path_length],
+        "colors": [
+            busStep.emissions.construction.color,
+            busStep.emissions.fuel.color,
+        ],
+        "NAME": ["Construction", "Fuel"],
+        "Mean of Transport": ["Bus", "Bus"],
+    })
+
+    geometry_data = busStep.geometry
+
+    return bus_data, geometry_data
 
 
 OSM_ROUTER_URL = "http://router.project-osrm.org/route/v1/driving"
@@ -170,18 +223,24 @@ def get_bus_emissions(
     EF_construction: float,
     color_usage: str,
     color_construction: str,
-):
-    return pd.DataFrame({
-        "kgCO2eq": [
-            route_length * EF_fuel,
-            route_length * EF_construction,
-        ],
-        "EF_tot": [EF_fuel, EF_construction],
-        "path_length": [route_length, route_length],
-        "colors": [color_usage, color_construction],
-        "NAME": ["Fuel", "Construction"],
-        "Mean of Transport": ["Bus", "Bus"],
-    })[::-1]
+    geometry: pd.DataFrame,
+) -> BusStepResults:
+    return BusStepResults(
+        geometry=geometry,
+        emissions=CarEmissions(
+            fuel=Emission(
+                kg_co2_eq=route_length * EF_fuel,
+                ef_tot=EF_fuel,
+                color=color_usage,
+            ),
+            construction=Emission(
+                kg_co2_eq=route_length * EF_construction,
+                ef_tot=EF_construction,
+                color=color_construction,
+            ),
+        ),
+        path_length=route_length,
+    )
 
 
 def get_road_geometry_data(
@@ -248,6 +307,7 @@ def car_bus_to_gdf(
         EF_bus["construction"],
         color_usage,
         color_cons,
+        road_geometry,
     )
 
     return data_car, road_geometry, data_bus, success
@@ -260,7 +320,7 @@ def bus_to_gdf(
     validate=val_perimeter,
     color_usage="#ffffff",
     color_cons="#ffffff",
-):
+) -> BusStepResults | None:
     """Parameters
         - departure_coords, arrival_coords
         - EF_bus, float emission factor for bus by pkm
@@ -269,7 +329,7 @@ def bus_to_gdf(
 
     Return:
     ------
-        - full dataframe for bus
+        - full dataframe for bus or None
 
     """
     route_geometry, route_length, success = find_route(departure_coords, arrival_coords)
@@ -280,19 +340,18 @@ def bus_to_gdf(
         route_geometry,
         validate,
     ):
-        return pd.DataFrame(), pd.DataFrame(), False
+        return None
 
-    data_bus = get_bus_emissions(
+    road_geometry = get_road_geometry_data(route_length, route_geometry, color_usage)
+
+    return get_bus_emissions(
         route_length,
         EF_bus["fuel"],
         EF_bus["construction"],
         color_usage,
         color_cons,
+        road_geometry,
     )
-
-    road_geometry = get_road_geometry_data(route_length, route_geometry, color_usage)
-
-    return data_bus, road_geometry, success
 
 
 def car_to_gdf(
