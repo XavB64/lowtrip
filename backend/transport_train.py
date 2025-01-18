@@ -117,8 +117,8 @@ def extend_search(
         return pd.DataFrame(), False, None
 
     # We can retry the API
-    gdf, train, path_length = find_train(new_departure, arrival_coords)
-    if train == False:
+    gdf, success, path_length = find_train(new_departure, arrival_coords)
+    if success == False:
         # We can change arrival_coords
         for search_perimeter in search_perimeters:  # Could be up to 10k  ~ size of Bdx
             new_arrival = find_nearest(
@@ -131,9 +131,9 @@ def extend_search(
 
         # Verify that we want to try to request the API again
         if new_arrival is not None:
-            gdf, train, path_length = find_train(new_departure, new_arrival)
+            gdf, success, path_length = find_train(new_departure, new_arrival)
 
-    return gdf, train, path_length
+    return gdf, success, path_length
 
 
 def find_train(
@@ -149,7 +149,7 @@ def find_train(
         - method : signal / trainmap
     return:
         - gdf, a geoserie with the path geometry / None if failure
-        - train, boolean
+        - success, boolean
 
     """
     if method == "trainmap":
