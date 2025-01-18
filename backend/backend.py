@@ -37,6 +37,7 @@ from transport_car import (
     bus_emissions_to_pd_objects,
     bus_to_gdf,
     car_bus_to_gdf,
+    car_emissions_to_pd_objects,
     car_to_gdf,
     ecar_to_gdf,
 )
@@ -120,15 +121,14 @@ def compute_emissions_custom(data, cmap=colors_custom):
             geo.append(geo_bus)
 
         elif transportmean == "Car":
-            # We get the number of passenger
-            data_car, geo_car, car = car_to_gdf(
+            results = car_to_gdf(
                 departure_coordinates,
                 arrival_coordinates,
                 passengers_nb=arrival.nb,
                 color_usage=cmap["Road"],
                 color_cons=cmap["Cons_infra"],
             )
-            if not car:  # One step is not successful
+            if results is None:  # Step is not successful
                 fail = True
                 ERROR = (
                     "step n°"
@@ -136,6 +136,7 @@ def compute_emissions_custom(data, cmap=colors_custom):
                     + " failed with Car, please change mean of transport or locations. "
                 )
                 break
+            data_car, geo_car = car_emissions_to_pd_objects(results)
             data_car["step"] = str(int(idx) + 1)
             emissions_data.append(data_car)  # gdf_car.copy()
             geo.append(geo_car)
@@ -295,7 +296,7 @@ def compute_emissions_all(data, cmap=colors_direct):
             cmap_road = colors_custom
         else:
             cmap_road = cmap
-        data_car, geo_car, bus_results, route = car_bus_to_gdf(
+        car_results, geo_car, bus_results, route = car_bus_to_gdf(
             tag1,
             tag2,
             color_usage=cmap_road["Road"],
@@ -305,7 +306,8 @@ def compute_emissions_all(data, cmap=colors_direct):
         if bus and bus_results is not None:
             data_bus, _ = bus_emissions_to_pd_objects(bus_results)
             l_data.append(data_bus)
-        if car:
+        if car and car_results is not None:
+            data_car, _ = car_emissions_to_pd_objects(car_results)
             l_data.append(data_car)
         # If we have a result for car and bus :
         if route:  # Adapt and add ecar
@@ -314,7 +316,7 @@ def compute_emissions_all(data, cmap=colors_direct):
                 geo.append(geo_car)
                 route_added = True
 
-        if data_car.empty:
+        if car_results is None:
             car = False
         if bus_results is None:
             bus = False

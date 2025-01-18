@@ -60,6 +60,16 @@ class BusStepResults:
     path_length: float
 
 
+@dataclass
+class CarStepResults:
+    """Dataclass for car emissions and geometry."""
+
+    geometry: pd.DataFrame
+    emissions: CarEmissions
+    path_length: float
+    passengers_label: str
+
+
 def bus_emissions_to_pd_objects(
     busStep: BusStepResults,
 ) -> (pd.DataFrame, pd.DataFrame):
@@ -84,6 +94,35 @@ def bus_emissions_to_pd_objects(
     geometry_data = busStep.geometry
 
     return bus_data, geometry_data
+
+
+def car_emissions_to_pd_objects(
+    carStep: CarStepResults,
+) -> (pd.DataFrame, pd.DataFrame):
+    car_data = pd.DataFrame({
+        "kgCO2eq": [
+            carStep.emissions.construction.kg_co2_eq,
+            carStep.emissions.fuel.kg_co2_eq,
+        ],
+        "EF_tot": [
+            carStep.emissions.construction.ef_tot,
+            carStep.emissions.fuel.ef_tot,
+        ],
+        "path_length": [carStep.path_length, carStep.path_length],
+        "colors": [
+            carStep.emissions.construction.color,
+            carStep.emissions.fuel.color,
+        ],
+        "NAME": ["Construction", "Fuel"],
+        "Mean of Transport": [
+            f"Car {carStep.passengers_label}",
+            f"Car {carStep.passengers_label}",
+        ],
+    })
+
+    geometry_data = carStep.geometry
+
+    return car_data, geometry_data
 
 
 OSM_ROUTER_URL = "http://router.project-osrm.org/route/v1/driving"
@@ -206,15 +245,25 @@ def get_car_emissions(
     color_usage: str,
     color_construction: str,
     passengers_label: str,
-):
-    return pd.DataFrame({
-        "kgCO2eq": [route_length * EF_fuel, route_length * EF_construction],
-        "EF_tot": [EF_fuel, EF_construction],
-        "path_length": [route_length, route_length],
-        "colors": [color_usage, color_construction],
-        "NAME": ["Fuel", "Construction"],
-        "Mean of Transport": [f"Car {passengers_label}", f"Car {passengers_label}"],
-    })[::-1]
+    geometry: pd.DataFrame,
+) -> CarStepResults:
+    return CarStepResults(
+        geometry=geometry,
+        emissions=CarEmissions(
+            fuel=Emission(
+                kg_co2_eq=route_length * EF_fuel,
+                ef_tot=EF_fuel,
+                color=color_usage,
+            ),
+            construction=Emission(
+                kg_co2_eq=route_length * EF_construction,
+                ef_tot=EF_construction,
+                color=color_construction,
+            ),
+        ),
+        path_length=route_length,
+        passengers_label=passengers_label,
+    )
 
 
 def get_bus_emissions(
@@ -290,16 +339,17 @@ def car_bus_to_gdf(
     ):
         return pd.DataFrame(), pd.DataFrame(), pd.DataFrame(), False
 
-    data_car = get_car_emissions(
+    road_geometry = get_road_geometry_data(route_length, route_geometry, color_usage)
+
+    data_car: CarStepResults = get_car_emissions(
         route_length,
         EF_car["fuel"],
         EF_car["construction"],
         color_usage,
         color_cons,
         "1p.",
+        road_geometry,
     )
-
-    road_geometry = get_road_geometry_data(route_length, route_geometry, color_usage)
 
     data_bus = get_bus_emissions(
         route_length,
@@ -362,7 +412,7 @@ def car_to_gdf(
     passengers_nb=1,
     color_usage="#ffffff",
     color_cons="#ffffff",
-):
+) -> CarStepResults | None:
     """Parameters
         - departure_coords, arrival_coords
         - EF_car, float emission factor for one car by km
@@ -372,7 +422,7 @@ def car_to_gdf(
 
     Return:
     ------
-        - full dataframe for car
+        - full dataframe for car or None
 
     """
     route_geometry, route_length, success = find_route(departure_coords, arrival_coords)
@@ -383,7 +433,7 @@ def car_to_gdf(
         route_geometry,
         validate,
     ):
-        return pd.DataFrame(), pd.DataFrame(), False
+        return None
 
     if passengers_nb == "👍":  # Hitch-hiking
         EF_fuel = EF_car["fuel"] * 0.04
@@ -395,15 +445,14 @@ def car_to_gdf(
         EF_cons = EF_car["construction"] / passengers_nb
         passengers_label = f"{passengers_nb}p."
 
-    data_car = get_car_emissions(
+    road_geometry = get_road_geometry_data(route_length, route_geometry, color_usage)
+
+    return get_car_emissions(
         route_length,
         EF_fuel,
         EF_cons,
         color_usage,
         color_cons,
         passengers_label,
+        road_geometry,
     )
-
-    road_geometry = get_road_geometry_data(route_length, route_geometry, color_usage)
-
-    return data_car, road_geometry, success
