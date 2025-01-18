@@ -106,7 +106,7 @@ def extend_search(
         - train (bool)
 
     """
-    # We extend the search perimeter progressively
+    # Look for a better departure
     for search_perimeter in search_perimeters:
         new_departure = find_nearest(departure_coords, search_perimeter)
         if new_departure is not None:
@@ -116,12 +116,12 @@ def extend_search(
         # No better departure found
         return pd.DataFrame(), False, None
 
-    # We can retry the API
+    # Retry to find a train path
     gdf, success, path_length = find_train(new_departure, arrival_coords)
     if success:
         return gdf, success, path_length
 
-    # We can change arrival_coords
+    # Look for a better arrival
     for search_perimeter in search_perimeters:  # Could be up to 10k  ~ size of Bdx
         new_arrival = find_nearest(
             arrival_coords[0],
@@ -131,11 +131,12 @@ def extend_search(
         if new_arrival is not None:
             break
 
-    # Verify that we want to try to request the API again
-    if new_arrival is not None:
-        gdf, success, path_length = find_train(new_departure, new_arrival)
+    if new_arrival is None:
+        # No better arrival found
+        return pd.DataFrame(), False, None
 
-    return gdf, success, path_length
+    # Retry to find a train path
+    return find_train(new_departure, new_arrival)
 
 
 def find_train(
