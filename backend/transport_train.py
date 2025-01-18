@@ -56,7 +56,7 @@ def find_nearest(point: tuple[float, float], search_perimeter):
     - search_perimeter : perimeters (m) to look around
 
     Return:
-    - new coordinates(lat, lon)
+    - new coordinates(lat, lon) or None
 
     """
     # Extend the area around the point
@@ -82,7 +82,7 @@ def find_nearest(point: tuple[float, float], search_perimeter):
 
     if response.status_code != HTTPStatus.OK or len(response.json()["elements"]) == 0:
         # Couldn't find a node
-        return False
+        return None
 
     # Extract the first point coordinates we could found
     new_point = pd.json_normalize(response.json()["elements"][0]).loc[0].geometry[0]
@@ -106,16 +106,15 @@ def extend_search(
         - train (bool)
 
     """
-    # We extend the search progressively
+    # We extend the search perimeter progressively
     for search_perimeter in search_perimeters:
-        # Departure
         new_departure = find_nearest(departure_coords, search_perimeter)
-        if new_departure != False:
+        if new_departure is not None:
             # Then we found a better place, we can stop the loop
             break
 
     # Maybe here try to check if the API is not already working
-    if new_departure == False:
+    if new_departure is None:
         # Then we will find nothing
         gdf = pd.DataFrame()
         train = False
@@ -133,11 +132,11 @@ def extend_search(
                     arrival_coords[1],
                     search_perimeter,
                 )
-                if new_arrival != False:
+                if new_arrival is not None:
                     break
 
             # Verify that we want to try to request the API again
-            if new_departure and new_arrival:
+            if new_arrival is not None:
                 gdf, train, path_length = find_train(new_departure, new_arrival)
 
     return gdf, train, path_length
