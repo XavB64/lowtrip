@@ -15,9 +15,61 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+from dataclasses import dataclass
+
 import pandas as pd
 from pyproj import Geod
 from shapely.geometry import LineString
+
+
+@dataclass
+class Emission:
+    """Class for emission."""
+
+    kg_co2_eq: float
+    ef_tot: float
+    color: str
+
+
+@dataclass
+class PlaneEmissions:
+    """Plane has two types of emissions: kerosene and contrails."""
+
+    kerosene: Emission
+    contrails: Emission
+
+
+@dataclass
+class PlaneStepResults:
+    """Class for plane step results."""
+
+    geometry: pd.DataFrame
+    emissions: PlaneEmissions
+
+
+def plane_emissions_to_pd_objects(
+    planeStep: PlaneStepResults,
+) -> (pd.DataFrame, pd.DataFrame):
+    plane_data = pd.DataFrame({
+        "kgCO2eq": [
+            planeStep.emissions.kerosene.kg_co2_eq,
+            planeStep.emissions.contrails.kg_co2_eq,
+        ],
+        "EF_tot": [
+            planeStep.emissions.kerosene.ef_tot,
+            planeStep.emissions.contrails.ef_tot,
+        ],
+        "colors": [
+            planeStep.emissions.kerosene.color,
+            planeStep.emissions.contrails.color,
+        ],
+        "NAME": ["Kerosene", "Contrails"],
+        "Mean of Transport": ["Plane", "Plane"],
+    })
+
+    geometry_data = planeStep.geometry
+
+    return plane_data, geometry_data
 
 
 EF_plane = {
@@ -104,7 +156,7 @@ def plane_to_gdf(
     detour=DETOUR_COEFF,
     color_usage="#ffffff",
     color_contrails="#ffffff",
-):
+) -> PlaneStepResults:
     """Parameters
         - departure_coords, arrival_coords
         - EF : emission factor in gCO2/pkm for plane depending on journey length
@@ -137,20 +189,6 @@ def plane_to_gdf(
     CO2_factors = emissions_factors["combustion"] + emissions_factors["upstream"]
     non_CO2_factors = emissions_factors["combustion"] * contrails
 
-    data_plane = pd.DataFrame({
-        "kgCO2eq": [
-            route_length * CO2_factors + holding,
-            route_length * non_CO2_factors,
-        ],
-        "EF_tot": [
-            CO2_factors,
-            non_CO2_factors,
-        ],
-        "colors": [color_usage, color_contrails],
-        "NAME": ["Kerosene", "Contrails"],
-        "Mean of Transport": ["Plane", "Plane"],
-    })
-
     geometry_data = pd.DataFrame(
         pd.Series({
             "colors": color_usage,
@@ -160,4 +198,18 @@ def plane_to_gdf(
         }),
     ).transpose()
 
-    return data_plane, geometry_data
+    return PlaneStepResults(
+        geometry=geometry_data,
+        emissions=PlaneEmissions(
+            kerosene=Emission(
+                kg_co2_eq=route_length * CO2_factors + holding,
+                ef_tot=CO2_factors,
+                color=color_usage,
+            ),
+            contrails=Emission(
+                kg_co2_eq=route_length * non_CO2_factors,
+                ef_tot=non_CO2_factors,
+                color=color_contrails,
+            ),
+        ),
+    )
