@@ -40,7 +40,7 @@ from transport_car import (
     ecar_to_gdf,
 )
 from transport_ferry import ferry_to_gdf, sail_to_gdf
-from transport_plane import plane_to_gdf
+from transport_plane import plane_emissions_to_pd_objects, plane_to_gdf
 from transport_train import train_to_gdf
 
 
@@ -178,12 +178,13 @@ def compute_emissions_custom(data, cmap=colors_custom):
             geo.append(geo_bike)
 
         elif transportmean == "Plane":
-            data_plane, geo_plane = plane_to_gdf(
+            plane_results = plane_to_gdf(
                 departure_coordinates,
                 arrival_coordinates,
                 color_usage=cmap["Plane"],
                 color_contrails=cmap["Contrails"],
             )
+            data_plane, geo_plane = plane_emissions_to_pd_objects(plane_results)
             data_plane["step"] = str(int(idx) + 1)
             emissions_data.append(data_plane)
             geo.append(geo_plane)
@@ -317,12 +318,13 @@ def compute_emissions_all(data, cmap=colors_direct):
 
     # Plane
     if plane:
-        data_plane, geo_plane = plane_to_gdf(
+        plane_result = plane_to_gdf(
             tag1,
             tag2,
             color_usage=cmap["Plane"],
             color_contrails=cmap["Contrails"],
         )
+        data_plane, geo_plane = plane_emissions_to_pd_objects(plane_result)
         l_data.append(data_plane)
         geo.append(geo_plane)
 
