@@ -52,6 +52,16 @@ class CarEmissions:
 
 
 @dataclass
+class CarBusResults:
+    """Dataclass for car and bus emissions and road geometry."""
+
+    geometry: pd.DataFrame
+    bus_emissions: CarEmissions
+    car_emissions: CarEmissions
+    path_length: float
+
+
+@dataclass
 class BusStepResults:
     """Dataclass for bus emissions and geometry."""
 
@@ -123,6 +133,48 @@ def car_emissions_to_pd_objects(
     geometry_data = carStep.geometry
 
     return car_data, geometry_data
+
+
+def car_bus_emissions_to_pd_objects(
+    results: CarBusResults,
+) -> (pd.DataFrame, pd.DataFrame, pd.DataFrame):
+    car_data = pd.DataFrame({
+        "kgCO2eq": [
+            results.car_emissions.construction.kg_co2_eq,
+            results.car_emissions.fuel.kg_co2_eq,
+        ],
+        "EF_tot": [
+            results.car_emissions.construction.ef_tot,
+            results.car_emissions.fuel.ef_tot,
+        ],
+        "path_length": [results.path_length, results.path_length],
+        "colors": [
+            results.car_emissions.construction.color,
+            results.car_emissions.fuel.color,
+        ],
+        "NAME": ["Construction", "Fuel"],
+        "Mean of Transport": ["Car 1p.", "Car 1p."],
+    })
+    bus_data = pd.DataFrame({
+        "kgCO2eq": [
+            results.bus_emissions.construction.kg_co2_eq,
+            results.bus_emissions.fuel.kg_co2_eq,
+        ],
+        "EF_tot": [
+            results.bus_emissions.construction.ef_tot,
+            results.bus_emissions.fuel.ef_tot,
+        ],
+        "path_length": [results.path_length, results.path_length],
+        "colors": [
+            results.bus_emissions.construction.color,
+            results.bus_emissions.fuel.color,
+        ],
+        "NAME": ["Construction", "Fuel"],
+        "Mean of Transport": ["Bus", "Bus"],
+    })
+    geometry_data = results.geometry
+
+    return car_data, bus_data, geometry_data
 
 
 OSM_ROUTER_URL = "http://router.project-osrm.org/route/v1/driving"
@@ -315,7 +367,7 @@ def car_bus_to_gdf(
     validate=val_perimeter,
     color_usage="#ffffff",
     color_cons="#ffffff",
-):
+) -> CarBusResults | None:
     """ONLY FOR FIRST FORM (optimization).
 
     Parameters
@@ -326,7 +378,7 @@ def car_bus_to_gdf(
         - color, color in hex of path and bar chart
         - validate
     return:
-        - full dataframe for car and bus, geometry only on car
+        - CarBusResults or None
 
     """
     route_geometry, route_length, success = find_route(departure_coords, arrival_coords)
@@ -337,11 +389,11 @@ def car_bus_to_gdf(
         route_geometry,
         validate,
     ):
-        return pd.DataFrame(), pd.DataFrame(), pd.DataFrame(), False
+        return None
 
     road_geometry = get_road_geometry_data(route_length, route_geometry, color_usage)
 
-    data_car: CarStepResults = get_car_emissions(
+    car_data: CarStepResults = get_car_emissions(
         route_length,
         EF_car["fuel"],
         EF_car["construction"],
@@ -351,7 +403,7 @@ def car_bus_to_gdf(
         road_geometry,
     )
 
-    data_bus = get_bus_emissions(
+    bus_data: BusStepResults = get_bus_emissions(
         route_length,
         EF_bus["fuel"],
         EF_bus["construction"],
@@ -360,7 +412,12 @@ def car_bus_to_gdf(
         road_geometry,
     )
 
-    return data_car, road_geometry, data_bus, success
+    return CarBusResults(
+        geometry=road_geometry,
+        bus_emissions=bus_data.emissions,
+        car_emissions=car_data.emissions,
+        path_length=route_length,
+    )
 
 
 def bus_to_gdf(
