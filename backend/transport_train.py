@@ -76,7 +76,7 @@ def find_nearest(point: tuple[float, float], search_perimeter):
     response = requests.get(
         "http://overpass-api.de/api/interpreter",
         params={
-            "data": f'[out:json][timeout:300];(way(poly : "{st[:-1]}")["railway"="rail"];);out geom;'
+            "data": f'[out:json][timeout:300];(way(poly : "{st[:-1]}")["railway"="rail"];);out geom;',
         },
     )
 
@@ -100,8 +100,8 @@ def extend_search(
     Parameters
     ----------
         - departure_coords, arrival_coords : list or tuple like with coordinates (lon, lat)
-        - perims : list-like ; perimeters to search for with overpass API
-    return:
+        - perims : list-like ; perimeters to search for with overpass API.
+    Return:
         - gdf (geoseries)
         - train (bool)
 
@@ -159,8 +159,6 @@ def find_train(
         - train, boolean
 
     """
-    # format lon, lat
-    # Build the request url
     if method == "trainmap":
         # trainmap
         url = (
@@ -174,38 +172,30 @@ def find_train(
             + train_s
             + "&geometries=geojson"
         )  # simplified
-    # Send the GET request
-    # import time
-    # s = time.time()
-    response = requests.get(url)
-    # print(time.time() - s)
 
-    # Check if the request was successful (status code 200)
-    if response.status_code == HTTPStatus.OK:
-        print("Path retrieved!")
-        if method == "trainmap":
-            # Store data in a geodataserie - trainmap
-            gdf = gpd.GeoSeries(
-                LineString(response.json()["geometry"]["coordinates"][0]),
-                crs="epsg:4326",
-            )
-        # geom = LineString(response.json()['geometry']['coordinates'][0])
-        # geod = Geod(ellps="WGS84")
-        # print('Train intial', geod.geometry_length(geom) / 1e3)
-        else:
-            path_length = response.json()["routes"][0]["distance"] / 1e3  # km
-            # Store data - signal
-            gdf = gpd.GeoSeries(
-                LineString(response.json()["routes"][0]["geometry"]["coordinates"]),
-                crs="epsg:4326",
-            )
-        train = True
-    else:
-        # Error message
+    response = requests.get(url)
+
+    if response.status_code != HTTPStatus.OK:
         print(f"Failed to retrieve data. Status code: {response.status_code}")
-        gdf, train, path_length = pd.DataFrame(), False, 0
+        gdf, success, path_length = pd.DataFrame(), False, 0
         # We will try to request again with overpass
-    return gdf, train, path_length
+        return gdf, success, path_length
+
+    if method == "trainmap":
+        gdf = gpd.GeoSeries(
+            LineString(response.json()["geometry"]["coordinates"][0]),
+            crs="epsg:4326",
+        )
+    else:
+        route = response.json()["routes"][0]
+        path_length = route["distance"] / 1e3  # km
+        gdf = gpd.GeoSeries(
+            LineString(route["geometry"]["coordinates"]),
+            crs="epsg:4326",
+        )
+    success = True
+
+    return gdf, success, path_length
 
 
 def train_to_gdf(
@@ -216,7 +206,7 @@ def train_to_gdf(
     validate=val_perimeter,
     color_usage="#ffffff",
     color_infra="#ffffff",
-):  # charte_mollow
+):
     """Parameters
         - departure_coords, arrival_coords
         - search_perimeter
@@ -227,59 +217,63 @@ def train_to_gdf(
 
     """
     # First try with coordinates supplied by the user
-    gdf, train, train_dist = find_train(departure_coords, arrival_coords)
+    gdf, success, path_length = find_train(departure_coords, arrival_coords)
 
-    # If failure then we try to find a better spot nearby - Put in another function
-    if train == False:
-        # We try to search nearby the coordinates and request again
-        gdf, train, train_dist = extend_search(
+    # If no train was found, then we try to extend the search perimeter by looking for
+    # new departure and arrival points within an acceptable perimeter
+    if success == False:
+        gdf, success, path_length = extend_search(
             departure_coords,
             arrival_coords,
             search_perimeter,
         )
 
-    # Validation part for train
-    if train:  # We have a geometry
-        if not validate_geom(departure_coords, arrival_coords, gdf.values[0], validate):
-            return pd.DataFrame(), pd.DataFrame(), False
+    if not success or not validate_geom(
+        departure_coords,
+        arrival_coords,
+        gdf.values[0],
+        validate,
+    ):
+        return pd.DataFrame(), pd.DataFrame(), False
 
-        # We need to filter by country and add length / Emission factors
-        gdf = filter_countries_world(gdf, method="train")
-        # Adding and computing emissions
-        l_length = []
-        # Compute the true distance
-        geod = Geod(ellps="WGS84")
-        for geom in gdf.geometry.values:
-            l_length.append(geod.geometry_length(geom) / 1e3)
-        # Add the distance to the dataframe
-        gdf["path_length"] = l_length
-        # Rescale the length with train_dist (especially when simplified = True)
-        print("Rescaling factor", train_dist / gdf["path_length"].sum())
-        gdf["path_length"] *= train_dist / gdf["path_length"].sum()
-        # Compute emissions : EF * length
-        gdf["EF_tot"] /= 1000.0  # Conversion in kg
-        gdf["kgCO2eq"] = gdf["path_length"] * gdf["EF_tot"]
-        # Add colors, here discretise the colormap
-        gdf["colors"] = color_usage
-        # Write
-        gdf = pd.concat([
-            pd.DataFrame({
-                "kgCO2eq": [train_dist * EF_train["infra"]],
-                "EF_tot": [EF_train["infra"]],
-                "colors": [color_infra],
-                "NAME": ["Infra"],
-            }),
-            gdf,
-        ])
+    # We need to filter by country and add length / Emission factors
+    gdf = filter_countries_world(gdf, method="train")
 
-        # Add infra
-        gdf["Mean of Transport"] = "Train"
-        gdf["label"] = "Railway"
-        gdf["length"] = str(int(train_dist)) + "km (" + gdf["NAME"] + ")"
-        gdf.reset_index(inplace=True)
+    # Compute the true distances
+    l_length = []
+    geod = Geod(ellps="WGS84")
+    for geom in gdf.geometry.values:
+        l_length.append(geod.geometry_length(geom) / 1e3)
+    gdf["path_length"] = l_length
 
-        data_train = gdf[["kgCO2eq", "colors", "NAME", "Mean of Transport"]]
-        geo_train = gdf[["colors", "label", "geometry", "length"]].dropna(axis=0)
-        # Returning the result
-        return data_train, geo_train, train
-    return pd.DataFrame(), pd.DataFrame(), False
+    # Rescale the length with path_length (especially when simplified = True)
+    # print("Rescaling factor", path_length / gdf["path_length"].sum())
+    gdf["path_length"] *= path_length / gdf["path_length"].sum()
+
+    # Compute emissions : EF * length
+    gdf["EF_tot"] /= 1000.0  # Conversion in kg
+    gdf["kgCO2eq"] = gdf["path_length"] * gdf["EF_tot"]
+
+    # Add colors, here discretise the colormap
+    gdf["colors"] = color_usage
+
+    gdf = pd.concat([
+        pd.DataFrame({
+            "kgCO2eq": [path_length * EF_train["infra"]],
+            "EF_tot": [EF_train["infra"]],
+            "colors": [color_infra],
+            "NAME": ["Infra"],
+        }),
+        gdf,
+    ])
+
+    # Add infra
+    gdf["Mean of Transport"] = "Train"
+    gdf["label"] = "Railway"
+    gdf["length"] = str(int(path_length)) + "km (" + gdf["NAME"] + ")"
+    gdf.reset_index(inplace=True)
+
+    data_train = gdf[["kgCO2eq", "colors", "NAME", "Mean of Transport"]]
+    geo_train = gdf[["colors", "label", "geometry", "length"]].dropna(axis=0)
+
+    return data_train, geo_train, success
