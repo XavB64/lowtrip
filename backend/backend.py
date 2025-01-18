@@ -36,6 +36,7 @@ from transport_bicycle import bicycle_to_gdf
 from transport_car import (
     bus_emissions_to_pd_objects,
     bus_to_gdf,
+    car_bus_emissions_to_pd_objects,
     car_bus_to_gdf,
     car_emissions_to_pd_objects,
     car_to_gdf,
@@ -296,30 +297,28 @@ def compute_emissions_all(data, cmap=colors_direct):
             cmap_road = colors_custom
         else:
             cmap_road = cmap
-        car_results, geo_car, bus_results, route = car_bus_to_gdf(
+
+        results = car_bus_to_gdf(
             tag1,
             tag2,
             color_usage=cmap_road["Road"],
             color_cons=cmap_road["Cons_infra"],
         )
 
-        if bus and bus_results is not None:
-            data_bus, _ = bus_emissions_to_pd_objects(bus_results)
-            l_data.append(data_bus)
-        if car and car_results is not None:
-            data_car, _ = car_emissions_to_pd_objects(car_results)
-            l_data.append(data_car)
-        # If we have a result for car and bus :
-        if route:  # Adapt and add ecar
+        if results is None:
+            car, bus = False, False
+        else:
+            car_data, bus_data, geometry = car_bus_emissions_to_pd_objects(results)
+
+            if bus:
+                l_data.append(bus_data)
+            if car:
+                l_data.append(car_data)
+
             # We check if car or bus was asked for a 1 step
             if car and bus and transp != "eCar":
-                geo.append(geo_car)
+                geo.append(geometry)
                 route_added = True
-
-        if car_results is None:
-            car = False
-        if bus_results is None:
-            bus = False
 
     # Plane
     if plane:
