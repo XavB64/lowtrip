@@ -118,20 +118,22 @@ def extend_search(
 
     # We can retry the API
     gdf, success, path_length = find_train(new_departure, arrival_coords)
-    if success == False:
-        # We can change arrival_coords
-        for search_perimeter in search_perimeters:  # Could be up to 10k  ~ size of Bdx
-            new_arrival = find_nearest(
-                arrival_coords[0],
-                arrival_coords[1],
-                search_perimeter,
-            )
-            if new_arrival is not None:
-                break
+    if success:
+        return gdf, success, path_length
 
-        # Verify that we want to try to request the API again
+    # We can change arrival_coords
+    for search_perimeter in search_perimeters:  # Could be up to 10k  ~ size of Bdx
+        new_arrival = find_nearest(
+            arrival_coords[0],
+            arrival_coords[1],
+            search_perimeter,
+        )
         if new_arrival is not None:
-            gdf, success, path_length = find_train(new_departure, new_arrival)
+            break
+
+    # Verify that we want to try to request the API again
+    if new_arrival is not None:
+        gdf, success, path_length = find_train(new_departure, new_arrival)
 
     return gdf, success, path_length
 
