@@ -42,7 +42,11 @@ from transport_car import (
     car_to_gdf,
     ecar_to_gdf,
 )
-from transport_ferry import ferry_to_gdf, sail_to_gdf
+from transport_ferry import (
+    ferry_emissions_to_pd_objects,
+    ferry_to_gdf,
+    sail_to_gdf,
+)
 from transport_plane import plane_emissions_to_pd_objects, plane_to_gdf
 from transport_train import train_to_gdf
 
@@ -194,12 +198,13 @@ def compute_emissions_custom(data, cmap=colors_custom):
             geo.append(geo_plane)
 
         elif transportmean == "Ferry":
-            data_ferry, geo_ferry = ferry_to_gdf(
+            results = ferry_to_gdf(
                 departure_coordinates,
                 arrival_coordinates,
                 color_usage=cmap["Ferry"],
                 options=arrival.options,
             )
+            data_ferry, geo_ferry = ferry_emissions_to_pd_objects(results)
             data_ferry["step"] = str(int(idx) + 1)
             emissions_data.append(data_ferry)
             geo.append(geo_ferry)
