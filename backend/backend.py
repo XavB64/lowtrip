@@ -32,7 +32,7 @@ from parameters import (
     colors_direct,
     min_plane_dist,
 )
-from transport_bicycle import bicycle_to_gdf
+from transport_bicycle import bicycle_emissions_to_pd_objects, bicycle_to_gdf
 from transport_car import (
     bus_emissions_to_pd_objects,
     bus_to_gdf,
@@ -163,13 +163,12 @@ def compute_emissions_custom(data, cmap=colors_custom):
             geo.append(geo_ecar)
 
         elif transportmean == "Bicycle":
-            # We get the number of passenger
-            data_bike, geo_bike, bike = bicycle_to_gdf(
+            results = bicycle_to_gdf(
                 departure_coordinates,
                 arrival_coordinates,
                 color=cmap["Bicycle"],
             )
-            if not bike:  # One step is not successful
+            if results is None:  # Step is not successful
                 fail = True
                 ERROR = (
                     "step n°"
@@ -177,6 +176,7 @@ def compute_emissions_custom(data, cmap=colors_custom):
                     + " failed with Bicycle, please change mean of transport or locations. "
                 )
                 break
+            data_bike, geo_bike = bicycle_emissions_to_pd_objects(results)
             data_bike["step"] = str(int(idx) + 1)
             emissions_data.append(data_bike)
             geo.append(geo_bike)
