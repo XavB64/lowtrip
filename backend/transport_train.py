@@ -100,7 +100,7 @@ def extend_search(
         - perims : list-like ; perimeters to search for with overpass API
     return:
         - gdf (geoseries)
-        - train (bool)
+        - success (bool)
 
     """
     # We extend the search progressively
@@ -118,13 +118,13 @@ def extend_search(
     if new_departure_coords == False:
         # Then we will find nothing
         gdf = pd.DataFrame()
-        train = False
+        success = False
         train_dist = None
     # return None, False
     else:
         # We can retry the API
-        gdf, train, train_dist = find_train(new_departure_coords, arrival_coords)
-        if train == False:
+        gdf, success, train_dist = find_train(new_departure_coords, arrival_coords)
+        if success == False:
             # We can change arrival_coords
             for perim in perims:  # Could be up to 10k  ~ size of Bdx
                 # Arrival
@@ -138,12 +138,12 @@ def extend_search(
 
             # Verify that we want to try to request the API again
             if new_departure_coords and new_arrival_coords:
-                gdf, train, train_dist = find_train(
+                gdf, success, train_dist = find_train(
                     new_departure_coords,
                     new_arrival_coords,
                 )
 
-    return gdf, train, train_dist
+    return gdf, success, train_dist
 
 
 def find_train(
@@ -159,7 +159,7 @@ def find_train(
         - method : signal / trainmap
     return:
         - gdf, a geoserie with the path geometry / None if failure
-        - train, boolean
+        - success, boolean
 
     """
     # format lon, lat
@@ -202,13 +202,13 @@ def find_train(
                 LineString(response.json()["routes"][0]["geometry"]["coordinates"]),
                 crs="epsg:4326",
             )
-        train = True
+        success = True
     else:
         # Error message
         print(f"Failed to retrieve data. Status code: {response.status_code}")
-        gdf, train, train_dist = pd.DataFrame(), False, 0
+        gdf, success, train_dist = pd.DataFrame(), False, 0
         # We will try to request again with overpass
-    return gdf, train, train_dist
+    return gdf, success, train_dist
 
 
 def train_to_gdf(
@@ -230,15 +230,19 @@ def train_to_gdf(
 
     """
     # First try with coordinates supplied by the user
-    gdf, train, train_dist = find_train(departure_coords, arrival_coords)
+    gdf, success, train_dist = find_train(departure_coords, arrival_coords)
 
     # If failure then we try to find a better spot nearby - Put in another function
-    if train == False:
+    if success == False:
         # We try to search nearby the coordinates and request again
-        gdf, train, train_dist = extend_search(departure_coords, arrival_coords, perims)
+        gdf, success, train_dist = extend_search(
+            departure_coords,
+            arrival_coords,
+            perims,
+        )
 
     # Validation part for train
-    if train:  # We have a geometry
+    if success:  # We have a geometry
         if not validate_geom(departure_coords, arrival_coords, gdf.values[0], validate):
             return pd.DataFrame(), pd.DataFrame(), False
 
@@ -280,5 +284,5 @@ def train_to_gdf(
         data_train = gdf[["kgCO2eq", "colors", "NAME", "Mean of Transport"]]
         geo_train = gdf[["colors", "label", "geometry", "length"]].dropna(axis=0)
         # Returning the result
-        return data_train, geo_train, train
+        return data_train, geo_train, success
     return pd.DataFrame(), pd.DataFrame(), False
