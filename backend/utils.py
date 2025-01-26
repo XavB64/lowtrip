@@ -40,18 +40,27 @@ def kilometer_to_degree(km):
     return c * km
 
 
-def filter_countries_world(gdf, method, th=sea_threshold):
+def filter_countries_world(
+    path: LineString,
+    method: str,
+    th=sea_threshold,
+):
     """Filter train path by countries (train_intensity.geojson).
 
     Parameters
     ----------
-        - gdf : train geometry in geoserie
+        - path : train geometry in LineString
         - mode : train / ecar
         - th : threshold to remove unmatched gaps between countries that are too small (km)
     return:
         - Geodataframe of train path by countries
 
     """
+    gdf = gpd.GeoSeries(
+        path,
+        crs="epsg:4326",
+    )
+
     if method == "train":
         iso = "ISO2"
         EF = "EF_tot"
