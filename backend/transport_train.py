@@ -33,8 +33,8 @@ from parameters import (
     val_perimeter,
 )
 from utils import (
-    filter_countries_world,
     kilometer_to_degree,
+    split_path_by_country,
     validate_geom,
 )
 
@@ -245,7 +245,7 @@ def train_to_gdf(
         return pd.DataFrame(), pd.DataFrame(), False
 
     # We need to filter by country and add length / Emission factors
-    gdf = filter_countries_world(
+    gdf = split_path_by_country(
         geometry,
         method="train",
     )
