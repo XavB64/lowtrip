@@ -45,6 +45,7 @@ from transport_car import (
 from transport_ferry import (
     ferry_emissions_to_pd_objects,
     ferry_to_gdf,
+    sail_emissions_to_pd_objects,
     sail_to_gdf,
 )
 from transport_plane import plane_emissions_to_pd_objects, plane_to_gdf
@@ -210,14 +211,15 @@ def compute_emissions_custom(data, cmap=colors_custom):
             geo.append(geo_ferry)
 
         elif transportmean == "Sail":
-            data_ferry, geo_ferry = sail_to_gdf(
+            results = sail_to_gdf(
                 departure_coordinates,
                 arrival_coordinates,
                 color_usage=cmap["Ferry"],
             )
-            data_ferry["step"] = str(int(idx) + 1)
-            emissions_data.append(data_ferry)
-            geo.append(geo_ferry)
+            data_sail, geo_sail = sail_emissions_to_pd_objects(results)
+            data_sail["step"] = str(int(idx) + 1)
+            emissions_data.append(data_sail)
+            geo.append(geo_sail)
 
     if fail:
         # One or more step weren't successful, we return nothing
