@@ -17,6 +17,7 @@
 
 # Need for ferry if straight line
 # from shapely.geometry import LineString
+from dataclasses import dataclass
 from http import HTTPStatus
 
 import geopandas as gpd
@@ -36,6 +37,37 @@ from utils import (
     split_path_by_country,
     validate_geom,
 )
+
+
+@dataclass
+class TrainEmission:
+    """Emission dataclass."""
+
+    kg_co2_eq: float
+    name: str
+    color: str
+
+
+@dataclass
+class TrainStepResults:
+    """Dataclass for train emissions and geometry."""
+
+    geometry: pd.DataFrame
+    emissions: list[TrainEmission]
+    path_length: float
+
+
+def train_emissions_to_pd_objects(
+    train_step: TrainStepResults,
+) -> (pd.DataFrame, pd.DataFrame):
+    res = {"kgCO2eq": [], "colors": [], "NAME": [], "Mean of Transport": []}
+    for emission in train_step.emissions:
+        res["kgCO2eq"].append(emission.kg_co2_eq)
+        res["colors"].append(emission.color)
+        res["NAME"].append(emission.name)
+        res["Mean of Transport"].append("Train")
+
+    return pd.DataFrame(res), train_step.geometry
 
 
 def flatten_list_of_tuples(lst):
@@ -241,7 +273,7 @@ def train_to_gdf(
         ).values[0],
         validate,
     ):
-        return pd.DataFrame(), pd.DataFrame(), False
+        return None
 
     # Split path by country and compute for each part of the path, the length and the emission factor
     gdf = split_path_by_country(
@@ -253,9 +285,10 @@ def train_to_gdf(
     # Compute emissions : EF * length
     gdf["EF_tot"] /= 1000.0  # Conversion in kg
     gdf["kgCO2eq"] = gdf["path_length"] * gdf["EF_tot"]
-    # Add colors, here discretise the colormap
+
     gdf["colors"] = color_usage
-    # Write
+
+    # Add infra emissions
     gdf = pd.concat([
         pd.DataFrame({
             "kgCO2eq": [train_dist * EF_train["infra"]],
@@ -267,12 +300,25 @@ def train_to_gdf(
     ])
 
     # Add infra
-    gdf["Mean of Transport"] = "Train"
     gdf["label"] = "Railway"
-    gdf["length"] = str(int(train_dist)) + "km (" + gdf["NAME"] + ")"
+    gdf["length"] = f"{train_dist}km ({gdf['NAME']})"
     gdf.reset_index(inplace=True)
 
-    data_train = gdf[["kgCO2eq", "colors", "NAME", "Mean of Transport"]]
     geo_train = gdf[["colors", "label", "geometry", "length"]].dropna(axis=0)
-    # Returning the result
-    return data_train, geo_train, success
+
+    emissions_data = gdf[["kgCO2eq", "colors", "NAME"]].to_dict("records")
+
+    emissions = [
+        TrainEmission(
+            name=emission_data["NAME"],
+            kg_co2_eq=emission_data["kgCO2eq"],
+            color=emission_data["colors"],
+        )
+        for emission_data in emissions_data
+    ]
+
+    return TrainStepResults(
+        geometry=geo_train,
+        emissions=emissions,
+        path_length=train_dist,
+    )
