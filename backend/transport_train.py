@@ -21,7 +21,6 @@ from http import HTTPStatus
 
 import geopandas as gpd
 import pandas as pd
-from pyproj import Geod
 import requests
 from shapely.geometry import LineString, Point
 
@@ -244,22 +243,13 @@ def train_to_gdf(
     ):
         return pd.DataFrame(), pd.DataFrame(), False
 
-    # We need to filter by country and add length / Emission factors
+    # Split path by country and compute for each part of the path, the length and the emission factor
     gdf = split_path_by_country(
         geometry,
         method="train",
+        real_path_length=train_dist,
     )
-    # Adding and computing emissions
-    l_length = []
-    # Compute the true distance
-    geod = Geod(ellps="WGS84")
-    for geom in gdf.geometry.values:
-        l_length.append(geod.geometry_length(geom) / 1e3)
-    # Add the distance to the dataframe
-    gdf["path_length"] = l_length
-    # Rescale the length with train_dist (especially when simplified = True)
-    print("Rescaling factor", train_dist / gdf["path_length"].sum())
-    gdf["path_length"] *= train_dist / gdf["path_length"].sum()
+
     # Compute emissions : EF * length
     gdf["EF_tot"] /= 1000.0  # Conversion in kg
     gdf["kgCO2eq"] = gdf["path_length"] * gdf["EF_tot"]

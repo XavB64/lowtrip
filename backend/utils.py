@@ -43,9 +43,10 @@ def kilometer_to_degree(km):
 def split_path_by_country(
     path: LineString,
     method: str,
+    real_path_length: float,
     sea_threshold=default_sea_threshold,
 ):
-    """Split the path by country.
+    """Split the path by country and compute the length of each of its parts.
 
     Parameters
     ----------
@@ -130,7 +131,19 @@ def split_path_by_country(
             )
         )
 
-    return gpd.GeoDataFrame(u, geometry="geometry", crs="epsg:4326").reset_index()
+    gdf = gpd.GeoDataFrame(u, geometry="geometry", crs="epsg:4326").reset_index()
+
+    # Compute the length of each part of the path
+    l_length = []
+    geod = Geod(ellps="WGS84")
+    for geom in gdf.geometry.values:
+        l_length.append(geod.geometry_length(geom) / 1e3)
+    gdf["path_length"] = l_length
+
+    # Rescale the length with train_dist (especially when simplified = True)
+    gdf["path_length"] *= real_path_length / gdf["path_length"].sum()
+
+    return gdf
 
 
 def validate_geom(tag1, tag2, geom, th):
