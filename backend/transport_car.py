@@ -30,7 +30,7 @@ from parameters import (
     route_s,
     val_perimeter,
 )
-from utils import filter_countries_world, validate_geom as validate_geometry
+from utils import split_path_by_country, validate_geom as validate_geometry
 
 
 @dataclass
@@ -239,7 +239,7 @@ def ecar_to_gdf(
         return pd.DataFrame(), pd.DataFrame(), False
 
     # We need to filter by country and add length / Emission factors
-    gdf = filter_countries_world(
+    gdf = split_path_by_country(
         route_geometry,
         method="ecar",
     )

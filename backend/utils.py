@@ -29,7 +29,7 @@ from shapely.geometry import LineString, MultiLineString
 
 from parameters import (
     carbon_intensity_electricity,
-    sea_threshold,
+    sea_threshold as default_sea_threshold,
     train_intensity,
 )
 
@@ -40,20 +40,20 @@ def kilometer_to_degree(km):
     return c * km
 
 
-def filter_countries_world(
+def split_path_by_country(
     path: LineString,
     method: str,
-    th=sea_threshold,
+    sea_threshold=default_sea_threshold,
 ):
-    """Filter train path by countries (train_intensity.geojson).
+    """Split the path by country.
 
     Parameters
     ----------
-        - path : train geometry in LineString
+        - path : path geometry in LineString
         - mode : train / ecar
         - th : threshold to remove unmatched gaps between countries that are too small (km)
     return:
-        - Geodataframe of train path by countries
+        - geodataframe of path parts by countries
 
     """
     gdf = gpd.GeoSeries(
@@ -69,7 +69,8 @@ def filter_countries_world(
         iso = "Code"
         EF = "mix"
         data = carbon_intensity_electricity
-    # Make the split by geometry
+
+    # Split by geometry
     gdf.name = "geometry"
     res = gpd.overlay(
         gpd.GeoDataFrame(gdf, geometry="geometry", crs="epsg:4326"),
@@ -81,24 +82,26 @@ def filter_countries_world(
         data,
         how="difference",
     )
+
     # Check if the unmatched data is significant
-    if diff.length.sum() > kilometer_to_degree(th):
+    if diff.length.sum() > kilometer_to_degree(sea_threshold):
         print("Sea detected")
         # In case we have bridges / tunnels across sea:
         # Distinction depending on linestring / multilinestring
         if diff.geometry[0].geom_type == "MultiLineString":
-            #  print('MultiLinestring')
             diff_2 = gpd.GeoDataFrame(list(diff.geometry.values[0].geoms))
         else:
-            # print("Linestring")
             diff_2 = gpd.GeoDataFrame(list(diff.geometry.values))
+
         diff_2.columns = ["geometry"]
         diff_2 = diff_2.set_geometry("geometry", crs="epsg:4326")
+
         # Filter depending is the gap is long enough to be taken into account and join with nearest country
-        test = diff_2[diff_2.length > kilometer_to_degree(th)].sjoin_nearest(
+        test = diff_2[diff_2.length > kilometer_to_degree(sea_threshold)].sjoin_nearest(
             data,
             how="left",
         )
+
         # Aggregation per country and combining geometries
         u = (
             pd.concat([res.explode(), test.explode()])
@@ -112,6 +115,7 @@ def filter_countries_world(
                 ),
             )
         )
+
     else:
         u = (
             res.explode()
@@ -125,7 +129,7 @@ def filter_countries_world(
                 ),
             )
         )
-    # Rendering result
+
     return gpd.GeoDataFrame(u, geometry="geometry", crs="epsg:4326").reset_index()
 
 
