@@ -18,7 +18,6 @@
 from dataclasses import dataclass
 from http import HTTPStatus
 
-import geopandas as gpd
 import pandas as pd
 from pyproj import Geod
 import requests
@@ -241,7 +240,7 @@ def ecar_to_gdf(
 
     # We need to filter by country and add length / Emission factors
     gdf = filter_countries_world(
-        gpd.GeoSeries(route_geometry, crs="epsg:4326"),
+        route_geometry,
         method="ecar",
     )
 

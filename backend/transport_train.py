@@ -246,10 +246,7 @@ def train_to_gdf(
 
     # We need to filter by country and add length / Emission factors
     gdf = filter_countries_world(
-        gpd.GeoSeries(
-            geometry,
-            crs="epsg:4326",
-        ),
+        geometry,
         method="train",
     )
     # Adding and computing emissions
