@@ -58,6 +58,15 @@ class FerryStepResults:
     options: str
 
 
+@dataclass
+class SailStepResults:
+    """Class for the results of a sail step."""
+
+    geometry: pd.DataFrame
+    emissions: Emission
+    path_length: float
+
+
 def ferry_emissions_to_pd_objects(
     ferry_step: FerryStepResults,
 ) -> (pd.DataFrame, pd.DataFrame):
@@ -73,6 +82,20 @@ def ferry_emissions_to_pd_objects(
     geometry_data = ferry_step.geometry
 
     return ferry_data, geometry_data
+
+
+def sail_emissions_to_pd_objects(
+    sail_step: SailStepResults,
+) -> (pd.DataFrame, pd.DataFrame):
+    sail_data = pd.DataFrame({
+        "kgCO2eq": [sail_step.emissions.kg_co2_eq],
+        "EF_tot": [sail_step.emissions.ef_tot],
+        "path_length": [sail_step.path_length],
+        "colors": [sail_step.emissions.color],
+        "NAME": ["Usage"],
+        "Mean of Transport": ["Sail"],
+    })
+    return sail_data, sail_step.geometry
 
 
 def get_shortest_path(line_gdf, start, end):
@@ -301,7 +324,7 @@ def ferry_to_gdf(
     )
 
 
-def sail_to_gdf(tag1, tag2, EF=EF_sail, color_usage="#ffffff"):
+def sail_to_gdf(tag1, tag2, EF=EF_sail, color_usage="#ffffff") -> SailStepResults:
     """Parameters
         - tag1, tag2
         - EF : emission factor in gCO2/pkm for ferry
@@ -321,17 +344,6 @@ def sail_to_gdf(tag1, tag2, EF=EF_sail, color_usage="#ffffff"):
     geod = Geod(ellps="WGS84")
     bird = geod.geometry_length(geom) / 1e3
     # Compute geodataframe and dataframe
-    # data
-    data_ferry = pd.DataFrame(
-        pd.Series({
-            "kgCO2eq": EF * bird,
-            "EF_tot": EF,
-            "path_length": bird,
-            "colors": color_usage,
-            "NAME": "Usage",
-            "Mean of Transport": "Sail",
-        }),
-    ).transpose()
     geo_ferry = pd.DataFrame(
         pd.Series({
             "colors": color_usage,
@@ -341,4 +353,12 @@ def sail_to_gdf(tag1, tag2, EF=EF_sail, color_usage="#ffffff"):
         }),
     ).transpose()
 
-    return data_ferry, geo_ferry
+    return SailStepResults(
+        geometry=geo_ferry,
+        emissions=Emission(
+            kg_co2_eq=EF * bird,
+            ef_tot=EF,
+            color=color_usage,
+        ),
+        path_length=bird,
+    )
