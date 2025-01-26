@@ -19,7 +19,6 @@ from dataclasses import dataclass
 from http import HTTPStatus
 
 import pandas as pd
-from pyproj import Geod
 import requests
 from shapely.geometry import LineString
 
@@ -242,21 +241,12 @@ def ecar_to_gdf(
     gdf = split_path_by_country(
         route_geometry,
         method="ecar",
+        real_path_length=route_length,
     )
 
     # Add colors
     gdf["colors"] = color_usage
 
-    l_length = []
-    # Compute the true distance
-    geod = Geod(ellps="WGS84")
-    for geom in gdf.geometry.values:
-        l_length.append(geod.geometry_length(geom) / 1e3)
-    # Add the distance to the dataframe
-    gdf["path_length"] = l_length
-    # Rescale the length with route_dist (especially when simplified = True)
-    # print("Rescaling factor", route_length / gdf["path_length"].sum())
-    gdf["path_length"] *= route_length / gdf["path_length"].sum()
     # Handle nb passengers
     passengers_nb = int(passengers_nb)
     # Compute emissions : EF * length
