@@ -158,7 +158,7 @@ def find_train(
         - departure_coords, arrival_coords : list or tuple like (lon, lat)
         - method : signal / trainmap
     return:
-        - gdf, a geoserie with the path geometry / None if failure
+        - geometry, a LineString or None
         - success, boolean
 
     """
@@ -186,9 +186,9 @@ def find_train(
     # Check if the request was not successful
     if response.status_code != HTTPStatus.OK:
         print(f"Failed to retrieve data. Status code: {response.status_code}")
-        gdf, success, train_dist = pd.DataFrame(), False, 0
+        geometry, success, train_dist = None, False, 0
         # We will try to request again with overpass
-        return gdf, success, train_dist
+        return geometry, success, train_dist
 
     print("Path retrieved!")
     if method == "trainmap":
@@ -197,13 +197,9 @@ def find_train(
         train_dist = response.json()["routes"][0]["distance"] / 1e3  # km
         geometry = LineString(response.json()["routes"][0]["geometry"]["coordinates"])
 
-    gdf = gpd.GeoSeries(
-        geometry,
-        crs="epsg:4326",
-    )
     success = True
 
-    return gdf, success, train_dist
+    return geometry, success, train_dist
 
 
 def train_to_gdf(
@@ -225,12 +221,12 @@ def train_to_gdf(
 
     """
     # First try with coordinates supplied by the user
-    gdf, success, train_dist = find_train(departure_coords, arrival_coords)
+    geometry, success, train_dist = find_train(departure_coords, arrival_coords)
 
     # If failure then we try to find a better spot nearby - Put in another function
     if success == False:
         # We try to search nearby the coordinates and request again
-        gdf, success, train_dist = extend_search(
+        geometry, success, train_dist = extend_search(
             departure_coords,
             arrival_coords,
             perims,
@@ -240,13 +236,22 @@ def train_to_gdf(
     if not success or not validate_geom(
         departure_coords,
         arrival_coords,
-        gdf.values[0],
+        gpd.GeoSeries(
+            geometry,
+            crs="epsg:4326",
+        ).values[0],
         validate,
     ):
         return pd.DataFrame(), pd.DataFrame(), False
 
     # We need to filter by country and add length / Emission factors
-    gdf = filter_countries_world(gdf, method="train")
+    gdf = filter_countries_world(
+        gpd.GeoSeries(
+            geometry,
+            crs="epsg:4326",
+        ),
+        method="train",
+    )
     # Adding and computing emissions
     l_length = []
     # Compute the true distance
