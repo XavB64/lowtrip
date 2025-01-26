@@ -192,21 +192,15 @@ def find_train(
 
     print("Path retrieved!")
     if method == "trainmap":
-        # Store data in a geodataserie - trainmap
-        gdf = gpd.GeoSeries(
-            LineString(response.json()["geometry"]["coordinates"][0]),
-            crs="epsg:4326",
-        )
-    # geom = LineString(response.json()['geometry']['coordinates'][0])
-    # geod = Geod(ellps="WGS84")
-    # print('Train intial', geod.geometry_length(geom) / 1e3)
-    else:
+        geometry = LineString(response.json()["geometry"]["coordinates"][0])
+    else:  # signal
         train_dist = response.json()["routes"][0]["distance"] / 1e3  # km
-        # Store data - signal
-        gdf = gpd.GeoSeries(
-            LineString(response.json()["routes"][0]["geometry"]["coordinates"]),
-            crs="epsg:4326",
-        )
+        geometry = LineString(response.json()["routes"][0]["geometry"]["coordinates"])
+
+    gdf = gpd.GeoSeries(
+        geometry,
+        crs="epsg:4326",
+    )
     success = True
 
     return gdf, success, train_dist
