@@ -143,7 +143,7 @@ def split_path_by_country(
     # Rescale the length with train_dist (especially when simplified = True)
     gdf["path_length"] *= real_path_length / gdf["path_length"].sum()
 
-    return gdf
+    return gdf.drop("ISO2", axis=1)
 
 
 def validate_geom(tag1, tag2, geom, th):
