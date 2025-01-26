@@ -49,7 +49,7 @@ from transport_ferry import (
     sail_to_gdf,
 )
 from transport_plane import plane_emissions_to_pd_objects, plane_to_gdf
-from transport_train import train_to_gdf
+from transport_train import train_emissions_to_pd_objects, train_to_gdf
 
 
 ######################
@@ -87,13 +87,13 @@ def compute_emissions_custom(data, cmap=colors_custom):
 
         # Compute depending on the mean of transport
         if transportmean == "Train":
-            data_train, geo_train, train = train_to_gdf(
+            results = train_to_gdf(
                 departure_coordinates,
                 arrival_coordinates,
                 color_usage=cmap["Train"],
                 color_infra=cmap["Cons_infra"],
             )
-            if not train:  # One step is not successful
+            if results is None:  # Step is not successful
                 fail = True
                 ERROR = (
                     "step n°"
@@ -101,7 +101,7 @@ def compute_emissions_custom(data, cmap=colors_custom):
                     + " failed with Train, please change mean of transport or locations. "
                 )
                 break
-            # Adding a step variable here to know which trip is it
+            data_train, geo_train = train_emissions_to_pd_objects(results)
             data_train["step"] = str(int(idx) + 1)
             emissions_data.append(data_train)
             geo.append(geo_train)
@@ -288,14 +288,16 @@ def compute_emissions_all(data, cmap=colors_direct):
 
     # Train
     if train:
-        data_train, geo_train, train = train_to_gdf(
+        results = train_to_gdf(
             tag1,
             tag2,
             color_usage=cmap["Train"],
             color_infra=cmap["Cons_infra"],
         )
-        l_data.append(data_train)
-        geo.append(geo_train)
+        if results is not None:
+            data_train, geo_train = train_emissions_to_pd_objects(results)
+            l_data.append(data_train)
+            geo.append(geo_train)
 
     # Car or Bus
     route_added = False
