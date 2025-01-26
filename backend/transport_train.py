@@ -183,31 +183,32 @@ def find_train(
     response = requests.get(url)
     # print(time.time() - s)
 
-    # Check if the request was successful (status code 200)
-    if response.status_code == HTTPStatus.OK:
-        print("Path retrieved!")
-        if method == "trainmap":
-            # Store data in a geodataserie - trainmap
-            gdf = gpd.GeoSeries(
-                LineString(response.json()["geometry"]["coordinates"][0]),
-                crs="epsg:4326",
-            )
-        # geom = LineString(response.json()['geometry']['coordinates'][0])
-        # geod = Geod(ellps="WGS84")
-        # print('Train intial', geod.geometry_length(geom) / 1e3)
-        else:
-            train_dist = response.json()["routes"][0]["distance"] / 1e3  # km
-            # Store data - signal
-            gdf = gpd.GeoSeries(
-                LineString(response.json()["routes"][0]["geometry"]["coordinates"]),
-                crs="epsg:4326",
-            )
-        success = True
-    else:
-        # Error message
+    # Check if the request was not successful
+    if response.status_code != HTTPStatus.OK:
         print(f"Failed to retrieve data. Status code: {response.status_code}")
         gdf, success, train_dist = pd.DataFrame(), False, 0
         # We will try to request again with overpass
+        return gdf, success, train_dist
+
+    print("Path retrieved!")
+    if method == "trainmap":
+        # Store data in a geodataserie - trainmap
+        gdf = gpd.GeoSeries(
+            LineString(response.json()["geometry"]["coordinates"][0]),
+            crs="epsg:4326",
+        )
+    # geom = LineString(response.json()['geometry']['coordinates'][0])
+    # geod = Geod(ellps="WGS84")
+    # print('Train intial', geod.geometry_length(geom) / 1e3)
+    else:
+        train_dist = response.json()["routes"][0]["distance"] / 1e3  # km
+        # Store data - signal
+        gdf = gpd.GeoSeries(
+            LineString(response.json()["routes"][0]["geometry"]["coordinates"]),
+            crs="epsg:4326",
+        )
+    success = True
+
     return gdf, success, train_dist
 
 
