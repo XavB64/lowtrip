@@ -27,6 +27,7 @@ from pyproj import Geod
 from shapely import ops
 from shapely.geometry import LineString, MultiLineString
 
+from models import TripPayload, TripStep
 from parameters import (
     carbon_intensity_electricity,
     sea_threshold as default_sea_threshold,
@@ -171,3 +172,18 @@ def validate_geom(tag1, tag2, geom, th):
         return False
     # If we arrive here both dep and arr were validated
     return True
+
+
+def extract_path_steps_from_payload(trip_payload: TripPayload) -> list[TripStep]:
+    result = []
+    for i in range(len(trip_payload["lon"])):
+        result.append(
+            TripStep(
+                lon=trip_payload["lon"][i],
+                lat=trip_payload["lat"][i],
+                transport=trip_payload["transp"][i],
+                passengers_nb=trip_payload["nb"][i],
+                options=trip_payload["options"][i],
+            ),
+        )
+    return result
