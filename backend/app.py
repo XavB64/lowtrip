@@ -50,9 +50,8 @@ def main():
             # My trip data and geo data
             data_mytrip, geo_mytrip, error = compute_emissions_custom(df)
 
-            # Error formatting
             if len(error) > 0:
-                error = "My trip: " + error
+                return {"error": f"My trip: {error}"}
 
             if not df.shape[0] > 2:
                 # Direct data and geo data
@@ -81,13 +80,11 @@ def main():
                     "gdf": gdf,
                     "my_trip": data_mytrip.to_json(orient="records"),
                     "direct_trip": data_direct.to_json(orient="records"),
-                    "error": error,
                 }
             else:
                 response = {
                     "gdf": gdf,
                     "my_trip": data_mytrip.to_json(orient="records"),
-                    "error": error,
                 }
 
         else:  # My trip vs custom trip
@@ -97,18 +94,19 @@ def main():
 
             # My trip data and geo data
             data_mytrip, geo_mytrip, error = compute_emissions_custom(df)
-            # Error message
+
             if len(error) > 0:
-                error = "My trip: " + error
+                return {error: f"My trip: {error}"}
+
             # Direct data and geo data
             # We change the color to pink
             data_alternative, geo_alternative, error_other = compute_emissions_custom(
                 df2,
                 cmap=colors_alternative,
             )
-            # Error message
+
             if len(error_other) > 0:
-                error_other = "Other trip: " + error_other
+                return {error: f"Other trip: {error_other}"}
 
             # Check if we have geo data :
             if len(error) > 0 and len(error_other) > 0:
@@ -130,7 +128,6 @@ def main():
                 "gdf": gdf,
                 "my_trip": data_mytrip.to_json(orient="records"),
                 "alternative_trip": data_alternative.to_json(orient="records"),
-                "error": error + error_other,
             }
 
         return response
