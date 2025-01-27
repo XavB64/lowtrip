@@ -301,7 +301,7 @@ def train_to_gdf(
 
     # Add infra
     gdf["label"] = "Railway"
-    gdf["length"] = f"{int(train_dist)}km ({gdf['NAME']})"
+    gdf["length"] = f"{int(train_dist)}km (" + gdf["NAME"] + ")"
     gdf.reset_index(inplace=True)
 
     geo_train = gdf[["colors", "label", "geometry", "length"]].dropna(axis=0)
