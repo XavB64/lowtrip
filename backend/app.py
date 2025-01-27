@@ -28,6 +28,7 @@ from backend import (
     compute_emissions_custom,
 )
 from parameters import colors_alternative
+from utils import extract_path_steps_from_payload
 
 
 warnings.filterwarnings("ignore")
@@ -45,6 +46,7 @@ def main():
         data = request.get_json()
 
         if data["mode"] == 1:  # My trip vs direct trips
+            inputs = extract_path_steps_from_payload(data["my-trip"])
             df = pd.DataFrame.from_dict(data["my-trip"])
 
             # My trip data and geo data
@@ -53,7 +55,7 @@ def main():
             if len(error) > 0:
                 return {"error": f"My trip: {error}"}
 
-            if not df.shape[0] > 2:
+            if len(inputs) == 2:
                 # Direct data and geo data
                 return_direct = True
                 data_direct, geo_direct = compute_emissions_all(df)
@@ -94,9 +96,6 @@ def main():
         # My trip data and geo data
         data_mytrip, geo_mytrip, error = compute_emissions_custom(df)
 
-        if len(error) > 0:
-            return {error: f"My trip: {error}"}
-
         # Direct data and geo data
         # We change the color to pink
         data_alternative, geo_alternative, error_other = compute_emissions_custom(
@@ -104,8 +103,12 @@ def main():
             cmap=colors_alternative,
         )
 
-        if len(error_other) > 0:
-            return {error: f"Other trip: {error_other}"}
+        if len(error) > 0 or len(error_other) > 0:
+            return {
+                error: f"My trip: {error}"
+                if len(error) > 0
+                else f"Other trip: {error_other}",
+            }
 
         # Check if we have geo data :
         if len(error) > 0 and len(error_other) > 0:
