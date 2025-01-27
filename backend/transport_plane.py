@@ -193,7 +193,7 @@ def plane_to_gdf(
         pd.Series({
             "colors": color_usage,
             "label": "Flight",
-            "length": f"{route_length}km",
+            "length": f"{int(route_length)}km",
             "geometry": plane_geometry,
         }),
     ).transpose()
