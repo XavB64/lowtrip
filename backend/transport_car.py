@@ -50,6 +50,25 @@ class CarEmissions:
 
 
 @dataclass
+class ECarEmission:
+    """Emission dataclass for Ecar."""
+
+    name: str
+    kg_co2_eq: float
+    color: str
+
+
+@dataclass
+class ECarStepResults:
+    """Dataclass for electric car emissions and geometry."""
+
+    geometry: pd.DataFrame
+    emissions: list[ECarEmission]
+    path_length: float
+    passengers_label: str
+
+
+@dataclass
 class CarBusResults:
     """Dataclass for car and bus emissions and road geometry."""
 
@@ -76,6 +95,19 @@ class CarStepResults:
     emissions: CarEmissions
     path_length: float
     passengers_label: str
+
+
+def e_car_emissions_to_pd_objects(
+    e_car_step: ECarStepResults,
+) -> (pd.DataFrame, pd.DataFrame):
+    res = {"kgCO2eq": [], "colors": [], "NAME": [], "Mean of Transport": []}
+    for emission in e_car_step.emissions:
+        res["kgCO2eq"].append(emission.kg_co2_eq)
+        res["colors"].append(emission.color)
+        res["NAME"].append(emission.name)
+        res["Mean of Transport"].append(f"eCar {e_car_step.passengers_label}")
+
+    return pd.DataFrame(res), e_car_step.geometry
 
 
 def bus_emissions_to_pd_objects(
@@ -235,7 +267,7 @@ def ecar_to_gdf(
         route_geometry,
         validate,
     ):
-        return pd.DataFrame(), pd.DataFrame(), False
+        return None
 
     # We need to filter by country and add length / Emission factors
     gdf = split_path_by_country(
@@ -257,6 +289,7 @@ def ecar_to_gdf(
         / (1e3 * passengers_nb)
     )  # g/kWh * kWh/km
     gdf["kgCO2eq"] = gdf["path_length"] * gdf["EF_tot"]
+
     # Add infra and construction
     gdf = pd.concat([
         pd.DataFrame({
@@ -267,16 +300,29 @@ def ecar_to_gdf(
         }),
         gdf,
     ])
-    name = str(passengers_nb) + "p."
-    gdf["Mean of Transport"] = ["eCar " + name for k in range(gdf.shape[0])]
     gdf["label"] = "Road"
     gdf["length"] = str(int(route_length)) + "km (" + gdf["NAME"] + ")"
-    gdf["NAME"] = " " + gdf["NAME"]
     gdf.reset_index(inplace=True)
-    data_ecar = gdf[["kgCO2eq", "colors", "NAME", "Mean of Transport"]]
+
     geo_ecar = gdf[["colors", "label", "geometry", "length"]].dropna(axis=0)
 
-    return data_ecar, geo_ecar, success
+    emissions_data = gdf[["kgCO2eq", "colors", "NAME"]].to_dict("records")
+
+    emissions = [
+        ECarEmission(
+            name=emission_data["NAME"],
+            kg_co2_eq=emission_data["kgCO2eq"],
+            color=emission_data["colors"],
+        )
+        for emission_data in emissions_data
+    ]
+
+    return ECarStepResults(
+        geometry=geo_ecar,
+        emissions=emissions,
+        path_length=route_length,
+        passengers_label=f"{passengers_nb}p.",
+    )
 
 
 def get_car_emissions(

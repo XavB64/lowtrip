@@ -40,6 +40,7 @@ from transport_car import (
     car_bus_to_gdf,
     car_emissions_to_pd_objects,
     car_to_gdf,
+    e_car_emissions_to_pd_objects,
     ecar_to_gdf,
 )
 from transport_ferry import (
@@ -148,14 +149,14 @@ def compute_emissions_custom(data, cmap=colors_custom):
             geo.append(geo_car)
 
         elif transportmean == "eCar":
-            data_ecar, geo_ecar, ecar = ecar_to_gdf(
+            results = ecar_to_gdf(
                 departure_coordinates,
                 arrival_coordinates,
                 passengers_nb=arrival.nb,
                 color_usage=cmap["Road"],
                 color_cons=cmap["Cons_infra"],
             )
-            if not ecar:  # One step is not successful
+            if results is None:  # Step is not successful
                 fail = True
                 ERROR = (
                     "step n°"
@@ -163,6 +164,7 @@ def compute_emissions_custom(data, cmap=colors_custom):
                     + " failed with eCar, please change mean of transport or locations. "
                 )
                 break
+            data_ecar, geo_ecar = e_car_emissions_to_pd_objects(results)
             data_ecar["step"] = str(int(idx) + 1)
             emissions_data.append(data_ecar)
             geo.append(geo_ecar)
