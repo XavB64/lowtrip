@@ -75,62 +75,58 @@ def main():
                 gdf = gdf.explode().to_json()  # [l_geo]
 
             if return_direct:
-                # Response
-                response = {
+                return {
                     "gdf": gdf,
                     "my_trip": data_mytrip.to_json(orient="records"),
                     "direct_trip": data_direct.to_json(orient="records"),
                 }
-            else:
-                response = {
-                    "gdf": gdf,
-                    "my_trip": data_mytrip.to_json(orient="records"),
-                }
 
-        else:  # My trip vs custom trip
-            # Convert json into pandas
-            df = pd.DataFrame.from_dict(data["my-trip"])
-            df2 = pd.DataFrame.from_dict(data["alternative-trip"])
-
-            # My trip data and geo data
-            data_mytrip, geo_mytrip, error = compute_emissions_custom(df)
-
-            if len(error) > 0:
-                return {error: f"My trip: {error}"}
-
-            # Direct data and geo data
-            # We change the color to pink
-            data_alternative, geo_alternative, error_other = compute_emissions_custom(
-                df2,
-                cmap=colors_alternative,
-            )
-
-            if len(error_other) > 0:
-                return {error: f"Other trip: {error_other}"}
-
-            # Check if we have geo data :
-            if len(error) > 0 and len(error_other) > 0:
-                gdf = None
-            else:
-                gdf = (
-                    pd.concat([geo_mytrip, geo_alternative]).explode().to_json()
-                )  # [l_geo]
-
-            # Prepare data for aggregation in the chart -  see frontend
-            data_mytrip, data_alternative = chart_refactor(
-                data_mytrip,
-                data_alternative,
-                True,
-            )
-
-            # Response
-            response = {
+            return {
                 "gdf": gdf,
                 "my_trip": data_mytrip.to_json(orient="records"),
-                "alternative_trip": data_alternative.to_json(orient="records"),
             }
 
-        return response
+        # My trip vs custom trip
+        # Convert json into pandas
+        df = pd.DataFrame.from_dict(data["my-trip"])
+        df2 = pd.DataFrame.from_dict(data["alternative-trip"])
+
+        # My trip data and geo data
+        data_mytrip, geo_mytrip, error = compute_emissions_custom(df)
+
+        if len(error) > 0:
+            return {error: f"My trip: {error}"}
+
+        # Direct data and geo data
+        # We change the color to pink
+        data_alternative, geo_alternative, error_other = compute_emissions_custom(
+            df2,
+            cmap=colors_alternative,
+        )
+
+        if len(error_other) > 0:
+            return {error: f"Other trip: {error_other}"}
+
+        # Check if we have geo data :
+        if len(error) > 0 and len(error_other) > 0:
+            gdf = None
+        else:
+            gdf = (
+                pd.concat([geo_mytrip, geo_alternative]).explode().to_json()
+            )  # [l_geo]
+
+        # Prepare data for aggregation in the chart -  see frontend
+        data_mytrip, data_alternative = chart_refactor(
+            data_mytrip,
+            data_alternative,
+            True,
+        )
+
+        return {
+            "gdf": gdf,
+            "my_trip": data_mytrip.to_json(orient="records"),
+            "alternative_trip": data_alternative.to_json(orient="records"),
+        }
 
     return {"message": "backend initialized"}
 
