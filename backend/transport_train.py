@@ -96,7 +96,7 @@ def find_nearest(lon, lat, perim):
     # Prepare the request
     url = "http://overpass-api.de/api/interpreter"  # To avoid the natural space at the end
     query = (
-        '[out:json][timeout:300];(way(poly : "'
+        '[out:json][timeout:60];(way(poly : "'
         + st[:-1]
         + '")["railway"="rail"];);out geom;'
     )  # ;convert item ::=::,::geom=geom(),_osm_type=type()
