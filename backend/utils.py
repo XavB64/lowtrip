@@ -181,7 +181,7 @@ def extract_path_steps_from_payload(trip_payload: TripPayload) -> list[TripStep]
             TripStep(
                 lon=trip_payload["lon"][i],
                 lat=trip_payload["lat"][i],
-                transport=trip_payload["transp"][i],
+                transport_means=trip_payload["transp"][i],
                 passengers_nb=trip_payload["nb"][i],
                 options=trip_payload["options"][i],
             ),

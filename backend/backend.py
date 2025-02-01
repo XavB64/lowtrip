@@ -27,6 +27,7 @@ from pyproj import Geod
 # Geometry
 from shapely.geometry import LineString
 
+from models import TripStep
 from parameters import (
     colors_custom,
     colors_direct,
@@ -58,9 +59,9 @@ from transport_train import train_emissions_to_pd_objects, train_to_gdf
 ######################
 
 
-def compute_emissions_custom(data, cmap=colors_custom):
+def compute_emissions_custom(trip_inputs: list[TripStep], cmap=colors_custom):
     """Parameters
-        - data, pandas dataframe format (will be json).
+        - trip_inputs, inputs of the trip
 
     Return:
     ------
@@ -74,17 +75,18 @@ def compute_emissions_custom(data, cmap=colors_custom):
     emissions_data = []
     geo = []
     fail = False  # To check if the query is successfull
-    for idx in data.index[:-1]:  # We loop until last departure
+
+    for idx in range(len(trip_inputs) - 1):  # We loop until last departure
         # Departure coordinates
-        depature = data.loc[idx]
+        depature = trip_inputs[idx]
         departure_coordinates = (depature.lon, depature.lat)
 
         # Arrival coordinates
-        arrival = data.loc[idx + 1]
+        arrival = trip_inputs[idx + 1]
         arrival_coordinates = (arrival.lon, arrival.lat)
 
         # Mean of transport
-        transportmean = arrival.transp
+        transportmean = arrival.transport_means
 
         # Compute depending on the mean of transport
         if transportmean == "Train":
@@ -131,7 +133,7 @@ def compute_emissions_custom(data, cmap=colors_custom):
             results = car_to_gdf(
                 departure_coordinates,
                 arrival_coordinates,
-                passengers_nb=arrival.nb,
+                passengers_nb=arrival.passengers_nb,
                 color_usage=cmap["Road"],
                 color_cons=cmap["Cons_infra"],
             )
@@ -152,7 +154,7 @@ def compute_emissions_custom(data, cmap=colors_custom):
             results = ecar_to_gdf(
                 departure_coordinates,
                 arrival_coordinates,
-                passengers_nb=arrival.nb,
+                passengers_nb=arrival.passengers_nb,
                 color_usage=cmap["Road"],
                 color_cons=cmap["Cons_infra"],
             )
@@ -249,7 +251,6 @@ def compute_emissions_all(data, cmap=colors_direct):
         - geodataframe for path
 
     """
-    # colors
     # Direct trip
     # Departure coordinates
     lon = data.loc[0].lon
@@ -272,7 +273,7 @@ def compute_emissions_all(data, cmap=colors_direct):
         plane = False
 
     # Retrieve the mean of transport: Car/Bus/Train/Plane
-    transp = data.loc[1].transp
+    transp = data.loc[1].transport_means
     if transp == "Train":
         train = False
     elif transp == "Plane":
