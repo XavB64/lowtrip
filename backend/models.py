@@ -17,6 +17,8 @@
 
 from dataclasses import dataclass
 
+from shapely.geometry import LineString
+
 
 @dataclass
 class TripPayload:
@@ -38,3 +40,14 @@ class TripStep:
     transport_means: str
     passengers_nb: str | None
     options: str | None
+
+
+@dataclass
+class TripStepGeometry:
+    """Trip step geometry."""
+
+    coordinates: LineString
+    transport_means: str
+    length: float
+    color: str
+    country_label: str | None
