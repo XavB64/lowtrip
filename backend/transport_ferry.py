@@ -32,6 +32,7 @@ from shapely.geometry import (
 )
 from shapely.ops import nearest_points, unary_union
 
+from models import TripStepGeometry
 from parameters import (
     EF_ferry,
     EF_sail,
@@ -52,7 +53,7 @@ class Emission:
 class FerryStepResults:
     """Class for the results of a ferry step."""
 
-    geometry: pd.DataFrame
+    geometry: TripStepGeometry
     emissions: Emission
     path_length: float
     options: str
@@ -62,9 +63,18 @@ class FerryStepResults:
 class SailStepResults:
     """Class for the results of a sail step."""
 
-    geometry: pd.DataFrame
+    geometry: TripStepGeometry
     emissions: Emission
     path_length: float
+
+
+def geometry_to_gdf(geometry: TripStepGeometry) -> gpd.GeoDataFrame:
+    return pd.DataFrame({
+        "colors": [geometry.color],
+        "label": [geometry.transport_means],
+        "length": [f"{int(geometry.length)}km"],
+        "geometry": [geometry.coordinates],
+    })
 
 
 def ferry_emissions_to_pd_objects(
@@ -79,7 +89,7 @@ def ferry_emissions_to_pd_objects(
         "Mean of Transport": ["Ferry"],
     })
 
-    geometry_data = ferry_step.geometry
+    geometry_data = geometry_to_gdf(ferry_step.geometry)
 
     return ferry_data, geometry_data
 
@@ -95,7 +105,7 @@ def sail_emissions_to_pd_objects(
         "NAME": ["Usage"],
         "Mean of Transport": ["Sail"],
     })
-    return sail_data, sail_step.geometry
+    return sail_data, geometry_to_gdf(sail_step.geometry)
 
 
 def get_shortest_path(line_gdf, start, end):
@@ -303,17 +313,14 @@ def ferry_to_gdf(
     elif options == "CabinVehicle":
         EF = EF["Car"] + EF["Cabin"] + EF["Base"]
 
-    geo_ferry = pd.DataFrame(
-        pd.Series({
-            "colors": color_usage,
-            "label": "Ferry",
-            "length": str(int(bird)) + "km",
-            "geometry": geom,
-        }),
-    ).transpose()
-
     return FerryStepResults(
-        geometry=geo_ferry,
+        geometry=TripStepGeometry(
+            coordinates=geom,
+            transport_means="Ferry",
+            length=bird,
+            color=color_usage,
+            country_label=None,
+        ),
         emissions=Emission(
             kg_co2_eq=EF * bird,
             ef_tot=EF,
@@ -343,18 +350,15 @@ def sail_to_gdf(tag1, tag2, EF=EF_sail, color_usage="#ffffff") -> SailStepResult
     # Compute the true distance
     geod = Geod(ellps="WGS84")
     bird = geod.geometry_length(geom) / 1e3
-    # Compute geodataframe and dataframe
-    geo_ferry = pd.DataFrame(
-        pd.Series({
-            "colors": color_usage,
-            "label": "Sail",
-            "length": str(int(bird)) + "km",
-            "geometry": geom,
-        }),
-    ).transpose()
 
     return SailStepResults(
-        geometry=geo_ferry,
+        geometry=TripStepGeometry(
+            coordinates=geom,
+            transport_means="Sail",
+            length=bird,
+            color=color_usage,
+            country_label=None,
+        ),
         emissions=Emission(
             kg_co2_eq=EF * bird,
             ef_tot=EF,
