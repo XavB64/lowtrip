@@ -25,6 +25,7 @@ import pandas as pd
 import requests
 from shapely.geometry import LineString, Point
 
+from models import TripStepGeometry
 from parameters import (
     EF_train,
     search_perimeter,
@@ -52,7 +53,7 @@ class TrainEmission:
 class TrainStepResults:
     """Dataclass for train emissions and geometry."""
 
-    geometry: pd.DataFrame
+    geometries: list[TripStepGeometry]
     emissions: list[TrainEmission]
     path_length: float
 
@@ -67,7 +68,16 @@ def train_emissions_to_pd_objects(
         res["NAME"].append(emission.name)
         res["Mean of Transport"].append("Train")
 
-    return pd.DataFrame(res), train_step.geometry
+    geometries = {"geometry": [], "length": [], "colors": [], "label": []}
+    for geometry in train_step.geometries:
+        geometries["geometry"].append(geometry.coordinates)
+        geometries["label"].append(geometry.transport_means)
+        geometries["length"].append(
+            f"{int(geometry.length)}km ({geometry.country_label})",
+        )
+        geometries["colors"].append(geometry.color)
+
+    return pd.DataFrame(res), pd.DataFrame(geometries)
 
 
 def flatten_list_of_tuples(lst):
@@ -300,14 +310,25 @@ def train_to_gdf(
     ])
 
     # Add infra
-    gdf["label"] = "Railway"
-    gdf["length"] = f"{int(train_dist)}km (" + gdf["NAME"] + ")"
     gdf.reset_index(inplace=True)
 
-    geo_train = gdf[["colors", "label", "geometry", "length"]].dropna(axis=0)
+    geo_train = (
+        gdf[["colors", "geometry", "path_length", "NAME"]]
+        .dropna(axis=0)
+        .to_dict("records")
+    )
+    geometries = [
+        TripStepGeometry(
+            coordinates=geo["geometry"],
+            transport_means="Railway",
+            length=geo["path_length"],
+            color=geo["colors"],
+            country_label=geo["NAME"],
+        )
+        for geo in geo_train
+    ]
 
     emissions_data = gdf[["kgCO2eq", "colors", "NAME"]].to_dict("records")
-
     emissions = [
         TrainEmission(
             name=emission_data["NAME"],
@@ -318,7 +339,7 @@ def train_to_gdf(
     ]
 
     return TrainStepResults(
-        geometry=geo_train,
+        geometries=geometries,
         emissions=emissions,
         path_length=train_dist,
     )
