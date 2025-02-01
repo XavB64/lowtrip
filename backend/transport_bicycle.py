@@ -23,6 +23,7 @@ import pandas as pd
 import requests
 from shapely.geometry import LineString
 
+from models import TripStepGeometry
 from parameters import EF_bicycle, val_perimeter
 from utils import validate_geom
 
@@ -47,7 +48,7 @@ class BicycleEmissions:
 class BicycleStepResults:
     """Class for the results of a bicycle step."""
 
-    geometry: pd.DataFrame
+    geometry: TripStepGeometry
     emissions: BicycleEmissions
     path_length: float
 
@@ -64,7 +65,12 @@ def bicycle_emissions_to_pd_objects(
         "Mean of Transport": ["Bicycle"],
     })
 
-    geometry_data = bicycle_step.geometry
+    geometry_data = pd.DataFrame({
+        "colors": [bicycle_step.geometry.color],
+        "label": [bicycle_step.geometry.transport_means],
+        "length": [f"{int(bicycle_step.geometry.length)}km"],
+        "geometry": [bicycle_step.geometry.coordinates],
+    })
 
     return bicycle_data, geometry_data
 
@@ -133,12 +139,13 @@ def bicycle_to_gdf(
         return None
 
     return BicycleStepResults(
-        geometry=pd.DataFrame({
-            "colors": [color],
-            "label": ["Bike"],
-            "length": str(int(route_length)) + "km",
-            "geometry": [route_geometry],
-        }),
+        geometry=TripStepGeometry(
+            coordinates=route_geometry,
+            transport_means="Bicycle",
+            length=route_length,
+            color=color,
+            country_label=None,
+        ),
         emissions=BicycleEmissions(
             construction=Emission(
                 kg_co2_eq=EF * route_length,
