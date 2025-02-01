@@ -21,6 +21,8 @@ import pandas as pd
 from pyproj import Geod
 from shapely.geometry import LineString
 
+from models import TripStepGeometry
+
 
 @dataclass
 class Emission:
@@ -43,7 +45,7 @@ class PlaneEmissions:
 class PlaneStepResults:
     """Class for plane step results."""
 
-    geometry: pd.DataFrame
+    geometry: TripStepGeometry
     emissions: PlaneEmissions
 
 
@@ -67,7 +69,12 @@ def plane_emissions_to_pd_objects(
         "Mean of Transport": ["Plane", "Plane"],
     })
 
-    geometry_data = planeStep.geometry
+    geometry_data = pd.DataFrame({
+        "geometry": [planeStep.geometry.coordinates],
+        "label": ["Flight"],
+        "length": [f"{int(planeStep.geometry.length)}km"],
+        "colors": [planeStep.geometry.color],
+    })
 
     return plane_data, geometry_data
 
@@ -189,17 +196,14 @@ def plane_to_gdf(
     CO2_factors = emissions_factors["combustion"] + emissions_factors["upstream"]
     non_CO2_factors = emissions_factors["combustion"] * contrails
 
-    geometry_data = pd.DataFrame(
-        pd.Series({
-            "colors": color_usage,
-            "label": "Flight",
-            "length": f"{int(route_length)}km",
-            "geometry": plane_geometry,
-        }),
-    ).transpose()
-
     return PlaneStepResults(
-        geometry=geometry_data,
+        geometry=TripStepGeometry(
+            coordinates=plane_geometry,
+            transport_means="Flight",
+            length=route_length,
+            color=color_usage,
+            country_label=None,
+        ),
         emissions=PlaneEmissions(
             kerosene=Emission(
                 kg_co2_eq=route_length * CO2_factors + holding,
