@@ -22,6 +22,7 @@ import pandas as pd
 import requests
 from shapely.geometry import LineString
 
+from models import TripStepGeometry
 from parameters import (
     EF_bus,
     EF_car,
@@ -72,7 +73,7 @@ class ECarStepResults:
 class CarBusResults:
     """Dataclass for car and bus emissions and road geometry."""
 
-    geometry: pd.DataFrame
+    geometry: list[TripStepGeometry]
     bus_emissions: CarEmissions
     car_emissions: CarEmissions
     path_length: float
@@ -82,7 +83,7 @@ class CarBusResults:
 class BusStepResults:
     """Dataclass for bus emissions and geometry."""
 
-    geometry: pd.DataFrame
+    geometry: TripStepGeometry
     emissions: CarEmissions
     path_length: float
 
@@ -91,10 +92,19 @@ class BusStepResults:
 class CarStepResults:
     """Dataclass for car emissions and geometry."""
 
-    geometry: pd.DataFrame
+    geometry: TripStepGeometry
     emissions: CarEmissions
     path_length: float
     passengers_label: str
+
+
+def road_geometry_to_pd_objects(trip_step_geometry: TripStepGeometry) -> pd.DataFrame:
+    return pd.DataFrame({
+        "colors": [trip_step_geometry.color],
+        "label": ["Road"],
+        "length": [f"{int(trip_step_geometry.length)}km"],
+        "geometry": [trip_step_geometry.coordinates],
+    })
 
 
 def e_car_emissions_to_pd_objects(
@@ -131,7 +141,7 @@ def bus_emissions_to_pd_objects(
         "Mean of Transport": ["Bus", "Bus"],
     })
 
-    geometry_data = busStep.geometry
+    geometry_data = road_geometry_to_pd_objects(busStep.geometry)
 
     return bus_data, geometry_data
 
@@ -160,7 +170,7 @@ def car_emissions_to_pd_objects(
         ],
     })
 
-    geometry_data = carStep.geometry
+    geometry_data = road_geometry_to_pd_objects(carStep.geometry)
 
     return car_data, geometry_data
 
@@ -202,7 +212,7 @@ def car_bus_emissions_to_pd_objects(
         "NAME": ["Construction", "Fuel"],
         "Mean of Transport": ["Bus", "Bus"],
     })
-    geometry_data = results.geometry
+    geometry_data = road_geometry_to_pd_objects(results.geometry)
 
     return car_data, bus_data, geometry_data
 
@@ -384,14 +394,13 @@ def get_road_geometry_data(
     route_geometry: LineString,
     color_usage: str,
 ):
-    return pd.DataFrame(
-        pd.Series({
-            "colors": color_usage,
-            "label": "Road",
-            "length": f"{int(route_length)}km",
-            "geometry": route_geometry,
-        }),
-    ).transpose()
+    return TripStepGeometry(
+        coordinates=route_geometry,
+        transport_means="Road",
+        color=color_usage,
+        length=route_length,
+        country_label=None,
+    )
 
 
 def car_bus_to_gdf(
