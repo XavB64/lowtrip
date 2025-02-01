@@ -59,8 +59,8 @@ def main():
             if len(inputs) < 2:
                 abort(400, "My trip: should have at least 1 step")
 
-            df = pd.DataFrame.from_dict(data["my-trip"])
-            data_mytrip, geo_mytrip, error = compute_emissions_custom(df)
+            df = pd.DataFrame.from_dict(inputs)
+            data_mytrip, geo_mytrip, error = compute_emissions_custom(inputs)
 
             if len(error) > 0:
                 return {"error": f"My trip: {error}"}
@@ -84,13 +84,15 @@ def main():
             }
 
         ### Compare emissions of 2 custom trips
-        df = pd.DataFrame.from_dict(data["my-trip"])
-        df2 = pd.DataFrame.from_dict(data["alternative-trip"])
+        main_trip_inputs = extract_path_steps_from_payload(data["my-trip"])
+        alternative_trip_inputs = extract_path_steps_from_payload(
+            data["alternative-trip"],
+        )
 
-        data_mytrip, geo_mytrip, error = compute_emissions_custom(df)
+        data_mytrip, geo_mytrip, error = compute_emissions_custom(main_trip_inputs)
 
         data_alternative, geo_alternative, error_other = compute_emissions_custom(
-            df2,
+            alternative_trip_inputs,
             cmap=colors_alternative,
         )
 

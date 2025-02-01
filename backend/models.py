@@ -35,6 +35,6 @@ class TripStep:
 
     lon: float
     lat: float
-    transport: str
+    transport_means: str
     passengers_nb: str | None
     options: str | None
