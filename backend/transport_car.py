@@ -63,7 +63,7 @@ class ECarEmission:
 class ECarStepResults:
     """Dataclass for electric car emissions and geometry."""
 
-    geometry: pd.DataFrame
+    geometries: TripStepGeometry
     emissions: list[ECarEmission]
     path_length: float
     passengers_label: str
@@ -117,7 +117,16 @@ def e_car_emissions_to_pd_objects(
         res["NAME"].append(emission.name)
         res["Mean of Transport"].append(f"eCar {e_car_step.passengers_label}")
 
-    return pd.DataFrame(res), e_car_step.geometry
+    geometry_res = {"colors": [], "label": [], "length": [], "geometry": []}
+    for geometry in e_car_step.geometries:
+        geometry_res["colors"].append(geometry.color)
+        geometry_res["label"].append("Road")
+        geometry_res["length"].append(
+            f"{int(geometry.length)}km ({geometry.country_label})",
+        )
+        geometry_res["geometry"].append(geometry.coordinates)
+
+    return pd.DataFrame(res), pd.DataFrame(geometry_res)
 
 
 def bus_emissions_to_pd_objects(
@@ -314,7 +323,21 @@ def ecar_to_gdf(
     gdf["length"] = str(int(route_length)) + "km (" + gdf["NAME"] + ")"
     gdf.reset_index(inplace=True)
 
-    geo_ecar = gdf[["colors", "label", "geometry", "length"]].dropna(axis=0)
+    geo_ecar = gdf[["colors", "label", "geometry", "path_length", "NAME"]].dropna(
+        axis=0,
+    )
+
+    geometries = []
+    for _, row in geo_ecar.iterrows():
+        geometries.append(
+            TripStepGeometry(
+                coordinates=row["geometry"],
+                transport_means="Road",
+                color=color_usage,
+                length=row["path_length"],
+                country_label=row["NAME"],
+            ),
+        )
 
     emissions_data = gdf[["kgCO2eq", "colors", "NAME"]].to_dict("records")
 
@@ -328,7 +351,7 @@ def ecar_to_gdf(
     ]
 
     return ECarStepResults(
-        geometry=geo_ecar,
+        geometries=geometries,
         emissions=emissions,
         path_length=route_length,
         passengers_label=f"{passengers_nb}p.",
