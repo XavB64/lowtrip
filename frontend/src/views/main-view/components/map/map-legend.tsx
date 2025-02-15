@@ -20,8 +20,7 @@ import { useTranslation } from "react-i18next";
 import { uniqBy } from "lodash";
 import { Box, Card, HStack, Text, VStack } from "@chakra-ui/react";
 
-import { SimulationResults } from "../../types";
-import { pathMapper } from "./const";
+import type { SimulationResults } from "../../../../types";
 
 const Legend = ({
   tripGeometries,
@@ -29,18 +28,20 @@ const Legend = ({
   tripGeometries: SimulationResults["tripGeometries"];
 }) => {
   const { t } = useTranslation();
-  const trips = useMemo(
-    () => uniqBy(tripGeometries, (trip) => trip.label),
+  const routes = useMemo(
+    () => uniqBy(tripGeometries, (trip) => trip.transportMeans),
     [tripGeometries],
   );
 
   return (
     <Card display="flex" position="absolute" zIndex={2} top={5} right={5} p={3}>
       <VStack align="start">
-        {trips.map((trip) => (
-          <HStack key={trip.label}>
-            <Box w={5} h={3} backgroundColor={trip.color} />
-            <Text fontSize="sm">{t(pathMapper[trip.label])}</Text>
+        {routes.map((route) => (
+          <HStack key={route.transportMeans}>
+            <Box w={5} h={3} backgroundColor={route.color} />
+            <Text fontSize="sm">
+              {t(`chart.paths.${route.transportMeans.toLowerCase()}`)}
+            </Text>
           </HStack>
         ))}
       </VStack>

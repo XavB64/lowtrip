@@ -115,11 +115,18 @@
       },
       "paths": {
         "railway": "Railway",
+        "railway_with_details": "Railway - {{countryLabel}}: {{length}}km",
         "road": "Road",
-        "bike": "Bicycle route",
-        "flight": "Flight path",
-        "ferry": "Ferry route",
-        "sail": "Sailboat route"
+        "road_with_details": "Road: {{length}}km",
+        "road_with_country_with_details": "Road - {{countryLabel}}: {{length}}km",
+        "bike": "Bike path",
+        "bike_with_details": "Bike path: {{length}}km",
+        "flight": "Air route",
+        "flight_with_details": "Air route: {{length}}km",
+        "ferry": "Sea route",
+        "ferry_with_details": "Sea route: {{length}}km",
+        "sail": "Sea route",
+        "sail_with_details": "Sea route: {{length}}km"
       },
       "category": {
         "infra": "Infrastructure",

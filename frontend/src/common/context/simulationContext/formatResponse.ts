@@ -1,13 +1,12 @@
+import i18next from "i18next";
 import {
   ApiResponse,
   SimulationResults,
-  Gdf,
   MyTripData,
   Transport,
   DirectTripData,
   Trip,
   TripStep,
-  Geometry,
   SimulationType,
 } from "../../../types";
 
@@ -167,30 +166,22 @@ export const formatResponse = (
     trips.push(alternativeTrip);
   }
 
-  const tripGeometries = (JSON.parse(data.gdf) as Gdf).features.reduce(
-    (acc, feature) => {
-      const duplicatedElement = acc.find(
-        (tripGeometry) =>
-          tripGeometry.label === feature.properties.label &&
-          tripGeometry.length === feature.properties.length,
-      );
-      if (
-        !duplicatedElement ||
-        ["Ferry", "Sail"].includes(feature.properties.label)
-      ) {
-        const newGeometry = {
-          label: feature.properties.label,
-          length: feature.properties.length,
-          color: feature.properties.colors,
-          coordinates: feature.geometry.coordinates,
-        };
-        acc.push(newGeometry);
-      }
+  const tripGeometries = data.geometries.flatMap((geometry) => {
+    const transportMeans =
+      geometry.transport_means === "Road" && geometry.country_label !== null
+        ? "road_with_country"
+        : geometry.transport_means.toLowerCase();
 
-      return acc;
-    },
-    [] as Geometry[],
-  );
+    return geometry.coordinates.map((coords) => ({
+      label: i18next.t(`chart.paths.${transportMeans}_with_details`, {
+        countryLabel: geometry.country_label,
+        length: Math.round(geometry.length),
+      }),
+      transportMeans: geometry.transport_means,
+      color: geometry.color,
+      coordinates: coords,
+    }));
+  });
 
   return {
     trips,

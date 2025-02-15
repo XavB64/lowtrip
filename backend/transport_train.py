@@ -23,7 +23,11 @@ from http import HTTPStatus
 import geopandas as gpd
 import pandas as pd
 import requests
-from shapely.geometry import LineString, Point
+from shapely.geometry import (
+    LineString,
+    MultiLineString,
+    Point,
+)
 
 from models import TripStepGeometry
 from parameters import (
@@ -38,6 +42,10 @@ from utils import (
     split_path_by_country,
     validate_geom,
 )
+
+
+class GeometryRecognitionError(Exception):
+    """Exception raised when the geometry is not recognized."""
 
 
 @dataclass
@@ -70,7 +78,7 @@ def train_emissions_to_pd_objects(
 
     geometries = {"geometry": [], "length": [], "colors": [], "label": []}
     for geometry in train_step.geometries:
-        geometries["geometry"].append(geometry.coordinates)
+        geometries["geometry"].append(MultiLineString(geometry.coordinates))
         geometries["label"].append(geometry.transport_means)
         geometries["length"].append(
             f"{int(geometry.length)}km ({geometry.country_label})",
@@ -252,13 +260,22 @@ def train_to_gdf(
     color_usage="#ffffff",
     color_infra="#ffffff",
 ):  # charte_mollow
-    """Parameters
+    """Find the train path between 2 points and compute the emissions of the path.
+
+    Parameters
+    ----------
         - departure_coords, arrival_coords
         - perims
         - validate
         - colormap, list of colors
-    return:
-        - full dataframe for trains.
+
+    Returns
+    -------
+        - full dataframe for trains
+
+    Raises
+    ------
+        GeometryRecognitionError: if the geometry is not recognized.
 
     """
     # First try with coordinates supplied by the user
@@ -317,16 +334,34 @@ def train_to_gdf(
         .dropna(axis=0)
         .to_dict("records")
     )
-    geometries = [
-        TripStepGeometry(
-            coordinates=geo["geometry"],
-            transport_means="Railway",
-            length=geo["path_length"],
-            color=geo["colors"],
-            country_label=geo["NAME"],
-        )
-        for geo in geo_train
-    ]
+
+    geometries = []
+    for geo in geo_train:
+        if type(geo["geometry"]) is LineString:
+            geometries.append(
+                TripStepGeometry(
+                    coordinates=[[list(coord) for coord in geo["geometry"].coords]],
+                    transport_means="Railway",
+                    length=geo["path_length"],
+                    color=geo["colors"],
+                    country_label=geo["NAME"],
+                ),
+            )
+        elif type(geo["geometry"]) is MultiLineString:
+            coordinates = []
+            for l in geo["geometry"].geoms:
+                coordinates.append([list(coord) for coord in l.coords])
+            geometries.append(
+                TripStepGeometry(
+                    coordinates=coordinates,
+                    transport_means="Railway",
+                    length=geo["path_length"],
+                    color=geo["colors"],
+                    country_label=geo["NAME"],
+                ),
+            )
+        else:
+            raise GeometryRecognitionError
 
     emissions_data = gdf[["kgCO2eq", "colors", "NAME"]].to_dict("records")
     emissions = [

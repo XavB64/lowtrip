@@ -103,7 +103,7 @@ def road_geometry_to_pd_objects(trip_step_geometry: TripStepGeometry) -> pd.Data
         "colors": [trip_step_geometry.color],
         "label": ["Road"],
         "length": [f"{int(trip_step_geometry.length)}km"],
-        "geometry": [trip_step_geometry.coordinates],
+        "geometry": [LineString(trip_step_geometry.coordinates[0])],
     })
 
 
@@ -124,7 +124,7 @@ def e_car_emissions_to_pd_objects(
         geometry_res["length"].append(
             f"{int(geometry.length)}km ({geometry.country_label})",
         )
-        geometry_res["geometry"].append(geometry.coordinates)
+        geometry_res["geometry"].append(LineString(geometry.coordinates[0]))
 
     return pd.DataFrame(res), pd.DataFrame(geometry_res)
 
@@ -331,7 +331,7 @@ def ecar_to_gdf(
     for _, row in geo_ecar.iterrows():
         geometries.append(
             TripStepGeometry(
-                coordinates=row["geometry"],
+                coordinates=[[list(coord) for coord in row["geometry"].coords]],
                 transport_means="Road",
                 color=color_usage,
                 length=row["path_length"],
@@ -418,7 +418,7 @@ def get_road_geometry_data(
     color_usage: str,
 ):
     return TripStepGeometry(
-        coordinates=route_geometry,
+        coordinates=[[list(coord) for coord in route_geometry.coords]],
         transport_means="Road",
         color=color_usage,
         length=route_length,

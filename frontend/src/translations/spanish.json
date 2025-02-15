@@ -115,11 +115,18 @@
       },
       "paths": {
         "railway": "Vía férrea",
+        "railway_with_details": "Vía férrea - {{countryLabel}}: {{length}}km",
         "road": "Carretera",
-        "bike": "Ruta en bicicleta",
-        "flight": "Ruta de vuelo",
-        "ferry": "Ruta de ferry",
-        "sail": "Ruta de velero"
+        "road_with_details": "Carretera: {{length}}km",
+        "road_with_country_with_details": "Carretera - {{countryLabel}}: {{length}}km",
+        "bike": "Carril bici",
+        "bike_with_details": "Carril bici: {{length}}km",
+        "flight": "Ruta aérea",
+        "flight_with_details": "Ruta aérea: {{length}}km",
+        "ferry": "Ruta marítima",
+        "ferry_with_details": "Ruta marítima: {{length}}km",
+        "sail": "Ruta marítima",
+        "sail_with_details": "Ruta marítima: {{length}}km"
       },
       "category": {
         "infra": "Infraestructura",

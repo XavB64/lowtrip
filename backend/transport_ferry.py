@@ -28,6 +28,7 @@ from pyproj import Geod
 from shapely.geometry import (
     CAP_STYLE,
     LineString,
+    MultiLineString,
     Point,
 )
 from shapely.ops import nearest_points, unary_union
@@ -73,7 +74,7 @@ def geometry_to_gdf(geometry: TripStepGeometry) -> gpd.GeoDataFrame:
         "colors": [geometry.color],
         "label": [geometry.transport_means],
         "length": [f"{int(geometry.length)}km"],
-        "geometry": [geometry.coordinates],
+        "geometry": [MultiLineString(geometry.coordinates)],
     })
 
 
@@ -313,9 +314,16 @@ def ferry_to_gdf(
     elif options == "CabinVehicle":
         EF = EF["Car"] + EF["Cabin"] + EF["Base"]
 
+    coordinates = []
+    for l in geom.geoms:
+        t = []
+        for coord in l.coords:
+            t.append(list(coord))
+        coordinates.append(t)
+
     return FerryStepResults(
         geometry=TripStepGeometry(
-            coordinates=geom,
+            coordinates=coordinates,
             transport_means="Ferry",
             length=bird,
             color=color_usage,
@@ -351,9 +359,16 @@ def sail_to_gdf(tag1, tag2, EF=EF_sail, color_usage="#ffffff") -> SailStepResult
     geod = Geod(ellps="WGS84")
     bird = geod.geometry_length(geom) / 1e3
 
+    coordinates = []
+    for l in geom.geoms:
+        t = []
+        for coord in l.coords:
+            t.append(list(coord))
+        coordinates.append(t)
+
     return SailStepResults(
         geometry=TripStepGeometry(
-            coordinates=geom,
+            coordinates=coordinates,
             transport_means="Sail",
             length=bird,
             color=color_usage,
