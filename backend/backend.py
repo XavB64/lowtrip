@@ -27,7 +27,7 @@ from pyproj import Geod
 # Geometry
 from shapely.geometry import LineString
 
-from models import TripStep
+from models import TripStep, TripStepGeometry
 from parameters import (
     colors_custom,
     colors_direct,
@@ -74,6 +74,7 @@ def compute_emissions_custom(trip_inputs: list[TripStep], cmap=colors_custom):
 
     emissions_data = []
     geo = []
+    geometries: list[TripStepGeometry] = []
     fail = False  # To check if the query is successfull
 
     for idx in range(len(trip_inputs) - 1):  # We loop until last departure
@@ -108,6 +109,7 @@ def compute_emissions_custom(trip_inputs: list[TripStep], cmap=colors_custom):
             data_train["step"] = str(int(idx) + 1)
             emissions_data.append(data_train)
             geo.append(geo_train)
+            geometries += results.geometries
 
         elif transportmean == "Bus":
             results = bus_to_gdf(
@@ -128,6 +130,7 @@ def compute_emissions_custom(trip_inputs: list[TripStep], cmap=colors_custom):
             data_bus["step"] = str(int(idx) + 1)
             emissions_data.append(data_bus)
             geo.append(geo_bus)
+            geometries.append(results.geometry)
 
         elif transportmean == "Car":
             results = car_to_gdf(
@@ -149,6 +152,7 @@ def compute_emissions_custom(trip_inputs: list[TripStep], cmap=colors_custom):
             data_car["step"] = str(int(idx) + 1)
             emissions_data.append(data_car)  # gdf_car.copy()
             geo.append(geo_car)
+            geometries.append(results.geometry)
 
         elif transportmean == "eCar":
             results = ecar_to_gdf(
@@ -170,6 +174,7 @@ def compute_emissions_custom(trip_inputs: list[TripStep], cmap=colors_custom):
             data_ecar["step"] = str(int(idx) + 1)
             emissions_data.append(data_ecar)
             geo.append(geo_ecar)
+            geometries += results.geometries
 
         elif transportmean == "Bicycle":
             results = bicycle_to_gdf(
@@ -189,6 +194,7 @@ def compute_emissions_custom(trip_inputs: list[TripStep], cmap=colors_custom):
             data_bike["step"] = str(int(idx) + 1)
             emissions_data.append(data_bike)
             geo.append(geo_bike)
+            geometries.append(results.geometry)
 
         elif transportmean == "Plane":
             plane_results = plane_to_gdf(
@@ -201,6 +207,7 @@ def compute_emissions_custom(trip_inputs: list[TripStep], cmap=colors_custom):
             data_plane["step"] = str(int(idx) + 1)
             emissions_data.append(data_plane)
             geo.append(geo_plane)
+            geometries.append(plane_results.geometry)
 
         elif transportmean == "Ferry":
             results = ferry_to_gdf(
@@ -213,6 +220,7 @@ def compute_emissions_custom(trip_inputs: list[TripStep], cmap=colors_custom):
             data_ferry["step"] = str(int(idx) + 1)
             emissions_data.append(data_ferry)
             geo.append(geo_ferry)
+            geometries.append(results.geometry)
 
         elif transportmean == "Sail":
             results = sail_to_gdf(
@@ -224,6 +232,7 @@ def compute_emissions_custom(trip_inputs: list[TripStep], cmap=colors_custom):
             data_sail["step"] = str(int(idx) + 1)
             emissions_data.append(data_sail)
             geo.append(geo_sail)
+            geometries.append(results.geometry)
 
     if fail:
         # One or more step weren't successful, we return nothing
@@ -236,7 +245,7 @@ def compute_emissions_custom(trip_inputs: list[TripStep], cmap=colors_custom):
         # Geodataframe for map
         geodata = gpd.GeoDataFrame(pd.concat(geo), geometry="geometry", crs="epsg:4326")
 
-    return data_custom, geodata, ERROR
+    return data_custom, geodata, ERROR, geometries
 
 
 def compute_emissions_all(data, cmap=colors_direct):
@@ -288,6 +297,7 @@ def compute_emissions_all(data, cmap=colors_direct):
     # Loop
     l_data = []
     geo = []
+    geometries: list[TripStepGeometry] = []
 
     # Train
     if train:
@@ -301,6 +311,7 @@ def compute_emissions_all(data, cmap=colors_direct):
             data_train, geo_train = train_emissions_to_pd_objects(results)
             l_data.append(data_train)
             geo.append(geo_train)
+            geometries += results.geometries
 
     # Car or Bus
     route_added = False
@@ -329,6 +340,7 @@ def compute_emissions_all(data, cmap=colors_direct):
 
             # We check if car or bus was asked for a 1 step
             if car and bus and transp != "eCar":
+                geometries.append(results.geometry)
                 geo.append(geometry)
                 route_added = True
 
@@ -343,6 +355,7 @@ def compute_emissions_all(data, cmap=colors_direct):
         data_plane, geo_plane = plane_emissions_to_pd_objects(plane_result)
         l_data.append(data_plane)
         geo.append(geo_plane)
+        geometries.append(plane_result.geometry)
 
     # We do not add the ferry in the general case
 
@@ -361,7 +374,7 @@ def compute_emissions_all(data, cmap=colors_direct):
                 crs="epsg:4326",
             )
 
-    return data, geodata
+    return data, geodata, geometries
 
 
 def chart_refactor(mytrip, alternative=None, do_alt=False):

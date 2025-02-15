@@ -70,7 +70,7 @@ def plane_emissions_to_pd_objects(
     })
 
     geometry_data = pd.DataFrame({
-        "geometry": [planeStep.geometry.coordinates],
+        "geometry": [LineString(planeStep.geometry.coordinates[0])],
         "label": ["Flight"],
         "length": [f"{int(planeStep.geometry.length)}km"],
         "colors": [planeStep.geometry.color],
@@ -198,7 +198,7 @@ def plane_to_gdf(
 
     return PlaneStepResults(
         geometry=TripStepGeometry(
-            coordinates=plane_geometry,
+            coordinates=[[list(coord) for coord in plane_geometry.coords]],
             transport_means="Flight",
             length=route_length,
             color=color_usage,

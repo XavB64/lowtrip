@@ -69,7 +69,7 @@ def bicycle_emissions_to_pd_objects(
         "colors": [bicycle_step.geometry.color],
         "label": [bicycle_step.geometry.transport_means],
         "length": [f"{int(bicycle_step.geometry.length)}km"],
-        "geometry": [bicycle_step.geometry.coordinates],
+        "geometry": [LineString(bicycle_step.geometry.coordinates[0])],
     })
 
     return bicycle_data, geometry_data
@@ -140,7 +140,7 @@ def bicycle_to_gdf(
 
     return BicycleStepResults(
         geometry=TripStepGeometry(
-            coordinates=route_geometry,
+            coordinates=[[list(coord) for coord in route_geometry.coords]],
             transport_means="Bicycle",
             length=route_length,
             color=color,

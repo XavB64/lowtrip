@@ -16,13 +16,11 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import React, { useEffect, useMemo } from "react";
-import { useTranslation } from "react-i18next";
 import { Marker, Polyline, TileLayer, Tooltip, useMap } from "react-leaflet";
 import { Box, HStack, Text } from "@chakra-ui/react";
 
 import { markerIcon } from "../../../../assets/marker-icon";
 import { SimulationResults } from "../../../../types";
-import { pathMapper } from "./const";
 
 type MapProps = {
   isDarkTheme: boolean;
@@ -38,7 +36,6 @@ const MapContent = ({
   alternativeStepsCoords,
 }: MapProps) => {
   const map = useMap();
-  const { t } = useTranslation();
 
   const tripGeometries = simulationResults?.tripGeometries;
 
@@ -94,9 +91,7 @@ const MapContent = ({
                     borderRadius={2}
                     bgColor={tripGeometry.color}
                   />
-                  <Text>
-                    {t(pathMapper[tripGeometry.label])} : {tripGeometry.length}
-                  </Text>
+                  <Text>{tripGeometry.label}</Text>
                 </HStack>
               </Tooltip>
             </Polyline>

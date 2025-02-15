@@ -183,11 +183,18 @@
       },
       "paths": {
         "railway": "Voie ferrée",
+        "railway_with_details": "Voie ferrée - {{countryLabel}} : {{length}}km",
         "road": "Route",
+        "road_with_details": "Route : {{length}}km",
+        "road_with_country_with_details": "Route - {{countryLabel}} : {{length}}km",
         "bike": "Voie cyclable",
+        "bike_with_details": "Voie cyclable : {{length}}km",
         "flight": "Route aérienne",
+        "flight_with_details": "Route aérienne : {{length}}km",
         "ferry": "Voie maritime",
-        "sail": "Voie maritime"
+        "ferry_with_details": "Voie maritime : {{length}}km",
+        "sail": "Voie maritime",
+        "sail_with_details": "Voie maritime : {{length}}km"
       },
       "category": {
         "infra": "Infrastructure",

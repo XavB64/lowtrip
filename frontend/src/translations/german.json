@@ -114,12 +114,19 @@
         "otherTrip": "Andere Reise"
       },
       "paths": {
-        "railway": "Eisenbahn",
+        "railway": "Eisenbahnstrecke",
+        "railway_with_details": "Eisenbahnstrecke - {{countryLabel}}: {{length}}km",
         "road": "Straße",
-        "bike": "Fahrradroute",
-        "flight": "Flugroute",
+        "road_with_details": "Straße: {{length}}km",
+        "road_with_country_with_details": "Straße - {{countryLabel}}: {{length}}km",
+        "bike": "Radweg",
+        "bike_with_details": "Radweg: {{length}}km",
+        "flight": "Luftroute",
+        "flight_with_details": "Luftroute: {{length}}km",
         "ferry": "Seeroute",
-        "sail": "Seeroute"
+        "ferry_with_details": "Seeroute: {{length}}km",
+        "sail": "Seeroute",
+        "sail_with_details": "Seeroute: {{length}}km"
       },
       "category": {
         "infra": "Infrastruktur",

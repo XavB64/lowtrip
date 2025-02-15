@@ -35,6 +35,14 @@ export enum FerryOptions {
   cabinVehicle = "CabinVehicle",
 }
 
+type TripStepGeometry = {
+  color: string;
+  coordinates: [number, number][][];
+  transport_means: string;
+  length: number;
+  country_label: string | null;
+};
+
 export type ApiResponse = {
   data: {
     gdf: string;
@@ -42,6 +50,7 @@ export type ApiResponse = {
     direct_trip?: string;
     alternative_trip?: string;
     error: string;
+    geometries: TripStepGeometry[];
   };
 };
 
@@ -127,8 +136,8 @@ export type TripStep = {
 );
 
 export type Geometry = {
+  transportMeans: string;
   label: string;
-  length: string;
   color: string;
   coordinates: [number, number][];
 };
