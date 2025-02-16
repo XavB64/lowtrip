@@ -20,7 +20,6 @@
 #####################
 
 # Classic
-import geopandas as gpd
 import pandas as pd
 from pyproj import Geod
 
@@ -66,14 +65,13 @@ def compute_emissions_custom(trip_inputs: list[TripStep], cmap=colors_custom):
     Return:
     ------
         - full dataframe for emissions
-        - geodataframe for path
+        - geometries for path
         - ERROR : string first step that fails
 
     """
     ERROR = ""
 
     emissions_data = []
-    geo = []
     geometries: list[TripStepGeometry] = []
     fail = False  # To check if the query is successfull
 
@@ -105,10 +103,9 @@ def compute_emissions_custom(trip_inputs: list[TripStep], cmap=colors_custom):
                     + " failed with Train, please change mean of transport or locations. "
                 )
                 break
-            data_train, geo_train = train_emissions_to_pd_objects(results)
+            data_train = train_emissions_to_pd_objects(results)
             data_train["step"] = str(int(idx) + 1)
             emissions_data.append(data_train)
-            geo.append(geo_train)
             geometries += results.geometries
 
         elif transportmean == "Bus":
@@ -126,10 +123,9 @@ def compute_emissions_custom(trip_inputs: list[TripStep], cmap=colors_custom):
                     + " failed with Bus, please change mean of transport or locations. "
                 )
                 break
-            data_bus, geo_bus = bus_emissions_to_pd_objects(results)
+            data_bus = bus_emissions_to_pd_objects(results)
             data_bus["step"] = str(int(idx) + 1)
             emissions_data.append(data_bus)
-            geo.append(geo_bus)
             geometries.append(results.geometry)
 
         elif transportmean == "Car":
@@ -148,10 +144,9 @@ def compute_emissions_custom(trip_inputs: list[TripStep], cmap=colors_custom):
                     + " failed with Car, please change mean of transport or locations. "
                 )
                 break
-            data_car, geo_car = car_emissions_to_pd_objects(results)
+            data_car = car_emissions_to_pd_objects(results)
             data_car["step"] = str(int(idx) + 1)
             emissions_data.append(data_car)  # gdf_car.copy()
-            geo.append(geo_car)
             geometries.append(results.geometry)
 
         elif transportmean == "eCar":
@@ -170,10 +165,9 @@ def compute_emissions_custom(trip_inputs: list[TripStep], cmap=colors_custom):
                     + " failed with eCar, please change mean of transport or locations. "
                 )
                 break
-            data_ecar, geo_ecar = e_car_emissions_to_pd_objects(results)
+            data_ecar = e_car_emissions_to_pd_objects(results)
             data_ecar["step"] = str(int(idx) + 1)
             emissions_data.append(data_ecar)
-            geo.append(geo_ecar)
             geometries += results.geometries
 
         elif transportmean == "Bicycle":
@@ -190,10 +184,9 @@ def compute_emissions_custom(trip_inputs: list[TripStep], cmap=colors_custom):
                     + " failed with Bicycle, please change mean of transport or locations. "
                 )
                 break
-            data_bike, geo_bike = bicycle_emissions_to_pd_objects(results)
+            data_bike = bicycle_emissions_to_pd_objects(results)
             data_bike["step"] = str(int(idx) + 1)
             emissions_data.append(data_bike)
-            geo.append(geo_bike)
             geometries.append(results.geometry)
 
         elif transportmean == "Plane":
@@ -203,10 +196,9 @@ def compute_emissions_custom(trip_inputs: list[TripStep], cmap=colors_custom):
                 color_usage=cmap["Plane"],
                 color_contrails=cmap["Contrails"],
             )
-            data_plane, geo_plane = plane_emissions_to_pd_objects(plane_results)
+            data_plane = plane_emissions_to_pd_objects(plane_results)
             data_plane["step"] = str(int(idx) + 1)
             emissions_data.append(data_plane)
-            geo.append(geo_plane)
             geometries.append(plane_results.geometry)
 
         elif transportmean == "Ferry":
@@ -216,10 +208,9 @@ def compute_emissions_custom(trip_inputs: list[TripStep], cmap=colors_custom):
                 color_usage=cmap["Ferry"],
                 options=arrival.options,
             )
-            data_ferry, geo_ferry = ferry_emissions_to_pd_objects(results)
+            data_ferry = ferry_emissions_to_pd_objects(results)
             data_ferry["step"] = str(int(idx) + 1)
             emissions_data.append(data_ferry)
-            geo.append(geo_ferry)
             geometries.append(results.geometry)
 
         elif transportmean == "Sail":
@@ -228,24 +219,20 @@ def compute_emissions_custom(trip_inputs: list[TripStep], cmap=colors_custom):
                 arrival_coordinates,
                 color_usage=cmap["Ferry"],
             )
-            data_sail, geo_sail = sail_emissions_to_pd_objects(results)
+            data_sail = sail_emissions_to_pd_objects(results)
             data_sail["step"] = str(int(idx) + 1)
             emissions_data.append(data_sail)
-            geo.append(geo_sail)
             geometries.append(results.geometry)
 
     if fail:
         # One or more step weren't successful, we return nothing
         data_custom = pd.DataFrame()
-        geodata = pd.DataFrame()
     else:
         # Query successfull, we concatenate the data
         data_custom = pd.concat(emissions_data)
         data_custom = data_custom.reset_index(drop=True)  # .drop("geometry", axis=1)
-        # Geodataframe for map
-        geodata = gpd.GeoDataFrame(pd.concat(geo), geometry="geometry", crs="epsg:4326")
 
-    return data_custom, geodata, ERROR, geometries
+    return data_custom, geometries, ERROR
 
 
 def compute_emissions_all(data, cmap=colors_direct):
@@ -257,7 +244,7 @@ def compute_emissions_all(data, cmap=colors_direct):
     Return:
     ------
         - full dataframe for emissions
-        - geodataframe for path
+        - geometries for path
 
     """
     # Direct trip
@@ -296,7 +283,6 @@ def compute_emissions_all(data, cmap=colors_direct):
 
     # Loop
     l_data = []
-    geo = []
     geometries: list[TripStepGeometry] = []
 
     # Train
@@ -308,13 +294,11 @@ def compute_emissions_all(data, cmap=colors_direct):
             color_infra=cmap["Cons_infra"],
         )
         if results is not None:
-            data_train, geo_train = train_emissions_to_pd_objects(results)
+            data_train = train_emissions_to_pd_objects(results)
             l_data.append(data_train)
-            geo.append(geo_train)
             geometries += results.geometries
 
     # Car or Bus
-    route_added = False
     if car or bus:
         if transp == "eCar":  # we use custom colors
             cmap_road = colors_custom
@@ -331,8 +315,7 @@ def compute_emissions_all(data, cmap=colors_direct):
         if results is None:
             car, bus = False, False
         else:
-            car_data, bus_data, geometry = car_bus_emissions_to_pd_objects(results)
-
+            car_data, bus_data = car_bus_emissions_to_pd_objects(results)
             if bus:
                 l_data.append(bus_data)
             if car:
@@ -341,8 +324,6 @@ def compute_emissions_all(data, cmap=colors_direct):
             # We check if car or bus was asked for a 1 step
             if car and bus and transp != "eCar":
                 geometries.append(results.geometry)
-                geo.append(geometry)
-                route_added = True
 
     # Plane
     if plane:
@@ -352,29 +333,20 @@ def compute_emissions_all(data, cmap=colors_direct):
             color_usage=cmap["Plane"],
             color_contrails=cmap["Contrails"],
         )
-        data_plane, geo_plane = plane_emissions_to_pd_objects(plane_result)
+        data_plane = plane_emissions_to_pd_objects(plane_result)
         l_data.append(data_plane)
-        geo.append(geo_plane)
         geometries.append(plane_result.geometry)
 
     # We do not add the ferry in the general case
 
     if not car and not bus and not train and not plane:
         # Only happens when plane was asked and the API failed
-        data, geodata = pd.DataFrame(), pd.DataFrame()
+        data = pd.DataFrame()
     else:
         # Data for bar chart
         data = pd.concat(l_data).reset_index(drop=True)
-        if not route_added and not train and not plane:
-            geodata = pd.DataFrame()
-        else:
-            geodata = gpd.GeoDataFrame(
-                pd.concat(geo),
-                geometry="geometry",
-                crs="epsg:4326",
-            )
 
-    return data, geodata, geometries
+    return data, geometries
 
 
 def chart_refactor(mytrip, alternative=None, do_alt=False):

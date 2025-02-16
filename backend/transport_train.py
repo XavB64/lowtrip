@@ -68,24 +68,14 @@ class TrainStepResults:
 
 def train_emissions_to_pd_objects(
     train_step: TrainStepResults,
-) -> (pd.DataFrame, pd.DataFrame):
+) -> pd.DataFrame:
     res = {"kgCO2eq": [], "colors": [], "NAME": [], "Mean of Transport": []}
     for emission in train_step.emissions:
         res["kgCO2eq"].append(emission.kg_co2_eq)
         res["colors"].append(emission.color)
         res["NAME"].append(emission.name)
         res["Mean of Transport"].append("Train")
-
-    geometries = {"geometry": [], "length": [], "colors": [], "label": []}
-    for geometry in train_step.geometries:
-        geometries["geometry"].append(MultiLineString(geometry.coordinates))
-        geometries["label"].append(geometry.transport_means)
-        geometries["length"].append(
-            f"{int(geometry.length)}km ({geometry.country_label})",
-        )
-        geometries["colors"].append(geometry.color)
-
-    return pd.DataFrame(res), pd.DataFrame(geometries)
+    return pd.DataFrame(res)
 
 
 def flatten_list_of_tuples(lst):

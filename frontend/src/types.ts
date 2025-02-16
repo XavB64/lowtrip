@@ -45,23 +45,12 @@ type TripStepGeometry = {
 
 export type ApiResponse = {
   data: {
-    gdf: string;
     my_trip: string;
     direct_trip?: string;
     alternative_trip?: string;
     error: string;
     geometries: TripStepGeometry[];
   };
-};
-
-export type Gdf = {
-  type: string;
-  features: {
-    id: string;
-    type: string;
-    properties: { colors: string; label: string; length: string };
-    geometry: { type: string; coordinates: [number, number][] };
-  }[];
 };
 
 export type MyTripData = {

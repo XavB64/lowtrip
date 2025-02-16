@@ -98,41 +98,22 @@ class CarStepResults:
     passengers_label: str
 
 
-def road_geometry_to_pd_objects(trip_step_geometry: TripStepGeometry) -> pd.DataFrame:
-    return pd.DataFrame({
-        "colors": [trip_step_geometry.color],
-        "label": ["Road"],
-        "length": [f"{int(trip_step_geometry.length)}km"],
-        "geometry": [LineString(trip_step_geometry.coordinates[0])],
-    })
-
-
 def e_car_emissions_to_pd_objects(
     e_car_step: ECarStepResults,
-) -> (pd.DataFrame, pd.DataFrame):
+) -> pd.DataFrame:
     res = {"kgCO2eq": [], "colors": [], "NAME": [], "Mean of Transport": []}
     for emission in e_car_step.emissions:
         res["kgCO2eq"].append(emission.kg_co2_eq)
         res["colors"].append(emission.color)
         res["NAME"].append(emission.name)
         res["Mean of Transport"].append(f"eCar {e_car_step.passengers_label}")
-
-    geometry_res = {"colors": [], "label": [], "length": [], "geometry": []}
-    for geometry in e_car_step.geometries:
-        geometry_res["colors"].append(geometry.color)
-        geometry_res["label"].append("Road")
-        geometry_res["length"].append(
-            f"{int(geometry.length)}km ({geometry.country_label})",
-        )
-        geometry_res["geometry"].append(LineString(geometry.coordinates[0]))
-
-    return pd.DataFrame(res), pd.DataFrame(geometry_res)
+    return pd.DataFrame(res)
 
 
 def bus_emissions_to_pd_objects(
     busStep: BusStepResults,
-) -> (pd.DataFrame, pd.DataFrame):
-    bus_data = pd.DataFrame({
+) -> pd.DataFrame:
+    return pd.DataFrame({
         "kgCO2eq": [
             busStep.emissions.construction.kg_co2_eq,
             busStep.emissions.fuel.kg_co2_eq,
@@ -150,15 +131,11 @@ def bus_emissions_to_pd_objects(
         "Mean of Transport": ["Bus", "Bus"],
     })
 
-    geometry_data = road_geometry_to_pd_objects(busStep.geometry)
-
-    return bus_data, geometry_data
-
 
 def car_emissions_to_pd_objects(
     carStep: CarStepResults,
-) -> (pd.DataFrame, pd.DataFrame):
-    car_data = pd.DataFrame({
+) -> pd.DataFrame:
+    return pd.DataFrame({
         "kgCO2eq": [
             carStep.emissions.construction.kg_co2_eq,
             carStep.emissions.fuel.kg_co2_eq,
@@ -179,14 +156,10 @@ def car_emissions_to_pd_objects(
         ],
     })
 
-    geometry_data = road_geometry_to_pd_objects(carStep.geometry)
-
-    return car_data, geometry_data
-
 
 def car_bus_emissions_to_pd_objects(
     results: CarBusResults,
-) -> (pd.DataFrame, pd.DataFrame, pd.DataFrame):
+) -> (pd.DataFrame, pd.DataFrame):
     car_data = pd.DataFrame({
         "kgCO2eq": [
             results.car_emissions.construction.kg_co2_eq,
@@ -221,9 +194,7 @@ def car_bus_emissions_to_pd_objects(
         "NAME": ["Construction", "Fuel"],
         "Mean of Transport": ["Bus", "Bus"],
     })
-    geometry_data = road_geometry_to_pd_objects(results.geometry)
-
-    return car_data, bus_data, geometry_data
+    return car_data, bus_data
 
 
 OSM_ROUTER_URL = "http://router.project-osrm.org/route/v1/driving"

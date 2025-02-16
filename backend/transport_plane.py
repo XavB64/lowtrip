@@ -51,8 +51,8 @@ class PlaneStepResults:
 
 def plane_emissions_to_pd_objects(
     planeStep: PlaneStepResults,
-) -> (pd.DataFrame, pd.DataFrame):
-    plane_data = pd.DataFrame({
+) -> pd.DataFrame:
+    return pd.DataFrame({
         "kgCO2eq": [
             planeStep.emissions.kerosene.kg_co2_eq,
             planeStep.emissions.contrails.kg_co2_eq,
@@ -68,15 +68,6 @@ def plane_emissions_to_pd_objects(
         "NAME": ["Kerosene", "Contrails"],
         "Mean of Transport": ["Plane", "Plane"],
     })
-
-    geometry_data = pd.DataFrame({
-        "geometry": [LineString(planeStep.geometry.coordinates[0])],
-        "label": ["Flight"],
-        "length": [f"{int(planeStep.geometry.length)}km"],
-        "colors": [planeStep.geometry.color],
-    })
-
-    return plane_data, geometry_data
 
 
 EF_plane = {

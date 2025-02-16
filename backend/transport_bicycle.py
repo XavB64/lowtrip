@@ -55,8 +55,8 @@ class BicycleStepResults:
 
 def bicycle_emissions_to_pd_objects(
     bicycle_step: BicycleStepResults,
-) -> (pd.DataFrame, pd.DataFrame):
-    bicycle_data = pd.DataFrame({
+) -> pd.DataFrame:
+    return pd.DataFrame({
         "kgCO2eq": [bicycle_step.emissions.construction.kg_co2_eq],
         "EF_tot": [bicycle_step.emissions.construction.ef_tot],
         "path_length": [bicycle_step.path_length],
@@ -64,15 +64,6 @@ def bicycle_emissions_to_pd_objects(
         "NAME": ["Bike-build"],
         "Mean of Transport": ["Bicycle"],
     })
-
-    geometry_data = pd.DataFrame({
-        "colors": [bicycle_step.geometry.color],
-        "label": [bicycle_step.geometry.transport_means],
-        "length": [f"{int(bicycle_step.geometry.length)}km"],
-        "geometry": [LineString(bicycle_step.geometry.coordinates[0])],
-    })
-
-    return bicycle_data, geometry_data
 
 
 API_KEY = os.environ.get("BICYCLE_API_KEY")
