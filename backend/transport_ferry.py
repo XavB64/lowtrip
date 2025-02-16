@@ -28,7 +28,6 @@ from pyproj import Geod
 from shapely.geometry import (
     CAP_STYLE,
     LineString,
-    MultiLineString,
     Point,
 )
 from shapely.ops import nearest_points, unary_union
@@ -69,19 +68,10 @@ class SailStepResults:
     path_length: float
 
 
-def geometry_to_gdf(geometry: TripStepGeometry) -> gpd.GeoDataFrame:
-    return pd.DataFrame({
-        "colors": [geometry.color],
-        "label": [geometry.transport_means],
-        "length": [f"{int(geometry.length)}km"],
-        "geometry": [MultiLineString(geometry.coordinates)],
-    })
-
-
 def ferry_emissions_to_pd_objects(
     ferry_step: FerryStepResults,
-) -> (pd.DataFrame, pd.DataFrame):
-    ferry_data = pd.DataFrame({
+) -> pd.DataFrame:
+    return pd.DataFrame({
         "kgCO2eq": [ferry_step.emissions.kg_co2_eq],
         "EF_tot": [ferry_step.emissions.ef_tot],
         "path_length": [ferry_step.path_length],
@@ -90,15 +80,11 @@ def ferry_emissions_to_pd_objects(
         "Mean of Transport": ["Ferry"],
     })
 
-    geometry_data = geometry_to_gdf(ferry_step.geometry)
-
-    return ferry_data, geometry_data
-
 
 def sail_emissions_to_pd_objects(
     sail_step: SailStepResults,
-) -> (pd.DataFrame, pd.DataFrame):
-    sail_data = pd.DataFrame({
+) -> pd.DataFrame:
+    return pd.DataFrame({
         "kgCO2eq": [sail_step.emissions.kg_co2_eq],
         "EF_tot": [sail_step.emissions.ef_tot],
         "path_length": [sail_step.path_length],
@@ -106,7 +92,6 @@ def sail_emissions_to_pd_objects(
         "NAME": ["Usage"],
         "Mean of Transport": ["Sail"],
     })
-    return sail_data, geometry_to_gdf(sail_step.geometry)
 
 
 def get_shortest_path(line_gdf, start, end):

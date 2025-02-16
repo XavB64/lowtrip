@@ -60,9 +60,7 @@ def main():
                 abort(400, "My trip: should have at least 1 step")
 
             df = pd.DataFrame.from_dict(inputs)
-            data_mytrip, geo_mytrip, error, geometries = compute_emissions_custom(
-                inputs,
-            )
+            data_mytrip, geometries, error = compute_emissions_custom(inputs)
 
             if len(error) > 0:
                 return {"error": f"My trip: {error}"}
@@ -70,20 +68,16 @@ def main():
             # If we have more than 1 step, we return immediately
             if len(inputs) > 2:
                 return {
-                    "gdf": geo_mytrip.explode().to_json(),
                     "my_trip": chart_refactor(data_mytrip).to_json(orient="records"),
                     "geometries": geometries,
                 }
 
             # If we have exactly 1 step, then we can compare with other means of transport
-            data_direct, geo_direct, direct_trips_geometries = compute_emissions_all(df)
-
-            gdf = pd.concat([geo_direct, geo_mytrip]).explode().to_json()
+            data_direct, direct_trips_geometries = compute_emissions_all(df)
 
             geometries += direct_trips_geometries
 
             return {
-                "gdf": gdf,
                 "my_trip": data_mytrip.to_json(orient="records"),
                 "direct_trip": data_direct.to_json(orient="records"),
                 "geometries": geometries,
@@ -95,11 +89,11 @@ def main():
             data["alternative-trip"],
         )
 
-        data_mytrip, geo_mytrip, error, main_geometries = compute_emissions_custom(
+        data_mytrip, main_geometries, error = compute_emissions_custom(
             main_trip_inputs,
         )
 
-        data_alternative, geo_alternative, error_other, alternative_geometries = (
+        data_alternative, alternative_geometries, error_other = (
             compute_emissions_custom(
                 alternative_trip_inputs,
                 cmap=colors_alternative,
@@ -113,8 +107,6 @@ def main():
                 else f"Other trip: {error_other}",
             }
 
-        gdf = pd.concat([geo_mytrip, geo_alternative]).explode().to_json()
-
         # Prepare data for aggregation in the chart -  see frontend
         data_mytrip, data_alternative = chart_refactor(
             data_mytrip,
@@ -123,7 +115,6 @@ def main():
         )
 
         return {
-            "gdf": gdf,
             "my_trip": data_mytrip.to_json(orient="records"),
             "alternative_trip": data_alternative.to_json(orient="records"),
             "geometries": main_geometries + alternative_geometries,
