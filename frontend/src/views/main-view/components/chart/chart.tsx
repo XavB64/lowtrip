@@ -26,7 +26,6 @@ import {
   AlertIcon,
   Link,
   IconButton,
-  keyframes,
 } from "@chakra-ui/react";
 import { round, uniqBy } from "lodash";
 import { BiHelpCircle } from "react-icons/bi";
@@ -50,6 +49,7 @@ import { getChartData, getLabel } from "./helpers";
 import CustomLabel from "./custom-label";
 import { FaShareAlt } from "react-icons/fa";
 import { generateUrlToShare } from "../../helpers/shareableLink";
+import { keyframes } from "@emotion/react";
 
 const fadeIn = keyframes`
   from { opacity: 0; }
