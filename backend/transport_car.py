@@ -22,7 +22,12 @@ import pandas as pd
 import requests
 from shapely.geometry import LineString
 
-from models import TripStepGeometry
+from models import (
+    EmissionPart,
+    StepData,
+    TripStepGeometry,
+    TripStepResult,
+)
 from parameters import (
     EF_bus,
     EF_car,
@@ -34,167 +39,12 @@ from utils import split_path_by_country, validate_geom as validate_geometry
 
 
 @dataclass
-class Emission:
-    """Emission dataclass."""
-
-    kg_co2_eq: float
-    ef_tot: float
-    color: str
-
-
-@dataclass
-class CarEmissions:
-    """Car and bus have two sources of emissions: construction and fuel."""
-
-    fuel: Emission
-    construction: Emission
-
-
-@dataclass
-class ECarEmission:
-    """Emission dataclass for Ecar."""
-
-    name: str
-    kg_co2_eq: float
-    color: str
-
-
-@dataclass
-class ECarStepResults:
-    """Dataclass for electric car emissions and geometry."""
-
-    geometries: TripStepGeometry
-    emissions: list[ECarEmission]
-    path_length: float
-    passengers_label: str
-
-
-@dataclass
 class CarBusResults:
     """Dataclass for car and bus emissions and road geometry."""
 
-    geometry: list[TripStepGeometry]
-    bus_emissions: CarEmissions
-    car_emissions: CarEmissions
-    path_length: float
-
-
-@dataclass
-class BusStepResults:
-    """Dataclass for bus emissions and geometry."""
-
-    geometry: TripStepGeometry
-    emissions: CarEmissions
-    path_length: float
-
-
-@dataclass
-class CarStepResults:
-    """Dataclass for car emissions and geometry."""
-
-    geometry: TripStepGeometry
-    emissions: CarEmissions
-    path_length: float
-    passengers_label: str
-
-
-def e_car_emissions_to_pd_objects(
-    e_car_step: ECarStepResults,
-) -> pd.DataFrame:
-    res = {"kgCO2eq": [], "colors": [], "NAME": [], "Mean of Transport": []}
-    for emission in e_car_step.emissions:
-        res["kgCO2eq"].append(emission.kg_co2_eq)
-        res["colors"].append(emission.color)
-        res["NAME"].append(emission.name)
-        res["Mean of Transport"].append(f"eCar {e_car_step.passengers_label}")
-    return pd.DataFrame(res)
-
-
-def bus_emissions_to_pd_objects(
-    busStep: BusStepResults,
-) -> pd.DataFrame:
-    return pd.DataFrame({
-        "kgCO2eq": [
-            busStep.emissions.construction.kg_co2_eq,
-            busStep.emissions.fuel.kg_co2_eq,
-        ],
-        "EF_tot": [
-            busStep.emissions.construction.ef_tot,
-            busStep.emissions.fuel.ef_tot,
-        ],
-        "path_length": [busStep.path_length, busStep.path_length],
-        "colors": [
-            busStep.emissions.construction.color,
-            busStep.emissions.fuel.color,
-        ],
-        "NAME": ["Construction", "Fuel"],
-        "Mean of Transport": ["Bus", "Bus"],
-    })
-
-
-def car_emissions_to_pd_objects(
-    carStep: CarStepResults,
-) -> pd.DataFrame:
-    return pd.DataFrame({
-        "kgCO2eq": [
-            carStep.emissions.construction.kg_co2_eq,
-            carStep.emissions.fuel.kg_co2_eq,
-        ],
-        "EF_tot": [
-            carStep.emissions.construction.ef_tot,
-            carStep.emissions.fuel.ef_tot,
-        ],
-        "path_length": [carStep.path_length, carStep.path_length],
-        "colors": [
-            carStep.emissions.construction.color,
-            carStep.emissions.fuel.color,
-        ],
-        "NAME": ["Construction", "Fuel"],
-        "Mean of Transport": [
-            f"Car {carStep.passengers_label}",
-            f"Car {carStep.passengers_label}",
-        ],
-    })
-
-
-def car_bus_emissions_to_pd_objects(
-    results: CarBusResults,
-) -> (pd.DataFrame, pd.DataFrame):
-    car_data = pd.DataFrame({
-        "kgCO2eq": [
-            results.car_emissions.construction.kg_co2_eq,
-            results.car_emissions.fuel.kg_co2_eq,
-        ],
-        "EF_tot": [
-            results.car_emissions.construction.ef_tot,
-            results.car_emissions.fuel.ef_tot,
-        ],
-        "path_length": [results.path_length, results.path_length],
-        "colors": [
-            results.car_emissions.construction.color,
-            results.car_emissions.fuel.color,
-        ],
-        "NAME": ["Construction", "Fuel"],
-        "Mean of Transport": ["Car 1p.", "Car 1p."],
-    })
-    bus_data = pd.DataFrame({
-        "kgCO2eq": [
-            results.bus_emissions.construction.kg_co2_eq,
-            results.bus_emissions.fuel.kg_co2_eq,
-        ],
-        "EF_tot": [
-            results.bus_emissions.construction.ef_tot,
-            results.bus_emissions.fuel.ef_tot,
-        ],
-        "path_length": [results.path_length, results.path_length],
-        "colors": [
-            results.bus_emissions.construction.color,
-            results.bus_emissions.fuel.color,
-        ],
-        "NAME": ["Construction", "Fuel"],
-        "Mean of Transport": ["Bus", "Bus"],
-    })
-    return car_data, bus_data
+    geometries: list[TripStepGeometry]
+    bus_step_data: StepData
+    car_step_data: StepData
 
 
 OSM_ROUTER_URL = "http://router.project-osrm.org/route/v1/driving"
@@ -310,22 +160,25 @@ def ecar_to_gdf(
             ),
         )
 
-    emissions_data = gdf[["kgCO2eq", "colors", "NAME"]].to_dict("records")
+    emissions_data = gdf[["kgCO2eq", "colors", "NAME", "EF_tot"]].to_dict("records")
 
     emissions = [
-        ECarEmission(
+        EmissionPart(
             name=emission_data["NAME"],
             kg_co2_eq=emission_data["kgCO2eq"],
             color=emission_data["colors"],
+            ef_tot=emission_data["EF_tot"],
         )
         for emission_data in emissions_data
     ]
 
-    return ECarStepResults(
+    return TripStepResult(
+        step_data=StepData(
+            transport_means="Ecar",
+            emissions=emissions,
+            path_length=route_length,
+        ),
         geometries=geometries,
-        emissions=emissions,
-        path_length=route_length,
-        passengers_label=f"{passengers_nb}p.",
     )
 
 
@@ -335,26 +188,21 @@ def get_car_emissions(
     EF_construction: float,
     color_usage: str,
     color_construction: str,
-    passengers_label: str,
-    geometry: pd.DataFrame,
-) -> CarStepResults:
-    return CarStepResults(
-        geometry=geometry,
-        emissions=CarEmissions(
-            fuel=Emission(
-                kg_co2_eq=route_length * EF_fuel,
-                ef_tot=EF_fuel,
-                color=color_usage,
-            ),
-            construction=Emission(
-                kg_co2_eq=route_length * EF_construction,
-                ef_tot=EF_construction,
-                color=color_construction,
-            ),
+) -> list[EmissionPart]:
+    return [
+        EmissionPart(
+            name="Construction",
+            kg_co2_eq=route_length * EF_construction,
+            ef_tot=EF_construction,
+            color=color_construction,
         ),
-        path_length=route_length,
-        passengers_label=passengers_label,
-    )
+        EmissionPart(
+            name="Fuel",
+            kg_co2_eq=route_length * EF_fuel,
+            ef_tot=EF_fuel,
+            color=color_usage,
+        ),
+    ]
 
 
 def get_bus_emissions(
@@ -363,24 +211,21 @@ def get_bus_emissions(
     EF_construction: float,
     color_usage: str,
     color_construction: str,
-    geometry: pd.DataFrame,
-) -> BusStepResults:
-    return BusStepResults(
-        geometry=geometry,
-        emissions=CarEmissions(
-            fuel=Emission(
-                kg_co2_eq=route_length * EF_fuel,
-                ef_tot=EF_fuel,
-                color=color_usage,
-            ),
-            construction=Emission(
-                kg_co2_eq=route_length * EF_construction,
-                ef_tot=EF_construction,
-                color=color_construction,
-            ),
+) -> list[EmissionPart]:
+    return [
+        EmissionPart(
+            name="Construction",
+            kg_co2_eq=route_length * EF_construction,
+            ef_tot=EF_construction,
+            color=color_construction,
         ),
-        path_length=route_length,
-    )
+        EmissionPart(
+            name="Fuel",
+            kg_co2_eq=route_length * EF_fuel,
+            ef_tot=EF_fuel,
+            color=color_usage,
+        ),
+    ]
 
 
 def get_road_geometry_data(
@@ -431,30 +276,34 @@ def car_bus_to_gdf(
 
     road_geometry = get_road_geometry_data(route_length, route_geometry, color_usage)
 
-    car_data: CarStepResults = get_car_emissions(
+    car_emissions = get_car_emissions(
         route_length,
         EF_car["fuel"],
         EF_car["construction"],
         color_usage,
         color_cons,
-        "1p.",
-        road_geometry,
     )
 
-    bus_data: BusStepResults = get_bus_emissions(
+    bus_emissions = get_bus_emissions(
         route_length,
         EF_bus["fuel"],
         EF_bus["construction"],
         color_usage,
         color_cons,
-        road_geometry,
     )
 
     return CarBusResults(
-        geometry=road_geometry,
-        bus_emissions=bus_data.emissions,
-        car_emissions=car_data.emissions,
-        path_length=route_length,
+        geometries=[road_geometry],
+        bus_step_data=StepData(
+            transport_means="Bus",
+            emissions=bus_emissions,
+            path_length=route_length,
+        ),
+        car_step_data=StepData(
+            transport_means="Car",
+            emissions=car_emissions,
+            path_length=route_length,
+        ),
     )
 
 
@@ -465,7 +314,7 @@ def bus_to_gdf(
     validate=val_perimeter,
     color_usage="#ffffff",
     color_cons="#ffffff",
-) -> BusStepResults | None:
+) -> TripStepResult | None:
     """Parameters
         - departure_coords, arrival_coords
         - EF_bus, float emission factor for bus by pkm
@@ -488,14 +337,21 @@ def bus_to_gdf(
         return None
 
     road_geometry = get_road_geometry_data(route_length, route_geometry, color_usage)
-
-    return get_bus_emissions(
+    emissions = get_bus_emissions(
         route_length,
         EF_bus["fuel"],
         EF_bus["construction"],
         color_usage,
         color_cons,
-        road_geometry,
+    )
+
+    return TripStepResult(
+        step_data=StepData(
+            transport_means="Bus",
+            emissions=emissions,
+            path_length=route_length,
+        ),
+        geometries=[road_geometry],
     )
 
 
@@ -507,7 +363,7 @@ def car_to_gdf(
     passengers_nb=1,
     color_usage="#ffffff",
     color_cons="#ffffff",
-) -> CarStepResults | None:
+) -> TripStepResult | None:
     """Parameters
         - departure_coords, arrival_coords
         - EF_car, float emission factor for one car by km
@@ -533,21 +389,24 @@ def car_to_gdf(
     if passengers_nb == "👍":  # Hitch-hiking
         EF_fuel = EF_car["fuel"] * 0.04
         EF_cons = 0
-        passengers_label = "👍"
     else:
         passengers_nb = int(passengers_nb)
         EF_fuel = EF_car["fuel"] * (1 + 0.04 * (passengers_nb - 1)) / passengers_nb
         EF_cons = EF_car["construction"] / passengers_nb
-        passengers_label = f"{passengers_nb}p."
 
-    road_geometry = get_road_geometry_data(route_length, route_geometry, color_usage)
+    geometry = get_road_geometry_data(route_length, route_geometry, color_usage)
 
-    return get_car_emissions(
-        route_length,
-        EF_fuel,
-        EF_cons,
-        color_usage,
-        color_cons,
-        passengers_label,
-        road_geometry,
+    return TripStepResult(
+        step_data=StepData(
+            transport_means="Car",
+            emissions=get_car_emissions(
+                route_length,
+                EF_fuel,
+                EF_cons,
+                color_usage,
+                color_cons,
+            ),
+            path_length=route_length,
+        ),
+        geometries=[geometry],
     )

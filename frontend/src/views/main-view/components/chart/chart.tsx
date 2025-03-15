@@ -39,11 +39,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import {
-  EmissionsCategory,
-  Trip,
-  type SimulationResults,
-} from "../../../../types";
+import { Trip, type SimulationResults } from "../../../../types";
 import { useTranslation } from "react-i18next";
 import { useMemo, useState } from "react";
 import { getChartData, getLabel } from "./helpers";
@@ -101,7 +97,7 @@ const Chart = ({
       const emissionParts = trip.steps.flatMap((step) =>
         step.emissionParts.map((emissionPart) => ({
           color: emissionPart.color,
-          emissionSource: emissionPart.emissionSource,
+          emissionSource: `${emissionPart.emissionSource} ${trip.isMainTrip ? "" : " "}`,
         })),
       );
       result.push({ trip, emissionParts });
@@ -109,7 +105,7 @@ const Chart = ({
     },
     [] as {
       trip: Trip;
-      emissionParts: { color: string; emissionSource: EmissionsCategory }[];
+      emissionParts: { color: string; emissionSource: string }[];
     }[],
   );
 
@@ -120,7 +116,7 @@ const Chart = ({
           trip.steps.flatMap((step) =>
             step.emissionParts.flatMap((emissionPart) => ({
               color: emissionPart.color,
-              emissionSource: emissionPart.emissionSource,
+              emissionSource: `${emissionPart.emissionSource} ${trip.isMainTrip ? "" : " "}`,
             })),
           ),
         ),

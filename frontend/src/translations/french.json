@@ -171,7 +171,7 @@
       "help": "Détails sur l'avion ",
       "transportMeans": {
         "plane": "Avion",
-        "car": "Voiture",
+        "car": "Voiture {{count}}p.",
         "ecar": "VE",
         "bus": "Bus",
         "train": "Train",

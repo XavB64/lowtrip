@@ -15,9 +15,6 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-# Need for ferry if straight line
-# from shapely.geometry import LineString
-from dataclasses import dataclass
 from http import HTTPStatus
 
 import geopandas as gpd
@@ -29,7 +26,12 @@ from shapely.geometry import (
     Point,
 )
 
-from models import TripStepGeometry
+from models import (
+    EmissionPart,
+    StepData,
+    TripStepGeometry,
+    TripStepResult,
+)
 from parameters import (
     EF_train,
     search_perimeter,
@@ -46,36 +48,6 @@ from utils import (
 
 class GeometryRecognitionError(Exception):
     """Exception raised when the geometry is not recognized."""
-
-
-@dataclass
-class TrainEmission:
-    """Emission dataclass."""
-
-    kg_co2_eq: float
-    name: str
-    color: str
-
-
-@dataclass
-class TrainStepResults:
-    """Dataclass for train emissions and geometry."""
-
-    geometries: list[TripStepGeometry]
-    emissions: list[TrainEmission]
-    path_length: float
-
-
-def train_emissions_to_pd_objects(
-    train_step: TrainStepResults,
-) -> pd.DataFrame:
-    res = {"kgCO2eq": [], "colors": [], "NAME": [], "Mean of Transport": []}
-    for emission in train_step.emissions:
-        res["kgCO2eq"].append(emission.kg_co2_eq)
-        res["colors"].append(emission.color)
-        res["NAME"].append(emission.name)
-        res["Mean of Transport"].append("Train")
-    return pd.DataFrame(res)
 
 
 def flatten_list_of_tuples(lst):
@@ -353,18 +325,22 @@ def train_to_gdf(
         else:
             raise GeometryRecognitionError
 
-    emissions_data = gdf[["kgCO2eq", "colors", "NAME"]].to_dict("records")
+    emissions_data = gdf[["kgCO2eq", "colors", "NAME", "EF_tot"]].to_dict("records")
     emissions = [
-        TrainEmission(
+        EmissionPart(
             name=emission_data["NAME"],
             kg_co2_eq=emission_data["kgCO2eq"],
             color=emission_data["colors"],
+            ef_tot=emission_data["EF_tot"],
         )
         for emission_data in emissions_data
     ]
 
-    return TrainStepResults(
+    return TripStepResult(
+        step_data=StepData(
+            transport_means="Train",
+            emissions=emissions,
+            path_length=train_dist,
+        ),
         geometries=geometries,
-        emissions=emissions,
-        path_length=train_dist,
     )

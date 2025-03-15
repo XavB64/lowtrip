@@ -15,15 +15,10 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-# Need for ferry if straight line
-# from shapely.geometry import LineString
-from dataclasses import dataclass
-
 import geopandas as gpd
 import momepy
 import networkx as nx
 import numpy as np
-import pandas as pd
 from pyproj import Geod
 from shapely.geometry import (
     CAP_STYLE,
@@ -32,66 +27,17 @@ from shapely.geometry import (
 )
 from shapely.ops import nearest_points, unary_union
 
-from models import TripStepGeometry
+from models import (
+    EmissionPart,
+    StepData,
+    TripStepGeometry,
+    TripStepResult,
+)
 from parameters import (
     EF_ferry,
     EF_sail,
     train_intensity,
 )
-
-
-@dataclass
-class Emission:
-    """Class for an emission object."""
-
-    kg_co2_eq: float
-    ef_tot: float
-    color: str
-
-
-@dataclass
-class FerryStepResults:
-    """Class for the results of a ferry step."""
-
-    geometry: TripStepGeometry
-    emissions: Emission
-    path_length: float
-    options: str
-
-
-@dataclass
-class SailStepResults:
-    """Class for the results of a sail step."""
-
-    geometry: TripStepGeometry
-    emissions: Emission
-    path_length: float
-
-
-def ferry_emissions_to_pd_objects(
-    ferry_step: FerryStepResults,
-) -> pd.DataFrame:
-    return pd.DataFrame({
-        "kgCO2eq": [ferry_step.emissions.kg_co2_eq],
-        "EF_tot": [ferry_step.emissions.ef_tot],
-        "path_length": [ferry_step.path_length],
-        "colors": [ferry_step.emissions.color],
-        "NAME": [ferry_step.options],
-        "Mean of Transport": ["Ferry"],
-    })
-
-
-def sail_emissions_to_pd_objects(
-    sail_step: SailStepResults,
-) -> pd.DataFrame:
-    return pd.DataFrame({
-        "kgCO2eq": [sail_step.emissions.kg_co2_eq],
-        "EF_tot": [sail_step.emissions.ef_tot],
-        "path_length": [sail_step.path_length],
-        "colors": [sail_step.emissions.color],
-        "NAME": ["Usage"],
-        "Mean of Transport": ["Sail"],
-    })
 
 
 def get_shortest_path(line_gdf, start, end):
@@ -270,7 +216,7 @@ def ferry_to_gdf(
     EF=EF_ferry,
     options="None",
     color_usage="#ffffff",
-) -> FerryStepResults:
+) -> TripStepResult:
     """Parameters
         - tag1, tag2
         - EF : emission factor in gCO2/pkm for ferry
@@ -306,25 +252,32 @@ def ferry_to_gdf(
             t.append(list(coord))
         coordinates.append(t)
 
-    return FerryStepResults(
-        geometry=TripStepGeometry(
-            coordinates=coordinates,
+    return TripStepResult(
+        step_data=StepData(
             transport_means="Ferry",
-            length=bird,
-            color=color_usage,
-            country_label=None,
+            emissions=[
+                EmissionPart(
+                    name="Usage",
+                    kg_co2_eq=EF * bird,
+                    ef_tot=EF,
+                    color=color_usage,
+                ),
+            ],
+            path_length=bird,
         ),
-        emissions=Emission(
-            kg_co2_eq=EF * bird,
-            ef_tot=EF,
-            color=color_usage,
-        ),
-        path_length=bird,
-        options=options,
+        geometries=[
+            TripStepGeometry(
+                coordinates=coordinates,
+                transport_means="Ferry",
+                length=bird,
+                color=color_usage,
+                country_label=None,
+            ),
+        ],
     )
 
 
-def sail_to_gdf(tag1, tag2, EF=EF_sail, color_usage="#ffffff") -> SailStepResults:
+def sail_to_gdf(tag1, tag2, EF=EF_sail, color_usage="#ffffff") -> TripStepResult:
     """Parameters
         - tag1, tag2
         - EF : emission factor in gCO2/pkm for ferry
@@ -351,18 +304,26 @@ def sail_to_gdf(tag1, tag2, EF=EF_sail, color_usage="#ffffff") -> SailStepResult
             t.append(list(coord))
         coordinates.append(t)
 
-    return SailStepResults(
-        geometry=TripStepGeometry(
-            coordinates=coordinates,
+    return TripStepResult(
+        step_data=StepData(
             transport_means="Sail",
-            length=bird,
-            color=color_usage,
-            country_label=None,
+            emissions=[
+                EmissionPart(
+                    name="Usage",
+                    kg_co2_eq=EF * bird,
+                    ef_tot=EF,
+                    color=color_usage,
+                ),
+            ],
+            path_length=bird,
         ),
-        emissions=Emission(
-            kg_co2_eq=EF * bird,
-            ef_tot=EF,
-            color=color_usage,
-        ),
-        path_length=bird,
+        geometries=[
+            TripStepGeometry(
+                coordinates=coordinates,
+                transport_means="Sail",
+                length=bird,
+                color=color_usage,
+                country_label=None,
+            ),
+        ],
     )

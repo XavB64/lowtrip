@@ -49,3 +49,38 @@ class TripStepGeometry:
     length: float
     color: str
     country_label: str | None
+
+
+@dataclass
+class EmissionPart:
+    """Emission dataclass."""
+
+    kg_co2_eq: float
+    ef_tot: float | None
+    name: str
+    color: str
+
+
+@dataclass
+class StepData:
+    """Emissions of the trip step."""
+
+    transport_means: str
+    emissions: list[EmissionPart]
+    path_length: float
+
+
+@dataclass
+class TripStepResult:
+    """Results of the trip step (emissions + geometries)."""
+
+    step_data: StepData
+    geometries: list[TripStepGeometry]
+
+
+@dataclass
+class TripResult:
+    """Results of the computation for a full trip."""
+
+    name: str  # MAIN_TRIP | SECOND_TRIP | DIRECT_TRIP_{PLANE/BOAT/CAR/...}
+    steps: list[StepData]
