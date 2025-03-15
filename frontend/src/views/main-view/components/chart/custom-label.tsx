@@ -18,14 +18,14 @@
 import { useBreakpoint } from "@chakra-ui/react";
 import { round } from "lodash";
 import { LabelProps } from "recharts";
-import { EmissionsCategory, Trip } from "../../types";
+import type { Trip } from "../../../../types";
 
 type CustomLabelProps = {
   emissionPartsByTrip: {
     trip: Trip;
-    emissionParts: { color: string; emissionSource: EmissionsCategory }[];
+    emissionParts: { color: string; emissionSource: string }[];
   }[];
-  emissionSource: EmissionsCategory;
+  emissionSource: string;
 } & LabelProps;
 
 /** Only display the custom label of the last emission part of the trip */
@@ -40,7 +40,7 @@ const CustomLabel = ({
     ({ trip }) => trip.label === props.value,
   ) as {
     trip: Trip;
-    emissionParts: { color: string; emissionSource: EmissionsCategory }[];
+    emissionParts: { color: string; emissionSource: string }[];
   };
 
   const shouldDisplay =

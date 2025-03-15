@@ -15,55 +15,20 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from dataclasses import dataclass
 from http import HTTPStatus
 import os
 
-import pandas as pd
 import requests
 from shapely.geometry import LineString
 
-from models import TripStepGeometry
+from models import (
+    EmissionPart,
+    StepData,
+    TripStepGeometry,
+    TripStepResult,
+)
 from parameters import EF_bicycle, val_perimeter
 from utils import validate_geom
-
-
-@dataclass
-class Emission:
-    """Class for an emission object."""
-
-    kg_co2_eq: float
-    ef_tot: float
-    color: str
-
-
-@dataclass
-class BicycleEmissions:
-    """Bicyle has only one emissions source: construction."""
-
-    construction: Emission
-
-
-@dataclass
-class BicycleStepResults:
-    """Class for the results of a bicycle step."""
-
-    geometry: TripStepGeometry
-    emissions: BicycleEmissions
-    path_length: float
-
-
-def bicycle_emissions_to_pd_objects(
-    bicycle_step: BicycleStepResults,
-) -> pd.DataFrame:
-    return pd.DataFrame({
-        "kgCO2eq": [bicycle_step.emissions.construction.kg_co2_eq],
-        "EF_tot": [bicycle_step.emissions.construction.ef_tot],
-        "path_length": [bicycle_step.path_length],
-        "colors": [bicycle_step.emissions.construction.color],
-        "NAME": ["Bike-build"],
-        "Mean of Transport": ["Bicycle"],
-    })
 
 
 API_KEY = os.environ.get("BICYCLE_API_KEY")
@@ -103,7 +68,7 @@ def bicycle_to_gdf(
     EF=EF_bicycle,
     color="#ffffff",
     validate=val_perimeter,
-) -> BicycleStepResults | None:
+) -> TripStepResult | None:
     """Parameters
         - departure_coords, arrival_coords
         - EF_bus, float emission factor for bike by pkm
@@ -112,7 +77,7 @@ def bicycle_to_gdf(
 
     Return:
     ------
-        - BicycleStepResults or None
+        - TripStepResult or None
 
     """
     # Route OSRM - create a separate function
@@ -129,20 +94,26 @@ def bicycle_to_gdf(
     ):
         return None
 
-    return BicycleStepResults(
-        geometry=TripStepGeometry(
-            coordinates=[[list(coord) for coord in route_geometry.coords]],
+    return TripStepResult(
+        step_data=StepData(
             transport_means="Bicycle",
-            length=route_length,
-            color=color,
-            country_label=None,
+            emissions=[
+                EmissionPart(
+                    name="Construction",
+                    kg_co2_eq=EF * route_length,
+                    ef_tot=EF,
+                    color=color,
+                ),
+            ],
+            path_length=route_length,
         ),
-        emissions=BicycleEmissions(
-            construction=Emission(
-                kg_co2_eq=EF * route_length,
-                ef_tot=EF,
+        geometries=[
+            TripStepGeometry(
+                coordinates=[[list(coord) for coord in route_geometry.coords]],
+                transport_means="Bicycle",
+                length=route_length,
                 color=color,
+                country_label=None,
             ),
-        ),
-        path_length=route_length,
+        ],
     )

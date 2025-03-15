@@ -27,7 +27,6 @@ from flask_cors import CORS
 import pandas as pd
 
 from backend import (
-    chart_refactor,
     compute_emissions_all,
     compute_emissions_custom,
 )
@@ -60,26 +59,24 @@ def main():
                 abort(400, "My trip: should have at least 1 step")
 
             df = pd.DataFrame.from_dict(inputs)
-            data_mytrip, geometries, error = compute_emissions_custom(inputs)
-
-            if len(error) > 0:
-                return {"error": f"My trip: {error}"}
+            main_trip, geometries = compute_emissions_custom("MAIN_TRIP", inputs)
 
             # If we have more than 1 step, we return immediately
             if len(inputs) > 2:
                 return {
-                    "my_trip": chart_refactor(data_mytrip).to_json(orient="records"),
+                    "trips": [main_trip],
                     "geometries": geometries,
                 }
 
             # If we have exactly 1 step, then we can compare with other means of transport
-            data_direct, direct_trips_geometries = compute_emissions_all(df)
+            direct_trips, direct_trips_geometries = compute_emissions_all(df)
 
             geometries += direct_trips_geometries
 
+            trips = [main_trip, *direct_trips]
+
             return {
-                "my_trip": data_mytrip.to_json(orient="records"),
-                "direct_trip": data_direct.to_json(orient="records"),
+                "trips": trips,
                 "geometries": geometries,
             }
 
@@ -89,35 +86,20 @@ def main():
             data["alternative-trip"],
         )
 
-        data_mytrip, main_geometries, error = compute_emissions_custom(
+        main_trip, main_trip_geometries = compute_emissions_custom(
+            "MAIN_TRIP",
             main_trip_inputs,
         )
 
-        data_alternative, alternative_geometries, error_other = (
-            compute_emissions_custom(
-                alternative_trip_inputs,
-                cmap=colors_alternative,
-            )
-        )
-
-        if len(error) > 0 or len(error_other) > 0:
-            return {
-                error: f"My trip: {error}"
-                if len(error) > 0
-                else f"Other trip: {error_other}",
-            }
-
-        # Prepare data for aggregation in the chart -  see frontend
-        data_mytrip, data_alternative = chart_refactor(
-            data_mytrip,
-            data_alternative,
-            True,
+        second_trip, second_trip_geometries = compute_emissions_custom(
+            "SECOND_TRIP",
+            alternative_trip_inputs,
+            cmap=colors_alternative,
         )
 
         return {
-            "my_trip": data_mytrip.to_json(orient="records"),
-            "alternative_trip": data_alternative.to_json(orient="records"),
-            "geometries": main_geometries + alternative_geometries,
+            "trips": [main_trip, second_trip],
+            "geometries": main_trip_geometries + second_trip_geometries,
         }
 
     return {"message": "backend initialized"}

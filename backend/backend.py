@@ -20,37 +20,32 @@
 #####################
 
 # Classic
-import pandas as pd
 from pyproj import Geod
 
 # Geometry
 from shapely.geometry import LineString
 
-from models import TripStep, TripStepGeometry
+from models import (
+    StepData,
+    TripResult,
+    TripStep,
+    TripStepGeometry,
+)
 from parameters import (
     colors_custom,
     colors_direct,
     min_plane_dist,
 )
-from transport_bicycle import bicycle_emissions_to_pd_objects, bicycle_to_gdf
+from transport_bicycle import bicycle_to_gdf
 from transport_car import (
-    bus_emissions_to_pd_objects,
     bus_to_gdf,
-    car_bus_emissions_to_pd_objects,
     car_bus_to_gdf,
-    car_emissions_to_pd_objects,
     car_to_gdf,
-    e_car_emissions_to_pd_objects,
     ecar_to_gdf,
 )
-from transport_ferry import (
-    ferry_emissions_to_pd_objects,
-    ferry_to_gdf,
-    sail_emissions_to_pd_objects,
-    sail_to_gdf,
-)
-from transport_plane import plane_emissions_to_pd_objects, plane_to_gdf
-from transport_train import train_emissions_to_pd_objects, train_to_gdf
+from transport_ferry import ferry_to_gdf, sail_to_gdf
+from transport_plane import plane_to_gdf
+from transport_train import train_to_gdf
 
 
 ######################
@@ -58,22 +53,28 @@ from transport_train import train_emissions_to_pd_objects, train_to_gdf
 ######################
 
 
-def compute_emissions_custom(trip_inputs: list[TripStep], cmap=colors_custom):
+def compute_emissions_custom(
+    name: str,
+    trip_inputs: list[TripStep],
+    cmap=colors_custom,
+):
     """Parameters
+    ----------
+        - name, name of the trip (MAIN_TRIP or SECONDARY_TRIP)
         - trip_inputs, inputs of the trip
 
     Return:
     ------
         - full dataframe for emissions
         - geometries for path
-        - ERROR : string first step that fails
+
+    Raises:
+    ------
+        ValueError: Si l'étape échoue avec le moyen de transport donné.
 
     """
-    ERROR = ""
-
-    emissions_data = []
+    emissions_data: list[StepData] = []
     geometries: list[TripStepGeometry] = []
-    fail = False  # To check if the query is successfull
 
     for idx in range(len(trip_inputs) - 1):  # We loop until last departure
         # Departure coordinates
@@ -86,6 +87,7 @@ def compute_emissions_custom(trip_inputs: list[TripStep], cmap=colors_custom):
 
         # Mean of transport
         transportmean = arrival.transport_means
+        results = None
 
         # Compute depending on the mean of transport
         if transportmean == "Train":
@@ -95,18 +97,6 @@ def compute_emissions_custom(trip_inputs: list[TripStep], cmap=colors_custom):
                 color_usage=cmap["Train"],
                 color_infra=cmap["Cons_infra"],
             )
-            if results is None:  # Step is not successful
-                fail = True
-                ERROR = (
-                    "step n°"
-                    + str(int(idx) + 1)
-                    + " failed with Train, please change mean of transport or locations. "
-                )
-                break
-            data_train = train_emissions_to_pd_objects(results)
-            data_train["step"] = str(int(idx) + 1)
-            emissions_data.append(data_train)
-            geometries += results.geometries
 
         elif transportmean == "Bus":
             results = bus_to_gdf(
@@ -115,18 +105,6 @@ def compute_emissions_custom(trip_inputs: list[TripStep], cmap=colors_custom):
                 color_usage=cmap["Road"],
                 color_cons=cmap["Cons_infra"],
             )
-            if results is None:
-                fail = True
-                ERROR = (
-                    "step n°"
-                    + str(int(idx) + 1)
-                    + " failed with Bus, please change mean of transport or locations. "
-                )
-                break
-            data_bus = bus_emissions_to_pd_objects(results)
-            data_bus["step"] = str(int(idx) + 1)
-            emissions_data.append(data_bus)
-            geometries.append(results.geometry)
 
         elif transportmean == "Car":
             results = car_to_gdf(
@@ -136,18 +114,6 @@ def compute_emissions_custom(trip_inputs: list[TripStep], cmap=colors_custom):
                 color_usage=cmap["Road"],
                 color_cons=cmap["Cons_infra"],
             )
-            if results is None:  # Step is not successful
-                fail = True
-                ERROR = (
-                    "step n°"
-                    + str(int(idx) + 1)
-                    + " failed with Car, please change mean of transport or locations. "
-                )
-                break
-            data_car = car_emissions_to_pd_objects(results)
-            data_car["step"] = str(int(idx) + 1)
-            emissions_data.append(data_car)  # gdf_car.copy()
-            geometries.append(results.geometry)
 
         elif transportmean == "eCar":
             results = ecar_to_gdf(
@@ -157,18 +123,6 @@ def compute_emissions_custom(trip_inputs: list[TripStep], cmap=colors_custom):
                 color_usage=cmap["Road"],
                 color_cons=cmap["Cons_infra"],
             )
-            if results is None:  # Step is not successful
-                fail = True
-                ERROR = (
-                    "step n°"
-                    + str(int(idx) + 1)
-                    + " failed with eCar, please change mean of transport or locations. "
-                )
-                break
-            data_ecar = e_car_emissions_to_pd_objects(results)
-            data_ecar["step"] = str(int(idx) + 1)
-            emissions_data.append(data_ecar)
-            geometries += results.geometries
 
         elif transportmean == "Bicycle":
             results = bicycle_to_gdf(
@@ -176,30 +130,14 @@ def compute_emissions_custom(trip_inputs: list[TripStep], cmap=colors_custom):
                 arrival_coordinates,
                 color=cmap["Bicycle"],
             )
-            if results is None:  # Step is not successful
-                fail = True
-                ERROR = (
-                    "step n°"
-                    + str(int(idx) + 1)
-                    + " failed with Bicycle, please change mean of transport or locations. "
-                )
-                break
-            data_bike = bicycle_emissions_to_pd_objects(results)
-            data_bike["step"] = str(int(idx) + 1)
-            emissions_data.append(data_bike)
-            geometries.append(results.geometry)
 
         elif transportmean == "Plane":
-            plane_results = plane_to_gdf(
+            results = plane_to_gdf(
                 departure_coordinates,
                 arrival_coordinates,
                 color_usage=cmap["Plane"],
                 color_contrails=cmap["Contrails"],
             )
-            data_plane = plane_emissions_to_pd_objects(plane_results)
-            data_plane["step"] = str(int(idx) + 1)
-            emissions_data.append(data_plane)
-            geometries.append(plane_results.geometry)
 
         elif transportmean == "Ferry":
             results = ferry_to_gdf(
@@ -208,10 +146,6 @@ def compute_emissions_custom(trip_inputs: list[TripStep], cmap=colors_custom):
                 color_usage=cmap["Ferry"],
                 options=arrival.options,
             )
-            data_ferry = ferry_emissions_to_pd_objects(results)
-            data_ferry["step"] = str(int(idx) + 1)
-            emissions_data.append(data_ferry)
-            geometries.append(results.geometry)
 
         elif transportmean == "Sail":
             results = sail_to_gdf(
@@ -219,20 +153,15 @@ def compute_emissions_custom(trip_inputs: list[TripStep], cmap=colors_custom):
                 arrival_coordinates,
                 color_usage=cmap["Ferry"],
             )
-            data_sail = sail_emissions_to_pd_objects(results)
-            data_sail["step"] = str(int(idx) + 1)
-            emissions_data.append(data_sail)
-            geometries.append(results.geometry)
 
-    if fail:
-        # One or more step weren't successful, we return nothing
-        data_custom = pd.DataFrame()
-    else:
-        # Query successfull, we concatenate the data
-        data_custom = pd.concat(emissions_data)
-        data_custom = data_custom.reset_index(drop=True)  # .drop("geometry", axis=1)
+        if results is None:  # Step is not successful
+            error_message = f"step n°{int(idx) + 1} failed with {transportmean}, please change mean of transport or locations."
+            raise ValueError(error_message)
 
-    return data_custom, geometries, ERROR
+        emissions_data.append(results.step_data)
+        geometries += results.geometries
+
+    return TripResult(name=name, steps=emissions_data), geometries
 
 
 def compute_emissions_all(data, cmap=colors_direct):
@@ -282,7 +211,7 @@ def compute_emissions_all(data, cmap=colors_direct):
         train, bus, car = False, False, False
 
     # Loop
-    l_data = []
+    trips: list[TripResult] = []
     geometries: list[TripStepGeometry] = []
 
     # Train
@@ -294,8 +223,7 @@ def compute_emissions_all(data, cmap=colors_direct):
             color_infra=cmap["Cons_infra"],
         )
         if results is not None:
-            data_train = train_emissions_to_pd_objects(results)
-            l_data.append(data_train)
+            trips.append(TripResult(name="TRAIN", steps=[results.step_data]))
             geometries += results.geometries
 
     # Car or Bus
@@ -315,15 +243,14 @@ def compute_emissions_all(data, cmap=colors_direct):
         if results is None:
             car, bus = False, False
         else:
-            car_data, bus_data = car_bus_emissions_to_pd_objects(results)
             if bus:
-                l_data.append(bus_data)
+                trips.append(TripResult(name="BUS", steps=[results.bus_step_data]))
             if car:
-                l_data.append(car_data)
+                trips.append(TripResult(name="CAR", steps=[results.car_step_data]))
 
             # We check if car or bus was asked for a 1 step
             if car and bus and transp != "eCar":
-                geometries.append(results.geometry)
+                geometries += results.geometries
 
     # Plane
     if plane:
@@ -333,57 +260,9 @@ def compute_emissions_all(data, cmap=colors_direct):
             color_usage=cmap["Plane"],
             color_contrails=cmap["Contrails"],
         )
-        data_plane = plane_emissions_to_pd_objects(plane_result)
-        l_data.append(data_plane)
-        geometries.append(plane_result.geometry)
+        trips.append(TripResult(name="PLANE", steps=[plane_result.step_data]))
+        geometries += plane_result.geometries
 
     # We do not add the ferry in the general case
 
-    if not car and not bus and not train and not plane:
-        # Only happens when plane was asked and the API failed
-        data = pd.DataFrame()
-    else:
-        # Data for bar chart
-        data = pd.concat(l_data).reset_index(drop=True)
-
-    return data, geometries
-
-
-def chart_refactor(mytrip, alternative=None, do_alt=False):
-    """This function prepare the data to be displayed in the chart correctly
-    parameters:
-        - mytrip, dataframe of custom trip
-        - alternative, dataframe of alternative trip if requested
-        - do_alt (bool), is there an alternative trip ?
-    return:
-        - data with changed fields for bar chart.
-    """
-    # Check if my trip worked
-    if mytrip.shape[0] > 0:
-        # Merging means of transport for custom trips
-        mytrip["NAME"] = (
-            mytrip["step"] + ". " + mytrip["Mean of Transport"] + " - " + mytrip["NAME"]
-        )  # + ' - ' + mytrip.index.map(str) + '\''
-        # Separtating bars
-        mytrip["Mean of Transport"] = "MyTrip"
-        # mytrip = mytrip[l_var]
-
-    if do_alt:
-        # Check if it worked
-        if alternative.shape[0] > 0:
-            # We have to render alternative as well
-            alternative["NAME"] = (
-                alternative["step"]
-                + ". "
-                + alternative["Mean of Transport"]
-                + " - "
-                + alternative["NAME"]
-                + " "
-            )  # + ' - ' + alternative.index.map(str)
-            alternative["Mean of Transport"] = "OtherTrip"
-            # Then we return both
-
-        return mytrip, alternative
-
-    # If it didnt work we return it (empty)
-    return mytrip
+    return trips, geometries

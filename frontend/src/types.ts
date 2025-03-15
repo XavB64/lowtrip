@@ -43,6 +43,20 @@ type TripStepGeometry = {
   country_label: string | null;
 };
 
+type TripResult = {
+  name: string;
+  steps: {
+    transport_means: string;
+    path_length: number;
+    emissions: {
+      name: string;
+      ef_tot: number;
+      kg_co2_eq: number;
+      color: string;
+    }[];
+  }[];
+};
+
 export type ApiResponse = {
   data: {
     my_trip: string;
@@ -50,6 +64,7 @@ export type ApiResponse = {
     alternative_trip?: string;
     error: string;
     geometries: TripStepGeometry[];
+    trips: TripResult[];
   };
 };
 
@@ -94,35 +109,9 @@ export type Trip = {
 
 export type TripStep = {
   emissions: number;
-} & (
-  | {
-      transportMeans: Transport.plane;
-      emissionParts: {
-        emissionSource:
-          | EmissionsCategory.contrails
-          | EmissionsCategory.kerosene;
-        color: string;
-        emissions: number;
-      }[];
-    }
-  | {
-      transportMeans: Transport.bus | Transport.car | Transport.ecar;
-      emissionParts: {
-        emissionSource: EmissionsCategory.construction | EmissionsCategory.fuel;
-        color: string;
-        emissions: number;
-        passengerNb?: number;
-      }[];
-    }
-  | {
-      transportMeans: Transport.train;
-      emissionParts: {
-        emissionSource: EmissionsCategory.infra | EmissionsCategory.none;
-        color: string;
-        emissions: number;
-      }[];
-    }
-);
+  transportMeans: Transport;
+  emissionParts: { emissionSource: string; color: string; emissions: number }[];
+};
 
 export type Geometry = {
   transportMeans: string;

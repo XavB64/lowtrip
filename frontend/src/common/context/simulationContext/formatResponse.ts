@@ -1,170 +1,79 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import i18next from "i18next";
 import {
   ApiResponse,
   SimulationResults,
-  MyTripData,
   Transport,
-  DirectTripData,
-  Trip,
   TripStep,
   SimulationType,
+  type Step,
 } from "../../../types";
 
-const extractTransportMeans = (emissionPartName: string) => {
-  if (emissionPartName.includes("Train")) {
-    return Transport.train;
-  }
-  if (emissionPartName.includes("Plane")) {
-    return Transport.plane;
-  }
-  if (emissionPartName.includes("eCar")) {
-    return Transport.ecar;
-  }
-  if (emissionPartName.includes("Car")) {
-    return Transport.car;
-  }
-  if (emissionPartName.includes("Bus")) {
-    return Transport.bus;
-  }
-  if (emissionPartName.includes("Ferry")) {
-    return Transport.ferry;
-  }
-  if (emissionPartName.includes("Bicycle")) {
-    return Transport.bicycle;
-  }
-  if (emissionPartName.includes("Sail")) {
-    return Transport.sail;
-  }
-};
-
-const formatMultiStepsTrip = (trip: MyTripData[], isMainTrip = false): Trip => {
-  if (trip.length === 0) {
-    return {
-      steps: [],
-      label: "My trip",
-      totalEmissions: 0,
-    };
-  }
-
-  const steps = trip.reduce((result, tripData, index) => {
-    if (index > 0 && tripData.step === trip[index - 1].step) {
-      // update the existing step
-      const currentStep = result[result.length - 1];
-      return [
-        ...result.slice(0, -1),
-        {
-          transportMeans: currentStep.transportMeans,
-          emissions: currentStep.emissions + tripData.kgCO2eq,
-          emissionParts: [
-            ...currentStep.emissionParts,
-            {
-              emissions: tripData.kgCO2eq,
-              emissionSource: tripData.NAME,
-              color: tripData.colors,
-            },
-          ],
-        } as TripStep,
-      ];
-    }
-
-    // create a new step
-    const transportMeans =
-      extractTransportMeans(tripData.NAME) ||
-      extractTransportMeans(trip[0]["Mean of Transport"]);
-    if (!transportMeans) {
-      console.error(
-        `Unknown transport means: ${tripData.NAME} or ${trip[0]["Mean of Transport"]}`,
-      );
-    }
-    return [
-      ...result,
-      {
-        emissions: tripData.kgCO2eq,
-        transportMeans,
-        emissionParts: [
-          {
-            emissions: tripData.kgCO2eq,
-            emissionSource: tripData.NAME,
-            color: tripData.colors,
-          },
-        ],
-      } as TripStep,
-    ];
-  }, [] as TripStep[]);
-
-  const totalEmissions = steps.reduce(
-    (total, step) => total + step.emissions,
-    0,
-  );
-
-  return {
-    steps,
-    label: trip[0]["Mean of Transport"],
-    totalEmissions,
-    isMainTrip,
-  };
-};
-
-const formatDirectTrips = (trips: DirectTripData[]): Trip[] => {
-  const tripsByTransportMeans = trips.reduce(
-    (result, tripData) => {
-      const transportMeans = tripData["Mean of Transport"];
-      const currentTrip = result[transportMeans];
-      const newTrip = {
-        emissions: (currentTrip?.emissions || 0) + tripData.kgCO2eq,
-        emissionParts: [
-          ...(currentTrip?.emissionParts || []),
-          {
-            emissionSource: tripData.NAME,
-            color: tripData.colors,
-            emissions: tripData.kgCO2eq,
-          },
-        ],
-      };
-      return {
-        ...result,
-        [transportMeans]: {
-          transportMeans,
-          ...newTrip,
-        },
-      };
-    },
-    {} as Record<Transport, TripStep>,
-  );
-
-  return Object.values(tripsByTransportMeans).map((trip) => ({
-    label: `Direct trip ${trip.transportMeans}`,
-    steps: [trip],
-    totalEmissions: trip.emissions,
-  }));
-};
-
 export const formatResponse = (
+  inputs: { mainSteps: Step[]; altSteps?: Step[] },
   data: ApiResponse["data"],
 ): Omit<SimulationResults, "inputs"> => {
-  let simulationType = SimulationType.mainTripOnly;
-  const trips: Trip[] = [];
-
-  const isMainTrip = true;
-  const myTrip = formatMultiStepsTrip(
-    JSON.parse(data.my_trip) as MyTripData[],
-    isMainTrip,
-  );
-  trips.push(myTrip);
-
-  if (data.direct_trip) {
-    simulationType = SimulationType.mainTripVsOtherTransportMeans;
-    const directTrips = formatDirectTrips(JSON.parse(data.direct_trip));
-    trips.push(...directTrips);
+  let simulationType = SimulationType.mainTripVsOtherTransportMeans;
+  if (inputs.mainSteps.length > 1) {
+    simulationType = SimulationType.mainTripOnly;
   }
-
-  if (data.alternative_trip) {
+  if (inputs.altSteps) {
     simulationType = SimulationType.mainTripVsOtherTrip;
-    const alternativeTrip = formatMultiStepsTrip(
-      JSON.parse(data.alternative_trip),
-    );
-    trips.push(alternativeTrip);
   }
+
+  const needToLabelTripSteps =
+    simulationType !== SimulationType.mainTripVsOtherTransportMeans;
+
+  const trips = data.trips.map((trip) => {
+    const formattedSteps: TripStep[] = [];
+    let totalEmissions = 0;
+
+    trip.steps.forEach((step, index) => {
+      const emissionParts: TripStep["emissionParts"] = [];
+      let stepEmissions = 0;
+      step.emissions.forEach((emission) => {
+        stepEmissions += emission.kg_co2_eq;
+        emissionParts.push({
+          emissionSource: needToLabelTripSteps
+            ? `${index + 1}. ${step.transport_means} - ${emission.name}`
+            : emission.name,
+          color: emission.color,
+          emissions: emission.kg_co2_eq,
+        });
+      });
+
+      totalEmissions += stepEmissions;
+      formattedSteps.push({
+        emissions: stepEmissions,
+        transportMeans: step.transport_means as Transport,
+        emissionParts,
+      });
+    });
+
+    let label: string;
+    if (trip.name === "MAIN_TRIP") {
+      if (inputs.mainSteps.length === 1) {
+        label = i18next.t(
+          `chart.transportMeans.${inputs.mainSteps[0].transportMean!}`,
+        );
+      } else {
+        label = i18next.t("chart.transportMeans.myTrip");
+      }
+    } else if (trip.name === "SECOND_TRIP") {
+      label = i18next.t("chart.transportMeans.otherTrip");
+    } else {
+      label = i18next.t(`chart.transportMeans.${trip.name.toLowerCase()}`, {
+        count: 1,
+      });
+    }
+
+    return {
+      label,
+      totalEmissions,
+      isMainTrip: trip.name === "MAIN_TRIP",
+      steps: formattedSteps,
+    };
+  });
 
   const tripGeometries = data.geometries.flatMap((geometry) => {
     const transportMeans =

@@ -80,7 +80,8 @@ export const getChartData = (
     const tripEmissionsByStep = trip.steps.reduce(
       (acc, tripStep) => {
         tripStep.emissionParts.forEach((emissionPart) => {
-          acc[emissionPart.emissionSource] = emissionPart.emissions;
+          acc[`${emissionPart.emissionSource} ${trip.isMainTrip ? "" : " "}`] =
+            emissionPart.emissions;
         });
         return acc;
       },
