@@ -25,16 +25,9 @@ const formatStepsForApi = (steps: Step[]): StepsForApi =>
     { lon: [], lat: [], transp: [], nb: [], options: [] } as StepsForApi,
   );
 
-export const getPayload = (steps: Step[], alternativeSteps?: Step[]) => {
-  if (alternativeSteps) {
-    return {
-      mode: 2,
-      "my-trip": formatStepsForApi(steps),
-      "alternative-trip": formatStepsForApi(alternativeSteps),
-    };
-  }
-  return {
-    mode: 1,
-    "my-trip": formatStepsForApi(steps),
-  };
-};
+export const getPayload = (steps: Step[], alternativeSteps?: Step[]) => ({
+  "main-trip": formatStepsForApi(steps),
+  ...(alternativeSteps
+    ? { "second-trip": formatStepsForApi(alternativeSteps) }
+    : {}),
+});

@@ -18,6 +18,7 @@
 ###################
 ###### Utils ######
 ###################
+from flask import abort
 import geopandas as gpd
 import numpy as np
 import pandas as pd
@@ -186,4 +187,8 @@ def extract_path_steps_from_payload(trip_payload: TripPayload) -> list[TripStep]
                 options=trip_payload["options"][i],
             ),
         )
+
+    if len(result) < 2:
+        abort(400, "Trip should have at least 1 step")
+
     return result

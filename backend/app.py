@@ -47,59 +47,43 @@ def main():
     if request.method == "POST":
         data = request.get_json()
 
-        if "my-trip" not in data:
-            abort(400, "My trip: you should provide a trip")
+        if "main-trip" not in data:
+            abort(400, "You should provide a main trip")
 
-        ### Compute emissions of a single custom trip and compare it with other means of transport
-        if "alternative-trip" not in data:
-            inputs = extract_path_steps_from_payload(data["my-trip"])
-
-            if len(inputs) < 2:
-                abort(400, "My trip: should have at least 1 step")
-
-            main_trip, geometries = compute_custom_trip_emissions("MAIN_TRIP", inputs)
-
-            # If we have more than 1 step, we return immediately
-            if len(inputs) > 2:
-                return {
-                    "trips": [main_trip],
-                    "geometries": geometries,
-                }
-
-            # If we have exactly 1 step, then we can compare with other means of transport
-            direct_trips, direct_trips_geometries = compute_direct_trips_emissions(
-                inputs,
-            )
-
-            geometries += direct_trips_geometries
-
-            trips = [main_trip, *direct_trips]
-
-            return {
-                "trips": trips,
-                "geometries": geometries,
-            }
-
-        ### Compare emissions of 2 custom trips
-        main_trip_inputs = extract_path_steps_from_payload(data["my-trip"])
-        alternative_trip_inputs = extract_path_steps_from_payload(
-            data["alternative-trip"],
-        )
-
+        ## Compute emisssions of the main custom trip
+        main_trip_inputs = extract_path_steps_from_payload(data["main-trip"])
         main_trip, main_trip_geometries = compute_custom_trip_emissions(
             "MAIN_TRIP",
             main_trip_inputs,
         )
 
-        second_trip, second_trip_geometries = compute_custom_trip_emissions(
-            "SECOND_TRIP",
-            alternative_trip_inputs,
-            cmap=colors_alternative,
-        )
+        trips = [main_trip]
+        geometries = main_trip_geometries
+
+        ### If alternative trip is provided, compute the emissions of the alternative trip
+        if "second-trip" in data:
+            alternative_trip_inputs = extract_path_steps_from_payload(
+                data["second-trip"],
+            )
+            second_trip, second_trip_geometries = compute_custom_trip_emissions(
+                "SECOND_TRIP",
+                alternative_trip_inputs,
+                cmap=colors_alternative,
+            )
+            trips = [main_trip, second_trip]
+            geometries += second_trip_geometries
+
+        ### If the custom trip has exaclty 1 step, compute the direct trips with other means of transport
+        elif len(main_trip_inputs) == 2:
+            direct_trips, direct_trips_geometries = compute_direct_trips_emissions(
+                main_trip_inputs,
+            )
+            geometries += direct_trips_geometries
+            trips = [main_trip, *direct_trips]
 
         return {
-            "trips": [main_trip, second_trip],
-            "geometries": main_trip_geometries + second_trip_geometries,
+            "trips": trips,
+            "geometries": geometries,
         }
 
     return {"message": "backend initialized"}
