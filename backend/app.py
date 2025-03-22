@@ -24,7 +24,6 @@ from flask import (
     request,
 )
 from flask_cors import CORS
-import pandas as pd
 
 from backend import (
     compute_custom_trip_emissions,
@@ -58,7 +57,6 @@ def main():
             if len(inputs) < 2:
                 abort(400, "My trip: should have at least 1 step")
 
-            df = pd.DataFrame.from_dict(inputs)
             main_trip, geometries = compute_custom_trip_emissions("MAIN_TRIP", inputs)
 
             # If we have more than 1 step, we return immediately
@@ -69,7 +67,9 @@ def main():
                 }
 
             # If we have exactly 1 step, then we can compare with other means of transport
-            direct_trips, direct_trips_geometries = compute_direct_trips_emissions(df)
+            direct_trips, direct_trips_geometries = compute_direct_trips_emissions(
+                inputs,
+            )
 
             geometries += direct_trips_geometries
 

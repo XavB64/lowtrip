@@ -164,23 +164,26 @@ def compute_custom_trip_emissions(
     return TripResult(name=name, steps=emissions_data), geometries
 
 
-def compute_direct_trips_emissions(data, cmap=colors_direct):
-    """If data is only one step then we do not compute this mean of transport as it will
-    appear in "my_trip"
-    parameters:
-        - data, pandas dataframe format (will be json).
+def compute_direct_trips_emissions(inputs: list[TripStep], cmap=colors_direct):
+    """Compute emissions for the same trip, but with other transport means given the initial transport means used,
+    the departure and arrival coordinates.
 
-    Return:
+    Parameters
+    ----------
+        - inputs: list of exactly 2 trip steps
+
+    Return
     ------
-        - full dataframe for emissions
-        - geometries for path
+        - trips: list of emissions for each mean of transport
+        - geometries: geometries of the trips
 
     """
-    departure = data.loc[0]
-    departure_coordinates = (departure.lon, departure.lat)
+    departure = inputs[0]
+    arrival = inputs[1]
 
-    arrival = data.loc[data.shape[0] - 1]
+    departure_coordinates = (departure.lon, departure.lat)
     arrival_coordinates = (arrival.lon, arrival.lat)
+    transport_means = arrival.transport_means
 
     # Check if we should compute it or not
     train, plane, car, bus = True, True, True, True
@@ -197,16 +200,15 @@ def compute_direct_trips_emissions(data, cmap=colors_direct):
         plane = False
 
     # Retrieve the mean of transport: Car/Bus/Train/Plane
-    transp = data.loc[1].transport_means
-    if transp == "Train":
+    if transport_means == "Train":
         train = False
-    elif transp == "Plane":
+    elif transport_means == "Plane":
         plane = False
-    elif transp == "Car":
+    elif transport_means == "Car":
         car = False
-    elif transp == "Bus":
+    elif transport_means == "Bus":
         bus = False
-    elif (transp == "Ferry") | (transp == "Sail"):
+    elif (transport_means == "Ferry") | (transport_means == "Sail"):
         train, bus, car = False, False, False
 
     trips: list[TripResult] = []
@@ -225,7 +227,7 @@ def compute_direct_trips_emissions(data, cmap=colors_direct):
             geometries += results.geometries
 
     if car or bus:
-        if transp == "eCar":  # we use custom colors
+        if transport_means == "eCar":  # we use custom colors
             cmap_road = colors_custom
         else:
             cmap_road = cmap
@@ -246,7 +248,7 @@ def compute_direct_trips_emissions(data, cmap=colors_direct):
                 trips.append(TripResult(name="CAR", steps=[results.car_step_data]))
 
             # We check if car or bus was asked for a 1 step
-            if car and bus and transp != "eCar":
+            if car and bus and transport_means != "eCar":
                 geometries += results.geometries
 
     if plane:
