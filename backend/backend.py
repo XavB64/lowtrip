@@ -53,7 +53,7 @@ from transport_train import train_to_gdf
 ######################
 
 
-def compute_emissions_custom(
+def compute_custom_trip_emissions(
     name: str,
     trip_inputs: list[TripStep],
     cmap=colors_custom,
@@ -86,11 +86,11 @@ def compute_emissions_custom(
         arrival_coordinates = (arrival.lon, arrival.lat)
 
         # Mean of transport
-        transportmean = arrival.transport_means
+        transport_means = arrival.transport_means
         results = None
 
         # Compute depending on the mean of transport
-        if transportmean == "Train":
+        if transport_means == "Train":
             results = train_to_gdf(
                 departure_coordinates,
                 arrival_coordinates,
@@ -98,7 +98,7 @@ def compute_emissions_custom(
                 color_infra=cmap["Cons_infra"],
             )
 
-        elif transportmean == "Bus":
+        elif transport_means == "Bus":
             results = bus_to_gdf(
                 departure_coordinates,
                 arrival_coordinates,
@@ -106,7 +106,7 @@ def compute_emissions_custom(
                 color_cons=cmap["Cons_infra"],
             )
 
-        elif transportmean == "Car":
+        elif transport_means == "Car":
             results = car_to_gdf(
                 departure_coordinates,
                 arrival_coordinates,
@@ -115,7 +115,7 @@ def compute_emissions_custom(
                 color_cons=cmap["Cons_infra"],
             )
 
-        elif transportmean == "eCar":
+        elif transport_means == "eCar":
             results = ecar_to_gdf(
                 departure_coordinates,
                 arrival_coordinates,
@@ -124,14 +124,14 @@ def compute_emissions_custom(
                 color_cons=cmap["Cons_infra"],
             )
 
-        elif transportmean == "Bicycle":
+        elif transport_means == "Bicycle":
             results = bicycle_to_gdf(
                 departure_coordinates,
                 arrival_coordinates,
                 color=cmap["Bicycle"],
             )
 
-        elif transportmean == "Plane":
+        elif transport_means == "Plane":
             results = plane_to_gdf(
                 departure_coordinates,
                 arrival_coordinates,
@@ -139,7 +139,7 @@ def compute_emissions_custom(
                 color_contrails=cmap["Contrails"],
             )
 
-        elif transportmean == "Ferry":
+        elif transport_means == "Ferry":
             results = ferry_to_gdf(
                 departure_coordinates,
                 arrival_coordinates,
@@ -147,7 +147,7 @@ def compute_emissions_custom(
                 options=arrival.options,
             )
 
-        elif transportmean == "Sail":
+        elif transport_means == "Sail":
             results = sail_to_gdf(
                 departure_coordinates,
                 arrival_coordinates,
@@ -155,7 +155,7 @@ def compute_emissions_custom(
             )
 
         if results is None:  # Step is not successful
-            error_message = f"step n°{int(idx) + 1} failed with {transportmean}, please change mean of transport or locations."
+            error_message = f"step n°{int(idx) + 1} failed with {transport_means}, please change mean of transport or locations."
             raise ValueError(error_message)
 
         emissions_data.append(results.step_data)
@@ -164,7 +164,7 @@ def compute_emissions_custom(
     return TripResult(name=name, steps=emissions_data), geometries
 
 
-def compute_emissions_all(data, cmap=colors_direct):
+def compute_direct_trips_emissions(data, cmap=colors_direct):
     """If data is only one step then we do not compute this mean of transport as it will
     appear in "my_trip"
     parameters:
@@ -176,24 +176,23 @@ def compute_emissions_all(data, cmap=colors_direct):
         - geometries for path
 
     """
-    # Direct trip
-    # Departure coordinates
-    lon = data.loc[0].lon
-    lat = data.loc[0].lat
-    tag1 = (lon, lat)
-    # Arrival coordinates
-    lon = data.loc[data.shape[0] - 1].lon
-    lat = data.loc[data.shape[0] - 1].lat
-    tag2 = (lon, lat)
+    departure = data.loc[0]
+    departure_coordinates = (departure.lon, departure.lat)
+
+    arrival = data.loc[data.shape[0] - 1]
+    arrival_coordinates = (arrival.lon, arrival.lat)
 
     # Check if we should compute it or not
     train, plane, car, bus = True, True, True, True
     # Sea modes - to do later : similar behavior than bus / car --> Custom function to get the route only once
-    # ferry, sail = False, False
 
     # Check distance for plane
     geod = Geod(ellps="WGS84")
-    if geod.geometry_length(LineString([tag1, tag2])) / 1e3 < min_plane_dist:
+    if (
+        geod.geometry_length(LineString([departure_coordinates, arrival_coordinates]))
+        / 1e3
+        < min_plane_dist
+    ):
         # Then we do not suggest the plane solution
         plane = False
 
@@ -210,15 +209,14 @@ def compute_emissions_all(data, cmap=colors_direct):
     elif (transp == "Ferry") | (transp == "Sail"):
         train, bus, car = False, False, False
 
-    # Loop
     trips: list[TripResult] = []
     geometries: list[TripStepGeometry] = []
 
     # Train
     if train:
         results = train_to_gdf(
-            tag1,
-            tag2,
+            departure_coordinates,
+            arrival_coordinates,
             color_usage=cmap["Train"],
             color_infra=cmap["Cons_infra"],
         )
@@ -226,7 +224,6 @@ def compute_emissions_all(data, cmap=colors_direct):
             trips.append(TripResult(name="TRAIN", steps=[results.step_data]))
             geometries += results.geometries
 
-    # Car or Bus
     if car or bus:
         if transp == "eCar":  # we use custom colors
             cmap_road = colors_custom
@@ -234,8 +231,8 @@ def compute_emissions_all(data, cmap=colors_direct):
             cmap_road = cmap
 
         results = car_bus_to_gdf(
-            tag1,
-            tag2,
+            departure_coordinates,
+            arrival_coordinates,
             color_usage=cmap_road["Road"],
             color_cons=cmap_road["Cons_infra"],
         )
@@ -252,17 +249,14 @@ def compute_emissions_all(data, cmap=colors_direct):
             if car and bus and transp != "eCar":
                 geometries += results.geometries
 
-    # Plane
     if plane:
         plane_result = plane_to_gdf(
-            tag1,
-            tag2,
+            departure_coordinates,
+            arrival_coordinates,
             color_usage=cmap["Plane"],
             color_contrails=cmap["Contrails"],
         )
         trips.append(TripResult(name="PLANE", steps=[plane_result.step_data]))
         geometries += plane_result.geometries
-
-    # We do not add the ferry in the general case
 
     return trips, geometries
