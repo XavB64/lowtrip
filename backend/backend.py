@@ -185,80 +185,52 @@ def compute_direct_trips_emissions(inputs: list[TripStep], cmap=colors_direct):
     arrival_coordinates = (arrival.lon, arrival.lat)
     transport_means = arrival.transport_means
 
-    # Check if we should compute it or not
-    train, plane, car, bus = True, True, True, True
-    # Sea modes - to do later : similar behavior than bus / car --> Custom function to get the route only once
-
-    # Check distance for plane
-    geod = Geod(ellps="WGS84")
-    if (
-        geod.geometry_length(LineString([departure_coordinates, arrival_coordinates]))
-        / 1e3
-        < min_plane_dist
-    ):
-        # Then we do not suggest the plane solution
-        plane = False
-
-    # Retrieve the mean of transport: Car/Bus/Train/Plane
-    if transport_means == "Train":
-        train = False
-    elif transport_means == "Plane":
-        plane = False
-    elif transport_means == "Car":
-        car = False
-    elif transport_means == "Bus":
-        bus = False
-    elif (transport_means == "Ferry") | (transport_means == "Sail"):
-        train, bus, car = False, False, False
-
     trips: list[TripResult] = []
     geometries: list[TripStepGeometry] = []
 
-    # Train
-    if train:
-        results = train_to_gdf(
-            departure_coordinates,
-            arrival_coordinates,
-            color_usage=cmap["Train"],
-            color_infra=cmap["Cons_infra"],
-        )
-        if results is not None:
-            trips.append(TripResult(name="TRAIN", steps=[results.step_data]))
-            geometries += results.geometries
+    # Compute train and road emissions except if the initial transport means is Ferry or Sail
+    if transport_means not in {"Ferry", "Sail"}:
+        if transport_means != "Train":
+            train_results = train_to_gdf(
+                departure_coordinates,
+                arrival_coordinates,
+                color_usage=cmap["Train"],
+                color_infra=cmap["Cons_infra"],
+            )
+            if train_results is not None:
+                trips.append(TripResult(name="TRAIN", steps=[train_results.step_data]))
+                geometries += train_results.geometries
 
-    if car or bus:
-        if transport_means == "eCar":  # we use custom colors
-            cmap_road = colors_custom
-        else:
-            cmap_road = cmap
-
-        results = car_bus_to_gdf(
+        cmap_road = colors_custom if transport_means == "eCar" else cmap
+        road_results = car_bus_to_gdf(
             departure_coordinates,
             arrival_coordinates,
             color_usage=cmap_road["Road"],
             color_cons=cmap_road["Cons_infra"],
         )
 
-        if results is None:
-            car, bus = False, False
-        else:
-            if bus:
-                trips.append(TripResult(name="BUS", steps=[results.bus_step_data]))
-            if car:
-                trips.append(TripResult(name="CAR", steps=[results.car_step_data]))
+        if road_results is not None:
+            if transport_means != "Bus":
+                trips.append(TripResult(name="BUS", steps=[road_results.bus_step_data]))
+            if transport_means != "Car":
+                trips.append(TripResult(name="CAR", steps=[road_results.car_step_data]))
+            if transport_means not in {"Bus", "Car", "eCar"}:
+                geometries += road_results.geometries
 
-            # We check if car or bus was asked for a 1 step
-            if car and bus and transport_means != "eCar":
-                geometries += results.geometries
+    # Compute plane emissions only for trips longer than 300km
+    if transport_means != "Plane":
+        bird_path = LineString([departure_coordinates, arrival_coordinates])
+        bird_distance = Geod(ellps="WGS84").geometry_length(bird_path) / 1e3
+        if bird_distance > min_plane_dist:
+            plane_result = plane_to_gdf(
+                departure_coordinates,
+                arrival_coordinates,
+                color_usage=cmap["Plane"],
+                color_contrails=cmap["Contrails"],
+            )
+            trips.append(TripResult(name="PLANE", steps=[plane_result.step_data]))
+            geometries += plane_result.geometries
 
-    if plane:
-        plane_result = plane_to_gdf(
-            departure_coordinates,
-            arrival_coordinates,
-            color_usage=cmap["Plane"],
-            color_contrails=cmap["Contrails"],
-        )
-        trips.append(TripResult(name="PLANE", steps=[plane_result.step_data]))
-        geometries += plane_result.geometries
+    # Sea modes - to do later : similar behavior than bus / car --> Custom function to get the route only once
 
     return trips, geometries
