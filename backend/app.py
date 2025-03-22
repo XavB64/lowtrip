@@ -27,8 +27,8 @@ from flask_cors import CORS
 import pandas as pd
 
 from backend import (
-    compute_emissions_all,
-    compute_emissions_custom,
+    compute_custom_trip_emissions,
+    compute_direct_trips_emissions,
 )
 from parameters import colors_alternative
 from utils import extract_path_steps_from_payload
@@ -59,7 +59,7 @@ def main():
                 abort(400, "My trip: should have at least 1 step")
 
             df = pd.DataFrame.from_dict(inputs)
-            main_trip, geometries = compute_emissions_custom("MAIN_TRIP", inputs)
+            main_trip, geometries = compute_custom_trip_emissions("MAIN_TRIP", inputs)
 
             # If we have more than 1 step, we return immediately
             if len(inputs) > 2:
@@ -69,7 +69,7 @@ def main():
                 }
 
             # If we have exactly 1 step, then we can compare with other means of transport
-            direct_trips, direct_trips_geometries = compute_emissions_all(df)
+            direct_trips, direct_trips_geometries = compute_direct_trips_emissions(df)
 
             geometries += direct_trips_geometries
 
@@ -86,12 +86,12 @@ def main():
             data["alternative-trip"],
         )
 
-        main_trip, main_trip_geometries = compute_emissions_custom(
+        main_trip, main_trip_geometries = compute_custom_trip_emissions(
             "MAIN_TRIP",
             main_trip_inputs,
         )
 
-        second_trip, second_trip_geometries = compute_emissions_custom(
+        second_trip, second_trip_geometries = compute_custom_trip_emissions(
             "SECOND_TRIP",
             alternative_trip_inputs,
             cmap=colors_alternative,
