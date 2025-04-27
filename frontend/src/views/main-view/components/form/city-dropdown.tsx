@@ -154,7 +154,7 @@ const CityDropdown = ({
     try {
       setIsLoading(true);
       const response = await axios.get(
-        `${PHOTON_API_URL}/api?q=${newQuery}&osm_tag=place:city&&osm_tag=place:village&osm_tag=place:town&layer=city&layer=district&limit=10&lang=${resultLng}`,
+        `${PHOTON_API_URL}/api?q=${newQuery}&osm_tag=place:city&&osm_tag=place:village&osm_tag=place:town&osm_tag=place:county&osm_tag=place:municipality&layer=city&layer=district&limit=10&lang=${resultLng}`
       );
       const cities = formatCities(response.data.features as PhotonApiCity[]);
       addToCache(newQuery, cities);
