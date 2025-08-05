@@ -33,7 +33,7 @@
     "@eslint/js": "^9.1.1",
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
-    "@testing-library/user-event": "^13.5.0",
+    "@testing-library/user-event": "^14.6.1",
     "@types/d3-ease": "^3.0.2",
     "@types/eslint__js": "^8.42.3",
     "@types/google.maps": "^3.54.10",
