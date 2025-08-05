@@ -18,7 +18,7 @@
     "match-sorter": "^6.3.4",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-i18next": "^14.1.0",
+    "react-i18next": "^15.6.1",
     "react-icons": "^4.12.0",
     "react-id-generator": "^3.0.2",
     "react-leaflet": "^4.2.1",
