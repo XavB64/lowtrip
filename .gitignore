@@ -2,6 +2,9 @@ __pycache__
 lowtrip-venv/
 lowtrip-env/
 
+# backend
+backend/.env
+
 # frontend
 frontend/node_modules
 frontend/build

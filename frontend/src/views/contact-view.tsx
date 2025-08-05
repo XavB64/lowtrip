@@ -10,12 +10,7 @@ import {
 } from "@chakra-ui/react";
 import { ChangeEvent, useState } from "react";
 import { useTranslation } from "react-i18next";
-import axios from "axios";
-import {
-  EMAIL_API_SERVICE_KEY,
-  EMAIL_API_SERVICE_URL,
-  LOWTRIP_MANAGER_EMAIL,
-} from "../config";
+import { API_URL } from "../config";
 import Modal from "../common/components/modal";
 
 async function sendEmail(
@@ -23,26 +18,18 @@ async function sendEmail(
   subject: string,
   message: string,
 ) {
-  try {
-    const data = {
-      sender: { name: senderEmail, email: senderEmail },
-      to: [{ email: LOWTRIP_MANAGER_EMAIL }],
+  return fetch(`${API_URL}/send-mail`, {
+    method: "post",
+    headers: {
+      "Content-Type": "application/json",
+      "Access-Contol-Allow-Origin": "*",
+    },
+    body: JSON.stringify({
+      sender_email: senderEmail,
       subject,
-      htmlContent: `Message envoyé par ${senderEmail}:<br/><br/> ${message}`,
-    };
-
-    return axios({
-      method: "post",
-      url: EMAIL_API_SERVICE_URL,
-      headers: {
-        "Content-Type": "application/json",
-        "api-key": EMAIL_API_SERVICE_KEY,
-      },
-      data: data,
-    });
-  } catch (error) {
-    console.error("Error sending email", error);
-  }
+      message,
+    }),
+  });
 }
 
 const ContactView = () => {
@@ -63,10 +50,11 @@ const ContactView = () => {
     }
     setSendingEmail(true);
     sendEmail(emailInput, subjectInput, messageInput)
-      .then(() => {
-        setIsSuccess(true);
+      .then((response) => {
+        setIsSuccess(response.ok);
       })
-      .catch(() => {
+      .catch((e) => {
+        console.log(e);
         setIsSuccess(false);
       })
       .then(() => {
