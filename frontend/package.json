@@ -28,7 +28,7 @@
     "react-icons": "^4.12.0",
     "react-id-generator": "^3.0.2",
     "react-leaflet": "^4.2.1",
-    "react-router-dom": "^6.22.3",
+    "react-router-dom": "^7.7.1",
     "react-scripts": "5.0.1",
     "recharts": "^2.11.0",
     "sort-by": "^1.2.0",
