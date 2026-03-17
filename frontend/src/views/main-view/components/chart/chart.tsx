@@ -45,17 +45,6 @@ import { getChartData, getLabel } from "./helpers";
 import CustomLabel from "./custom-label";
 import { FaShareAlt } from "react-icons/fa";
 import { generateUrlToShare } from "../../helpers/shareableLink";
-import { keyframes } from "@emotion/react";
-
-const fadeIn = keyframes`
-  from { opacity: 0; }
-  to { opacity: 1; }
-`;
-
-const fadeOut = keyframes`
-  from { opacity: 1; }
-  to { opacity: 0; }
-`;
 
 /**
  * Corresponds to 2kg of CO2 emissions per year per person
@@ -150,7 +139,7 @@ const Chart = ({
             boxShadow="md"
             textAlign="center"
             zIndex="1000"
-            animation={`${fadeIn} 0.5s, ${fadeOut} 0.5s 2.5s`}
+            animation="fadeIn 0.5s, fadeOut 0.5s 2.5s"
           >
             {t("chart.copied-link")}
           </Box>
