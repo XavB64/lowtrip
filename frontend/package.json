@@ -4,8 +4,6 @@
   "private": true,
   "dependencies": {
     "@chakra-ui/react": "^2.8.2",
-    "@emotion/react": "^11.11.3",
-    "@emotion/styled": "^11.11.0",
     "axios": "^1.6.2",
     "country-flag-icons": "^1.5.11",
     "framer-motion": "^11.0.3",
