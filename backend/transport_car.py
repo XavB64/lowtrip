@@ -58,8 +58,8 @@ def find_route(
     parameters:
         - departure_coords, arrival_coords : list or tuple like ; (lon, lat).
 
-    Return:
-    ------
+    Returns
+    -------
         - route_geometry : shapely geometry linestring
         - route_length : float, distance in km
         - success : boolean
@@ -321,8 +321,8 @@ def bus_to_gdf(
         - color, color in hex of path and bar chart
         - validate
 
-    Return:
-    ------
+    Returns
+    -------
         - full dataframe for bus or None
 
     """
@@ -371,8 +371,8 @@ def car_to_gdf(
         - validate
         - nb, number of passenger in the car (used only for custom trip).
 
-    Return:
-    ------
+    Returns
+    -------
         - full dataframe for car or None
 
     """

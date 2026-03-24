@@ -65,7 +65,8 @@ def great_circle_geometry(
 
     parameters: departure_coords, arrival_coords
 
-    Return:
+    Returns
+    -------
         - shapely geometry (Linestring)
         - Geodesic distance in km
 

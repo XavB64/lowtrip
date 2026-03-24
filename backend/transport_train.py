@@ -237,7 +237,8 @@ def train_to_gdf(
 
     Raises
     ------
-        GeometryRecognitionError: if the geometry is not recognized.
+    GeometryRecognitionError
+        If the geometry is not recognized.
 
     """
     # First try with coordinates supplied by the user

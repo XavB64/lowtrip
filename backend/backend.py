@@ -63,14 +63,15 @@ def compute_custom_trip_emissions(
         - name, name of the trip (MAIN_TRIP or SECONDARY_TRIP)
         - trip_inputs, inputs of the trip
 
-    Return:
-    ------
+    Returns
+    -------
         - full dataframe for emissions
         - geometries for path
 
-    Raises:
+    Raises
     ------
-        ValueError: Si l'étape échoue avec le moyen de transport donné.
+    ValueError
+        Si l'étape échoue avec le moyen de transport donné.
 
     """
     emissions_data: list[StepData] = []
@@ -172,8 +173,9 @@ def compute_direct_trips_emissions(inputs: list[TripStep], cmap=colors_direct):
     ----------
         - inputs: list of exactly 2 trip steps
 
-    Return
-    ------
+    Returns
+    -------
+    list[...]
         - trips: list of emissions for each mean of transport
         - geometries: geometries of the trips
 
