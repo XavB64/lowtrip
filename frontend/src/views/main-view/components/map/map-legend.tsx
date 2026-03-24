@@ -17,10 +17,10 @@
 
 import React, { useMemo } from "react";
 import { useTranslation } from "react-i18next";
-import { uniqBy } from "lodash";
 import { Box, Card, HStack, Text, VStack } from "@chakra-ui/react";
 
 import type { SimulationResults } from "../../../../types";
+import { uniqBy } from "../../../../common/utils";
 
 const Legend = ({
   tripGeometries,
@@ -29,7 +29,7 @@ const Legend = ({
 }) => {
   const { t } = useTranslation();
   const routes = useMemo(
-    () => uniqBy(tripGeometries, (trip) => trip.transportMeans),
+    () => uniqBy(tripGeometries, "transportMeans"),
     [tripGeometries],
   );
 
