@@ -9,7 +9,7 @@
     "country-flag-icons": "^1.6.15",
     "framer-motion": "^12.38.0",
     "i18next": "^23.10.1",
-    "i18next-browser-languagedetector": "^8.2.0",
+    "i18next-browser-languagedetector": "^8.2.1",
     "katex": "^0.16.40",
     "leaflet": "^1.9.4",
     "react": "18.3",
