@@ -16,7 +16,6 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { useBreakpoint } from "@chakra-ui/react";
-import { round } from "lodash";
 import { LabelProps } from "recharts";
 import type { Trip } from "../../../../types";
 
@@ -55,7 +54,7 @@ const CustomLabel = ({
         textAnchor="middle"
         fontSize={breakpoint === "base" ? 10 : 16}
       >
-        {round(trip.totalEmissions)}
+        {Math.round(trip.totalEmissions)}
       </text>
       <text
         x={Number(props.x ?? 0) + Number(props.width ?? 0) / 2}

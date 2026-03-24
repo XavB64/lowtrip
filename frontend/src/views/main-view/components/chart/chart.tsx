@@ -27,7 +27,6 @@ import {
   Link,
   IconButton,
 } from "@chakra-ui/react";
-import { round, uniqBy } from "lodash";
 import { BiHelpCircle } from "react-icons/bi";
 import {
   Bar,
@@ -46,6 +45,7 @@ import CustomLabel from "./custom-label";
 import { FaShareAlt } from "react-icons/fa";
 import { generateUrlToShare } from "../../helpers/shareableLink";
 import { keyframes } from "@emotion/react";
+import { uniqBy } from "../../../../common/utils";
 
 const fadeIn = keyframes`
   from { opacity: 0; }
@@ -167,7 +167,7 @@ const Chart = ({
         <Text>
           {t("chart.information.info1")}{" "}
           <Text as="b">
-            {round(
+            {Math.round(
               (mainTrip.totalEmissions / ANNUAL_CO2_EMISSIONS_BUDGET) * 100,
             )}
             %
@@ -196,7 +196,7 @@ const Chart = ({
           <YAxis padding={{ top: 50 }} hide />
           <Tooltip
             formatter={(value, name: string) => [
-              `${round(Number(value), 0)} kg`,
+              `${Math.round(Number(value))} kg`,
               getLabel(name, t),
             ]}
             contentStyle={{ fontSize: "12px" }}
