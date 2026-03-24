@@ -1,4 +1,3 @@
-import axios from "axios";
 import {
   ReactNode,
   createContext,
@@ -106,35 +105,36 @@ export const SimulationProvider = ({ children }: { children: ReactNode }) => {
 
     const payload = getPayload(mainSteps, altSteps);
 
-    axios
-      .post(API_URL, JSON.stringify(payload), {
-        headers: {
-          "Access-Contol-Allow-Origin": "*",
-          "Content-Type": "application/json",
-        },
-      })
-      .then((response: ApiResponse) => {
-        if (response.data.error) {
-          setErrorMessage(response.data.error);
-          openErrorModal();
-        } else {
-          const formattedSimulation = formatResponse(
-            { mainSteps, altSteps },
-            response.data,
-          );
-          setSimulationResults({
-            ...formattedSimulation,
-            inputs: { mainTrip: mainSteps, alternativeTrip: altSteps },
-          });
-        }
-      })
-      .catch((err) => {
-        console.log(err);
+    const res = await fetch(API_URL, {
+      method: "POST",
+      headers: {
+        "Access-Contol-Allow-Origin": "*",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (!res.ok) {
+      console.error(`${res.status} ${res.statusText}`);
+      openErrorModal();
+    } else {
+      const response: ApiResponse = await res.json();
+      if (response.error) {
+        setErrorMessage(response.error);
         openErrorModal();
-      })
-      .finally(async () => {
-        setIsLoading(false);
-      });
+      } else {
+        const formattedSimulation = formatResponse(
+          { mainSteps, altSteps },
+          response,
+        );
+        setSimulationResults({
+          ...formattedSimulation,
+          inputs: { mainTrip: mainSteps, alternativeTrip: altSteps },
+        });
+      }
+    }
+
+    setIsLoading(false);
   };
 
   const context = useMemo(

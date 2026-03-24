@@ -15,7 +15,6 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import axios from "axios";
 import { useEffect, useMemo, useState } from "react";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import "./i18n";
@@ -37,7 +36,7 @@ import { ConsentContextProvider } from "./common/context/consentContext";
 const App = () => {
   // first API call to wake up the server
   useEffect(() => {
-    axios.get(API_URL, {
+    fetch(API_URL, {
       headers: { "Access-Contol-Allow-Origin": "*" },
     });
   }, []);

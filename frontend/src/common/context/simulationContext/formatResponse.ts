@@ -11,7 +11,7 @@ import {
 
 export const formatResponse = (
   inputs: { mainSteps: Step[]; altSteps?: Step[] },
-  data: ApiResponse["data"],
+  data: ApiResponse,
 ): Omit<SimulationResults, "inputs"> => {
   let simulationType = SimulationType.mainTripVsOtherTransportMeans;
   if (inputs.mainSteps.length > 1) {
