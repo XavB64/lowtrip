@@ -19,9 +19,7 @@
     "react-id-generator": "^3.0.2",
     "react-leaflet": "^4.2.1",
     "react-router-dom": "^7.13.1",
-    "react-scripts": "5.0.1",
-    "recharts": "^3.8.0",
-    "web-vitals": "^2.1.4"
+    "recharts": "^3.8.0"
   },
   "devDependencies": {
     "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
@@ -34,26 +32,23 @@
     "@types/node": "^20.10.6",
     "@types/react": "^18.3.28",
     "@types/react-dom": "^18.3.7",
+    "@typescript-eslint/eslint-plugin": "^8.57.2",
+    "@vitejs/plugin-react": "^6.0.1",
     "eslint": "^8.57.0",
     "eslint-config-prettier": "^9.1.0",
     "prettier": "^3.8.1",
     "typescript": "^4.9.5",
-    "typescript-eslint": "^7.7.1"
+    "typescript-eslint": "^7.7.1",
+    "vite": "^8.0.2"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject",
+    "start": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
     "lint": "eslint src --ext .ts,.tsx --fix",
     "lint:check": "eslint src --ext .ts,.tsx",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
-  },
-  "eslintConfig": {
-    "extends": [
-      "react-app"
-    ]
   },
   "browserslist": {
     "production": [
