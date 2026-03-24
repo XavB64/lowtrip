@@ -107,7 +107,8 @@ def split_path_by_country(
 
         # Aggregation per country and combining geometries
         u = (
-            pd.concat([res.explode(), test.explode()])
+            pd
+            .concat([res.explode(), test.explode()])
             .groupby(iso)
             .agg(
                 NAME=("NAME", lambda x: x.iloc[0]),
@@ -121,7 +122,8 @@ def split_path_by_country(
 
     else:
         u = (
-            res.explode()
+            res
+            .explode()
             .groupby(iso)
             .agg(
                 NAME=("NAME", lambda x: x.iloc[0]),

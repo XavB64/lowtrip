@@ -120,7 +120,7 @@ ignore = [
     # Pandas
     "PD002",  # `inplace=True` should be avoided; it has inconsistent behavior
     "PD011",  # Use `.to_numpy()` instead of `.values`
-    "PD901",  # Avoid using the generic variable name `df` for DataFrames
+    "ICN002", # Avoid using the generic variable name `gdp` for geopandas
 
     # Security
     "S113",  # Probable use of requests call without timeout
