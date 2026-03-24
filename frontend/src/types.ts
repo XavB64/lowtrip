@@ -58,14 +58,12 @@ type TripResult = {
 };
 
 export type ApiResponse = {
-  data: {
-    my_trip: string;
-    direct_trip?: string;
-    alternative_trip?: string;
-    error: string;
-    geometries: TripStepGeometry[];
-    trips: TripResult[];
-  };
+  my_trip: string;
+  direct_trip?: string;
+  alternative_trip?: string;
+  error: string;
+  geometries: TripStepGeometry[];
+  trips: TripResult[];
 };
 
 export type MyTripData = {

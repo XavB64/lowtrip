@@ -1,4 +1,3 @@
-import axios from "axios";
 import i18n from "i18next";
 import { useState, useEffect, useMemo } from "react";
 import { useTranslation } from "react-i18next";
@@ -151,35 +150,35 @@ const CityDropdown = ({
       setResults(cachedResult);
       return;
     }
-    try {
-      setIsLoading(true);
 
-      const params = new URLSearchParams();
-      params.append("q", newQuery);
-      params.append("lang", resultLng);
-      params.append("limit", "10");
-      params.append("layer", "city");
-      params.append("layer", "district");
-      [
-        "place:city",
-        "place:village",
-        "place:town",
-        "place:county",
-        "place:municipality",
-      ].forEach((tag) => params.append("osm_tag", tag));
+    setIsLoading(true);
 
-      const response = await axios.get(
-        `${PHOTON_API_URL}/api?${params.toString()}`,
-      );
+    const params = new URLSearchParams();
+    params.append("q", newQuery);
+    params.append("lang", resultLng);
+    params.append("limit", "10");
+    params.append("layer", "city");
+    params.append("layer", "district");
+    [
+      "place:city",
+      "place:village",
+      "place:town",
+      "place:county",
+      "place:municipality",
+    ].forEach((tag) => params.append("osm_tag", tag));
 
-      const cities = formatCities(response.data.features as PhotonApiCity[]);
+    const res = await fetch(`${PHOTON_API_URL}/api?${params.toString()}`);
+
+    if (!res.ok) {
+      console.error(`Error fetching cities: ${res.status} ${res.statusText}`);
+    } else {
+      const response = await res.json();
+      const cities = formatCities(response.features as PhotonApiCity[]);
       addToCache(newQuery, cities);
       setResults(cities);
-    } catch (error) {
-      console.error("Error fetching cities:", error);
-    } finally {
-      setIsLoading(false);
     }
+
+    setIsLoading(false);
   };
 
   useEffect(() => {
