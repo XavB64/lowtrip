@@ -17,10 +17,11 @@ const CookieBanner = () => {
 
     // Initialize Google Analytics
     window.dataLayer = window.dataLayer || [];
-    function gtag() {
-      // eslint-disable-next-line prefer-rest-params
-      dataLayer.push(arguments);
+
+    function gtag(...args: unknown[]) {
+      window.dataLayer.push(args);
     }
+
     gtag("js", new Date());
     gtag("config", "G-L04SXCD38Q");
   };

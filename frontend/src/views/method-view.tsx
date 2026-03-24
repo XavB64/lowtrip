@@ -49,7 +49,10 @@ const MethodView = () => {
 
   // Render the LaTeX equation using KaTeX
   useEffect(() => {
-    katex.render(equation, document.getElementById("equation"));
+    const element = document.getElementById("equation");
+    if (element) {
+      katex.render(equation, element);
+    }
   }, [equation]);
 
   return (
