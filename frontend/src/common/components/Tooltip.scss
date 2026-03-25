@@ -1,0 +1,45 @@
+.tooltip {
+  position: relative;
+  display: inline-block;
+
+  .content {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+
+    background: #333;
+    color: white;
+    padding: 6px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+
+    max-width: max(100px, 100%);
+    white-space: normal;
+    width: max-content;
+    word-wrap: break-word;
+
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.15s ease-in-out;
+
+    z-index: 1000;
+
+    @media (min-width: 768px) {
+      font-size: 12px;
+    }
+  }
+
+  &.top .content {
+    bottom: 125%;
+  }
+
+  &.bottom .content {
+    top: 125%;
+  }
+
+  &:hover {
+    .content {
+      opacity: 1;
+    }
+  }
+}
