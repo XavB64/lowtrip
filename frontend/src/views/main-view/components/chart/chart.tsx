@@ -20,9 +20,7 @@ import { useMemo, useState } from "react";
 import {
   Box,
   useBreakpoint,
-  Tooltip as ChakraTooltip,
   Flex,
-  useDisclosure,
   Text,
   Alert,
   AlertIcon,
@@ -38,11 +36,12 @@ import {
   BarChart,
   LabelList,
   ResponsiveContainer,
-  Tooltip,
+  Tooltip as ChartTooltip,
   XAxis,
   YAxis,
 } from "recharts";
 
+import Tooltip from "common/components/Tooltip";
 import { uniqBy } from "common/utils";
 import type { Trip, SimulationResults } from "types";
 
@@ -76,7 +75,6 @@ const Chart = ({
 }: ChartProps) => {
   const { t } = useTranslation();
   const breakpoint = useBreakpoint();
-  const { isOpen, onOpen, onToggle, onClose } = useDisclosure();
 
   const [showCopiedLinkNotification, setShowCopiedLinkNotification] =
     useState(false);
@@ -197,7 +195,7 @@ const Chart = ({
             fontSize={breakpoint === "base" ? 8 : 14}
           />
           <YAxis padding={{ top: 50 }} hide />
-          <Tooltip
+          <ChartTooltip
             formatter={(value, name: string) => [
               `${Math.round(Number(value))} kg`,
               getLabel(name, t),
@@ -226,22 +224,15 @@ const Chart = ({
       </ResponsiveContainer>
 
       <Flex justifyContent="flex-end" height="auto" width="100%">
-        <ChakraTooltip
-          label={t("results.explanation")}
-          isOpen={isOpen}
-          fontSize={breakpoint === "base" ? 11 : 12}
-        >
+        <Tooltip content={t("results.explanation")}>
           <span style={{ fontSize: breakpoint === "base" ? 10 : 12 }}>
             {" "}
             {t("chart.help")}
             <BiHelpCircle
               style={{ display: "inline-block", marginRight: "5px" }}
-              onMouseEnter={onOpen}
-              onMouseLeave={onClose}
-              onClick={onToggle}
             />
           </span>
-        </ChakraTooltip>
+        </Tooltip>
       </Flex>
     </Box>
   );
