@@ -22,7 +22,7 @@ import {
   MenuButton,
   MenuItem,
   MenuList,
-  Tooltip,
+  Tooltip as ChakraTooltip,
   Text,
   Wrap,
   Center,
@@ -39,6 +39,7 @@ import { FaFerry } from "react-icons/fa6";
 import { IoMdBicycle } from "react-icons/io";
 import { MdElectricCar, MdSailing } from "react-icons/md";
 
+import Tooltip from "common/components/Tooltip";
 import { Step, Transport, FerryOptions, thumbUp } from "types";
 
 const TRANSPORTS = [
@@ -176,16 +177,16 @@ const TransportWithOptions = ({
   const { t } = useTranslation();
   return (
     <Menu>
-      <Tooltip label={t(`form.transportMeans.${transport}`)}>
+      <ChakraTooltip label={t(`form.transportMeans.${transport}`)}>
         <MenuButton position="relative">
-          <Tooltip label={t(`form.transportMeans.${transport}`)}>
+          <ChakraTooltip label={t(`form.transportMeans.${transport}`)}>
             <Center
               {...TransportButtonBaseStyle}
               backgroundColor={isSelected ? "#474747" : "#b7b7b7"}
             >
               {icon}
             </Center>
-          </Tooltip>
+          </ChakraTooltip>
           {isSelected && (
             <Box
               position="absolute"
@@ -202,7 +203,7 @@ const TransportWithOptions = ({
             </Box>
           )}
         </MenuButton>
-      </Tooltip>
+      </ChakraTooltip>
       <MenuList zIndex={3}>
         {options.map((option) => (
           <MenuItem
@@ -237,7 +238,7 @@ const TransportButton = ({
 }: TransportButtonProps) => {
   const { t } = useTranslation();
   return (
-    <Tooltip label={t(`form.transportMeans.${transport}`)}>
+    <Tooltip content={t(`form.transportMeans.${transport}`)} position="bottom">
       <Button
         onClick={updateStep}
         {...TransportButtonBaseStyle}
