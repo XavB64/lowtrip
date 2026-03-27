@@ -1,5 +1,6 @@
 import { TFunction } from "i18next";
-import { Step } from "types";
+
+import type { Step } from "types";
 
 const formatMissingParams = (missingParams: string[], t: TFunction) => {
   if (missingParams.length === 0) return "";
