@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import React, { useMemo } from "react";
+import { useMemo } from "react";
 
 import { Box, Card, HStack, Text, VStack } from "@chakra-ui/react";
 import { useTranslation } from "react-i18next";
