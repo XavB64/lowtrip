@@ -1,15 +1,17 @@
+import { useEffect } from "react";
+
 import { Box, IconButton, Stack } from "@chakra-ui/react";
 import { BiChevronUp } from "react-icons/bi";
+import { useSearchParams } from "react-router-dom";
 
+import { CacheProvider } from "common/context/cacheContext";
+import { useConsentContext } from "common/context/consentContext";
+import { useSimulationContext } from "common/context/simulationContext";
+import { checkIsOnMobile } from "common/utils";
+
+import { stepsAreInvalid } from "./components/form/helpers/utils";
 import { LeftPanel } from "./components/left-panel";
 import Map from "./components/map";
-import { checkIsOnMobile } from "common/utils";
-import { useConsentContext } from "common/context/consentContext";
-import { CacheProvider } from "common/context/cacheContext";
-import { useSearchParams } from "react-router-dom";
-import { useEffect } from "react";
-import { useSimulationContext } from "common/context/simulationContext";
-import { stepsAreInvalid } from "./components/form/helpers/utils";
 import { extractPathStepsFromSimplifiedSteps } from "./helpers/shareableLink";
 
 const MainView = ({

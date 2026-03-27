@@ -8,6 +8,7 @@ import {
 } from "@chakra-ui/react";
 import i18n from "i18next";
 import { useTranslation } from "react-i18next";
+
 import SettingsChoices, { LANGUAGES, MAP_THEMES } from "./settings-choices";
 
 const UserSettingsModal = ({

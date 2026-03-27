@@ -1,6 +1,5 @@
-import i18n from "i18next";
 import { useState, useEffect, useMemo } from "react";
-import { useTranslation } from "react-i18next";
+
 import {
   Box,
   Popover,
@@ -9,9 +8,13 @@ import {
   Text,
   Spinner,
 } from "@chakra-ui/react";
-import { PHOTON_API_URL } from "config";
+import i18n from "i18next";
+import { useTranslation } from "react-i18next";
+
 import { useCache } from "common/context/cacheContext";
 import { useDebounce } from "common/hooks";
+import { PHOTON_API_URL } from "config";
+
 import { City, PhotonApiCity } from "./types";
 
 const formatCityName = (

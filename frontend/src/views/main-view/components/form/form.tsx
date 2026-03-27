@@ -25,15 +25,17 @@ import {
   VStack,
   useBreakpoint,
 } from "@chakra-ui/react";
-import { BiSolidPlusCircle } from "react-icons/bi";
-import { TRIP_TYPE } from "types";
-import { PrimaryButton } from "common/components/primary-button";
-import { StepField } from "./step-field";
-import ErrorModal from "./error-modal";
 import { useTranslation } from "react-i18next";
-import { stepsAreInvalid } from "./helpers/utils";
-import { getAdviceTextTranslation } from "./helpers/translationHelper";
+import { BiSolidPlusCircle } from "react-icons/bi";
+
+import { PrimaryButton } from "common/components/primary-button";
 import { useSimulationContext } from "common/context/simulationContext";
+import { TRIP_TYPE } from "types";
+
+import ErrorModal from "./error-modal";
+import { getAdviceTextTranslation } from "./helpers/translationHelper";
+import { stepsAreInvalid } from "./helpers/utils";
+import { StepField } from "./step-field";
 
 type FormProps = {
   displayedTrip: TRIP_TYPE;

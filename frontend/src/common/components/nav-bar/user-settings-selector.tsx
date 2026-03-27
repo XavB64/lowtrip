@@ -7,10 +7,10 @@ import {
   PopoverTrigger,
   useBreakpoint,
 } from "@chakra-ui/react";
-import { IoMdSettings } from "react-icons/io";
-import SettingsChoices, { LANGUAGES, MAP_THEMES } from "./settings-choices";
-
 import i18n from "i18next";
+import { IoMdSettings } from "react-icons/io";
+
+import SettingsChoices, { LANGUAGES, MAP_THEMES } from "./settings-choices";
 
 const UserSettingsSelector = ({
   themeSettings: { isDarkTheme, switchMapTheme },

@@ -16,12 +16,14 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { useEffect, useState } from "react";
+
+import { HStack, IconButton } from "@chakra-ui/react";
 import { BiTrash } from "react-icons/bi";
 
-import TransportSelector from "./transport-selector";
-import { HStack, IconButton } from "@chakra-ui/react";
 import type { Step } from "types";
+
 import CityDropdown from "./city-dropdown";
+import TransportSelector from "./transport-selector";
 import { City } from "./types";
 
 type StepFieldProps = {

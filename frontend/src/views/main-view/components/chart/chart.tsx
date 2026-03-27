@@ -15,6 +15,8 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { useMemo, useState } from "react";
+
 import {
   Box,
   useBreakpoint,
@@ -27,7 +29,10 @@ import {
   Link,
   IconButton,
 } from "@chakra-ui/react";
+import { keyframes } from "@emotion/react";
+import { useTranslation } from "react-i18next";
 import { BiHelpCircle } from "react-icons/bi";
+import { FaShareAlt } from "react-icons/fa";
 import {
   Bar,
   BarChart,
@@ -37,15 +42,13 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import type { Trip, SimulationResults } from "types";
-import { useTranslation } from "react-i18next";
-import { useMemo, useState } from "react";
-import { getChartData, getLabel } from "./helpers";
-import CustomLabel from "./custom-label";
-import { FaShareAlt } from "react-icons/fa";
-import { generateUrlToShare } from "../../helpers/shareableLink";
-import { keyframes } from "@emotion/react";
+
 import { uniqBy } from "common/utils";
+import type { Trip, SimulationResults } from "types";
+
+import CustomLabel from "./custom-label";
+import { getChartData, getLabel } from "./helpers";
+import { generateUrlToShare } from "../../helpers/shareableLink";
 
 const fadeIn = keyframes`
   from { opacity: 0; }

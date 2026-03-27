@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import i18next from "i18next";
+
 import {
   ApiResponse,
   SimulationResults,
