@@ -6,12 +6,15 @@ import {
   useMemo,
   useState,
 } from "react";
-import nextId from "react-id-generator";
-import { ApiResponse, SimulationResults, Step, TRIP_TYPE } from "types";
+
 import { useDisclosure } from "@chakra-ui/react";
+import nextId from "react-id-generator";
+
 import { API_URL } from "config";
-import { getPayload } from "./getPayload";
+import { ApiResponse, SimulationResults, Step, TRIP_TYPE } from "types";
+
 import { formatResponse } from "./formatResponse";
+import { getPayload } from "./getPayload";
 
 type Context = {
   steps: Step[];

@@ -16,16 +16,18 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import React, { useMemo, useRef } from "react";
+
+import { Card, useBreakpointValue } from "@chakra-ui/react";
 import { MapContainer } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
-import { Card, useBreakpointValue } from "@chakra-ui/react";
 
+import { useSimulationContext } from "common/context/simulationContext";
 import { checkIsOnMobile } from "common/utils";
 import type { Step } from "types";
+
 import Chart from "../chart";
-import Legend from "./map-legend";
 import MapContent from "./map-content";
-import { useSimulationContext } from "common/context/simulationContext";
+import Legend from "./map-legend";
 
 const extractCoords = (steps?: Step[]) =>
   (steps || [])
