@@ -1,5 +1,5 @@
 __pycache__
-lowtrip-venv/
+*venv/
 lowtrip-env/
 
 # backend
