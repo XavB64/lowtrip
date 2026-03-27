@@ -19,8 +19,8 @@ import React, { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { Box, Card, HStack, Text, VStack } from "@chakra-ui/react";
 
-import type { SimulationResults } from "../../../../types";
-import { uniqBy } from "../../../../common/utils";
+import type { SimulationResults } from "types";
+import { uniqBy } from "common/utils";
 
 const Legend = ({
   tripGeometries,

@@ -10,8 +10,8 @@ import {
 } from "@chakra-ui/react";
 import { ChangeEvent, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { API_URL } from "../config";
-import Modal from "../common/components/modal";
+import { API_URL } from "config";
+import Modal from "common/components/modal";
 
 async function sendEmail(
   senderEmail: string,

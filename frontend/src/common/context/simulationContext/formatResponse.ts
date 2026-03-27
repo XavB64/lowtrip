@@ -7,7 +7,7 @@ import {
   TripStep,
   SimulationType,
   type Step,
-} from "../../../types";
+} from "types";
 
 export const formatResponse = (
   inputs: { mainSteps: Step[]; altSteps?: Step[] },

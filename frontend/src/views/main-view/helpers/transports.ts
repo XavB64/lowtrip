@@ -1,4 +1,4 @@
-import type { Transport } from "../../../types";
+import type { Transport } from "types";
 
 export const transportMeanIsCar = (transportMean: Transport) =>
   ["Car", "eCar"].includes(transportMean);

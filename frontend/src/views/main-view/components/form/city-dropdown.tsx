@@ -9,9 +9,9 @@ import {
   Text,
   Spinner,
 } from "@chakra-ui/react";
-import { PHOTON_API_URL } from "../../../../config";
-import { useCache } from "../../../../common/context/cacheContext";
-import { useDebounce } from "../../../../common/hooks";
+import { PHOTON_API_URL } from "config";
+import { useCache } from "common/context/cacheContext";
+import { useDebounce } from "common/hooks";
 import { City, PhotonApiCity } from "./types";
 
 const formatCityName = (
