@@ -96,44 +96,50 @@ export const SimulationProvider = ({ children }: { children: ReactNode }) => {
     [steps, alternativeSteps, setSteps, setAlternativeSteps],
   );
 
-  const submitForm = async (mainSteps: Step[], altSteps?: Step[]) => {
-    if (mainSteps.length < 1 || mainSteps.some((step) => !step.locationCoords))
-      throw new Error("At least one step required");
-    setIsLoading(true);
+  const submitForm = useCallback(
+    async (mainSteps: Step[], altSteps?: Step[]) => {
+      if (
+        mainSteps.length < 1 ||
+        mainSteps.some((step) => !step.locationCoords)
+      )
+        throw new Error("At least one step required");
+      setIsLoading(true);
 
-    const payload = getPayload(mainSteps, altSteps);
+      const payload = getPayload(mainSteps, altSteps);
 
-    const res = await fetch(API_URL, {
-      method: "POST",
-      headers: {
-        "Access-Contol-Allow-Origin": "*",
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(payload),
-    });
+      const res = await fetch(API_URL, {
+        method: "POST",
+        headers: {
+          "Access-Contol-Allow-Origin": "*",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
 
-    if (!res.ok) {
-      console.error(`${res.status} ${res.statusText}`);
-      openErrorModal();
-    } else {
-      const response: ApiResponse = await res.json();
-      if (response.error) {
-        setErrorMessage(response.error);
+      if (!res.ok) {
+        console.error(`${res.status} ${res.statusText}`);
         openErrorModal();
       } else {
-        const formattedSimulation = formatResponse(
-          { mainSteps, altSteps },
-          response,
-        );
-        setSimulationResults({
-          ...formattedSimulation,
-          inputs: { mainTrip: mainSteps, alternativeTrip: altSteps },
-        });
+        const response: ApiResponse = await res.json();
+        if (response.error) {
+          setErrorMessage(response.error);
+          openErrorModal();
+        } else {
+          const formattedSimulation = formatResponse(
+            { mainSteps, altSteps },
+            response,
+          );
+          setSimulationResults({
+            ...formattedSimulation,
+            inputs: { mainTrip: mainSteps, alternativeTrip: altSteps },
+          });
+        }
       }
-    }
 
-    setIsLoading(false);
-  };
+      setIsLoading(false);
+    },
+    [openErrorModal],
+  );
 
   const context = useMemo(
     () => ({
