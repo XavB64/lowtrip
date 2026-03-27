@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import type { Step } from "../../../types";
+import type { Step } from "types";
 import { stepsAreInvalid } from "../components/form/helpers/utils";
 import nextId from "react-id-generator";
 import { transportMeanIsCar, transportMeanIsFerry } from "./transports";

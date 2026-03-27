@@ -17,7 +17,7 @@
 
 import { useBreakpoint } from "@chakra-ui/react";
 import { LabelProps } from "recharts";
-import type { Trip } from "../../../../types";
+import type { Trip } from "types";
 
 type CustomLabelProps = {
   emissionPartsByTrip: {

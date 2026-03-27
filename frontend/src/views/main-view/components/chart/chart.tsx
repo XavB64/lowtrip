@@ -37,7 +37,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { Trip, type SimulationResults } from "../../../../types";
+import type { Trip, SimulationResults } from "types";
 import { useTranslation } from "react-i18next";
 import { useMemo, useState } from "react";
 import { getChartData, getLabel } from "./helpers";
@@ -45,7 +45,7 @@ import CustomLabel from "./custom-label";
 import { FaShareAlt } from "react-icons/fa";
 import { generateUrlToShare } from "../../helpers/shareableLink";
 import { keyframes } from "@emotion/react";
-import { uniqBy } from "../../../../common/utils";
+import { uniqBy } from "common/utils";
 
 const fadeIn = keyframes`
   from { opacity: 0; }

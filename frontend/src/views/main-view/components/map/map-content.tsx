@@ -19,8 +19,8 @@ import React, { useEffect, useMemo } from "react";
 import { Marker, Polyline, TileLayer, Tooltip, useMap } from "react-leaflet";
 import { Box, HStack, Text } from "@chakra-ui/react";
 
-import { markerIcon } from "../../../../assets/marker-icon";
-import { SimulationResults } from "../../../../types";
+import { markerIcon } from "assets/marker-icon";
+import type { SimulationResults } from "types";
 
 type MapProps = {
   isDarkTheme: boolean;

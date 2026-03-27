@@ -3,12 +3,12 @@ import { BiChevronUp } from "react-icons/bi";
 
 import { LeftPanel } from "./components/left-panel";
 import Map from "./components/map";
-import { checkIsOnMobile } from "../../common/utils";
-import { useConsentContext } from "../../common/context/consentContext";
-import { CacheProvider } from "../../common/context/cacheContext";
+import { checkIsOnMobile } from "common/utils";
+import { useConsentContext } from "common/context/consentContext";
+import { CacheProvider } from "common/context/cacheContext";
 import { useSearchParams } from "react-router-dom";
 import { useEffect } from "react";
-import { useSimulationContext } from "../../common/context/simulationContext";
+import { useSimulationContext } from "common/context/simulationContext";
 import { stepsAreInvalid } from "./components/form/helpers/utils";
 import { extractPathStepsFromSimplifiedSteps } from "./helpers/shareableLink";
 

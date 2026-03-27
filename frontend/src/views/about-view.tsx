@@ -1,10 +1,10 @@
 import { Box, Heading, Image, Stack, Text } from "@chakra-ui/react";
 import { useTranslation } from "react-i18next";
-import mollow from "../assets/logo_mollow.png";
-import sailcoop from "../assets/logo_sailcoop.jpg";
-import bonpote from "../assets/bonpote_aurores.png";
-import shimla from "../assets/shimla_text.png";
-import { checkIsOnMobile } from "../common/utils";
+import mollow from "assets/logo_mollow.png";
+import sailcoop from "assets/logo_sailcoop.jpg";
+import bonpote from "assets/bonpote_aurores.png";
+import shimla from "assets/shimla_text.png";
+import { checkIsOnMobile } from "common/utils";
 
 const AboutView = () => {
   const { t } = useTranslation();
