@@ -15,6 +15,8 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { useEffect, useState } from "react";
+
 import {
   Card,
   Center,
@@ -27,14 +29,15 @@ import {
   Tabs,
   VStack,
 } from "@chakra-ui/react";
-import Form from "./form";
-import Chart from "./chart";
-import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+
 import Logo from "assets/lowtrip_logo.png";
-import { checkIsOnMobile } from "common/utils";
 import { useSimulationContext } from "common/context/simulationContext";
+import { checkIsOnMobile } from "common/utils";
 import { TRIP_TYPE } from "types";
+
+import Chart from "./chart";
+import Form from "./form";
 
 type LeftPanelProps = {
   withLogo?: boolean;
@@ -71,6 +74,7 @@ export const LeftPanel = ({ withLogo }: LeftPanelProps) => {
 
     // wait for the chart to render before scrolling
     if (simulationResults) setTimeout(() => scrollToChart(), 200);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [simulationResults]);
 
   return (

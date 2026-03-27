@@ -16,11 +16,15 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { useEffect, useMemo, useState } from "react";
+
+import { ChakraProvider, Stack, VStack } from "@chakra-ui/react";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import "./i18n";
 
 import NavbarWrapper from "./common/components/nav-bar";
+import { ConsentContextProvider } from "./common/context/consentContext";
+import { SimulationProvider } from "./common/context/simulationContext";
 import { API_URL } from "./config";
+import theme from "./theme";
 import {
   ContactView,
   ErrorView,
@@ -28,10 +32,7 @@ import {
   MethodView,
   AboutView,
 } from "./views";
-import theme from "./theme";
-import { ChakraProvider, Stack, VStack } from "@chakra-ui/react";
-import { SimulationProvider } from "./common/context/simulationContext";
-import { ConsentContextProvider } from "./common/context/consentContext";
+import "./i18n";
 
 const App = () => {
   // first API call to wake up the server
