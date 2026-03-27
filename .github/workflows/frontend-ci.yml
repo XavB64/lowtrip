@@ -60,6 +60,6 @@ jobs:
       - name: Serve the built app
         run: |
           npm install -g serve
-          serve -s build -l 5000 &
+          serve -s dist -l 5000 &
           sleep 5
           curl -f http://127.0.0.1:5000
