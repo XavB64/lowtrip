@@ -16,17 +16,6 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import {
-  BiSolidBus,
-  BiSolidCar,
-  BiSolidPlaneAlt,
-  BiSolidTrain,
-} from "react-icons/bi";
-import { FaFerry } from "react-icons/fa6";
-import { MdElectricCar, MdSailing } from "react-icons/md";
-import { IoMdBicycle } from "react-icons/io";
-import { Step, Transport, FerryOptions, thumbUp } from "types";
-import { useTranslation } from "react-i18next";
-import {
   Box,
   Button,
   Menu,
@@ -39,6 +28,18 @@ import {
   Center,
 } from "@chakra-ui/react";
 import { TFunction } from "i18next";
+import { useTranslation } from "react-i18next";
+import {
+  BiSolidBus,
+  BiSolidCar,
+  BiSolidPlaneAlt,
+  BiSolidTrain,
+} from "react-icons/bi";
+import { FaFerry } from "react-icons/fa6";
+import { IoMdBicycle } from "react-icons/io";
+import { MdElectricCar, MdSailing } from "react-icons/md";
+
+import { Step, Transport, FerryOptions, thumbUp } from "types";
 
 const TRANSPORTS = [
   {

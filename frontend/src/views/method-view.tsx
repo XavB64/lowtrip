@@ -15,6 +15,8 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { useEffect } from "react";
+
 import {
   Box,
   Text,
@@ -28,13 +30,13 @@ import {
   Heading,
   Link,
 } from "@chakra-ui/react";
-import { useTranslation } from "react-i18next";
-import MethodologyPdf from "../assets/lowtrip_methodology.pdf";
+import i18n from "i18next";
 import katex from "katex";
 import "katex/dist/katex.min.css";
+import { useTranslation } from "react-i18next";
 import { FaCheck } from "react-icons/fa";
-import i18n from "i18next";
-import { useEffect } from "react";
+
+import MethodologyPdf from "../assets/lowtrip_methodology.pdf";
 
 // Tried to use the language to change the text in french but I couldn't
 // I think we should just write directly 2 pages and not use traduction elements

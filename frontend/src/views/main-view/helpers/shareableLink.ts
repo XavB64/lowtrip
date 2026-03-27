@@ -1,8 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import type { Step } from "types";
-import { stepsAreInvalid } from "../components/form/helpers/utils";
 import nextId from "react-id-generator";
+
+import type { Step } from "types";
+
 import { transportMeanIsCar, transportMeanIsFerry } from "./transports";
+import { stepsAreInvalid } from "../components/form/helpers/utils";
 
 const simplifySteps = (steps: Step[]) =>
   steps.map((step) => {

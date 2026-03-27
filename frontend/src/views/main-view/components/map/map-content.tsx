@@ -16,8 +16,9 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import React, { useEffect, useMemo } from "react";
-import { Marker, Polyline, TileLayer, Tooltip, useMap } from "react-leaflet";
+
 import { Box, HStack, Text } from "@chakra-ui/react";
+import { Marker, Polyline, TileLayer, Tooltip, useMap } from "react-leaflet";
 
 import { markerIcon } from "assets/marker-icon";
 import type { SimulationResults } from "types";

@@ -16,11 +16,12 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import React, { useMemo } from "react";
-import { useTranslation } from "react-i18next";
-import { Box, Card, HStack, Text, VStack } from "@chakra-ui/react";
 
-import type { SimulationResults } from "types";
+import { Box, Card, HStack, Text, VStack } from "@chakra-ui/react";
+import { useTranslation } from "react-i18next";
+
 import { uniqBy } from "common/utils";
+import type { SimulationResults } from "types";
 
 const Legend = ({
   tripGeometries,
