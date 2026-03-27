@@ -55,6 +55,7 @@ const MainView = ({
           : undefined,
       );
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams]);
 
   return (
