@@ -4,7 +4,7 @@ geopandas == 0.14.4
 pandas == 2.0.0
 numpy == 1.23.2
 networkx == 2.8.4
-momepy == 0.6.0
+momepy == 0.11.0
 pyproj == 3.6.1
 requests == 2.28.1
 Werkzeug == 2.2.2
