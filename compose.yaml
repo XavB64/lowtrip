@@ -12,4 +12,4 @@ services:
       context: frontend
     ports:
       - 3000:3000
-    command: ["npm", "start"]
+    command: ["npm", "run", "start", "--", "--host", "0.0.0.0"]

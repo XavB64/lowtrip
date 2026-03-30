@@ -1,4 +1,5 @@
 import L from "leaflet";
+import markerShadow from "leaflet/dist/images/marker-shadow.png";
 
 export const markerIcon = (color: string) => {
   return L.divIcon({
@@ -23,6 +24,6 @@ export const markerIcon = (color: string) => {
       </svg>`,
     className: "svg-icon",
     iconAnchor: [12, 24],
-    shadowUrl: require("leaflet/dist/images/marker-shadow.png"),
+    shadowUrl: markerShadow,
   });
 };
