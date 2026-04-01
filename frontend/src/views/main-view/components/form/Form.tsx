@@ -18,17 +18,15 @@
 import { useMemo } from "react";
 
 import {
-  Button,
+  Button as ChakraButton,
   Divider,
-  Stack,
   Text,
   VStack,
-  useBreakpoint,
 } from "@chakra-ui/react";
 import { useTranslation } from "react-i18next";
 import { BiSolidPlusCircle } from "react-icons/bi";
 
-import { PrimaryButton } from "common/components/primary-button";
+import Button from "common/components/Button";
 import { useSimulationContext } from "common/context/simulationContext";
 import { TRIP_TYPE } from "types";
 
@@ -36,6 +34,7 @@ import ErrorModal from "./error-modal";
 import { getAdviceTextTranslation } from "./helpers/translationHelper";
 import { stepsAreInvalid } from "./helpers/utils";
 import { StepField } from "./step-field";
+import "./Form.scss";
 
 type FormProps = {
   displayedTrip: TRIP_TYPE;
@@ -56,8 +55,6 @@ const Form = ({ displayedTrip, showAlternativeForm }: FormProps) => {
     removeStep,
     submitForm,
   } = useSimulationContext();
-
-  const breakpoint = useBreakpoint();
 
   const formIsNotValid = useMemo(() => {
     if (displayedTrip === TRIP_TYPE.ALTERNATIVE) {
@@ -99,7 +96,7 @@ const Form = ({ displayedTrip, showAlternativeForm }: FormProps) => {
         ),
       )}
 
-      <Button
+      <ChakraButton
         onClick={() => addStep(displayedTrip)}
         colorScheme="lightgrey"
         borderRadius="20px"
@@ -107,7 +104,7 @@ const Form = ({ displayedTrip, showAlternativeForm }: FormProps) => {
         leftIcon={<BiSolidPlusCircle />}
       >
         {t("form.addStep")}
-      </Button>
+      </ChakraButton>
 
       <Divider
         borderColor="lightgrey.500"
@@ -121,41 +118,39 @@ const Form = ({ displayedTrip, showAlternativeForm }: FormProps) => {
         {adviceText && <Text textAlign="center">{adviceText}</Text>}
         {displayedTrip === TRIP_TYPE.ALTERNATIVE ? (
           stepsAreInvalid(steps) ? null : (
-            <PrimaryButton
+            <Button
               onClick={() => submitForm(steps, alternativeSteps)}
-              isDisabled={formIsNotValid}
-              isLoading={isLoading}
+              disabled={formIsNotValid}
+              loading={isLoading}
             >
               {t("form.compareWithThisTrip")}
-            </PrimaryButton>
+            </Button>
           )
         ) : (
-          <>
-            <Stack
-              w="100%"
-              direction={breakpoint === "base" ? "column" : "row"}
+          <div className="buttons-row">
+            <Button
+              onClick={() => submitForm(steps)}
+              disabled={formIsNotValid}
+              loading={isLoading}
+              className="form-action-button"
             >
-              <PrimaryButton
-                onClick={() => submitForm(steps)}
-                isDisabled={formIsNotValid}
-                isLoading={isLoading}
-              >
-                {steps.length < 3
-                  ? t("form.otherTransportMeans")
-                  : t("form.computeEmissions")}
-              </PrimaryButton>
-              <PrimaryButton
+              {steps.length < 3
+                ? t("form.otherTransportMeans")
+                : t("form.computeEmissions")}
+            </Button>
+            {showAlternativeForm && (
+              <Button
                 onClick={showAlternativeForm}
-                isDisabled={formIsNotValid}
-                isLoading={false}
-                variant="outline"
+                disabled={formIsNotValid}
+                className="form-action-button"
+                outline
               >
                 {steps.length < 3
                   ? t("form.anotherTrip")
                   : t("form.compareToAnotherTrip")}
-              </PrimaryButton>
-            </Stack>
-          </>
+              </Button>
+            )}
+          </div>
         )}
       </VStack>
 
