@@ -15,19 +15,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import {
-  Box,
-  Button,
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuList,
-  Tooltip as ChakraTooltip,
-  Text,
-  Wrap,
-  Center,
-} from "@chakra-ui/react";
-import { TFunction } from "i18next";
+import { Button, Text, Wrap } from "@chakra-ui/react";
 import { useTranslation } from "react-i18next";
 import {
   BiSolidBus,
@@ -40,7 +28,9 @@ import { IoMdBicycle } from "react-icons/io";
 import { MdElectricCar, MdSailing } from "react-icons/md";
 
 import Tooltip from "common/components/Tooltip";
-import { Step, Transport, FerryOptions, thumbUp } from "types";
+import { Step, Transport } from "types";
+
+import TransportWithOptions from "./TransportWithOptions";
 
 const TRANSPORTS = [
   {
@@ -77,77 +67,6 @@ const TRANSPORTS = [
   },
 ];
 
-const getTransportOptions = (
-  transport: Transport.ecar | Transport.car | Transport.ferry,
-  t: TFunction,
-): { label: string; stepOptions: Partial<Step> }[] => {
-  if (transport === Transport.ferry) {
-    return [
-      {
-        label: t("form.ferryNone"),
-        stepOptions: {
-          options: FerryOptions.none,
-          passengers: undefined,
-        },
-      },
-      {
-        label: t("form.ferryCabin"),
-        stepOptions: {
-          options: FerryOptions.cabin,
-          passengers: undefined,
-        },
-      },
-      {
-        label: t("form.ferryVehicle"),
-        stepOptions: {
-          options: FerryOptions.vehicle,
-          passengers: undefined,
-        },
-      },
-      {
-        label: t("form.ferryCabinVehicle"),
-        stepOptions: {
-          options: FerryOptions.cabinVehicle,
-          passengers: undefined,
-        },
-      },
-    ];
-  }
-  const basicCarOptions = [1, 2, 3, 4, 5, 6, 7].map((count) => ({
-    label: t("form.passengersNb", { count }),
-    stepOptions: {
-      passengers: `${count}` as Step["passengers"],
-      options: undefined,
-    },
-  }));
-  return transport === Transport.car
-    ? [
-        ...basicCarOptions,
-        {
-          label: t("form.hitchHiking"),
-          stepOptions: { passengers: thumbUp, options: undefined },
-        },
-      ]
-    : basicCarOptions;
-};
-
-function getIcon(step: Step) {
-  if (step.passengers) return step.passengers;
-  if (step.options) {
-    switch (step.options) {
-      case FerryOptions.none:
-        return "💺";
-      case FerryOptions.cabin:
-        return "🏠";
-      case FerryOptions.vehicle:
-        return "🚗";
-      case FerryOptions.cabinVehicle:
-        return "🏰";
-    }
-  }
-  return "";
-}
-
 const TransportButtonBaseStyle = {
   padding: 0,
   width: "30px",
@@ -157,71 +76,6 @@ const TransportButtonBaseStyle = {
   color: "white",
 };
 
-type TransportWithOptionsProps = {
-  updateStep: (index: number, data: Partial<Step>) => void;
-  isSelected: boolean;
-  step: Step;
-  icon: JSX.Element;
-  transport: Transport.car | Transport.ecar | Transport.ferry;
-  options: { label: string; stepOptions: Partial<Step> }[];
-};
-
-const TransportWithOptions = ({
-  updateStep,
-  isSelected,
-  step,
-  icon,
-  transport,
-  options,
-}: TransportWithOptionsProps) => {
-  const { t } = useTranslation();
-  return (
-    <Menu>
-      <ChakraTooltip label={t(`form.transportMeans.${transport}`)}>
-        <MenuButton position="relative">
-          <ChakraTooltip label={t(`form.transportMeans.${transport}`)}>
-            <Center
-              {...TransportButtonBaseStyle}
-              backgroundColor={isSelected ? "#474747" : "#b7b7b7"}
-            >
-              {icon}
-            </Center>
-          </ChakraTooltip>
-          {isSelected && (
-            <Box
-              position="absolute"
-              bottom={-1}
-              right={-1}
-              bgColor="#0097a7"
-              color="white"
-              borderRadius="full"
-              fontSize="xs"
-              h={4}
-              w={4}
-            >
-              {getIcon(step)}
-            </Box>
-          )}
-        </MenuButton>
-      </ChakraTooltip>
-      <MenuList zIndex={3}>
-        {options.map((option) => (
-          <MenuItem
-            key={option.label}
-            onClick={() =>
-              updateStep(step.index, {
-                transportMean: transport,
-                ...option.stepOptions,
-              })
-            }
-          >
-            {option.label}
-          </MenuItem>
-        ))}
-      </MenuList>
-    </Menu>
-  );
-};
 
 type TransportButtonProps = {
   updateStep?: () => void;
@@ -273,7 +127,6 @@ const TransportSelector = ({
             step={step}
             icon={item.icon}
             transport={item.value}
-            options={getTransportOptions(item.value, t)}
           />
         ) : (
           <TransportButton
