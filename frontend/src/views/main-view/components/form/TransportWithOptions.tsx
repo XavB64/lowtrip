@@ -4,10 +4,8 @@ import { TFunction } from "i18next";
 import { useTranslation } from "react-i18next";
 
 import Tooltip from "common/components/Tooltip";
-import { FerryOptions, thumbUp, Transport, type Step } from "types";
-
-import "./TransportWithOptions.scss";
 import { checkIsOnMobile } from "common/utils";
+import { FerryOptions, thumbUp, Transport, type Step } from "types";
 
 const getTransportOptions = (
   transport: Transport,

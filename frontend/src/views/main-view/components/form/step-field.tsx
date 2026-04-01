@@ -23,7 +23,7 @@ import { BiTrash } from "react-icons/bi";
 import type { Step } from "types";
 
 import CityDropdown from "./city-dropdown";
-import TransportSelector from "./transport-selector";
+import TransportSelector from "./TransportSelector";
 import { City } from "./types";
 
 type StepFieldProps = {

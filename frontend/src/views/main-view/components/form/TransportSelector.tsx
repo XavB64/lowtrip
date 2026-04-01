@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Button, Text, Wrap } from "@chakra-ui/react";
+import { Text, Wrap } from "@chakra-ui/react";
 import { useTranslation } from "react-i18next";
 import {
   BiSolidBus,
@@ -30,6 +30,7 @@ import { MdElectricCar, MdSailing } from "react-icons/md";
 import Tooltip from "common/components/Tooltip";
 import { Step, Transport } from "types";
 
+import "./TransportSelector.scss";
 import TransportWithOptions from "./TransportWithOptions";
 
 const TRANSPORTS = [
@@ -67,43 +68,6 @@ const TRANSPORTS = [
   },
 ];
 
-const TransportButtonBaseStyle = {
-  padding: 0,
-  width: "30px",
-  minWidth: "30px",
-  height: "30px",
-  borderRadius: "100px",
-  color: "white",
-};
-
-
-type TransportButtonProps = {
-  updateStep?: () => void;
-  isSelected: boolean;
-  icon: JSX.Element;
-  transport: Transport;
-};
-
-const TransportButton = ({
-  updateStep,
-  isSelected,
-  icon,
-  transport,
-}: TransportButtonProps) => {
-  const { t } = useTranslation();
-  return (
-    <Tooltip content={t(`form.transportMeans.${transport}`)} position="bottom">
-      <Button
-        onClick={updateStep}
-        {...TransportButtonBaseStyle}
-        backgroundColor={isSelected ? "#474747" : "#b7b7b7"}
-      >
-        {icon}
-      </Button>
-    </Tooltip>
-  );
-};
-
 const TransportSelector = ({
   updateStep,
   step,
@@ -116,6 +80,7 @@ const TransportSelector = ({
   return (
     <Wrap direction="row" marginBottom={2} marginTop={1} spacing={[1, 2]}>
       <Text>{t("form.by")}</Text>
+
       {TRANSPORTS.map((item) =>
         item.value === Transport.ferry ||
         item.value === Transport.car ||
@@ -129,18 +94,27 @@ const TransportSelector = ({
             transport={item.value}
           />
         ) : (
-          <TransportButton
+          <Tooltip
             key={item.value}
-            updateStep={() =>
-              updateStep(step.index, {
-                transportMean: item.value,
-                passengers: undefined,
-              })
-            }
-            isSelected={item.value === step.transportMean}
-            icon={item.icon}
-            transport={item.value}
-          />
+            content={t(`form.transportMeans.${item.value}`)}
+            position="bottom"
+          >
+            <button
+              className={`transport__button ${
+                item.value === step.transportMean
+                  ? "transport__button--selected"
+                  : ""
+              }`}
+              onClick={() => {
+                updateStep(step.index, {
+                  transportMean: item.value,
+                  passengers: undefined,
+                });
+              }}
+            >
+              <div className="transport__icon">{item.icon}</div>
+            </button>
+          </Tooltip>
         ),
       )}
     </Wrap>
