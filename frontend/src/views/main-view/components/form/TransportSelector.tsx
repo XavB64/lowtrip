@@ -15,7 +15,6 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Text, Wrap } from "@chakra-ui/react";
 import { useTranslation } from "react-i18next";
 import {
   BiSolidBus,
@@ -78,8 +77,8 @@ const TransportSelector = ({
   const { t } = useTranslation();
 
   return (
-    <Wrap direction="row" marginBottom={2} marginTop={1} spacing={[1, 2]}>
-      <Text>{t("form.by")}</Text>
+    <div className="transport-selector-section">
+      <p>{t("form.by")}</p>
 
       {TRANSPORTS.map((item) =>
         item.value === Transport.ferry ||
@@ -117,7 +116,7 @@ const TransportSelector = ({
           </Tooltip>
         ),
       )}
-    </Wrap>
+    </div>
   );
 };
 
