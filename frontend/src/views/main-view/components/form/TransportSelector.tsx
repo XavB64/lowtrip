@@ -34,35 +34,35 @@ import TransportWithOptions from "./TransportWithOptions";
 
 const TRANSPORTS = [
   {
-    value: Transport.train,
+    transport: Transport.train,
     icon: <BiSolidTrain size={20} />,
   },
   {
-    value: Transport.plane,
+    transport: Transport.plane,
     icon: <BiSolidPlaneAlt size={20} />,
   },
   {
-    value: Transport.bus,
+    transport: Transport.bus,
     icon: <BiSolidBus size={20} />,
   },
   {
-    value: Transport.car,
+    transport: Transport.car,
     icon: <BiSolidCar size={20} />,
   },
   {
-    value: Transport.ecar,
+    transport: Transport.ecar,
     icon: <MdElectricCar size={20} />,
   },
   {
-    value: Transport.ferry,
+    transport: Transport.ferry,
     icon: <FaFerry size={20} />,
   },
   {
-    value: Transport.sail,
+    transport: Transport.sail,
     icon: <MdSailing size={20} />,
   },
   {
-    value: Transport.bicycle,
+    transport: Transport.bicycle,
     icon: <IoMdBicycle size={20} />,
   },
 ];
@@ -80,38 +80,38 @@ const TransportSelector = ({
     <div className="transport-selector-section">
       <p>{t("form.by")}</p>
 
-      {TRANSPORTS.map((item) =>
-        item.value === Transport.ferry ||
-        item.value === Transport.car ||
-        item.value === Transport.ecar ? (
+      {TRANSPORTS.map(({ transport, icon }) =>
+        transport === Transport.ferry ||
+        transport === Transport.car ||
+        transport === Transport.ecar ? (
           <TransportWithOptions
-            key={item.value}
+            key={transport}
             updateStep={updateStep}
-            isSelected={item.value === step.transportMean}
+            isSelected={transport === step.transportMean}
             step={step}
-            icon={item.icon}
-            transport={item.value}
+            icon={icon}
+            transport={transport}
           />
         ) : (
           <Tooltip
-            key={item.value}
-            content={t(`form.transportMeans.${item.value}`)}
+            key={transport}
+            content={t(`form.transportMeans.${transport}`)}
             position="bottom"
           >
             <button
               className={`transport__button ${
-                item.value === step.transportMean
+                transport === step.transportMean
                   ? "transport__button--selected"
                   : ""
               }`}
               onClick={() => {
                 updateStep(step.index, {
-                  transportMean: item.value,
+                  transportMean: transport,
                   passengers: undefined,
                 });
               }}
             >
-              <div className="transport__icon">{item.icon}</div>
+              <div className="transport__icon">{icon}</div>
             </button>
           </Tooltip>
         ),
