@@ -19,6 +19,17 @@ updates:
     open-pull-requests-limit: 100
     labels:
       - "dependencies"
+    ignore:
+      # ESLint 10 is not yet supported by eslint-plugin-react-hooks
+      # and typescript-eslint. Installing it causes npm peer dependency
+      # resolution failures (ERESOLVE). Keep ESLint on 9.x until the
+      # ecosystem publishes ESLint 10 support.
+      - dependency-name: "eslint"
+        versions:
+          - ">=10 <11"
+      - dependency-name: "@eslint/js"
+        versions:
+          - ">=10 <11"
 
   - package-ecosystem: "docker"
     directory: "/"
