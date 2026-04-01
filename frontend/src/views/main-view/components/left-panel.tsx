@@ -74,7 +74,6 @@ export const LeftPanel = ({ withLogo }: LeftPanelProps) => {
 
     // wait for the chart to render before scrolling
     if (simulationResults) setTimeout(() => scrollToChart(), 200);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [simulationResults]);
 
   return (

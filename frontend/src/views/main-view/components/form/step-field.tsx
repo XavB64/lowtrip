@@ -64,7 +64,6 @@ export const StepField = ({ removeStep, updateStep, step }: StepFieldProps) => {
       });
     }
     if (!shoudlReset) setShouldReset(true);
-    // eslint-disable-next-line
   }, [value]);
 
   return (

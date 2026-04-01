@@ -145,7 +145,6 @@ const CityDropdown = ({
       default:
         return "en";
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [i18n.language]);
 
   const handleChange = async (newQuery: string) => {
@@ -191,7 +190,6 @@ const CityDropdown = ({
     } else {
       setResults([]);
     }
-    // eslint-disable-next-line
   }, [query]);
 
   useEffect(() => {
