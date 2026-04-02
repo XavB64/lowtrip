@@ -17,7 +17,6 @@
 
 import { useMemo } from "react";
 
-import { Box, Card, HStack, Text, VStack } from "@chakra-ui/react";
 import { useTranslation } from "react-i18next";
 
 import { uniqBy } from "common/utils";
@@ -35,18 +34,17 @@ const Legend = ({
   );
 
   return (
-    <Card display="flex" position="absolute" zIndex={2} top={5} right={5} p={3}>
-      <VStack align="start">
-        {routes.map((route) => (
-          <HStack key={route.transportMeans}>
-            <Box w={5} h={3} backgroundColor={route.color} />
-            <Text fontSize="sm">
-              {t(`chart.paths.${route.transportMeans.toLowerCase()}`)}
-            </Text>
-          </HStack>
-        ))}
-      </VStack>
-    </Card>
+    <div className="map-legend-card">
+      {routes.map((route) => (
+        <div key={route.transportMeans} className="legend-row">
+          <div
+            className="legend-color"
+            style={{ backgroundColor: route.color }}
+          />
+          <span>{t(`chart.paths.${route.transportMeans.toLowerCase()}`)}</span>
+        </div>
+      ))}
+    </div>
   );
 };
 

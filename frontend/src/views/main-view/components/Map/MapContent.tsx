@@ -17,7 +17,6 @@
 
 import React, { useEffect, useMemo } from "react";
 
-import { Box, HStack, Text } from "@chakra-ui/react";
 import { Marker, Polyline, TileLayer, Tooltip, useMap } from "react-leaflet";
 
 import { markerIcon } from "assets/marker-icon";
@@ -85,15 +84,13 @@ const MapContent = ({
               ])}
             >
               <Tooltip sticky>
-                <HStack>
-                  <Box
-                    h={2}
-                    w={2}
-                    borderRadius={2}
-                    bgColor={tripGeometry.color}
+                <div className="map-tooltip">
+                  <div
+                    className="trip-dot"
+                    style={{ backgroundColor: tripGeometry.color }}
                   />
-                  <Text>{tripGeometry.label}</Text>
-                </HStack>
+                  <span>{tripGeometry.label}</span>
+                </div>
               </Tooltip>
             </Polyline>
           </React.Fragment>
