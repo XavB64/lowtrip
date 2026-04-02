@@ -71,7 +71,9 @@
       "ferryNone": "Seat",
       "ferryCabin": "Cabin",
       "ferryVehicle": "Seat + car",
-      "ferryCabinVehicle": "Cabin + car"
+      "ferryCabinVehicle": "Cabin + car",
+      "errorTitle": "Ooops something happened !",
+      "errorNoPathFound": "Sorry, we could not find any path."
     },
     "about": {
       "introduction1": "Lowtrip is an independent, free and open-source project. The aim of this application is to provide accurate carbon footprints per passenger for each mode of transport and journey. These results enable users to make informed choices in the context of reducing their carbon footprint to curb the effects of global warming.",

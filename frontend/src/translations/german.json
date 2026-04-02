@@ -71,7 +71,9 @@
       "ferryNone": "Sitzplatz",
       "ferryCabin": "Kabine",
       "ferryVehicle": "Sitzplatz + auto",
-      "ferryCabinVehicle": "Kabine + auto"
+      "ferryCabinVehicle": "Kabine + auto",
+      "errorTitle": "Oops, etwas ist passiert!",
+      "errorNoPathFound": "Entschuldigung, wir konnten keinen Weg finden."
     },
     "about": {
       "introduction1": "Lowtrip ist ein unabhängiges, kostenloses und Open-Source-Projekt. Das Ziel dieser Anwendung ist es, genaue Kohlenstoff-Fußabdrücke pro Passagier für jedes Verkehrsmittel und jede Reise bereitzustellen. Diese Ergebnisse ermöglichen es den Benutzern, informierte Entscheidungen im Zusammenhang mit der Reduzierung ihres Kohlenstoff-Fußabdrucks zu treffen, um die Auswirkungen der globalen Erwärmung zu bekämpfen.",

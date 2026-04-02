@@ -139,7 +139,9 @@
       "ferryNone": "Place assise",
       "ferryCabin": "Cabine",
       "ferryVehicle": "Place assise + voiture",
-      "ferryCabinVehicle": "Cabine + voiture"
+      "ferryCabinVehicle": "Cabine + voiture",
+      "errorTitle": "Oups il y a eu un problème !",
+      "errorNoPathFound": "Désolé, nous n'avons pas pu trouver de chemin"
     },
     "about": {
       "introduction1": "Lowtrip est un projet indépendant, gratuit et open-source. L'objectif de cette application est de fournir des bilans carbone par passager précis pour chaque mode de transport et trajet. Ces résultats permettent à l'utilisateur de faire des choix informés dans le contexte de réduction de leur empreinte carbone pour freiner les effets du réchauffement climatique.",
