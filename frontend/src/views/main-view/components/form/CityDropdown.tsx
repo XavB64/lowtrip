@@ -54,17 +54,19 @@ const formatCities = (rawCities: PhotonApiCity[]) => {
   return cities;
 };
 
+type CityDropdownProps = {
+  selectCity: (city: City) => void;
+  resetCity: () => void;
+  stepName?: string;
+  stepIndex: number;
+};
+
 const CityDropdown = ({
   selectCity,
   resetCity,
   stepName,
   stepIndex,
-}: {
-  selectCity: (city: City) => void;
-  resetCity: () => void;
-  stepName?: string;
-  stepIndex: number;
-}) => {
+}: CityDropdownProps) => {
   const { t } = useTranslation();
   const { getCacheValue, addToCache, resetCache } = useCache();
   const [results, setResults] = useState<City[]>([]);
@@ -126,11 +128,8 @@ const CityDropdown = ({
   };
 
   useEffect(() => {
-    if (query && query !== stepName) {
-      handleChange(query);
-    } else {
-      setResults([]);
-    }
+    if (query && query !== stepName) handleChange(query);
+    else setResults([]);
   }, [query]);
 
   useEffect(() => {
@@ -138,11 +137,8 @@ const CityDropdown = ({
   }, [stepName]);
 
   useEffect(() => {
-    if (results.length > 0) {
-      setIsOpen(true);
-    } else {
-      setIsOpen(false);
-    }
+    if (results.length > 0) setIsOpen(true);
+    else setIsOpen(false);
   }, [results]);
 
   const handleKeyDown = (event: React.KeyboardEvent) => {
