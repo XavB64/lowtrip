@@ -17,7 +17,6 @@
 
 import { useMemo, useRef } from "react";
 
-import { Card, useBreakpointValue } from "@chakra-ui/react";
 import { MapContainer } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 
@@ -26,8 +25,9 @@ import { checkIsOnMobile } from "common/utils";
 import type { Step } from "types";
 
 import Chart from "../chart";
-import MapContent from "./map-content";
-import Legend from "./map-legend";
+import MapContent from "./MapContent";
+import Legend from "./MapLegend";
+import "./Map.scss";
 
 const extractCoords = (steps?: Step[]) =>
   (steps || [])
@@ -40,7 +40,6 @@ type MapProps = {
 
 const Map = ({ isDarkTheme }: MapProps) => {
   const chartRef = useRef<null | HTMLDivElement>(null);
-  const allowScrollToZoom = useBreakpointValue([false, true], { ssr: false });
   const isOnMobile = checkIsOnMobile();
 
   const { steps, alternativeSteps, simulationResults } = useSimulationContext();
@@ -53,14 +52,14 @@ const Map = ({ isDarkTheme }: MapProps) => {
   );
 
   return (
-    <>
+    <div className="map-container">
       {!isOnMobile && simulationResults && (
         <Legend tripGeometries={simulationResults.tripGeometries} />
       )}
       <MapContainer
         center={[48, 10]}
         zoom={5}
-        scrollWheelZoom={allowScrollToZoom}
+        scrollWheelZoom={!isOnMobile}
         style={{ width: "100%", position: "relative" }}
       >
         <MapContent
@@ -71,20 +70,11 @@ const Map = ({ isDarkTheme }: MapProps) => {
         />
       </MapContainer>
       {simulationResults && isOnMobile && (
-        <Card
-          ref={chartRef}
-          position="absolute"
-          w={200}
-          bottom={3}
-          right={3}
-          zIndex={2}
-          p="10px"
-          shadow="none"
-        >
+        <div ref={chartRef} className="map-chart-card">
           <Chart simulationResults={simulationResults} />
-        </Card>
+        </div>
       )}
-    </>
+    </div>
   );
 };
 

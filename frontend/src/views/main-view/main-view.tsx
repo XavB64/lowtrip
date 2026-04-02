@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 
-import { Box, IconButton, Stack } from "@chakra-ui/react";
+import { IconButton, Stack } from "@chakra-ui/react";
 import { BiChevronUp } from "react-icons/bi";
 import { useSearchParams } from "react-router-dom";
 
@@ -11,7 +11,7 @@ import { checkIsOnMobile } from "common/utils";
 
 import { stepsAreInvalid } from "./components/form/helpers/utils";
 import { LeftPanel } from "./components/left-panel";
-import Map from "./components/map";
+import Map from "./components/Map";
 import { extractPathStepsFromSimplifiedSteps } from "./helpers/shareableLink";
 
 const MainView = ({
@@ -61,14 +61,9 @@ const MainView = ({
     <CacheProvider>
       <Stack direction={["column", "row"]} width="100%">
         <LeftPanel withLogo={withLogo} />
-        <Box
-          w="100%"
-          height="100%"
-          minHeight={["calc(100vh - 64px)", "none"]}
-          position="relative"
-        >
-          <Map isDarkTheme={isDarkTheme} />
-        </Box>
+
+        <Map isDarkTheme={isDarkTheme} />
+
         {isOnMobile && (
           <IconButton
             aria-label="scroll-to-top"
