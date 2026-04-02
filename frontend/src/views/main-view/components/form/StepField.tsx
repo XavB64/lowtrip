@@ -22,7 +22,7 @@ import { BiTrash } from "react-icons/bi";
 import Button from "common/components/Button";
 import type { Step } from "types";
 
-import CityDropdown from "./city-dropdown";
+import CityDropdown from "./CityDropdown";
 import TransportSelector from "./TransportSelector";
 import { City } from "./types";
 
