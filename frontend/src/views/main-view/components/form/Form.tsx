@@ -70,13 +70,8 @@ const Form = ({ displayedTrip, showAlternativeForm }: FormProps) => {
   }, [t, displayedTrip, steps, alternativeSteps]);
 
   return (
-    <VStack
-      paddingY={5}
-      paddingX={[3, 5]}
-      backgroundColor="#efefef"
-      borderRadius={`${displayedTrip === TRIP_TYPE.ALTERNATIVE ? "12px 0" : "0 12px"} 12px 12px`}
-      justifyContent="right"
-      alignItems="start"
+    <div
+      className={`form ${displayedTrip === TRIP_TYPE.ALTERNATIVE ? "alternative-trip" : ""}`}
     >
       {(displayedTrip === TRIP_TYPE.MAIN ? steps : alternativeSteps).map(
         (step) => (
@@ -154,7 +149,7 @@ const Form = ({ displayedTrip, showAlternativeForm }: FormProps) => {
         onClose={onClose}
         errorMessage={errorMessage}
       />
-    </VStack>
+    </div>
   );
 };
 
