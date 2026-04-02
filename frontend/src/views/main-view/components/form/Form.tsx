@@ -17,12 +17,7 @@
 
 import { useMemo } from "react";
 
-import {
-  Button as ChakraButton,
-  Divider,
-  Text,
-  VStack,
-} from "@chakra-ui/react";
+import { Divider, Text, VStack } from "@chakra-ui/react";
 import { useTranslation } from "react-i18next";
 import { BiSolidPlusCircle } from "react-icons/bi";
 
@@ -96,15 +91,15 @@ const Form = ({ displayedTrip, showAlternativeForm }: FormProps) => {
         ),
       )}
 
-      <ChakraButton
+      <Button
+        className="add-step-button"
         onClick={() => addStep(displayedTrip)}
-        colorScheme="lightgrey"
-        borderRadius="20px"
-        color="black"
-        leftIcon={<BiSolidPlusCircle />}
       >
+        <span className="icon-wrapper">
+          <BiSolidPlusCircle />
+        </span>
         {t("form.addStep")}
-      </ChakraButton>
+      </Button>
 
       <Divider
         borderColor="lightgrey.500"

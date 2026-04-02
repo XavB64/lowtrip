@@ -15,6 +15,22 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+.add-step-button {
+  background-color: #d3d3d3;
+  color: black;
+  border-radius: 20px;
+  padding: 0 16px;
+  line-height: 1.2;
+
+  .icon-wrapper {
+    padding-right: 8px;
+  }
+
+  &:hover {
+    background: #bfbfbf;
+  }
+}
+
 .buttons-row {
   display: flex;
   flex-direction: column;
