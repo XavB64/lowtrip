@@ -21,10 +21,10 @@ import { useTranslation } from "react-i18next";
 import { BiSolidPlusCircle } from "react-icons/bi";
 
 import Button from "common/components/Button";
+import Modal from "common/components/modal";
 import { useSimulationContext } from "common/context/simulationContext";
 import { TRIP_TYPE } from "types";
 
-import ErrorModal from "./error-modal";
 import { getAdviceTextTranslation } from "./helpers/translationHelper";
 import { stepsAreInvalid } from "./helpers/utils";
 import { StepField } from "./StepField";
@@ -137,10 +137,11 @@ const Form = ({ displayedTrip, showAlternativeForm }: FormProps) => {
         )}
       </div>
 
-      <ErrorModal
-        isOpen={isOpen}
+      <Modal
+        headerTitle={t("form.errorTitle")}
+        mainText={errorMessage ?? t("form.errorNoPathFound")}
         onClose={onClose}
-        errorMessage={errorMessage}
+        isOpen={isOpen}
       />
     </div>
   );

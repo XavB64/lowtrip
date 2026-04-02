@@ -71,7 +71,9 @@
       "ferryNone": "Sedute",
       "ferryCabin": "Cabina",
       "ferryVehicle": "Sedute + macchina",
-      "ferryCabinVehicle": "Cabina + macchina"
+      "ferryCabinVehicle": "Cabina + macchina",
+      "errorTitle": "Ops, è successo qualcosa!",
+      "errorNoPathFound": "Spiacenti, non siamo riusciti a trovare alcun percorso."
     },
     "about": {
       "introduction1": "Lowtrip è un progetto indipendente, gratuito e open source. Lo scopo di questa applicazione è fornire impronte di carbonio accurate per passeggero per ogni mezzo di trasporto e viaggio. Questi risultati consentono agli utenti di fare scelte informate nel contesto della riduzione delle loro impronte di carbonio per contrastare gli effetti del riscaldamento globale.",

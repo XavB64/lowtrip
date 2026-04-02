@@ -20,7 +20,7 @@ type Context = {
   steps: Step[];
   alternativeSteps: Step[];
   simulationResults?: SimulationResults;
-  errorMessage: string;
+  errorMessage?: string;
   isLoading: boolean;
   modalContext: { isOpen: boolean; onClose: () => void };
   addStep: (trip: TRIP_TYPE) => void;
@@ -47,7 +47,7 @@ export const SimulationProvider = ({ children }: { children: ReactNode }) => {
     useState<SimulationResults>();
 
   const { isOpen, onOpen: openErrorModal, onClose } = useDisclosure();
-  const [errorMessage, setErrorMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState<string>();
   const [isLoading, setIsLoading] = useState(false);
 
   const addStep = useCallback(
@@ -152,7 +152,7 @@ export const SimulationProvider = ({ children }: { children: ReactNode }) => {
         isOpen,
         onClose: () => {
           onClose();
-          setErrorMessage("");
+          setErrorMessage(undefined);
         },
       },
       addStep,
