@@ -15,9 +15,9 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { useBreakpoint } from "@chakra-ui/react";
 import { LabelProps } from "recharts";
 
+import { checkIsOnMobile } from "common/utils";
 import type { Trip } from "types";
 
 type CustomLabelProps = {
@@ -34,7 +34,7 @@ const CustomLabel = ({
   emissionSource,
   ...props
 }: CustomLabelProps) => {
-  const breakpoint = useBreakpoint();
+  const isOnMobile = checkIsOnMobile();
 
   const { emissionParts, trip } = emissionPartsByTrip.find(
     ({ trip }) => trip.label === props.value,
@@ -51,9 +51,9 @@ const CustomLabel = ({
     <>
       <text
         x={Number(props.x ?? 0) + Number(props.width ?? 0) / 2}
-        y={Number(props.y ?? 0) - (breakpoint === "base" ? 15 : 20)}
+        y={Number(props.y ?? 0) - (isOnMobile ? 15 : 20)}
         textAnchor="middle"
-        fontSize={breakpoint === "base" ? 10 : 16}
+        fontSize={isOnMobile ? 10 : 16}
       >
         {Math.round(trip.totalEmissions)}
       </text>
@@ -61,7 +61,7 @@ const CustomLabel = ({
         x={Number(props.x ?? 0) + Number(props.width ?? 0) / 2}
         y={Number(props.y ?? 0) - 5}
         textAnchor="middle"
-        fontSize={breakpoint === "base" ? 8 : 12}
+        fontSize={isOnMobile ? 8 : 12}
       >
         kgCO2eq
       </text>

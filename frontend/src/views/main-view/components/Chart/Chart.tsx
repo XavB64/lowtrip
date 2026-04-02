@@ -17,19 +17,8 @@
 
 import { useMemo, useState } from "react";
 
-import {
-  Box,
-  useBreakpoint,
-  Flex,
-  Text,
-  Alert,
-  AlertIcon,
-  Link,
-  IconButton,
-} from "@chakra-ui/react";
-import { keyframes } from "@emotion/react";
 import { useTranslation } from "react-i18next";
-import { BiHelpCircle } from "react-icons/bi";
+import { BiHelpCircle, BiInfoCircle } from "react-icons/bi";
 import { FaShareAlt } from "react-icons/fa";
 import {
   Bar,
@@ -42,22 +31,13 @@ import {
 } from "recharts";
 
 import Tooltip from "common/components/Tooltip";
-import { uniqBy } from "common/utils";
+import { checkIsOnMobile, uniqBy } from "common/utils";
 import type { Trip, SimulationResults } from "types";
 
-import CustomLabel from "./custom-label";
+import CustomLabel from "./CustomLabel";
 import { getChartData, getLabel } from "./helpers";
 import { generateUrlToShare } from "../../helpers/shareableLink";
-
-const fadeIn = keyframes`
-  from { opacity: 0; }
-  to { opacity: 1; }
-`;
-
-const fadeOut = keyframes`
-  from { opacity: 1; }
-  to { opacity: 0; }
-`;
+import "./Chart.scss";
 
 /**
  * Corresponds to 2kg of CO2 emissions per year per person
@@ -74,7 +54,6 @@ const Chart = ({
   simulationResults: { trips, simulationType, inputs },
 }: ChartProps) => {
   const { t } = useTranslation();
-  const breakpoint = useBreakpoint();
 
   const [showCopiedLinkNotification, setShowCopiedLinkNotification] =
     useState(false);
@@ -127,72 +106,52 @@ const Chart = ({
   );
 
   return (
-    <Box h="100%" w="100%">
-      <Text mr={3} align="center" color="#595959" fontSize={["small", "large"]}>
-        {chartTitle}{" "}
-        <IconButton
+    <div className="chart-container">
+      <div className="chart-title">
+        {chartTitle}
+
+        <button
+          className="share-icon-button"
           onClick={() =>
             generateUrlToShare(inputs, setShowCopiedLinkNotification)
           }
-          aria-label="delete"
-          borderRadius="20px"
-          icon={<FaShareAlt size={20} />}
-        />
+          aria-label="share"
+        >
+          <FaShareAlt size={15} />
+        </button>
+
         {showCopiedLinkNotification && (
-          <Box
-            position="fixed"
-            bottom="20px"
-            left="50%"
-            transform="translateX(-50%)"
-            bg="green.500"
-            color="white"
-            p="10px"
-            borderRadius="md"
-            boxShadow="md"
-            textAlign="center"
-            zIndex="1000"
-            animation={`${fadeIn} 0.5s, ${fadeOut} 0.5s 2.5s`}
-          >
-            {t("chart.copied-link")}
-          </Box>
+          <div className="copied-toast">{t("chart.copied-link")}</div>
         )}
-      </Text>
-      <Alert
-        status="info"
-        my={3}
-        borderRadius={5}
-        fontSize={[10, 12]}
-        p={[2, 3]}
-      >
-        <AlertIcon boxSize={[4, 5]} />
-        <Text>
+      </div>
+
+      <div className="alert">
+        <BiInfoCircle className="alert-icon-svg" />
+        <span>
           {t("chart.information.info1")}{" "}
-          <Text as="b">
+          <strong>
             {Math.round(
               (mainTrip.totalEmissions / ANNUAL_CO2_EMISSIONS_BUDGET) * 100,
             )}
             %
-          </Text>{" "}
+          </strong>{" "}
           {t("chart.information.your")}{" "}
-          <Link
+          <a
             href={t("chart.information.link")}
-            isExternal
-            textDecoration="underline"
+            target="_blank"
+            rel="noopener noreferrer"
           >
             {t("chart.information.info2")}
-          </Link>{" "}
+          </a>{" "}
           {t("chart.information.info3")}
-        </Text>
-      </Alert>
+        </span>
+      </div>
 
-      <ResponsiveContainer
-        height={breakpoint === "base" ? 230 : 400}
-        width="100%"
-      >
+      <ResponsiveContainer height={checkIsOnMobile() ? 230 : 400} width="100%">
         <BarChart data={chartData} margin={{ bottom: 0 }}>
           <XAxis
             dataKey="displayedName"
-            fontSize={breakpoint === "base" ? 8 : 14}
+            fontSize={checkIsOnMobile() ? 8 : 14}
           />
           <YAxis padding={{ top: 50 }} hide />
           <ChartTooltip
@@ -223,18 +182,15 @@ const Chart = ({
         </BarChart>
       </ResponsiveContainer>
 
-      <Flex justifyContent="flex-end" height="auto" width="100%">
+      <div className="chart-footer">
         <Tooltip content={t("results.explanation")}>
-          <span style={{ fontSize: breakpoint === "base" ? 10 : 12 }}>
-            {" "}
+          <div className="plane-explanation-tooltip">
             {t("chart.help")}
-            <BiHelpCircle
-              style={{ display: "inline-block", marginRight: "5px" }}
-            />
-          </span>
+            <BiHelpCircle className="help-icon" />
+          </div>
         </Tooltip>
-      </Flex>
-    </Box>
+      </div>
+    </div>
   );
 };
 

@@ -36,7 +36,7 @@ import { useSimulationContext } from "common/context/simulationContext";
 import { checkIsOnMobile } from "common/utils";
 import { TRIP_TYPE } from "types";
 
-import Chart from "./chart";
+import Chart from "./Chart";
 import Form from "./form";
 
 type LeftPanelProps = {
