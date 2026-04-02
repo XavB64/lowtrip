@@ -15,30 +15,49 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-.add-step-button {
-  background-color: #d3d3d3;
-  color: black;
-  border-radius: 20px;
-  padding: 0 16px;
-  line-height: 1.2;
-
-  .icon-wrapper {
-    padding-right: 8px;
-  }
-
-  &:hover {
-    background: #bfbfbf;
-  }
-}
-
-.buttons-row {
+.form {
   display: flex;
   flex-direction: column;
-  width: 100%;
-  gap: 5px;
+  align-items: start;
+  gap: 8px;
+
+  padding: 20px 12px;
+  background-color: #efefef;
+  border-radius: 0 12px 12px 12px;
+
+  &.alternative-trip {
+    border-radius: 12px 0 12px 12px;
+  }
 
   @media (min-width: 600px) {
-    flex-direction: row;
+    padding: 20px;
+  }
+
+  .add-step-button {
+    background-color: #d3d3d3;
+    color: black;
+    border-radius: 20px;
+    padding: 0 16px;
+    line-height: 1.2;
+
+    .icon-wrapper {
+      padding-right: 8px;
+    }
+
+    &:hover {
+      background: #bfbfbf;
+    }
+  }
+
+  .buttons-row {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: 5px;
+
+    @media (min-width: 600px) {
+      flex-direction: row;
+    }
   }
 
   .form-action-button {
