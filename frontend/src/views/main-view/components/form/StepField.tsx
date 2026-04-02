@@ -17,9 +17,9 @@
 
 import { useEffect, useState } from "react";
 
-import { HStack, IconButton } from "@chakra-ui/react";
 import { BiTrash } from "react-icons/bi";
 
+import Button from "common/components/Button";
 import type { Step } from "types";
 
 import CityDropdown from "./city-dropdown";
@@ -68,7 +68,7 @@ export const StepField = ({ removeStep, updateStep, step }: StepFieldProps) => {
 
   return (
     <>
-      <HStack w="100%">
+      <div className="step-field-row">
         <div
           style={{
             position: "relative",
@@ -84,14 +84,15 @@ export const StepField = ({ removeStep, updateStep, step }: StepFieldProps) => {
         </div>
 
         {step.index > 2 && (
-          <IconButton
+          <Button
+            className="delete-step-button"
             onClick={() => removeStep(step.index)}
             aria-label="delete"
-            borderRadius="20px"
-            icon={<BiTrash size={20} />}
-          />
+          >
+            <BiTrash size={20} />
+          </Button>
         )}
-      </HStack>
+      </div>
       {!isDeparture && (
         <TransportSelector step={step} updateStep={updateStep} />
       )}

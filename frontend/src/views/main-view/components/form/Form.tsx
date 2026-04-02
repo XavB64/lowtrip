@@ -27,7 +27,7 @@ import { TRIP_TYPE } from "types";
 import ErrorModal from "./error-modal";
 import { getAdviceTextTranslation } from "./helpers/translationHelper";
 import { stepsAreInvalid } from "./helpers/utils";
-import { StepField } from "./step-field";
+import { StepField } from "./StepField";
 import "./Form.scss";
 
 type FormProps = {
