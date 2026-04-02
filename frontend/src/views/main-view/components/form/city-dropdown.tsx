@@ -70,24 +70,6 @@ const ClearButton = ({ resetCity }: { resetCity: () => void }) => {
       aria-label="Clear input"
       title={t("form.clearInput")}
       onClick={resetCity}
-      style={{
-        position: "absolute",
-        right: "0.5rem",
-        bottom: "0.80rem",
-        justifyContent: "center",
-        alignItems: "center",
-        width: "1.5rem",
-        height: "1.5rem",
-        appearance: "none",
-        border: "none",
-        borderRadius: "50%",
-        background: "gray",
-        margin: 0,
-        padding: "2px",
-        color: "white",
-        fontSize: "1.5rem",
-        display: "flex",
-      }}
     >
       ×
     </button>
@@ -96,18 +78,7 @@ const ClearButton = ({ resetCity }: { resetCity: () => void }) => {
 
 const Loader = () => {
   return (
-    <div
-      style={{
-        position: "absolute",
-        right: "0.5rem",
-        bottom: "0.80rem",
-        justifyContent: "center",
-        alignItems: "center",
-        width: "1.5rem",
-        height: "1.5rem",
-        display: "flex",
-      }}
-    >
+    <div className="loader-wrapper">
       <Spinner size="sm" />
     </div>
   );
@@ -230,6 +201,7 @@ const CityDropdown = ({
         <PopoverTrigger>
           <input
             type={"text"}
+            className="city-dropdown-input"
             value={value}
             autoComplete="off"
             onChange={(e) => setValue(e.target.value)}
@@ -237,17 +209,7 @@ const CityDropdown = ({
             placeholder={
               isDeparture ? t("form.placeholderFrom") : t("form.placeholderTo")
             }
-            // onBlur={() => setIsOpen(false)}
             id={`dropdownId-${stepIndex}`}
-            style={{
-              width: "100%",
-              height: "50px",
-              padding: "9px",
-              border: "1px solid lightgrey",
-              borderRadius: "20px",
-              backgroundColor: "white",
-              fontSize: "16px",
-            }}
           />
         </PopoverTrigger>
         <PopoverContent w="100%">
