@@ -1,0 +1,124 @@
+// lowtrip, a web interface to compute travel CO2eq for different means of transport worldwide.
+
+// Copyright (C) 2024  Bonnemaizon Xavier, Ni Clara, Gres Paola & Pellas Chiara
+
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published
+// by the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Affero General Public License for more details.
+
+// You should have received a copy of the GNU Affero General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+.chart-container {
+  width: 100%;
+  height: 100%;
+
+  .chart-title {
+    text-align: center;
+    color: #595959;
+    font-size: 14px;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+
+    @media (min-width: 600px) {
+      font-size: 18px;
+      flex-direction: row;
+    }
+  }
+
+  .share-icon-button {
+    width: 25px;
+    height: 25px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+
+    cursor: pointer;
+    color: #595959;
+    background: transparent;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background: rgba(0, 0, 0, 0.05);
+    }
+
+    @media (min-width: 600px) {
+      width: 35px;
+      height: 35px;
+      border: 1px solid rgba(0, 0, 0, 0.15);
+    }
+  }
+
+  .copied-toast {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #22c55e;
+    color: white;
+    padding: 10px;
+    border-radius: 6px;
+    z-index: 1000;
+    text-align: center;
+    animation:
+      fadeIn 0.5s,
+      fadeOut 0.5s 2.5s;
+  }
+
+  .alert {
+    margin: 0;
+    margin-top: 12px;
+    padding: 6px;
+    border-radius: 5px;
+    background: #e0f2fe;
+    color: #0369a1;
+    font-size: 10px;
+
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    @media (min-width: 600px) {
+      font-size: 12px;
+      padding: 8px 12px;
+    }
+
+    .alert-icon-svg {
+      width: 20px;
+      height: 20px;
+      color: #0f766e;
+      flex-shrink: 0;
+    }
+
+    a {
+      text-decoration: underline;
+    }
+  }
+
+  .chart-footer {
+    display: flex;
+    justify-content: flex-end;
+    width: 100%;
+
+    .plane-explanation-tooltip {
+      display: flex;
+      align-items: center;
+      font-size: 12px;
+
+      .help-icon {
+        margin-left: 5px;
+      }
+    }
+  }
+}

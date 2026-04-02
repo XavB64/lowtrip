@@ -24,7 +24,7 @@ import { useSimulationContext } from "common/context/simulationContext";
 import { checkIsOnMobile } from "common/utils";
 import type { Step } from "types";
 
-import Chart from "../chart";
+import Chart from "../Chart";
 import MapContent from "./MapContent";
 import Legend from "./MapLegend";
 import "./Map.scss";
