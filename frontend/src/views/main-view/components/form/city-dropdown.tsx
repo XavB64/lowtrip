@@ -62,28 +62,6 @@ const formatCities = (rawCities: PhotonApiCity[]) => {
   return cities;
 };
 
-const ClearButton = ({ resetCity }: { resetCity: () => void }) => {
-  const { t } = useTranslation();
-  return (
-    <button
-      className="clear-input-button"
-      aria-label="Clear input"
-      title={t("form.clearInput")}
-      onClick={resetCity}
-    >
-      ×
-    </button>
-  );
-};
-
-const Loader = () => {
-  return (
-    <div className="loader-wrapper">
-      <Spinner size="sm" />
-    </div>
-  );
-};
-
 const CityDropdown = ({
   selectCity,
   resetCity,
@@ -214,51 +192,39 @@ const CityDropdown = ({
         </PopoverTrigger>
         <PopoverContent w="100%">
           {results.map((option, index) => (
-            <Option
+            <Box
               key={option.name}
-              option={option}
-              onSelectOption={selectCity}
-              setIsOpen={setIsOpen}
-              isActive={active === index}
-            />
+              onClick={() => {
+                selectCity(option);
+                setIsOpen(false);
+              }}
+              p={1}
+              bgColor={active === index ? "gray.100" : ""}
+              _hover={{ bgColor: "gray.100" }}
+            >
+              <Text cursor={"pointer"}>{option.name}</Text>
+            </Box>
           ))}
         </PopoverContent>
       </Popover>
-      {isLoading && <Loader />}
-      {value && !isLoading && <ClearButton resetCity={resetCity} />}
+
+      {isLoading && (
+        <div className="loader-wrapper">
+          <div className="spinner" />
+        </div>
+      )}
+
+      {value && !isLoading && (
+        <button
+          className="clear-input-button"
+          aria-label="Clear input"
+          title={t("form.clearInput")}
+          onClick={resetCity}
+        >
+          ×
+        </button>
+      )}
     </>
-  );
-};
-
-const Option = ({
-  option,
-  onSelectOption,
-  setIsOpen,
-  isActive,
-}: {
-  option: City;
-  onSelectOption: (option: City) => void;
-  setIsOpen: (isOpen: boolean) => void;
-  isActive: boolean;
-}) => {
-  const selectOption = () => {
-    onSelectOption(option);
-    setIsOpen(false);
-  };
-
-  const getBgColor = () => {
-    if (isActive) return "gray.100";
-  };
-
-  return (
-    <Box
-      onClick={selectOption}
-      p={1}
-      bgColor={getBgColor()}
-      _hover={{ bgColor: "gray.100" }}
-    >
-      <Text cursor={"pointer"}>{option.name}</Text>
-    </Box>
   );
 };
 
