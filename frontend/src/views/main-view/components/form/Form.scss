@@ -33,6 +33,24 @@
     padding: 20px;
   }
 
+  .step-field-row {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    width: 100%;
+
+    .delete-step-button {
+      background: transparent;
+      border-radius: 20px;
+      color: black;
+
+      &:hover {
+        background: rgba(220, 38, 38, 0.1);
+        color: #dc2626;
+      }
+    }
+  }
+
   .add-step-button {
     background-color: #d3d3d3;
     color: black;
