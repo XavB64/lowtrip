@@ -60,7 +60,7 @@ const Map = ({ isDarkTheme }: MapProps) => {
         center={[48, 10]}
         zoom={5}
         scrollWheelZoom={!isOnMobile}
-        style={{ width: "100%", position: "relative" }}
+        style={{ width: "100%", height: "100%", position: "relative" }}
       >
         <MapContent
           isDarkTheme={isDarkTheme}

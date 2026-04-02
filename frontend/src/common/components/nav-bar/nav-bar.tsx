@@ -27,8 +27,6 @@ import {
   MenuItem,
   MenuList,
   Spacer,
-  Stack,
-  VStack,
   useDisclosure,
 } from "@chakra-ui/react";
 import { useTranslation } from "react-i18next";
@@ -43,6 +41,7 @@ import UserSettingsModal from "./user-settings-modal";
 import UserSettingsSelector from "./user-settings-selector";
 import CookieBanner from "../cookie-banner";
 import { GithubItem, GithubMenuItem } from "./github-items";
+import "./NavBar.scss";
 
 const navItems = [
   {
@@ -144,20 +143,13 @@ const NavbarWrapper = ({
 }) => (
   <ChakraProvider theme={theme}>
     <ConsentContextProvider>
-      <VStack w="100vw" h={["100%", "100vh"]} spacing={0}>
+      <div className="nav-bar-wrapper">
         <NavBar themeSettings={themeSettings} />
-        <Stack
-          direction={["column", "row"]}
-          w="100%"
-          spacing={0}
-          height="calc(100vh - 64px)"
-          overflowY="auto"
-          id="main-body"
-        >
+        <div className="view" id="main-body">
           <Outlet />
-        </Stack>
+        </div>
         <CookieBanner />
-      </VStack>
+      </div>
     </ConsentContextProvider>
   </ChakraProvider>
 );
