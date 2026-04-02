@@ -1,13 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
 
-import {
-  Box,
-  Popover,
-  PopoverTrigger,
-  PopoverContent,
-  Text,
-  Spinner,
-} from "@chakra-ui/react";
 import i18n from "i18next";
 import { useTranslation } from "react-i18next";
 
@@ -173,40 +165,52 @@ const CityDropdown = ({
     }
   };
 
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (!(e.target instanceof HTMLElement)) return;
+      if (!e.target.closest(".city-dropdown")) {
+        setIsOpen(false);
+        setValue(stepName || "");
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   return (
-    <>
-      <Popover isOpen={isOpen} autoFocus={false} matchWidth closeOnBlur={true}>
-        <PopoverTrigger>
-          <input
-            type={"text"}
-            className="city-dropdown-input"
-            value={value}
-            autoComplete="off"
-            onChange={(e) => setValue(e.target.value)}
-            onKeyDown={handleKeyDown}
-            placeholder={
-              isDeparture ? t("form.placeholderFrom") : t("form.placeholderTo")
-            }
-            id={`dropdownId-${stepIndex}`}
-          />
-        </PopoverTrigger>
-        <PopoverContent w="100%">
+    <div className="city-dropdown">
+      <input
+        type="text"
+        className="city-dropdown-input"
+        value={value}
+        autoComplete="off"
+        onChange={(e) => setValue(e.target.value)}
+        onKeyDown={handleKeyDown}
+        placeholder={
+          isDeparture ? t("form.placeholderFrom") : t("form.placeholderTo")
+        }
+        id={`dropdownId-${stepIndex}`}
+      />
+
+      {isOpen && (
+        <div className="city-dropdown-menu">
           {results.map((option, index) => (
-            <Box
+            <div
               key={option.name}
+              className={`city-dropdown-item ${
+                active === index ? "active" : ""
+              }`}
               onClick={() => {
                 selectCity(option);
                 setIsOpen(false);
               }}
-              p={1}
-              bgColor={active === index ? "gray.100" : ""}
-              _hover={{ bgColor: "gray.100" }}
             >
-              <Text cursor={"pointer"}>{option.name}</Text>
-            </Box>
+              {option.name}
+            </div>
           ))}
-        </PopoverContent>
-      </Popover>
+        </div>
+      )}
 
       {isLoading && (
         <div className="loader-wrapper">
@@ -224,7 +228,7 @@ const CityDropdown = ({
           ×
         </button>
       )}
-    </>
+    </div>
   );
 };
 
