@@ -17,7 +17,6 @@
 
 import { useMemo } from "react";
 
-import { Divider, Text, VStack } from "@chakra-ui/react";
 import { useTranslation } from "react-i18next";
 import { BiSolidPlusCircle } from "react-icons/bi";
 
@@ -96,16 +95,10 @@ const Form = ({ displayedTrip, showAlternativeForm }: FormProps) => {
         {t("form.addStep")}
       </Button>
 
-      <Divider
-        borderColor="lightgrey.500"
-        opacity={1}
-        width="100%"
-        alignSelf="center"
-        my={3}
-      />
+      <hr className="divider" aria-orientation="horizontal" />
 
-      <VStack w="100%">
-        {adviceText && <Text textAlign="center">{adviceText}</Text>}
+      <div className="submit-section">
+        {adviceText && <p>{adviceText}</p>}
         {displayedTrip === TRIP_TYPE.ALTERNATIVE ? (
           stepsAreInvalid(steps) ? null : (
             <Button
@@ -142,7 +135,7 @@ const Form = ({ displayedTrip, showAlternativeForm }: FormProps) => {
             )}
           </div>
         )}
-      </VStack>
+      </div>
 
       <ErrorModal
         isOpen={isOpen}
