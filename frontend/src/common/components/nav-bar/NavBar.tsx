@@ -15,24 +15,13 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import {
-  Box,
-  Button,
-  ChakraProvider,
-  HStack,
-  IconButton,
-  Image,
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuList,
-  Spacer,
-  useDisclosure,
-} from "@chakra-ui/react";
-import { useTranslation } from "react-i18next";
-import { GiHamburgerMenu } from "react-icons/gi";
-import { Link, Outlet } from "react-router-dom";
+import { useEffect, useState } from "react";
 
+import { ChakraProvider, useDisclosure } from "@chakra-ui/react";
+import { useTranslation } from "react-i18next";
+import { Link, Outlet, useLocation } from "react-router-dom";
+
+import gitLogo from "assets/github.png";
 import Logo from "assets/lowtrip_logo.png";
 import { ConsentContextProvider } from "common/context/consentContext";
 import theme from "theme";
@@ -40,8 +29,18 @@ import theme from "theme";
 import UserSettingsModal from "./user-settings-modal";
 import UserSettingsSelector from "./user-settings-selector";
 import CookieBanner from "../cookie-banner";
-import { GithubItem, GithubMenuItem } from "./github-items";
 import "./NavBar.scss";
+
+const GithubItem = ({ className }: { className?: string }) => (
+  <a
+    href="https://github.com/XavB64/lowtrip/"
+    target="_blank"
+    rel="noopener noreferrer"
+    className={`github-link ${className}`}
+  >
+    <img src={gitLogo} alt="GitHub" />
+  </a>
+);
 
 const navItems = [
   {
@@ -69,67 +68,75 @@ const NavBar = ({
     switchMapTheme: () => void;
   };
 }) => {
-  // Determine the display of the navigation items based on screen size
   const { t } = useTranslation();
+  const location = useLocation();
   const { isOpen, onOpen: openErrorModal, onClose } = useDisclosure();
 
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const toggleMenu = () => {
+    setIsMenuOpen((prev) => !prev);
+  };
+
+  useEffect(() => {
+    setIsMenuOpen(false);
+  }, [location.pathname]);
+
   return (
-    <HStack
-      w="100%"
-      background="#515151"
-      px={{ base: 3, md: 6 }}
-      py={4}
-      boxShadow="md"
-      h="64px"
-    >
-      <Link to="/" style={{ height: "120%" }}>
-        <Image src={Logo} h="120%" />
+    <div className="nav-bar">
+      <Link to="/" className="logo">
+        <img src={Logo} />
       </Link>
-      <Spacer />
-      <HStack display={{ base: "none", md: "flex" }}>
+
+      {/* Desktop menu */}
+      <div className="nav-bar-desktop">
         {navItems.map((item) => (
-          <Link to={item.url} key={item.name}>
-            <Button
-              fontSize={16}
-              color="#fff"
-              variant="ghost"
-              _hover={{ backgroundColor: "none", color: "#D1D1D1" }}
-              _active={{ backgroundColor: "none", color: "#D1D1D1" }}
-            >
-              {t(`navbar.${item.label}`)}
-            </Button>
+          <Link to={item.url} key={item.name} className="desktop-link">
+            {t(`navbar.${item.label}`)}
           </Link>
         ))}
         <GithubItem />
         <UserSettingsSelector themeSettings={themeSettings} />
-      </HStack>
-      <Box display={{ base: "block", md: "none" }}>
-        <Menu>
-          <MenuButton
-            as={IconButton}
-            aria-label="Options"
-            icon={<GiHamburgerMenu size={25} />}
-            colorScheme="transparent"
-          />
-          <MenuList>
+      </div>
+
+      {/* Mobile menu */}
+      <div className="nav-bar-mobile">
+        <button className="burger" onClick={toggleMenu}>
+          ☰
+        </button>
+
+        {isMenuOpen && (
+          <div className="dropdown">
             {navItems.map((item) => (
-              <Link to={item.url} key={item.name}>
-                <MenuItem key={item.name}>{t(`navbar.${item.label}`)}</MenuItem>
+              <Link
+                to={item.url}
+                key={item.name}
+                className="dropdown-item"
+                onClick={toggleMenu}
+              >
+                {t(`navbar.${item.label}`)}
               </Link>
             ))}
-            <GithubMenuItem />
-            <MenuItem onClick={openErrorModal}>{t("navbar.settings")}</MenuItem>
-          </MenuList>
-        </Menu>
+            <GithubItem className="dropdown-item" />
+            <button
+              className="dropdown-item"
+              onClick={() => {
+                openErrorModal();
+                setIsMenuOpen(false);
+              }}
+            >
+              {t("navbar.settings")}
+            </button>
+          </div>
+        )}
+
         <UserSettingsModal
           isOpen={isOpen}
-          onClose={() => {
-            onClose();
-          }}
+          onClose={onClose}
           themeSettings={themeSettings}
         />
-      </Box>
-    </HStack>
+      </div>
+    </div>
   );
 };
 
