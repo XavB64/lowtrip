@@ -1,9 +1,26 @@
+// Lowtrip, a web interface to compute travel CO2eq for different means of transport worldwide.
+
+// Copyright (C) 2024  Bonnemaizon Xavier, Ni Clara, Gres Paola & Pellas Chiara
+
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published
+// by the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Affero General Public License for more details.
+
+// You should have received a copy of the GNU Affero General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 import { useEffect } from "react";
 
-import { Button, Center, Text } from "@chakra-ui/react";
 import { useTranslation } from "react-i18next";
 
 import { useConsentContext } from "../context/consentContext";
+import "./CookieBanner.scss";
 
 const CookieBanner = () => {
   const { t } = useTranslation();
@@ -39,26 +56,12 @@ const CookieBanner = () => {
   }
 
   return (
-    <Center
-      position="absolute"
-      zIndex={100}
-      backgroundColor="#515151"
-      bottom={0}
-      width="100%"
-      padding={2}
-      flexDirection={["column", "row"]}
-    >
-      <Text color="white" textAlign={["center", "left"]} pb={[2, 0]}>
-        {t("cookieBanner.message")}
-      </Text>
-      <Button
-        marginLeft={[0, 4]}
-        onClick={handleConsent}
-        width={["100%", "auto"]}
-      >
+    <div className="cookie-banner">
+      <p className="cookie-banner__text">{t("cookieBanner.message")}</p>
+      <button className="cookie-banner__button" onClick={handleConsent}>
         {t("cookieBanner.ok")}
-      </Button>
-    </Center>
+      </button>
+    </div>
   );
 };
 
