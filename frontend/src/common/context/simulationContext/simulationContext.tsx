@@ -7,7 +7,7 @@ import {
   useState,
 } from "react";
 
-import { useDisclosure } from "@chakra-ui/react";
+import { useTranslation } from "react-i18next";
 import nextId from "react-id-generator";
 
 import { API_URL } from "config";
@@ -22,18 +22,20 @@ type Context = {
   simulationResults?: SimulationResults;
   errorMessage?: string;
   isLoading: boolean;
-  modalContext: { isOpen: boolean; onClose: () => void };
   addStep: (trip: TRIP_TYPE) => void;
   removeStep: (trip: TRIP_TYPE, index: number) => void;
   updateStep: (trip: TRIP_TYPE, index: number, data: Partial<Step>) => void;
   setSteps: (steps: Step[]) => void;
   setAlternativeSteps: (steps: Step[]) => void;
   submitForm: (mainSteps: Step[], alternativeSteps?: Step[]) => void;
+  closeErrorModal: () => void;
 };
 
 const SimulationContext = createContext<Context | null>(null);
 
 export const SimulationProvider = ({ children }: { children: ReactNode }) => {
+  const { t } = useTranslation();
+
   const [steps, setSteps] = useState<Step[]>([
     { index: 1, id: nextId() },
     { index: 2, id: nextId() },
@@ -46,7 +48,6 @@ export const SimulationProvider = ({ children }: { children: ReactNode }) => {
   const [simulationResults, setSimulationResults] =
     useState<SimulationResults>();
 
-  const { isOpen, onOpen: openErrorModal, onClose } = useDisclosure();
   const [errorMessage, setErrorMessage] = useState<string>();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -118,12 +119,11 @@ export const SimulationProvider = ({ children }: { children: ReactNode }) => {
 
       if (!res.ok) {
         console.error(`${res.status} ${res.statusText}`);
-        openErrorModal();
+        setErrorMessage(t("form.errorNoPathFound"));
       } else {
         const response: ApiResponse = await res.json();
         if (response.error) {
           setErrorMessage(response.error);
-          openErrorModal();
         } else {
           const formattedSimulation = formatResponse(
             { mainSteps, altSteps },
@@ -138,7 +138,7 @@ export const SimulationProvider = ({ children }: { children: ReactNode }) => {
 
       setIsLoading(false);
     },
-    [openErrorModal],
+    [],
   );
 
   const context = useMemo(
@@ -148,19 +148,15 @@ export const SimulationProvider = ({ children }: { children: ReactNode }) => {
       simulationResults,
       errorMessage,
       isLoading,
-      modalContext: {
-        isOpen,
-        onClose: () => {
-          onClose();
-          setErrorMessage(undefined);
-        },
-      },
       addStep,
       removeStep,
       updateStep,
       setSteps,
       setAlternativeSteps,
       submitForm,
+      closeErrorModal: () => {
+        setErrorMessage(undefined);
+      },
     }),
     [
       steps,
@@ -168,8 +164,6 @@ export const SimulationProvider = ({ children }: { children: ReactNode }) => {
       simulationResults,
       errorMessage,
       isLoading,
-      isOpen,
-      onClose,
       addStep,
       removeStep,
       updateStep,

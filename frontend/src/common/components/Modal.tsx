@@ -17,14 +17,7 @@
 
 import { PropsWithChildren } from "react";
 
-import {
-  Modal as ChakraModal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalCloseButton,
-} from "@chakra-ui/react";
+import "./Modal.scss";
 
 type ModalProps = PropsWithChildren<{
   onClose: () => void;
@@ -32,15 +25,26 @@ type ModalProps = PropsWithChildren<{
   headerTitle: string;
 }>;
 
-const Modal = ({ headerTitle, onClose, isOpen, children }: ModalProps) => (
-  <ChakraModal onClose={onClose} isOpen={isOpen} isCentered>
-    <ModalOverlay />
-    <ModalContent>
-      <ModalHeader>{headerTitle}</ModalHeader>
-      <ModalCloseButton />
-      <ModalBody marginBottom={5}>{children}</ModalBody>
-    </ModalContent>
-  </ChakraModal>
-);
+const Modal = ({ headerTitle, onClose, isOpen, children }: ModalProps) => {
+  if (!isOpen) return null;
+
+  return (
+    <div className="modal">
+      <div className="modal__overlay" onClick={onClose} />
+
+      <div className="modal__content">
+        <div className="modal__header">
+          <h2 className="modal__title">{headerTitle}</h2>
+
+          <button className="modal__close" onClick={onClose}>
+            ×
+          </button>
+        </div>
+
+        <div className="modal__body">{children}</div>
+      </div>
+    </div>
+  );
+};
 
 export default Modal;
