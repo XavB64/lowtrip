@@ -3,6 +3,7 @@ import { useState, useRef, useEffect, useMemo } from "react";
 import { TFunction } from "i18next";
 import { useTranslation } from "react-i18next";
 
+import { IconButton } from "common/components/Button";
 import Tooltip from "common/components/Tooltip";
 import { checkIsOnMobile } from "common/utils";
 import { FerryOptions, thumbUp, Transport, type Step } from "types";
@@ -86,7 +87,7 @@ type Props = {
   updateStep: (index: number, data: Partial<Step>) => void;
   isSelected: boolean;
   step: Step;
-  icon: React.ReactNode;
+  icon: JSX.Element;
   transport: Transport;
 };
 
@@ -183,21 +184,16 @@ export const TransportWithOptions = ({
   return (
     <div className="transport-selector-with-options">
       <Tooltip content={transport} position="bottom" displayTooltip={!open}>
-        <button
+        <IconButton
+          icon={icon}
           ref={buttonRef}
-          className={`transport__button ${
-            isSelected ? "transport__button--selected" : ""
-          }`}
+          className={`transport__button ${isSelected ? "selected" : ""}`}
           onClick={() => (open ? closeMenu() : openMenu())}
-          aria-haspopup="menu"
-          aria-expanded={open}
         >
-          <div className="transport__icon">{icon}</div>
-
           {isSelected && (
             <div className="transport__badge">{getIcon(step)}</div>
           )}
-        </button>
+        </IconButton>
       </Tooltip>
 
       {open && (

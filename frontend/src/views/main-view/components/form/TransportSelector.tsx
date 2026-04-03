@@ -26,6 +26,7 @@ import { FaFerry } from "react-icons/fa6";
 import { IoMdBicycle } from "react-icons/io";
 import { MdElectricCar, MdSailing } from "react-icons/md";
 
+import { IconButton } from "common/components/Button";
 import Tooltip from "common/components/Tooltip";
 import { Step, Transport } from "types";
 
@@ -98,11 +99,10 @@ const TransportSelector = ({
             content={t(`form.transportMeans.${transport}`)}
             position="bottom"
           >
-            <button
+            <IconButton
+              icon={icon}
               className={`transport__button ${
-                transport === step.transportMean
-                  ? "transport__button--selected"
-                  : ""
+                transport === step.transportMean ? "selected" : ""
               }`}
               onClick={() => {
                 updateStep(step.index, {
@@ -110,9 +110,7 @@ const TransportSelector = ({
                   passengers: undefined,
                 });
               }}
-            >
-              <div className="transport__icon">{icon}</div>
-            </button>
+            />
           </Tooltip>
         ),
       )}

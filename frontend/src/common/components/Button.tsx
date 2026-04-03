@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { PropsWithChildren } from "react";
+import { forwardRef, PropsWithChildren } from "react";
 
 import "./Button.scss";
 
@@ -45,5 +45,26 @@ const Button = ({
     </button>
   );
 };
+
+type IconButtonProps = PropsWithChildren<{
+  icon: JSX.Element;
+  onClick: () => void;
+  className?: string;
+}>;
+
+export const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(
+  ({ icon, onClick, className, children }, ref) => {
+    return (
+      <button
+        ref={ref}
+        className={`icon-button ${className}`}
+        onClick={onClick}
+      >
+        <div className="icon-wrapper">{icon}</div>
+        {children}
+      </button>
+    );
+  },
+);
 
 export default Button;

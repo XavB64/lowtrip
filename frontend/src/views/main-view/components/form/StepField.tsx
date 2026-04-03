@@ -19,7 +19,7 @@ import { useEffect, useState } from "react";
 
 import { BiTrash } from "react-icons/bi";
 
-import Button from "common/components/Button";
+import { IconButton } from "common/components/Button";
 import type { Step } from "types";
 
 import CityDropdown from "./CityDropdown";
@@ -84,13 +84,12 @@ export const StepField = ({ removeStep, updateStep, step }: StepFieldProps) => {
         </div>
 
         {step.index > 2 && (
-          <Button
+          <IconButton
+            icon={<BiTrash size={20} />}
             className="delete-step-button"
             onClick={() => removeStep(step.index)}
             aria-label="delete"
-          >
-            <BiTrash size={20} />
-          </Button>
+          />
         )}
       </div>
       {!isDeparture && (

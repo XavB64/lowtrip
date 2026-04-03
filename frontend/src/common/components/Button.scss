@@ -66,3 +66,27 @@
     transform: rotate(360deg);
   }
 }
+
+.icon-button {
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+  width: 30px;
+  min-width: 30px;
+  height: 30px;
+  border-radius: 100px;
+  background-color: #b7b7b7;
+  color: white;
+
+  .icon-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
