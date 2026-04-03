@@ -17,18 +17,6 @@
 
 import { useEffect, useState } from "react";
 
-import {
-  Card,
-  Center,
-  Heading,
-  Image,
-  Tab,
-  TabList,
-  TabPanel,
-  TabPanels,
-  Tabs,
-  VStack,
-} from "@chakra-ui/react";
 import { useTranslation } from "react-i18next";
 
 import Logo from "assets/lowtrip_logo.png";
@@ -38,6 +26,7 @@ import { TRIP_TYPE } from "types";
 
 import Chart from "./Chart";
 import Form from "./form";
+import "./LeftPanel.scss";
 
 type LeftPanelProps = {
   withLogo?: boolean;
@@ -77,74 +66,40 @@ export const LeftPanel = ({ withLogo }: LeftPanelProps) => {
   }, [simulationResults]);
 
   return (
-    <VStack
-      width={["100%", "45%"]}
-      justifyContent="space-between"
-      height="100%"
-      minHeight={["calc(100vh - 64px)", "none"]}
-      overflow="auto"
-      p={1}
-      id="left-panel"
-    >
-      <VStack padding={3} spacing={5} height="100%" width="100%">
-        {withLogo && (
-          <Center bgColor="blue.500" borderRadius={10} p={1}>
-            <Image src={Logo} w={24} />
-          </Center>
-        )}
-        <Heading
-          color="#595959"
-          fontSize="x-large"
-          fontWeight={900}
-          textAlign="center"
-        >
-          {t("home.compareTravelEmissions")}
-        </Heading>
+    <div className="left-panel">
+      {withLogo && (
+        <div className="logo-wrapper">
+          <img src={Logo} alt="Logo" className="logo" />
+        </div>
+      )}
 
-        <Tabs
-          index={displayedTrip === TRIP_TYPE.MAIN ? 0 : 1}
-          onChange={handleTabsChange}
-          isFitted
-          variant="enclosed"
-          w="100%"
-        >
-          <TabList borderBottom="none">
-            <Tab _selected={{ bg: "#efefef" }} borderRadius="12px 12px 0 0">
-              {t("form.tabMyTrip")}
-            </Tab>
-            <Tab _selected={{ bg: "#efefef" }} borderRadius="12px 12px 0 0">
-              {t("form.tabOtherTrip")}
-            </Tab>
-          </TabList>
-          <TabPanels>
-            <TabPanel padding={0}>
-              <Form
-                displayedTrip={displayedTrip}
-                showAlternativeForm={() =>
-                  setDisplayedTrip(TRIP_TYPE.ALTERNATIVE)
-                }
-              />
-            </TabPanel>
-            <TabPanel padding={0}>
-              <Form displayedTrip={displayedTrip} />
-            </TabPanel>
-          </TabPanels>
-        </Tabs>
+      <h1 className="title"> {t("home.compareTravelEmissions")}</h1>
 
-        {simulationResults && !isOnMobile && (
-          <Card
-            position="static"
-            w="100%"
-            bottom="auto"
-            right="auto"
-            zIndex={2}
-            p="10px"
-            shadow="none"
+      <div className="main-section">
+        <div className="tab-list">
+          <button
+            className={`tab ${displayedTrip === TRIP_TYPE.MAIN ? "active" : ""}`}
+            onClick={handleTabsChange}
           >
-            <Chart simulationResults={simulationResults} />
-          </Card>
-        )}
-      </VStack>
-    </VStack>
+            {t("form.tabMyTrip")}
+          </button>
+          <button
+            className={`tab ${displayedTrip === TRIP_TYPE.ALTERNATIVE ? "active" : ""}`}
+            onClick={handleTabsChange}
+          >
+            {t("form.tabOtherTrip")}
+          </button>
+        </div>
+
+        <Form
+          displayedTrip={displayedTrip}
+          showAlternativeForm={() => setDisplayedTrip(TRIP_TYPE.ALTERNATIVE)}
+        />
+      </div>
+
+      {simulationResults && !isOnMobile && (
+        <Chart simulationResults={simulationResults} />
+      )}
+    </div>
   );
 };
