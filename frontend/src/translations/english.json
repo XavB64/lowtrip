@@ -157,11 +157,11 @@
         "table": {
           "title1": "Means of Transport",
           "title2": "Distance source",
-          "transport1": "Train",
-          "transport2": "Car - Bus - eCar",
-          "transport3": "Bicycle route",
-          "transport4": "Plane",
-          "transport5": "Ferry - Sailboat",
+          "train": "Train",
+          "car-ecar-bus": "Car - Bus - eCar",
+          "bike": "Bicycle route",
+          "plane": "Plane",
+          "ferry-sail": "Ferry - Sailboat",
           "dataOpenstreetmap": "OpenStreetMap network",
           "dataGeodesic": "Geodesic distance + average detour",
           "dataApproximation": "Approximation of shortest path"
@@ -173,36 +173,48 @@
           "title1": "Means of Transport",
           "title2": "Variable",
           "title3": "Why?",
-          "transport1": "Train",
-          "transport2": "Bus - Bicycle",
-          "transport3": "Car",
-          "transport4": "eCar",
-          "transport5": "Plane",
-          "transport6": "Ferry",
-          "variables1": "Visited countries",
-          "variables2": "-",
-          "variables3": "Number of passengers",
-          "variables4": "Number of passengers & Visited countries",
-          "variables5": "Travel distance",
-          "variables6": "User parameters",
-          "why1": "≠ Electrification rate;≠ Energy carbon intensity;≠ Filling rates",
-          "why2": "-",
-          "why3": "Personal footprint allocation;Consumption increases with weight",
-          "why4": "Idem Car;≠ Energy carbon intensity",
-          "why5": "Higher proportion of take-off for short-haul routes;Use of generally less efficient planes",
-          "why6": "-"
+          "train": {
+            "label": "Train",
+            "variables": "Visited countries",
+            "explanations": "≠ Electrification rate;≠ Energy carbon intensity;≠ Filling rates"
+          },
+          "bus-bike": {
+            "label": "Bus - Bicycle",
+            "variables": "-",
+            "explanations": "-"
+          },
+          "car": {
+            "label": "Car",
+            "variables": "Number of passengers",
+            "explanations": "Personal footprint allocation;Consumption increases with weight"
+          },
+          "ecar": {
+            "label": "eCar",
+            "variables": "Number of passengers & Visited countries",
+            "explanations": "Idem Car;≠ Energy carbon intensity"
+          },
+          "plane": {
+            "label": "Plane",
+            "variables": "Travel distance",
+            "explanations": "Higher proportion of take-off for short-haul routes;Use of generally less efficient planes"
+          },
+          "ferry": {
+            "label": "Ferry",
+            "variables": "User parameters",
+            "explanations": "-"
+          }
         },
         "table2": {
           "title1": "Means of Transport",
           "title2": "Usage",
           "title3": "Vehicle production",
           "title4": "Infrastructure construction",
-          "transport1": "Train",
-          "transport2": "Bus - Car - eCar",
-          "transport3": "Bicycle",
-          "transport4": "Plane",
-          "transport5": "Ferry",
-          "dataNotFound": "No found"
+          "train": "Train",
+          "car-ecar-bus": "Bus - Car - eCar",
+          "bike": "Bicycle",
+          "plane": "Plane",
+          "ferry": "Ferry",
+          "dataNotFound": "Not found"
         },
         "text1": "Emission factors consider usage (linked to the manufacture and use of energy to move the vehicle) as well as infrastructure and vehicle construction where these are significant. The table below summarizes the types of emissions taken into account by lowtrip. Empty cells mean that the related emissions did not contribute significantly to the result and are therefore excluded to facilitate understanding and readability for the user."
       }
