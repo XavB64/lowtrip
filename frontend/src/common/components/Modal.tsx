@@ -15,6 +15,8 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { PropsWithChildren } from "react";
+
 import {
   Modal as ChakraModal,
   ModalOverlay,
@@ -22,28 +24,21 @@ import {
   ModalHeader,
   ModalBody,
   ModalCloseButton,
-  Text,
 } from "@chakra-ui/react";
 
-const Modal = ({
-  headerTitle,
-  mainText,
-  onClose,
-  isOpen,
-}: {
+type ModalProps = PropsWithChildren<{
   onClose: () => void;
   isOpen: boolean;
   headerTitle: string;
-  mainText: string;
-}) => (
+}>;
+
+const Modal = ({ headerTitle, onClose, isOpen, children }: ModalProps) => (
   <ChakraModal onClose={onClose} isOpen={isOpen} isCentered>
     <ModalOverlay />
     <ModalContent>
       <ModalHeader>{headerTitle}</ModalHeader>
       <ModalCloseButton />
-      <ModalBody marginBottom={5}>
-        <Text>{mainText}</Text>
-      </ModalBody>
+      <ModalBody marginBottom={5}>{children}</ModalBody>
     </ModalContent>
   </ChakraModal>
 );
