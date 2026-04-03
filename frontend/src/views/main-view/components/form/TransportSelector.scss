@@ -12,31 +12,10 @@
 
   .transport__button {
     position: relative;
-    border: none;
-    cursor: pointer;
-    padding: 8px;
-    border-radius: 8px;
-    background-color: #b7b7b7;
-    display: flex;
-    align-items: center;
-    justify-content: center;
 
-    padding: 0;
-    width: 30px;
-    min-width: 30px;
-    height: 30px;
-    border-radius: 100px;
-    color: white;
-
-    &--selected {
+    &.selected {
       background-color: #474747;
       color: white;
-    }
-
-    .transport__icon {
-      display: flex;
-      align-items: center;
-      justify-content: center;
     }
   }
 
