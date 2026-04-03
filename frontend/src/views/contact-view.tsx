@@ -12,7 +12,7 @@ import {
 } from "@chakra-ui/react";
 import { useTranslation } from "react-i18next";
 
-import Modal from "common/components/modal";
+import Modal from "common/components/Modal";
 import { API_URL } from "config";
 
 async function sendEmail(
@@ -147,10 +147,15 @@ const ContactView = () => {
             ? "contact.messageSentTitle"
             : "contact.messageNotSentTitle",
         )}
-        mainText={t(
-          isSuccess ? "contact.messageSentText" : "contact.messageNotSentText",
-        )}
-      />
+      >
+        <p>
+          {t(
+            isSuccess
+              ? "contact.messageSentText"
+              : "contact.messageNotSentText",
+          )}
+        </p>
+      </Modal>
     </Stack>
   );
 };

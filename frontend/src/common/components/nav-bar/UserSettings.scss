@@ -48,6 +48,13 @@
   }
 }
 
+// desktop
+.user-settings-modal {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
 // mobile
 .user-settings-popover {
   position: relative;

@@ -15,18 +15,11 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import {
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalCloseButton,
-} from "@chakra-ui/react";
 import i18n from "i18next";
 import { useTranslation } from "react-i18next";
 
 import SettingsChoices, { LANGUAGES, MAP_THEMES } from "./settings-choices";
+import Modal from "../Modal";
 
 const UserSettingsModal = ({
   onClose,
@@ -42,30 +35,25 @@ const UserSettingsModal = ({
 }) => {
   const { t } = useTranslation();
   return (
-    <Modal onClose={onClose} isOpen={isOpen} isCentered>
-      <ModalOverlay />
-      <ModalContent margin={5}>
-        <ModalHeader>{t("navbar.settings")}</ModalHeader>
-        <ModalCloseButton />
-        <ModalBody>
-          <SettingsChoices
-            options={LANGUAGES}
-            onChange={(language) => i18n.changeLanguage(language)}
-            optionIsSelected={(language) => i18n.language === language}
-            isLanguageSelector
-          />
-          <SettingsChoices
-            options={MAP_THEMES}
-            onChange={() => {
-              switchMapTheme();
-            }}
-            optionIsSelected={(theme) =>
-              (isDarkTheme && theme === "dark") ||
-              (!isDarkTheme && theme === "light")
-            }
-          />
-        </ModalBody>
-      </ModalContent>
+    <Modal onClose={onClose} isOpen={isOpen} headerTitle={t("navbar.settings")}>
+      <div className="user-settings user-settings-modal">
+        <SettingsChoices
+          options={LANGUAGES}
+          onChange={(language) => i18n.changeLanguage(language)}
+          optionIsSelected={(language) => i18n.language === language}
+          isLanguageSelector
+        />
+        <SettingsChoices
+          options={MAP_THEMES}
+          onChange={() => {
+            switchMapTheme();
+          }}
+          optionIsSelected={(theme) =>
+            (isDarkTheme && theme === "dark") ||
+            (!isDarkTheme && theme === "light")
+          }
+        />
+      </div>
     </Modal>
   );
 };
