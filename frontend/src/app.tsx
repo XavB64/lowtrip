@@ -20,7 +20,7 @@ import { useEffect, useMemo, useState } from "react";
 import { ChakraProvider, Stack, VStack } from "@chakra-ui/react";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
-import NavbarWrapper from "./common/components/nav-bar";
+import NavbarWrapper from "./common/components/NavBar";
 import { ConsentContextProvider } from "./common/context/consentContext";
 import { SimulationProvider } from "./common/context/simulationContext";
 import { API_URL } from "./config";

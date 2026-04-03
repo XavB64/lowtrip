@@ -26,8 +26,8 @@ import Logo from "assets/lowtrip_logo.png";
 import { ConsentContextProvider } from "common/context/consentContext";
 import theme from "theme";
 
-import UserSettingsModal from "./user-settings-modal";
-import UserSettingsSelector from "./user-settings-selector";
+import UserSettingsModal from "./UserSettingsModal";
+import UserSettingsSelector from "./UserSettingsPopover";
 import CookieBanner from "../cookie-banner";
 import "./NavBar.scss";
 
