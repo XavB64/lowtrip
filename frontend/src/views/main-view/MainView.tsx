@@ -1,9 +1,9 @@
 import { useEffect } from "react";
 
-import { IconButton, Stack } from "@chakra-ui/react";
 import { BiChevronUp } from "react-icons/bi";
 import { useSearchParams } from "react-router-dom";
 
+import { IconButton } from "common/components/Button";
 import { CacheProvider } from "common/context/cacheContext";
 import { useConsentContext } from "common/context/consentContext";
 import { useSimulationContext } from "common/context/simulationContext";
@@ -59,30 +59,24 @@ const MainView = ({
 
   return (
     <CacheProvider>
-      <Stack direction={["column", "row"]} width="100%">
+      <div className="main-view">
         <LeftPanel withLogo={withLogo} />
 
         <Map isDarkTheme={isDarkTheme} />
 
         {isOnMobile && (
           <IconButton
-            aria-label="scroll-to-top"
+            className={`scroll-to-top-button ${consentGiven ? "consent-given" : ""}`}
             icon={<BiChevronUp />}
             onClick={() => {
               const mainBody = document.getElementById("main-body");
               if (mainBody)
                 mainBody.scrollTo({ top: 0, left: 0, behavior: "smooth" });
             }}
-            zIndex={2}
-            position="fixed"
-            bottom={consentGiven ? 3 : "20%"}
-            left={3}
-            colorScheme="blue"
-            isRound
-            display={["flex", "none"]}
+            aria-label="scroll-to-top"
           />
         )}
-      </Stack>
+      </div>
     </CacheProvider>
   );
 };

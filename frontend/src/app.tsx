@@ -33,6 +33,7 @@ import {
   AboutView,
 } from "./views";
 import "./i18n";
+import "./styles.scss";
 
 const App = () => {
   // first API call to wake up the server
