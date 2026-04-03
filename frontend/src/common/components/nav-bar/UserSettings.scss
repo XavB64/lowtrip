@@ -1,0 +1,104 @@
+// Lowtrip, a web interface to compute travel CO2eq for different means of transport worldwide.
+
+// Copyright (C) 2024  Bonnemaizon Xavier, Ni Clara, Gres Paola & Pellas Chiara
+
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published
+// by the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Affero General Public License for more details.
+
+// You should have received a copy of the GNU Affero General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+.user-settings {
+  .settings-group {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: 4px;
+  }
+
+  .settings-button {
+    padding: 6px 10px;
+    font-size: 14px;
+
+    @media (min-width: 600px) {
+      font-size: 16px;
+    }
+
+    .flag-icon {
+      width: 30px;
+    }
+
+    &:hover:not(:disabled) {
+      opacity: 0.85;
+      background: #b3eef5;
+    }
+
+    &:disabled {
+      cursor: default;
+      opacity: 1;
+    }
+  }
+}
+
+// mobile
+.user-settings-popover {
+  position: relative;
+
+  .popover__trigger {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    color: white;
+    cursor: pointer;
+
+    .setting-icon {
+      height: 32px;
+      width: 32px;
+    }
+
+    &:hover {
+      color: #d1d1d1;
+    }
+  }
+
+  .popover__content {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: -10px;
+
+    background: #efefef;
+    border-radius: 15px;
+    padding: 8px 12px;
+    min-width: 200px;
+
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    z-index: 100;
+  }
+
+  .popover__arrow {
+    position: absolute;
+    top: -6px;
+    right: 19px;
+
+    width: 12px;
+    height: 12px;
+    background: #efefef;
+
+    transform: rotate(45deg);
+  }
+
+  .popover__body {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+}
