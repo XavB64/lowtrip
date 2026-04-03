@@ -17,7 +17,7 @@
 
 import { useEffect, useState } from "react";
 
-import { ChakraProvider, useDisclosure } from "@chakra-ui/react";
+import { ChakraProvider } from "@chakra-ui/react";
 import { useTranslation } from "react-i18next";
 import { Link, Outlet, useLocation } from "react-router-dom";
 
@@ -70,9 +70,9 @@ const NavBar = ({
 }) => {
   const { t } = useTranslation();
   const location = useLocation();
-  const { isOpen, onOpen: openErrorModal, onClose } = useDisclosure();
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const toggleMenu = () => {
     setIsMenuOpen((prev) => !prev);
@@ -121,8 +121,8 @@ const NavBar = ({
             <button
               className="dropdown-item"
               onClick={() => {
-                openErrorModal();
                 setIsMenuOpen(false);
+                setIsModalOpen(true);
               }}
             >
               {t("navbar.settings")}
@@ -131,8 +131,10 @@ const NavBar = ({
         )}
 
         <UserSettingsModal
-          isOpen={isOpen}
-          onClose={onClose}
+          isOpen={isModalOpen}
+          onClose={() => {
+            setIsModalOpen(false);
+          }}
           themeSettings={themeSettings}
         />
       </div>

@@ -43,11 +43,11 @@ const Form = ({ displayedTrip, showAlternativeForm }: FormProps) => {
     alternativeSteps,
     errorMessage,
     isLoading,
-    modalContext: { isOpen, onClose },
     addStep,
     updateStep,
     removeStep,
     submitForm,
+    closeErrorModal,
   } = useSimulationContext();
 
   const formIsNotValid = useMemo(() => {
@@ -139,8 +139,8 @@ const Form = ({ displayedTrip, showAlternativeForm }: FormProps) => {
 
       <Modal
         headerTitle={t("form.errorTitle")}
-        onClose={onClose}
-        isOpen={isOpen}
+        onClose={closeErrorModal}
+        isOpen={!!errorMessage}
       >
         <p>{errorMessage ?? t("form.errorNoPathFound")}</p>
       </Modal>
