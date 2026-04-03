@@ -1,0 +1,76 @@
+.about {
+  width: 100%;
+  padding: 12px 10%;
+  padding-top: 24px;
+  overflow: auto;
+
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+
+  color: #595959;
+  font-size: 14px;
+
+  line-height: 1.6;
+
+  @media (min-width: 600px) {
+    font-size: 18px;
+    gap: 40px;
+  }
+
+  .introduction {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .inspiring-projects {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+
+    @media (min-width: 600px) {
+      gap: 50px;
+    }
+  }
+
+  .about__title {
+    color: #3182ce;
+    font-weight: bold;
+    font-size: 2rem;
+  }
+
+  .about__section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+
+    &.reverse {
+      flex-direction: column-reverse;
+    }
+
+    @media (min-width: 600px) {
+      flex-direction: row !important;
+
+      .about__text {
+        max-width: 70%;
+      }
+    }
+
+    img {
+      min-width: 25%;
+      max-width: 100%;
+      height: auto;
+    }
+  }
+
+  .link {
+    color: #3182ce;
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
