@@ -18,11 +18,11 @@
         "table": {
           "title1": "Moyen de Transport",
           "title2": "Source de la Distance",
-          "transport1": "Train",
-          "transport2": "Voiture - Bus - VE",
-          "transport3": "Voie cyclable",
-          "transport4": "Avion",
-          "transport5": "Ferry - Voilier",
+          "train": "Train",
+          "car-ecar-bus": "Voiture - Bus - VE",
+          "bike": "Voie cyclable",
+          "plane": "Avion",
+          "ferry-sail": "Ferry - Voilier",
           "dataOpenstreetmap": "Réseau OpenStreetMap",
           "dataGeodesic": "Distance géodésique + déviation moyenne",
           "dataApproximation": "Approximation du plus court chemin"
@@ -34,35 +34,47 @@
           "title1": "Moyen de Transport",
           "title2": "Variable",
           "title3": "Pourquoi ?",
-          "transport1": "Train",
-          "transport2": "Bus - Vélo",
-          "transport3": "Voiture",
-          "transport4": "VE",
-          "transport5": "Avion",
-          "transport6": "Ferry",
-          "variables1": "Pays traversés",
-          "variables2": "-",
-          "variables3": "Nombre de passagers",
-          "variables4": "Nombre de passagers & Pays traversés",
-          "variables5": "Distance du trajet",
-          "variables6": "Paramètres utilisateur",
-          "why1": "≠ Taux d'éléctrification;≠ Intensité carbone de l'énergie;≠ Taux de remplissage",
-          "why2": "-",
-          "why3": "Attribution de l'empreinte personnelle;Augmentation de la consommation avec le poids",
-          "why4": "Idem Voiture;≠ Intensités carbone de l'énergie",
-          "why5": "Part plus importante du décollage pour les trajets courts;Utilisation d'appareils en général moins performants",
-          "why6": "-"
+          "train": {
+            "label": "Train",
+            "variables": "Pays traversés",
+            "explanations": "≠ Taux d'éléctrification;≠ Intensité carbone de l'énergie;≠ Taux de remplissage"
+          },
+          "bus-bike": {
+            "label": "Bus - Vélo",
+            "variables": "-",
+            "explanations": "-"
+          },
+          "car": {
+            "label": "Voiture",
+            "variables": "Nombre de passagers",
+            "explanations": "Attribution de l'empreinte personnelle;Augmentation de la consommation avec le poids"
+          },
+          "ecar": {
+            "label": "VE",
+            "variables": "Nombre de passagers & Pays traversés",
+            "explanations": "Idem Voiture;≠ Intensités carbone de l'énergie"
+          },
+          "plane": {
+            "label": "Avion",
+            "variables": "Distance du trajet",
+            "explanations": "Part plus importante du décollage pour les trajets courts;Utilisation d'appareils en général moins performants"
+          },
+          "ferry": {
+            "label": "Ferry",
+            "variables": "Paramètres utilisateur",
+            "explanations": "-"
+          }
         },
         "table2": {
           "title1": "Moyen de Transport",
           "title2": "Usage",
           "title3": "Production du véhicule",
           "title4": "Construction des infrastructures",
-          "transport1": "Train",
-          "transport2": "Bus - Voiture - VE",
-          "transport3": "Vélo",
-          "transport4": "Avion",
-          "transport5": "Ferry",
+          "train": "Train",
+          "car-ecar-bus": "Bus - Voiture - VE",
+          "bike": "Vélo",
+          "plane": "Avion",
+          "ferry": "Ferry",
           "dataNotFound": "Non trouvé"
         },
         "text1": "Les facteurs d'émissions considèrent l'utilisation (en lien avec la production et l'utilisation de l'énergie pour faire avancer le véhicule) ainsi que les infrastructures et la construction du véhicule lorques ces dernières sont significatives. \n La table ci dessous résume les types d'émissions prises en compte dans lowtrip. Les cellules vides signifient que le facteur d'émission correspondant ne contribue pas significativement au résultat, et se retrouve exclu du rendu final afin de faciliter la compréhension et la lecture."

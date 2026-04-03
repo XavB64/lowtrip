@@ -157,11 +157,11 @@
         "table": {
           "title1": "Medio de Transporte",
           "title2": "Fuente de distancia",
-          "transport1": "Tren",
-          "transport2": "Auto - Autobús - Auto eléctrico",
-          "transport3": "Ruta en bicicleta",
-          "transport4": "Avión",
-          "transport5": "Ferry - Velero",
+          "train": "Tren",
+          "car-ecar-bus": "Auto - Autobús - Auto eléctrico",
+          "bike": "Ruta en bicicleta",
+          "plane": "Avión",
+          "ferry-sail": "Ferry - Velero",
           "dataOpenstreetmap": "Red de OpenStreetMap",
           "dataGeodesic": "Distancia geodésica + desvío promedio",
           "dataApproximation": "Aproximación de la ruta más corta"
@@ -173,35 +173,47 @@
           "title1": "Medio de Transporte",
           "title2": "Variable",
           "title3": "¿Por qué?",
-          "transport1": "Tren",
-          "transport2": "Autobús - Bicicleta",
-          "transport3": "Auto",
-          "transport4": "Auto eléctrico",
-          "transport5": "Avión",
-          "transport6": "Ferry",
-          "variables1": "Países visitados",
-          "variables2": "-",
-          "variables3": "Número de pasajeros",
-          "variables4": "Número de pasajeros y países visitados",
-          "variables5": "Distancia de viaje",
-          "variables6": "Parámetros del usuario",
-          "why1": "≠ Tasa de electrificación; ≠ Intensidad de carbono de energía; ≠ Tasas de llenado",
-          "why2": "-",
-          "why3": "Asignación personal de huella; El consumo aumenta con el peso",
-          "why4": "Idem Auto; ≠ Intensidad de carbono de energía",
-          "why5": "Mayor proporción de despegue para rutas de corta distancia; Uso de aviones generalmente menos eficientes",
-          "why6": "-"
+          "train": {
+            "label": "Tren",
+            "variables": "Países visitados",
+            "explanations": "≠ Tasa de electrificación; ≠ Intensidad de carbono de energía; ≠ Tasas de llenado"
+          },
+          "bus-bike": {
+            "label": "Autobús - Bicicleta",
+            "variables": "-",
+            "explanations": "-"
+          },
+          "car": {
+            "label": "Auto",
+            "variables": "Número de pasajeros",
+            "explanations": "Asignación personal de huella; El consumo aumenta con el peso"
+          },
+          "ecar": {
+            "label": "Auto eléctrico",
+            "variables": "Número de pasajeros y países visitados",
+            "explanations": "Idem Auto; ≠ Intensidad de carbono de energía"
+          },
+          "plane": {
+            "label": "Avión",
+            "variables": "Distancia de viaje",
+            "explanations": "Mayor proporción de despegue para rutas de corta distancia; Uso de aviones generalmente menos eficientes"
+          },
+          "ferry": {
+            "label": "Ferry",
+            "variables": "Parámetros del usuario",
+            "explanations": "-"
+          }
         },
         "table2": {
           "title1": "Medio de Transporte",
           "title2": "Uso",
           "title3": "Producción de vehículos",
           "title4": "Construcción de infraestructura",
-          "transport1": "Tren",
-          "transport2": "Autobús - Auto - Auto eléctrico",
-          "transport3": "Bicicleta",
-          "transport4": "Avión",
-          "transport5": "Ferry",
+          "train": "Tren",
+          "car-ecar-bus": "Autobús - Auto - Auto eléctrico",
+          "bike": "Bicicleta",
+          "plane": "Avión",
+          "ferry": "Ferry",
           "dataNotFound": "No encontrado"
         },
         "text1": "Los factores de emisión consideran el uso (vinculado a la fabricación y uso de energía para mover el vehículo), así como la infraestructura y la construcción de vehículos donde estos son significativos. La tabla a continuación resume los tipos de emisiones tenidos en cuenta por lowtrip. Las celdas vacías significan que las emisiones relacionadas no contribuyeron significativamente al resultado y, por lo tanto, se excluyen para facilitar la comprensión y la legibilidad para el usuario."

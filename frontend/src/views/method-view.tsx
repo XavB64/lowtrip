@@ -17,29 +17,53 @@
 
 import { useEffect } from "react";
 
-import {
-  Box,
-  Text,
-  TableContainer,
-  Table,
-  Thead,
-  Tbody,
-  Tr,
-  Th,
-  Td,
-  Heading,
-  Link,
-} from "@chakra-ui/react";
 import i18n from "i18next";
 import katex from "katex";
 import "katex/dist/katex.min.css";
 import { useTranslation } from "react-i18next";
-import { FaCheck } from "react-icons/fa";
 
 import MethodologyPdf from "../assets/lowtrip_methodology.pdf";
+import "./MethodView.scss";
 
-// Tried to use the language to change the text in french but I couldn't
-// I think we should just write directly 2 pages and not use traduction elements
+const CALCULATION_METHOD_BY_TRANSPORT = [
+  { transport: "train", method: "dataOpenstreetmap" },
+  { transport: "car-ecar-bus", method: "dataOpenstreetmap" },
+  { transport: "bike", method: "dataOpenstreetmap" },
+  { transport: "plane", method: "dataGeodesic" },
+  { transport: "ferry-sail", method: "dataApproximation" },
+];
+
+const TRANSPORTS_FOR_EMISSION_FACTORS_VARIABLES = [
+  "train",
+  "bus-bike",
+  "car",
+  "ecar",
+  "plane",
+  "ferry",
+];
+
+const LIFECYCLE_EMISSIONS_BY_TRANSPORT = [
+  { transport: "train", use: true, production: false, infrastructure: true },
+  {
+    transport: "car-ecar-bus",
+    use: true,
+    production: true,
+    infrastructure: false,
+  },
+  {
+    transport: "bike",
+    use: false,
+    production: true,
+    infrastructure: "unknown",
+  },
+  { transport: "plane", use: true, production: false, infrastructure: false },
+  {
+    transport: "ferry",
+    use: true,
+    production: false,
+    infrastructure: "unknown",
+  },
+];
 
 const MethodView = () => {
   const { t } = useTranslation();
@@ -58,286 +82,128 @@ const MethodView = () => {
   }, [equation]);
 
   return (
-    <Box
-      h="100%"
-      w="100%"
-      overflowX="hidden"
-      paddingLeft="10%"
-      paddingRight="10%"
-      paddingY={[3, 16]}
-      color="#595959"
-      fontSize={["small", "large"]}
-      textAlign="left"
-      justifyContent="center"
-    >
-      <Heading
-        as="h1"
-        color="blue.500"
-        fontWeight="bold"
-        fontSize={"3xl"}
-        marginBottom={3}
-      >
-        {t("method.introduction.title")}
-      </Heading>
-      <Text marginBottom={3}>{t("method.introduction.text1")}</Text>
-      <Text marginBottom={3}>{t("method.introduction.text2")}</Text>
-      <Text marginBottom={10}>
+    <div className="method-view">
+      <h1 className="method__title">{t("method.introduction.title")}</h1>
+
+      <p>{t("method.introduction.text1")}</p>
+      <p>{t("method.introduction.text2")}</p>
+
+      <p className="mb-lg">
         {t("method.introduction.text3")}{" "}
-        <Link
+        <a
           href={MethodologyPdf}
           target="_blank"
           rel="noreferrer"
-          color="blue.400"
+          className="link"
         >
           {t("method.introduction.text4")}
-        </Link>
+        </a>
         {t("method.introduction.text5")}
-      </Text>
+      </p>
 
-      <Heading
-        as="h2"
-        color="blue.500"
-        fontWeight="bold"
-        fontSize={"2xl"}
-        marginBottom={3}
-        marginTop={10}
-      >
+      <h2 className="method__subtitle">
         {t("method.howEmissionsAreComputed.title")}
-      </Heading>
-      <Text marginBottom={3}>{t("method.howEmissionsAreComputed.text1")}</Text>
+      </h2>
+
+      <p>{t("method.howEmissionsAreComputed.text1")}</p>
+
       <div id="equation" />
 
-      <Heading
-        as="h2"
-        color="blue.500"
-        fontWeight="bold"
-        fontSize={"2xl"}
-        marginBottom={3}
-        marginTop={10}
-      >
+      <h2 className="method__subtitle">
         {t("method.distanceEstimation.title")}
-      </Heading>
-      <TableContainer>
-        <Table variant="simple" fontSize={14} marginBottom={3} overflow="auto">
-          <Thead>
-            <Tr>
-              <Th>{t("method.distanceEstimation.table.title1")}</Th>
-              <Th>{t("method.distanceEstimation.table.title2")}</Th>
-            </Tr>
-          </Thead>
-          <Tbody>
-            <Tr>
-              <Td bg="blue.100">
-                {t("method.distanceEstimation.table.transport1")}
-              </Td>
-              <Td>{t("method.distanceEstimation.table.dataOpenstreetmap")}</Td>
-            </Tr>
-            <Tr>
-              <Td bg="blue.100">
-                {t("method.distanceEstimation.table.transport2")}
-              </Td>
-              <Td>{t("method.distanceEstimation.table.dataOpenstreetmap")}</Td>
-            </Tr>
-            <Tr>
-              <Td bg="blue.100">
-                {t("method.distanceEstimation.table.transport3")}
-              </Td>
-              <Td>{t("method.distanceEstimation.table.dataOpenstreetmap")}</Td>
-            </Tr>
-            <Tr>
-              <Td bg="blue.100">
-                {t("method.distanceEstimation.table.transport4")}
-              </Td>
-              <Td>{t("method.distanceEstimation.table.dataGeodesic")}</Td>
-            </Tr>
-            <Tr>
-              <Td bg="blue.100">
-                {t("method.distanceEstimation.table.transport5")}
-              </Td>
-              <Td>{t("method.distanceEstimation.table.dataApproximation")}</Td>
-            </Tr>
-            {/* Add more rows as needed */}
-          </Tbody>
-        </Table>
-      </TableContainer>
+      </h2>
 
-      <Heading
-        as="h2"
-        color="blue.500"
-        fontWeight="bold"
-        fontSize={"2xl"}
-        marginBottom={3}
-        marginTop={10}
-      >
-        {t("method.emissionFactors.title")}
-      </Heading>
-      <TableContainer>
-        <Table variant="simple" fontSize={14} marginBottom={3} overflow="auto">
-          <Thead>
-            <Tr>
-              <Th>{t("method.emissionFactors.table1.title1")}</Th>
-              <Th>{t("method.emissionFactors.table1.title2")}</Th>
-              <Th>{t("method.emissionFactors.table1.title3")}</Th>
-            </Tr>
-          </Thead>
-          <Tbody>
-            <Tr>
-              <Td bg="blue.100">
-                {t("method.emissionFactors.table1.transport1")}
-              </Td>
-              <Td>{t("method.emissionFactors.table1.variables1")}</Td>
-              <Td>
-                {t("method.emissionFactors.table1.why1")
-                  .split(";")
-                  .map((line) => (
-                    <Text key={line}>{line}</Text>
-                  ))}
-              </Td>
-            </Tr>
-            <Tr>
-              <Td bg="blue.100">
-                {t("method.emissionFactors.table1.transport2")}
-              </Td>
-              <Td>{t("method.emissionFactors.table1.variables2")}</Td>
-              <Td>
-                {t("method.emissionFactors.table1.why2")
-                  .split(";")
-                  .map((line) => (
-                    <Text key={line}>{line}</Text>
-                  ))}
-              </Td>
-            </Tr>
-            <Tr>
-              <Td bg="blue.100">
-                {t("method.emissionFactors.table1.transport3")
-                  .split(";")
-                  .map((line) => (
-                    <Text key={line}>{line}</Text>
-                  ))}
-              </Td>
-              <Td>{t("method.emissionFactors.table1.variables3")}</Td>
-              <Td>
-                {t("method.emissionFactors.table1.why3")
-                  .split(";")
-                  .map((line) => (
-                    <Text key={line}>{line}</Text>
-                  ))}
-              </Td>
-            </Tr>
-            <Tr>
-              <Td bg="blue.100">
-                {t("method.emissionFactors.table1.transport4")}
-              </Td>
-              <Td>{t("method.emissionFactors.table1.variables4")}</Td>
-              <Td>
-                {t("method.emissionFactors.table1.why4")
-                  .split(";")
-                  .map((line) => (
-                    <Text key={line}>{line}</Text>
-                  ))}
-              </Td>
-            </Tr>
-            <Tr>
-              <Td bg="blue.100">
-                {t("method.emissionFactors.table1.transport5")}
-              </Td>
-              <Td>{t("method.emissionFactors.table1.variables5")}</Td>
-              <Td>
-                {t("method.emissionFactors.table1.why5")
-                  .split(";")
-                  .map((line) => (
-                    <Text key={line}>{line}</Text>
-                  ))}
-              </Td>
-            </Tr>
-            <Tr>
-              <Td bg="blue.100">
-                {t("method.emissionFactors.table1.transport6")}
-              </Td>
-              <Td>{t("method.emissionFactors.table1.variables6")}</Td>
-              <Td>
-                {t("method.emissionFactors.table1.why6")
-                  .split(";")
-                  .map((line) => (
-                    <Text key={line}>{line}</Text>
-                  ))}
-              </Td>
-            </Tr>
-            {/* Add more rows as needed */}
-          </Tbody>
-        </Table>
-      </TableContainer>
-      <Text marginBottom={3}>{t("method.emissionFactors.text1")}</Text>
-      <TableContainer>
-        <Table variant="simple" fontSize={14} marginBottom={3} overflow="auto">
-          <Thead>
-            <Tr>
-              <Th>{t("method.emissionFactors.table2.title1")}</Th>
-              <Th>{t("method.emissionFactors.table2.title2")}</Th>
-              <Th>{t("method.emissionFactors.table2.title3")}</Th>
-              <Th>{t("method.emissionFactors.table2.title4")}</Th>
-            </Tr>
-          </Thead>
-          <Tbody>
-            <Tr>
-              <Td bg="blue.100">
-                {t("method.emissionFactors.table2.transport1")}
-              </Td>
-              <Td>
-                <FaCheck color="green" />
-              </Td>
-              <Td> - </Td>
-              <Td>
-                <FaCheck color="green" />
-              </Td>
-            </Tr>
-            <Tr>
-              <Td bg="blue.100">
-                {t("method.emissionFactors.table2.transport2")}
-              </Td>
-              <Td>
-                <FaCheck color="green" />
-              </Td>
-              <Td>
-                <FaCheck color="green" />
-              </Td>
-              <Td> - </Td>
-            </Tr>
-            <Tr>
-              <Td bg="blue.100">
-                {t("method.emissionFactors.table2.transport3")}
-              </Td>
-              <Td> - </Td>
-              <Td>
-                <FaCheck color="green" />
-              </Td>
-              <Td>{t("method.emissionFactors.table2.dataNotFound")}</Td>
-            </Tr>
-            <Tr>
-              <Td bg="blue.100">
-                {t("method.emissionFactors.table2.transport4")}
-              </Td>
-              <Td>
-                <FaCheck color="green" />
-              </Td>
-              <Td> - </Td>
-              <Td> - </Td>
-            </Tr>
-            <Tr>
-              <Td bg="blue.100">
-                {t("method.emissionFactors.table2.transport5")}
-              </Td>
-              <Td>
-                <FaCheck color="green" />
-              </Td>
-              <Td> - </Td>
-              <Td>{t("method.emissionFactors.table2.dataNotFound")}</Td>
-            </Tr>
-            {/* Add more rows as needed */}
-          </Tbody>
-        </Table>
-      </TableContainer>
-    </Box>
+      <div className="table-container">
+        <table className="table">
+          <thead>
+            <tr>
+              <th>{t("method.distanceEstimation.table.title1")}</th>
+              <th>{t("method.distanceEstimation.table.title2")}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {CALCULATION_METHOD_BY_TRANSPORT.map(({ transport, method }) => (
+              <tr key={transport}>
+                <td className="highlight">
+                  {t(`method.distanceEstimation.table.${transport}`)}
+                </td>
+                <td>{t(`method.distanceEstimation.table.${method}`)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <h2 className="method__subtitle">{t("method.emissionFactors.title")}</h2>
+
+      <div className="table-container">
+        <table className="table">
+          <thead>
+            <tr>
+              <th>{t("method.emissionFactors.table1.title1")}</th>
+              <th>{t("method.emissionFactors.table1.title2")}</th>
+              <th>{t("method.emissionFactors.table1.title3")}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {TRANSPORTS_FOR_EMISSION_FACTORS_VARIABLES.map((transport) => (
+              <tr key={transport}>
+                <td className="highlight">
+                  {t(`method.emissionFactors.table1.${transport}.label`)}
+                </td>
+                <td>
+                  {t(`method.emissionFactors.table1.${transport}.variables`)}
+                </td>
+                <td>
+                  {t(`method.emissionFactors.table1.${transport}.explanations`)
+                    .split(";")
+                    .map((line) => (
+                      <p key={line}>{line}</p>
+                    ))}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <p className="emission-factors-text">
+        {t("method.emissionFactors.text1")}
+      </p>
+
+      <div className="table-container">
+        <table className="table">
+          <thead>
+            <tr>
+              <th>{t("method.emissionFactors.table2.title1")}</th>
+              <th>{t("method.emissionFactors.table2.title2")}</th>
+              <th>{t("method.emissionFactors.table2.title3")}</th>
+              <th>{t("method.emissionFactors.table2.title4")}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {LIFECYCLE_EMISSIONS_BY_TRANSPORT.map(
+              ({ transport, use, production, infrastructure }) => (
+                <tr key={transport}>
+                  <td className="highlight">
+                    {t(`method.emissionFactors.table2.${transport}`)}
+                  </td>
+                  <td>{use ? "✔" : "-"}</td>
+                  <td>{production ? "✔" : "-"}</td>
+                  <td>
+                    {infrastructure == "unknown"
+                      ? t("method.emissionFactors.table2.dataNotFound")
+                      : infrastructure
+                        ? "✔"
+                        : "-"}
+                  </td>
+                </tr>
+              ),
+            )}
+          </tbody>
+        </table>
+      </div>
+    </div>
   );
 };
 

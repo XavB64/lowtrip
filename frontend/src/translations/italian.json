@@ -157,11 +157,11 @@
         "table": {
           "title1": "Mezzi di trasporto",
           "title2": "Fonte della distanza",
-          "transport1": "Treno",
-          "transport2": "Auto - Autobus - Auto elettrica",
-          "transport3": "Percorso in bicicletta",
-          "transport4": "Aereo",
-          "transport5": "Traghetto - Barca a vela",
+          "train": "Treno",
+          "car-ecar-bus": "Auto - Autobus - Auto elettrica",
+          "bike": "Percorso in bicicletta",
+          "plane": "Aereo",
+          "ferry-sail": "Traghetto - Barca a vela",
           "dataOpenstreetmap": "Rete OpenStreetMap",
           "dataGeodesic": "Distanza geodetica + deviazione media",
           "dataApproximation": "Approssimazione del percorso più breve"
@@ -173,35 +173,47 @@
           "title1": "Mezzi di trasporto",
           "title2": "Variabile",
           "title3": "Perché?",
-          "transport1": "Treno",
-          "transport2": "Autobus - Bicicletta",
-          "transport3": "Auto",
-          "transport4": "Auto elettrica",
-          "transport5": "Aereo",
-          "transport6": "Traghetto",
-          "variables1": "Paesi visitati",
-          "variables2": "-",
-          "variables3": "Numero di passeggeri",
-          "variables4": "Numero di passeggeri e paesi visitati",
-          "variables5": "Distanza di viaggio",
-          "variables6": "Parametri dell'utente",
-          "why1": "≠ Tasso di elettrificazione; ≠ Intensità carbonica dell'energia; ≠ Tassi di riempimento",
-          "why2": "-",
-          "why3": "Assegnazione personale dell'impronta; Il consumo aumenta con il peso",
-          "why4": "Idem Auto; ≠ Intensità carbonica dell'energia",
-          "why5": "Maggiore proporzione di decollo per rotte a breve raggio; Utilizzo di aerei generalmente meno efficienti",
-          "why6": "-"
+          "train": {
+            "label": "Treno",
+            "variables": "Paesi visitati",
+            "explanations": "≠ Tasso di elettrificazione; ≠ Intensità carbonica dell'energia; ≠ Tassi di riempimento"
+          },
+          "bus-bike": {
+            "label": "Autobus - Bicicletta",
+            "variables": "-",
+            "explanations": "-"
+          },
+          "car": {
+            "label": "Auto",
+            "variables": "Numero di passeggeri",
+            "explanations": "Assegnazione personale dell'impronta; Il consumo aumenta con il peso"
+          },
+          "ecar": {
+            "label": "Auto elettrica",
+            "variables": "Numero di passeggeri e paesi visitati",
+            "explanations": "Idem Auto; ≠ Intensità carbonica dell'energia"
+          },
+          "plane": {
+            "label": "Aereo",
+            "variables": "Distanza di viaggio",
+            "explanations": "Maggiore proporzione di decollo per rotte a breve raggio; Utilizzo di aerei generalmente meno efficienti"
+          },
+          "ferry": {
+            "label": "Traghetto",
+            "variables": "Parametri dell'utente",
+            "explanations": "-"
+          }
         },
         "table2": {
           "title1": "Mezzi di trasporto",
           "title2": "Utilizzo",
           "title3": "Produzione del veicolo",
           "title4": "Costruzione dell'infrastruttura",
-          "transport1": "Treno",
-          "transport2": "Autobus - Auto - Auto elettrica",
-          "transport3": "Bicicletta",
-          "transport4": "Aereo",
-          "transport5": "Traghetto",
+          "train": "Treno",
+          "car-ecar-bus": "Autobus - Auto - Auto elettrica",
+          "bike": "Bicicletta",
+          "plane": "Aereo",
+          "ferry": "Traghetto",
           "dataNotFound": "Non trovato"
         },
         "text1": "I fattori di emissione considerano l'utilizzo (legato alla produzione e all'uso di energia per spostare il veicolo) nonché la costruzione di infrastrutture e veicoli dove questi sono significativi. La tabella seguente riassume i tipi di emissioni prese in considerazione da lowtrip. Le celle vuote significano che le emissioni correlate non hanno contribuito significativamente al risultato e quindi sono escluse per facilitare la comprensione e la leggibilità per l'utente."
