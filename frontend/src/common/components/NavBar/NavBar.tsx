@@ -17,14 +17,12 @@
 
 import { useEffect, useState } from "react";
 
-import { ChakraProvider } from "@chakra-ui/react";
 import { useTranslation } from "react-i18next";
 import { Link, Outlet, useLocation } from "react-router-dom";
 
 import gitLogo from "assets/github.png";
 import Logo from "assets/lowtrip_logo.png";
 import { ConsentContextProvider } from "common/context/consentContext";
-import theme from "theme";
 
 import UserSettingsModal from "./UserSettingsModal";
 import UserSettingsSelector from "./UserSettingsPopover";
@@ -150,17 +148,15 @@ const NavbarWrapper = ({
     switchMapTheme: () => void;
   };
 }) => (
-  <ChakraProvider theme={theme}>
-    <ConsentContextProvider>
-      <div className="nav-bar-wrapper">
-        <NavBar themeSettings={themeSettings} />
-        <div className="view" id="main-body">
-          <Outlet />
-        </div>
-        <CookieBanner />
+  <ConsentContextProvider>
+    <div className="nav-bar-wrapper">
+      <NavBar themeSettings={themeSettings} />
+      <div className="view" id="main-body">
+        <Outlet />
       </div>
-    </ConsentContextProvider>
-  </ChakraProvider>
+      <CookieBanner />
+    </div>
+  </ConsentContextProvider>
 );
 
 export default NavbarWrapper;
