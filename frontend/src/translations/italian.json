@@ -8,6 +8,7 @@
       "yourMessage": "Cosa vorresti dire?",
       "subjectIsRequired": "Oggetto obbligatorio",
       "yourSubject": "Il tuo oggetto",
+      "messageIsRequired": "Messaggio vuoto",
       "messageSentTitle": "Messaggio inviato!",
       "messageSentText": "Il tuo messaggio è stato inviato con successo. Ti risponderemo al più presto. Grazie!",
       "messageNotSentTitle": "Messaggio non inviato...",

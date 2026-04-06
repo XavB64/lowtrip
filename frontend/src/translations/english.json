@@ -8,6 +8,7 @@
       "yourSubject": "Your subject",
       "yourEmail": "Your email",
       "yourMessage": "What would you like to say?",
+      "messageIsRequired": "Empty message",
       "messageSentTitle": "Message sent!",
       "messageSentText": "Your message has been successfully sent. We will respond to you as soon as possible. Thank you!",
       "messageNotSentTitle": "Message not sent...",
