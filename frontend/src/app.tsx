@@ -17,14 +17,12 @@
 
 import { useEffect, useMemo, useState } from "react";
 
-import { ChakraProvider } from "@chakra-ui/react";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
 import NavbarWrapper from "./common/components/NavBar";
 import { ConsentContextProvider } from "./common/context/consentContext";
 import { SimulationProvider } from "./common/context/simulationContext";
 import { API_URL } from "./config";
-import theme from "./theme";
 import {
   ContactView,
   ErrorView,
@@ -84,15 +82,13 @@ const App = () => {
     {
       path: "/embed",
       element: (
-        <ChakraProvider theme={theme}>
-          <ConsentContextProvider>
-            <SimulationProvider>
-              <div className="embedded-view">
-                <MainView isDarkTheme={false} withLogo={true} />
-              </div>
-            </SimulationProvider>
-          </ConsentContextProvider>
-        </ChakraProvider>
+        <ConsentContextProvider>
+          <SimulationProvider>
+            <div className="embedded-view">
+              <MainView isDarkTheme={false} withLogo={true} />
+            </div>
+          </SimulationProvider>
+        </ConsentContextProvider>
       ),
     },
   ]);
