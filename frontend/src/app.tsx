@@ -17,7 +17,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 
-import { ChakraProvider, Stack, VStack } from "@chakra-ui/react";
+import { ChakraProvider } from "@chakra-ui/react";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
 import NavbarWrapper from "./common/components/NavBar";
@@ -87,16 +87,9 @@ const App = () => {
         <ChakraProvider theme={theme}>
           <ConsentContextProvider>
             <SimulationProvider>
-              <VStack w="100vw" h={["100%", "100vh"]} spacing={0}>
-                <Stack
-                  direction={["column", "row"]}
-                  w="100%"
-                  h="100%"
-                  spacing={0}
-                >
-                  <MainView isDarkTheme={false} withLogo={true} />
-                </Stack>
-              </VStack>
+              <div className="embedded-view">
+                <MainView isDarkTheme={false} withLogo={true} />
+              </div>
             </SimulationProvider>
           </ConsentContextProvider>
         </ChakraProvider>
