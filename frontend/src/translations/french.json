@@ -88,6 +88,7 @@
       "yourEmail": "Ton email",
       "yourSubject": "Ton objet",
       "yourMessage": "Qu'as-tu à nous dire ?",
+      "messageIsRequired": "Message vide",
       "messageSentTitle": "Message envoyé !",
       "messageSentText": "Ton message a bien été envoyé. Nous te répondrons dans les plus brefs délais. Merci !",
       "messageNotSentTitle": "Message non envoyé...",

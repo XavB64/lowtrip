@@ -1,19 +1,12 @@
-import { ChangeEvent, useState } from "react";
+import { useState } from "react";
 
-import {
-  Button,
-  FormControl,
-  FormErrorMessage,
-  FormLabel,
-  Input,
-  Stack,
-  Textarea,
-  useDisclosure,
-} from "@chakra-ui/react";
 import { useTranslation } from "react-i18next";
 
+import Button from "common/components/Button";
 import Modal from "common/components/Modal";
 import { API_URL } from "config";
+
+import "./ContactView.scss";
 
 async function sendEmail(
   senderEmail: string,
@@ -36,7 +29,7 @@ async function sendEmail(
 
 const ContactView = () => {
   const { t } = useTranslation();
-  const { isOpen, onOpen: openModal, onClose } = useDisclosure();
+  const [isOpen, setIsOpen] = useState(false);
 
   const [emailInput, setEmailInput] = useState("");
   const [subjectInput, setSubjectInput] = useState("");
@@ -61,86 +54,81 @@ const ContactView = () => {
       })
       .then(() => {
         setSendingEmail(false);
-        openModal();
+        setIsOpen(true);
       });
   };
 
   return (
-    <Stack
-      w="100%"
-      h={"calc(100vh - 64px)"}
-      alignItems="center"
-      paddingInline={[10, 20]}
-      paddingBlock={8}
-      backgroundColor="#efefef"
-    >
-      <FormControl
-        isInvalid={formHasBeenSubmitted && emailInput === ""}
-        isRequired
+    <div className="contact-view">
+      <div
+        className={`form-control ${formHasBeenSubmitted && !emailInput ? "error" : ""}`}
       >
-        <FormLabel>{t("contact.yourEmail")}</FormLabel>
-        <Input
+        <label className="form-label">
+          {t("contact.yourEmail")} <span className="red">*</span>
+        </label>
+
+        <input
           type="email"
           value={emailInput}
-          onChange={(e: ChangeEvent<HTMLInputElement>) =>
-            setEmailInput(e.target.value)
-          }
-          background="white"
-          borderRadius="10px"
-          border="1px solid lightgrey"
+          onChange={(e) => setEmailInput(e.target.value)}
+          className="input"
+          required
         />
-        {formHasBeenSubmitted && emailInput === "" && (
-          <FormErrorMessage>{t("contact.emailIsRequired")}</FormErrorMessage>
+
+        {formHasBeenSubmitted && !emailInput && (
+          <p className="error-message">{t("contact.emailIsRequired")}</p>
         )}
-      </FormControl>
-      <FormControl
-        isInvalid={formHasBeenSubmitted && subjectInput === ""}
-        isRequired
+      </div>
+
+      <div
+        className={`form-control ${formHasBeenSubmitted && !subjectInput ? "error" : ""}`}
       >
-        <FormLabel>{t("contact.yourSubject")}</FormLabel>
-        <Input
+        <label className="form-label">
+          {t("contact.yourSubject")} <span className="red">*</span>
+        </label>
+
+        <input
           type="text"
           value={subjectInput}
-          onChange={(e: ChangeEvent<HTMLInputElement>) =>
-            setSubjectInput(e.target.value)
-          }
-          background="white"
-          borderRadius="10px"
-          border="1px solid lightgrey"
+          onChange={(e) => setSubjectInput(e.target.value)}
+          className="input"
         />
-        {formHasBeenSubmitted && subjectInput === "" && (
-          <FormErrorMessage>{t("contact.subjectIsRequired")}</FormErrorMessage>
+
+        {formHasBeenSubmitted && !subjectInput && (
+          <p className="error-message">{t("contact.subjectIsRequired")}</p>
         )}
-      </FormControl>
-      <FormControl
-        isInvalid={formHasBeenSubmitted && messageInput === ""}
-        isRequired
-        marginBlock={4}
+      </div>
+
+      <div
+        className={`form-control ${formHasBeenSubmitted && !messageInput ? "error" : ""}`}
       >
-        <FormLabel>{t("contact.yourMessage")}</FormLabel>
-        <Textarea
+        <label className="form-label">
+          {t("contact.yourMessage")} <span className="red">*</span>
+        </label>
+
+        <textarea
           value={messageInput}
           onChange={(e) => setMessageInput(e.target.value)}
-          minHeight="200px"
-          size="sm"
-          background="white"
-          borderRadius="10px"
-          border="1px solid lightgrey"
+          className="textarea"
         />
-      </FormControl>
+
+        {formHasBeenSubmitted && !messageInput && (
+          <p className="error-message">{t("contact.messageIsRequired")}</p>
+        )}
+      </div>
+
       <Button
-        isLoading={sendingEmail}
-        loadingText={t("contact.sendingEmail")}
-        colorScheme="teal"
-        variant="solid"
+        className="submit-button"
         onClick={submitForm}
+        disabled={sendingEmail}
       >
-        {t("contact.sendEmail")}
+        {sendingEmail ? t("contact.sendingEmail") : t("contact.sendEmail")}
       </Button>
+
       <Modal
         isOpen={isOpen}
         onClose={() => {
-          onClose();
+          setIsOpen(false);
         }}
         headerTitle={t(
           isSuccess
@@ -156,7 +144,7 @@ const ContactView = () => {
           )}
         </p>
       </Modal>
-    </Stack>
+    </div>
   );
 };
 
