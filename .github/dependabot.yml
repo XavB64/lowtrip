@@ -5,7 +5,7 @@ updates:
     schedule:
       interval: "weekly"
     commit-message:
-      prefix: "back:"
+      prefix: "📦 back:"
     open-pull-requests-limit: 100
     labels:
       - "dependencies"
@@ -15,7 +15,7 @@ updates:
     schedule:
       interval: "weekly"
     commit-message:
-      prefix: "front:"
+      prefix: "📦 front:"
     open-pull-requests-limit: 100
     labels:
       - "dependencies"
