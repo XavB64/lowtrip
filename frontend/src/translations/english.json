@@ -137,7 +137,8 @@
         "fuel": "Fuel",
         "kerosene": "Kerosene",
         "contrails": "Contrails & NOx",
-        "bikeBuild": "Bicycle production"
+        "bikeBuild": "Bicycle production",
+        "usage": "Usage"
       }
     },
     "method": {

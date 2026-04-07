@@ -17,33 +17,7 @@
 
 import { TFunction } from "i18next";
 
-import { EmissionsCategory, Transport, Trip } from "types";
-
-const transportMeansMapper: Record<Transport | string, string> = {
-  [Transport.plane]: "chart.transportMeans.plane",
-  [Transport.car]: "chart.transportMeans.car",
-  [Transport.ecar]: "chart.transportMeans.ecar",
-  [Transport.bus]: "chart.transportMeans.bus",
-  [Transport.train]: "chart.transportMeans.train",
-  [Transport.ferry]: "chart.transportMeans.ferry",
-  [Transport.bicycle]: "chart.transportMeans.bicycle",
-  [Transport.sail]: "chart.transportMeans.sail",
-  [Transport.myTrip]: "chart.transportMeans.myTrip",
-  [Transport.otherTrip]: "chart.transportMeans.otherTrip",
-};
-
-const categoryMapper: Record<EmissionsCategory | string, string> = {
-  [EmissionsCategory.infra]: "chart.category.infra",
-  [EmissionsCategory.construction]: "chart.category.construction",
-  [EmissionsCategory.fuel]: "chart.category.fuel",
-  [EmissionsCategory.kerosene]: "chart.category.kerosene",
-  [EmissionsCategory.contrails]: "chart.category.contrails",
-  [EmissionsCategory.bikeBuild]: "chart.category.bikeBuild",
-  [EmissionsCategory.none]: "form.ferryNone",
-  [EmissionsCategory.cabin]: "form.ferryCabin",
-  [EmissionsCategory.vehicle]: "form.ferryVehicle",
-  [EmissionsCategory.cabinVehicle]: "form.ferryCabinVehicle",
-};
+import { Trip } from "types";
 
 export const getChartData = (
   trips: Trip[],
@@ -63,10 +37,10 @@ export const getChartData = (
 
     for (let index = 0; index < trip.steps.length; index++) {
       const tripStep = trip.steps[index];
-      const stepLabel = `${trip.label}__${index + 1}. ${t(transportMeansMapper[tripStep.transportMeans], { count: tripStep.passengers })}`;
+      const stepLabel = `${trip.label}__${index + 1}. ${t("chart.transportMeans." + tripStep.transportMeans, { count: tripStep.passengers })}`;
 
       for (const emissionPart of tripStep.emissionParts) {
-        emissionPartLabel = `${stepLabel} - ${t(categoryMapper[emissionPart.emissionSource]) || emissionPart.emissionSource}`;
+        emissionPartLabel = `${stepLabel} - ${t("chart.category." + emissionPart.emissionSource, { defaultValue: emissionPart.emissionSource })}`;
         tripEmissionsByStep.set(emissionPartLabel, emissionPart.emissions);
         bars.push({
           emissionSource: emissionPartLabel,
