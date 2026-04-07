@@ -45,31 +45,6 @@ const categoryMapper: Record<EmissionsCategory | string, string> = {
   [EmissionsCategory.cabinvehicle]: "form.ferryCabinVehicle",
 };
 
-const getLabel = (name: string, t: TFunction<"translation", undefined>) => {
-  if (name.includes("Direct trip")) {
-    const nameParts = name.split(" ");
-    if (nameParts.length < 3) {
-      console.error("Failed to parse trip name: ", name);
-      return name;
-    }
-    const transport = nameParts[2] as Transport;
-    if ([Transport.car, Transport.ecar].includes(transport)) {
-      return `${t("chart.transportMeans.car")} ${nameParts[3]}`;
-    }
-
-    return t(transportMeansMapper[transport]);
-  }
-
-  return name
-    .split(" ")
-    .map((substring) => {
-      const transport = transportMeansMapper[substring];
-      const category = categoryMapper[substring];
-      return t(transport ?? category ?? substring);
-    })
-    .join(" ");
-};
-
 export const getChartData = (
   trips: Trip[],
   t: TFunction<"translation", undefined>,
@@ -101,7 +76,7 @@ export const getChartData = (
     }
 
     chartData.push({
-      displayedName: getLabel(trip.label, t),
+      displayedName: trip.label,
       name: trip.label,
       ...Object.fromEntries(tripEmissionsByStep),
     });
