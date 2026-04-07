@@ -34,7 +34,7 @@ import Tooltip from "common/components/Tooltip";
 import { checkIsOnMobile, uniqBy } from "common/utils";
 import type { Trip, SimulationResults } from "types";
 
-import CustomLabel from "./CustomLabel";
+import CustomLabel, { LastEmissionSourceByTrip } from "./CustomLabel";
 import { getChartData, getLabel } from "./helpers";
 import { generateUrlToShare } from "../../helpers/shareableLink";
 import "./Chart.scss";
@@ -72,22 +72,20 @@ const Chart = ({
 
   const chartData = useMemo(() => getChartData(trips, t), [trips, t]);
 
-  const emissionPartsByTrip = trips.reduce(
-    (result, trip) => {
-      const emissionParts = trip.steps.flatMap((step) =>
-        step.emissionParts.map((emissionPart) => ({
-          color: emissionPart.color,
-          emissionSource: `${emissionPart.emissionSource} ${trip.isMainTrip ? "" : " "}`,
-        })),
-      );
-      result.push({ trip, emissionParts });
-      return result;
-    },
-    [] as {
-      trip: Trip;
-      emissionParts: { color: string; emissionSource: string }[];
-    }[],
-  );
+  const lastEmissionSourceByTrip = useMemo(() => {
+    const result: LastEmissionSourceByTrip[] = [];
+
+    for (const trip of trips) {
+      const lastStep = trip.steps.at(-1)!;
+      const lastEmissionSource = lastStep.emissionParts.at(-1)!.emissionSource;
+      result.push({
+        tripLabel: trip.label,
+        totalEmissions: trip.totalEmissions,
+        lastEmissionSource: `${lastEmissionSource} ${trip.isMainTrip ? "" : " "}`,
+      });
+    }
+    return result;
+  }, [trips]);
 
   const bars = useMemo(
     () =>
@@ -172,7 +170,7 @@ const Chart = ({
                 dataKey="name"
                 content={
                   <CustomLabel
-                    emissionPartsByTrip={emissionPartsByTrip}
+                    lastEmissionSourceByTrip={lastEmissionSourceByTrip}
                     emissionSource={emissionPart.emissionSource}
                   />
                 }

@@ -18,33 +18,36 @@
 import { LabelProps } from "recharts";
 
 import { checkIsOnMobile } from "common/utils";
-import type { Trip } from "types";
+
+export type LastEmissionSourceByTrip = {
+  tripLabel: string;
+  totalEmissions: number;
+  lastEmissionSource: string;
+};
 
 type CustomLabelProps = {
-  emissionPartsByTrip: {
-    trip: Trip;
-    emissionParts: { color: string; emissionSource: string }[];
-  }[];
+  lastEmissionSourceByTrip: LastEmissionSourceByTrip[];
   emissionSource: string;
 } & LabelProps;
 
-/** Only display the custom label of the last emission part of the trip */
+/**
+ * This label is displayed on the chart, above each stacked bar.
+ *
+ * Only display the custom label of the last emission part of the trip (otherwise,
+ * it appears at each stack)
+ */
 const CustomLabel = ({
-  emissionPartsByTrip,
+  lastEmissionSourceByTrip,
   emissionSource,
   ...props
 }: CustomLabelProps) => {
   const isOnMobile = checkIsOnMobile();
 
-  const { emissionParts, trip } = emissionPartsByTrip.find(
-    ({ trip }) => trip.label === props.value,
-  ) as {
-    trip: Trip;
-    emissionParts: { color: string; emissionSource: string }[];
-  };
+  const entry = lastEmissionSourceByTrip.find(
+    (entry) => entry.tripLabel === props.value,
+  )!;
 
-  const shouldDisplay =
-    emissionParts.slice(-1)[0].emissionSource === emissionSource;
+  const shouldDisplay = entry.lastEmissionSource === emissionSource;
   if (!shouldDisplay) return null;
 
   return (
@@ -55,7 +58,7 @@ const CustomLabel = ({
         textAnchor="middle"
         fontSize={isOnMobile ? 10 : 16}
       >
-        {Math.round(trip.totalEmissions)}
+        {Math.round(entry.totalEmissions)}
       </text>
       <text
         x={Number(props.x ?? 0) + Number(props.width ?? 0) / 2}
