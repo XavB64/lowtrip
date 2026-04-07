@@ -155,9 +155,9 @@ const Chart = ({
           />
           <YAxis padding={{ top: 50 }} hide />
           <ChartTooltip
-            formatter={(value, name: string) => [
+            formatter={(value, name) => [
               `${Math.round(Number(value))} kg`,
-              getLabel(name, t),
+              getLabel(String(name ?? ""), t),
             ]}
             contentStyle={{ fontSize: "12px" }}
           />
