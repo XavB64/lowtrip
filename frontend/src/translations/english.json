@@ -57,14 +57,14 @@
       "placeholderTo": "To...",
       "by": "By",
       "transportMeans": {
-        "Train": "Train",
-        "Plane": "Plane",
-        "Bus": "Bus",
-        "Car": "Car",
-        "eCar": "Electric car",
-        "Ferry": "Ferry",
-        "Bicycle": "Bicycle",
-        "Sail": "Sailboat"
+        "train": "Train",
+        "plane": "Plane",
+        "bus": "Bus",
+        "car": "Car",
+        "ecar": "Electric car",
+        "ferry": "Ferry",
+        "bicycle": "Bicycle",
+        "sail": "Sailboat"
       },
       "passengersNb_one": "{{count}} passenger",
       "passengersNb_other": "{{count}} passengers",

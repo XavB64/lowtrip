@@ -42,7 +42,7 @@ const categoryMapper: Record<EmissionsCategory | string, string> = {
   [EmissionsCategory.none]: "form.ferryNone",
   [EmissionsCategory.cabin]: "form.ferryCabin",
   [EmissionsCategory.vehicle]: "form.ferryVehicle",
-  [EmissionsCategory.cabinvehicle]: "form.ferryCabinVehicle",
+  [EmissionsCategory.cabinVehicle]: "form.ferryCabinVehicle",
 };
 
 export const getChartData = (

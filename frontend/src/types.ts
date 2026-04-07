@@ -16,23 +16,23 @@ export type Step = {
 };
 
 export enum Transport {
-  plane = "Plane",
-  car = "Car",
-  ecar = "eCar",
-  bus = "Bus",
-  train = "Train",
-  ferry = "Ferry",
-  bicycle = "Bicycle",
-  sail = "Sail",
-  myTrip = "MyTrip",
-  otherTrip = "OtherTrip",
+  plane = "plane",
+  car = "car",
+  ecar = "ecar",
+  bus = "bus",
+  train = "train",
+  ferry = "ferry",
+  bicycle = "bicycle",
+  sail = "sail",
+  myTrip = "myTrip",
+  otherTrip = "otherTrip",
 }
 
 export enum FerryOptions {
-  none = "None",
-  cabin = "Cabin",
-  vehicle = "Vehicle",
-  cabinVehicle = "CabinVehicle",
+  none = "none",
+  cabin = "cabin",
+  vehicle = "vehicle",
+  cabinVehicle = "cabinVehicle",
 }
 
 type TripStepGeometry = {
@@ -86,16 +86,16 @@ export type DirectTripData = {
 };
 
 export enum EmissionsCategory {
-  infra = "Infra",
-  construction = "Construction",
-  fuel = "Fuel",
-  kerosene = "Kerosene",
-  contrails = "Contrails",
-  bikeBuild = "Bike-build",
-  none = "None",
-  cabin = "Cabin",
-  vehicle = "Vehicle",
-  cabinvehicle = "CabinVehicle",
+  infra = "infra",
+  construction = "construction",
+  fuel = "fuel",
+  kerosene = "kerosene",
+  contrails = "contrails",
+  bikeBuild = "bikeBuild",
+  none = "none",
+  cabin = "cabin",
+  vehicle = "vehicle",
+  cabinVehicle = "cabinVehicle",
 }
 
 export type Trip = {
