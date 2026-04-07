@@ -45,10 +45,7 @@ const categoryMapper: Record<EmissionsCategory | string, string> = {
   [EmissionsCategory.cabinvehicle]: "form.ferryCabinVehicle",
 };
 
-export const getLabel = (
-  name: string,
-  t: TFunction<"translation", undefined>,
-) => {
+const getLabel = (name: string, t: TFunction<"translation", undefined>) => {
   if (name.includes("Direct trip")) {
     const nameParts = name.split(" ");
     if (nameParts.length < 3) {
@@ -77,28 +74,43 @@ export const getChartData = (
   trips: Trip[],
   t: TFunction<"translation", undefined>,
 ) => {
-  const results = [];
+  const chartData = [];
+  const lastEmissionSourceByTrip: {
+    tripLabel: string;
+    totalEmissions: number;
+    lastEmissionSource: string;
+  }[] = [];
+  const bars = [];
 
   for (const trip of trips) {
     const tripEmissionsByStep = new Map<string, number>();
+    let emissionPartLabel: string;
 
     for (let index = 0; index < trip.steps.length; index++) {
       const tripStep = trip.steps[index];
+      const stepLabel = `${trip.label}__${index + 1}. ${t(transportMeansMapper[tripStep.transportMeans], { count: tripStep.passengers })}`;
 
       for (const emissionPart of tripStep.emissionParts) {
-        tripEmissionsByStep.set(
-          `${emissionPart.emissionSource} ${trip.isMainTrip ? "" : " "}`,
-          emissionPart.emissions,
-        );
+        emissionPartLabel = `${stepLabel} - ${t(categoryMapper[emissionPart.emissionSource]) || emissionPart.emissionSource}`;
+        tripEmissionsByStep.set(emissionPartLabel, emissionPart.emissions);
+        bars.push({
+          emissionSource: emissionPartLabel,
+          color: emissionPart.color,
+        });
       }
     }
 
-    results.push({
+    chartData.push({
       displayedName: getLabel(trip.label, t),
       name: trip.label,
       ...Object.fromEntries(tripEmissionsByStep),
     });
+    lastEmissionSourceByTrip.push({
+      tripLabel: trip.label,
+      totalEmissions: trip.totalEmissions,
+      lastEmissionSource: emissionPartLabel!,
+    });
   }
 
-  return results;
+  return { chartData, bars, lastEmissionSourceByTrip };
 };
