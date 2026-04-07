@@ -60,16 +60,6 @@ const Chart = ({
 
   const mainTrip = trips.find((trip) => trip.isMainTrip) as Trip;
 
-  const chartTitle = useMemo(() => {
-    if (simulationType === "mainTripVsOtherTrip") {
-      return t("results.vsOtherTrip");
-    }
-    if (simulationType === "mainTripVsOtherTransportMeans") {
-      return t("results.vsOtherMeans");
-    }
-    return t("results.yourTripEmissions");
-  }, [simulationType, t]);
-
   const { chartData, bars, lastEmissionSourceByTrip } = useMemo(
     () => getChartData(trips, t),
     [trips, t],
@@ -78,7 +68,7 @@ const Chart = ({
   return (
     <div className="chart-container">
       <div className="chart-title">
-        {chartTitle}
+        {t(`results.${simulationType}`)}
 
         <button
           className="share-icon-button"

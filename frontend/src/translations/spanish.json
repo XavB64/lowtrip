@@ -89,9 +89,9 @@
       "shimla": "La película documental 'Shimla', nombrada así por la ciudad india, explora el tema del agua y la ecología a través de un viaje ambicioso desde París hasta la India y de regreso utilizando una combinación de trenes, ferries y autostop. Este enfoque innovador para viajar no solo crea conciencia sobre los problemas ambientales, sino que también muestra cómo se pueden utilizar diversos modos de transporte para minimizar las emisiones de carbono y maximizar la riqueza de la experiencia de viaje. Johan y Victoria, los realizadores de la película, confiaron en lowtrip para estimar la huella de carbono asociada a su aventura y las reducciones posteriores en comparación con los medios de transporte habituales para distancias tan largas."
     },
     "results": {
-      "vsOtherTrip": "Tu viaje vs Otro viaje",
-      "vsOtherMeans": "Tu viaje vs Otros medios de transporte",
-      "yourTripEmissions": "Emisiones de tu viaje",
+      "mainTripVsOtherTrip": "Tu viaje vs Otro viaje",
+      "mainTripVsOtherTransportMeans": "Tu viaje vs Otros medios de transporte",
+      "mainTripOnly": "Emisiones de tu viaje",
       "explanation": "La combustión del queroseno a gran altitud produce nubes llamadas estelas de condensación. Combinados con las emisiones de NOx, estos efectos no relacionados con el CO2 contribuyen al calentamiento global. La conexión representada puede que actualmente no esté operada por una aerolínea. Este modo no se muestra por defecto cuando la longitud del viaje es inferior a 300 km."
     },
     "chart": {

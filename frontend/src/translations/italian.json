@@ -89,9 +89,9 @@
       "shimla": "Il film documentario 'Shimla', così chiamato dalla città indiana, esplora il tema dell'acqua e dell'ecologia attraverso un viaggio ambizioso da Parigi all'India e ritorno utilizzando una combinazione di treni, traghetti e autostop. Questo approccio innovativo al viaggio non solo sensibilizza sulle questioni ambientali ma mostra anche come siano possibili una varietà di mezzi di trasporto per minimizzare le emissioni di carbonio e massimizzare la ricchezza dell'esperienza di viaggio. Johan e Victoria, i registi del film, hanno affidato a lowtrip la stima dell'impronta di carbonio associata alla loro avventura e le riduzioni successive rispetto ai mezzi di trasporto usuali per tali distanze."
     },
     "results": {
-      "vsOtherTrip": "Il tuo viaggio VS Altro viaggio",
-      "vsOtherMeans": "Il tuo viaggio VS Altri mezzi di trasporto",
-      "yourTripEmissions": "Le tue emissioni di viaggio",
+      "mainTripVsOtherTrip": "Il tuo viaggio VS Altro viaggio",
+      "mainTripVsOtherTransportMeans": "Il tuo viaggio VS Altri mezzi di trasporto",
+      "mainTripOnly": "Le tue emissioni di viaggio",
       "explanation": "La combustione del cherosene ad alta quota produce nuvole chiamate scie di condensazione. Insieme alle emissioni di NOx, questi effetti non-CO2 contribuiscono al riscaldamento globale. La connessione rappresentata potrebbe attualmente non essere operata da una compagnia aerea. Questa modalità non viene visualizzata per impostazione predefinita quando la lunghezza del viaggio è inferiore a 300 km."
     },
     "chart": {
