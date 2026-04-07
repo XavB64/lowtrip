@@ -89,9 +89,9 @@
       "shimla": "The documentary film 'Shimla', named after the Indian city, explores the theme of water and ecology through an ambitious journey from Paris to India and back using a combination of trains, ferries, and hitchhiking ('autostop'). This innovative approach to travel not only raises awareness about environmental issues but also showcases how diverse modes of transportation can be used to minimize carbon emissions and maximize the richness of the travel experience. Johan and Victoria, the movie makers, trusted lowtrip to estimate the associated carbon footprint of their adventure and subsequent reductions compared to usual means of transportation for such distances."
     },
     "results": {
-      "vsOtherTrip": "Your trip VS Other trip",
-      "vsOtherMeans": "Your trip VS Other means of transport",
-      "yourTripEmissions": "Your trip emissions",
+      "mainTripVsOtherTrip": "Your trip VS Other trip",
+      "mainTripVsOtherTransportMeans": "Your trip VS Other means of transport",
+      "mainTripOnly": "Your trip emissions",
       "explanation": "The combustion of kerosene at high altitude produces clouds called contrails. Combined with NOx emissions, these non-CO2 effects contribute to global warming. The represented connection might not be currently operated by a flight company. This mode is not displayed by default when the journey length is below 300km."
     },
     "chart": {
