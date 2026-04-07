@@ -7,6 +7,7 @@ import {
   TripStep,
   SimulationType,
   type Step,
+  thumbUp,
 } from "types";
 
 export const formatResponse = (
@@ -29,6 +30,25 @@ export const formatResponse = (
     let totalEmissions = 0;
 
     trip.steps.forEach((step, index) => {
+      let passengers: number | undefined;
+      if (["Car", "Ecar"].includes(step.transport_means)) {
+        if (
+          simulationType === SimulationType.mainTripVsOtherTransportMeans &&
+          trip.name !== "MAIN_TRIP"
+        ) {
+          passengers = 1;
+        } else {
+          const input =
+            inputs[trip.name === "MAIN_TRIP" ? "mainSteps" : "altSteps"]![
+              index + 1
+            ];
+          passengers =
+            !!input.passengers && input.passengers !== thumbUp
+              ? Number(input.passengers)
+              : 1;
+        }
+      }
+
       const emissionParts: TripStep["emissionParts"] = [];
       let stepEmissions = 0;
       step.emissions.forEach((emission) => {
@@ -47,6 +67,7 @@ export const formatResponse = (
         emissions: stepEmissions,
         transportMeans: step.transport_means as Transport,
         emissionParts,
+        passengers,
       });
     });
 

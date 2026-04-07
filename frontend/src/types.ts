@@ -108,6 +108,7 @@ export type Trip = {
 export type TripStep = {
   emissions: number;
   transportMeans: Transport;
+  passengers?: number;
   emissionParts: { emissionSource: string; color: string; emissions: number }[];
 };
 
