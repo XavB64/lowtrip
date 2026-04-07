@@ -183,7 +183,11 @@ export const TransportWithOptions = ({
 
   return (
     <div className="transport-selector-with-options">
-      <Tooltip content={transport} position="bottom" displayTooltip={!open}>
+      <Tooltip
+        content={t(`form.transportMeans.${transport}`)}
+        position="bottom"
+        displayTooltip={!open}
+      >
         <IconButton
           icon={icon}
           ref={buttonRef}
