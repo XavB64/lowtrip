@@ -31,11 +31,11 @@ import {
 } from "recharts";
 
 import Tooltip from "common/components/Tooltip";
-import { checkIsOnMobile, uniqBy } from "common/utils";
+import { checkIsOnMobile } from "common/utils";
 import type { Trip, SimulationResults } from "types";
 
-import CustomLabel, { LastEmissionSourceByTrip } from "./CustomLabel";
-import { getChartData, getLabel } from "./helpers";
+import CustomLabel from "./CustomLabel";
+import { getChartData } from "./helpers";
 import { generateUrlToShare } from "../../helpers/shareableLink";
 import "./Chart.scss";
 
@@ -70,37 +70,9 @@ const Chart = ({
     return t("results.yourTripEmissions");
   }, [simulationType, t]);
 
-  const chartData = useMemo(() => getChartData(trips, t), [trips, t]);
-
-  const lastEmissionSourceByTrip = useMemo(() => {
-    const result: LastEmissionSourceByTrip[] = [];
-
-    for (const trip of trips) {
-      const lastStep = trip.steps.at(-1)!;
-      const lastEmissionSource = lastStep.emissionParts.at(-1)!.emissionSource;
-      result.push({
-        tripLabel: trip.label,
-        totalEmissions: trip.totalEmissions,
-        lastEmissionSource: `${lastEmissionSource} ${trip.isMainTrip ? "" : " "}`,
-      });
-    }
-    return result;
-  }, [trips]);
-
-  const bars = useMemo(
-    () =>
-      uniqBy(
-        trips.flatMap((trip) =>
-          trip.steps.flatMap((step) =>
-            step.emissionParts.flatMap((emissionPart) => ({
-              color: emissionPart.color,
-              emissionSource: `${emissionPart.emissionSource} ${trip.isMainTrip ? "" : " "}`,
-            })),
-          ),
-        ),
-        "emissionSource",
-      ),
-    [trips],
+  const { chartData, bars, lastEmissionSourceByTrip } = useMemo(
+    () => getChartData(trips, t),
+    [trips, t],
   );
 
   return (
@@ -155,7 +127,7 @@ const Chart = ({
           <ChartTooltip
             formatter={(value, name) => [
               `${Math.round(Number(value))} kg`,
-              getLabel(String(name ?? ""), t),
+              String(name).split("__")[1],
             ]}
             contentStyle={{ fontSize: "12px" }}
           />

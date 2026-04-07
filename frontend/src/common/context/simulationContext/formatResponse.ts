@@ -22,9 +22,6 @@ export const formatResponse = (
     simulationType = SimulationType.mainTripVsOtherTrip;
   }
 
-  const needToLabelTripSteps =
-    simulationType !== SimulationType.mainTripVsOtherTransportMeans;
-
   const trips = data.trips.map((trip) => {
     const formattedSteps: TripStep[] = [];
     let totalEmissions = 0;
@@ -54,9 +51,7 @@ export const formatResponse = (
       step.emissions.forEach((emission) => {
         stepEmissions += emission.kg_co2_eq;
         emissionParts.push({
-          emissionSource: needToLabelTripSteps
-            ? `${index + 1}. ${step.transport_means} - ${emission.name}`
-            : emission.name,
+          emissionSource: emission.name,
           color: emission.color,
           emissions: emission.kg_co2_eq,
         });
