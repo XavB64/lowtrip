@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useMemo } from "react";
+import { useState, useRef, useEffect, useMemo, JSX } from "react";
 
 import { TFunction } from "i18next";
 import { useTranslation } from "react-i18next";
