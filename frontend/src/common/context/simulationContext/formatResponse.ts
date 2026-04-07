@@ -14,7 +14,7 @@ export const formatResponse = (
   data: ApiResponse,
 ): Omit<SimulationResults, "inputs"> => {
   let simulationType = SimulationType.mainTripVsOtherTransportMeans;
-  if (inputs.mainSteps.length > 1) {
+  if (inputs.mainSteps.length > 2) {
     simulationType = SimulationType.mainTripOnly;
   }
   if (inputs.altSteps) {
@@ -52,13 +52,12 @@ export const formatResponse = (
 
     let label: string;
     if (trip.name === "MAIN_TRIP") {
-      if (inputs.mainSteps.length === 1) {
-        label = i18next.t(
-          `chart.transportMeans.${inputs.mainSteps[0].transportMean!}`,
-        );
-      } else {
-        label = i18next.t("chart.transportMeans.myTrip");
-      }
+      label = i18next.t(
+        simulationType === SimulationType.mainTripVsOtherTransportMeans
+          ? `chart.transportMeans.${inputs.mainSteps[1].transportMean!}`
+          : "chart.transportMeans.myTrip",
+        { count: inputs.mainSteps[1].passengers },
+      );
     } else if (trip.name === "SECOND_TRIP") {
       label = i18next.t("chart.transportMeans.otherTrip");
     } else {
