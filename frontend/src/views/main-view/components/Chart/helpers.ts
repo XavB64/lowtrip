@@ -77,22 +77,28 @@ export const getChartData = (
   trips: Trip[],
   t: TFunction<"translation", undefined>,
 ) => {
-  return trips.map((trip) => {
-    const tripEmissionsByStep = trip.steps.reduce(
-      (acc, tripStep) => {
-        tripStep.emissionParts.forEach((emissionPart) => {
-          acc[`${emissionPart.emissionSource} ${trip.isMainTrip ? "" : " "}`] =
-            emissionPart.emissions;
-        });
-        return acc;
-      },
-      {} as Record<string, number>,
-    );
+  const results = [];
 
-    return {
+  for (const trip of trips) {
+    const tripEmissionsByStep = new Map<string, number>();
+
+    for (let index = 0; index < trip.steps.length; index++) {
+      const tripStep = trip.steps[index];
+
+      for (const emissionPart of tripStep.emissionParts) {
+        tripEmissionsByStep.set(
+          `${emissionPart.emissionSource} ${trip.isMainTrip ? "" : " "}`,
+          emissionPart.emissions,
+        );
+      }
+    }
+
+    results.push({
       displayedName: getLabel(trip.label, t),
       name: trip.label,
-      ...tripEmissionsByStep,
-    };
-  });
+      ...Object.fromEntries(tripEmissionsByStep),
+    });
+  }
+
+  return results;
 };
