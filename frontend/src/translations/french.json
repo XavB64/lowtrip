@@ -217,7 +217,8 @@
         "fuel": "Carburant",
         "kerosene": "Kérosène",
         "contrails": "Trainées & NOx",
-        "bikeBuild": "Construction du vélo"
+        "bikeBuild": "Construction du vélo",
+        "usage": "Traversée"
       }
     },
     "cookieBanner": {

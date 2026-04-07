@@ -257,7 +257,7 @@ def ferry_to_gdf(
             transport_means="ferry",
             emissions=[
                 EmissionPart(
-                    name="Usage",
+                    name="usage",
                     kg_co2_eq=EF * bird,
                     ef_tot=EF,
                     color=color_usage,
