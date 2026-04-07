@@ -121,7 +121,7 @@ export const TransportWithOptions = ({
       const top = checkIsOnMobile() ? -menuHeight - 12 : rect.height;
 
       // Horizontal
-      const menuWidth = transport === "Ferry" ? 170 : 95;
+      const menuWidth = transport === "ferry" ? 170 : 95;
       const left = rect.width - menuWidth;
 
       setPosition({

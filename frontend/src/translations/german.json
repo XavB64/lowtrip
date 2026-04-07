@@ -57,14 +57,14 @@
       "placeholderTo": "Nach...",
       "by": "Mit",
       "transportMeans": {
-        "Train": "Zug",
-        "Plane": "Flugzeug",
-        "Bus": "Bus",
-        "Car": "Auto",
-        "eCar": "Elektroauto",
-        "Ferry": "Fähre",
-        "Bicycle": "Fahrrad",
-        "Sail": "Segelboot"
+        "train": "Zug",
+        "plane": "Flugzeug",
+        "bus": "Bus",
+        "car": "Auto",
+        "ecar": "Elektroauto",
+        "ferry": "Fähre",
+        "bicycle": "Fahrrad",
+        "sail": "Segelboot"
       },
       "passengersNb_one": "{{count}} Passagier",
       "passengersNb_other": "{{count}} Passagiere",

@@ -137,14 +137,14 @@
       "placeholderTo": "À...",
       "by": "En",
       "transportMeans": {
-        "Train": "Train",
-        "Plane": "Avion",
-        "Bus": "Bus",
-        "Car": "Voiture",
-        "eCar": "Voiture électrique",
-        "Ferry": "Ferry",
-        "Bicycle": "Vélo",
-        "Sail": "Voilier"
+        "train": "Train",
+        "plane": "Avion",
+        "bus": "Bus",
+        "car": "Voiture",
+        "ecar": "Voiture électrique",
+        "ferry": "Ferry",
+        "bicycle": "Vélo",
+        "sail": "Voilier"
       },
       "passengersNb_one": "{{count}} passager",
       "passengersNb_other": "{{count}} passagers",

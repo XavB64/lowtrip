@@ -96,10 +96,10 @@ def bicycle_to_gdf(
 
     return TripStepResult(
         step_data=StepData(
-            transport_means="Bicycle",
+            transport_means="bicycle",
             emissions=[
                 EmissionPart(
-                    name="Construction",
+                    name="bikeBuild",
                     kg_co2_eq=EF * route_length,
                     ef_tot=EF,
                     color=color,
@@ -110,7 +110,7 @@ def bicycle_to_gdf(
         geometries=[
             TripStepGeometry(
                 coordinates=[[list(coord) for coord in route_geometry.coords]],
-                transport_means="Bicycle",
+                transport_means="bicycle",
                 length=route_length,
                 color=color,
                 country_label=None,

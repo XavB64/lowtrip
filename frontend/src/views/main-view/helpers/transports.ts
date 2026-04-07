@@ -1,7 +1,7 @@
 import type { Transport } from "types";
 
 export const transportMeanIsCar = (transportMean: Transport) =>
-  ["Car", "eCar"].includes(transportMean);
+  transportMean === "car" || transportMean === "ecar";
 
 export const transportMeanIsFerry = (transportMean: Transport) =>
-  transportMean === "Ferry";
+  transportMean === "ferry";

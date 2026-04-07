@@ -91,7 +91,7 @@ def compute_custom_trip_emissions(
         results = None
 
         # Compute depending on the mean of transport
-        if transport_means == "Train":
+        if transport_means == "train":
             results = train_to_gdf(
                 departure_coordinates,
                 arrival_coordinates,
@@ -99,7 +99,7 @@ def compute_custom_trip_emissions(
                 color_infra=cmap["Cons_infra"],
             )
 
-        elif transport_means == "Bus":
+        elif transport_means == "bus":
             results = bus_to_gdf(
                 departure_coordinates,
                 arrival_coordinates,
@@ -107,7 +107,7 @@ def compute_custom_trip_emissions(
                 color_cons=cmap["Cons_infra"],
             )
 
-        elif transport_means == "Car":
+        elif transport_means == "car":
             results = car_to_gdf(
                 departure_coordinates,
                 arrival_coordinates,
@@ -116,7 +116,7 @@ def compute_custom_trip_emissions(
                 color_cons=cmap["Cons_infra"],
             )
 
-        elif transport_means == "eCar":
+        elif transport_means == "ecar":
             results = ecar_to_gdf(
                 departure_coordinates,
                 arrival_coordinates,
@@ -125,14 +125,14 @@ def compute_custom_trip_emissions(
                 color_cons=cmap["Cons_infra"],
             )
 
-        elif transport_means == "Bicycle":
+        elif transport_means == "bicycle":
             results = bicycle_to_gdf(
                 departure_coordinates,
                 arrival_coordinates,
                 color=cmap["Bicycle"],
             )
 
-        elif transport_means == "Plane":
+        elif transport_means == "plane":
             results = plane_to_gdf(
                 departure_coordinates,
                 arrival_coordinates,
@@ -140,7 +140,7 @@ def compute_custom_trip_emissions(
                 color_contrails=cmap["Contrails"],
             )
 
-        elif transport_means == "Ferry":
+        elif transport_means == "ferry":
             results = ferry_to_gdf(
                 departure_coordinates,
                 arrival_coordinates,
@@ -148,7 +148,7 @@ def compute_custom_trip_emissions(
                 options=arrival.options,
             )
 
-        elif transport_means == "Sail":
+        elif transport_means == "sail":
             results = sail_to_gdf(
                 departure_coordinates,
                 arrival_coordinates,
@@ -191,8 +191,8 @@ def compute_direct_trips_emissions(inputs: list[TripStep], cmap=colors_direct):
     geometries: list[TripStepGeometry] = []
 
     # Compute train and road emissions except if the initial transport means is Ferry or Sail
-    if transport_means not in {"Ferry", "Sail"}:
-        if transport_means != "Train":
+    if transport_means not in {"ferry", "sail"}:
+        if transport_means != "train":
             train_results = train_to_gdf(
                 departure_coordinates,
                 arrival_coordinates,
@@ -203,7 +203,7 @@ def compute_direct_trips_emissions(inputs: list[TripStep], cmap=colors_direct):
                 trips.append(TripResult(name="TRAIN", steps=[train_results.step_data]))
                 geometries += train_results.geometries
 
-        cmap_road = colors_custom if transport_means == "eCar" else cmap
+        cmap_road = colors_custom if transport_means == "ecar" else cmap
         road_results = car_bus_to_gdf(
             departure_coordinates,
             arrival_coordinates,
@@ -212,15 +212,15 @@ def compute_direct_trips_emissions(inputs: list[TripStep], cmap=colors_direct):
         )
 
         if road_results is not None:
-            if transport_means != "Bus":
+            if transport_means != "bus":
                 trips.append(TripResult(name="BUS", steps=[road_results.bus_step_data]))
-            if transport_means != "Car":
+            if transport_means != "car":
                 trips.append(TripResult(name="CAR", steps=[road_results.car_step_data]))
-            if transport_means not in {"Bus", "Car", "eCar"}:
+            if transport_means not in {"bus", "car", "ecar"}:
                 geometries += road_results.geometries
 
     # Compute plane emissions only for trips longer than 300km
-    if transport_means != "Plane":
+    if transport_means != "plane":
         bird_path = LineString([departure_coordinates, arrival_coordinates])
         bird_distance = Geod(ellps="WGS84").geometry_length(bird_path) / 1e3
         if bird_distance > min_plane_dist:

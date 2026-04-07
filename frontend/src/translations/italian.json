@@ -57,14 +57,14 @@
       "placeholderTo": "A...",
       "by": "Da",
       "transportMeans": {
-        "Train": "Treno",
-        "Plane": "Aereo",
-        "Bus": "Autobus",
-        "Car": "Auto",
-        "eCar": "Auto elettrica",
-        "Ferry": "Traghetto",
-        "Bicycle": "Bicicletta",
-        "Sail": "Barca a vela"
+        "train": "Treno",
+        "plane": "Aereo",
+        "bus": "Autobus",
+        "car": "Auto",
+        "ecar": "Auto elettrica",
+        "ferry": "Traghetto",
+        "bicycle": "Bicicletta",
+        "sail": "Barca a vela"
       },
       "passengersNb_one": "{{count}} passeggero",
       "passengersNb_other": "{{count}} passeggeri",

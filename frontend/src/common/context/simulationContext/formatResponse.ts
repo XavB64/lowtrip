@@ -28,7 +28,7 @@ export const formatResponse = (
 
     trip.steps.forEach((step, index) => {
       let passengers: number | undefined;
-      if (["Car", "Ecar"].includes(step.transport_means)) {
+      if (["car", "ecar"].includes(step.transport_means)) {
         if (
           simulationType === SimulationType.mainTripVsOtherTransportMeans &&
           trip.name !== "MAIN_TRIP"

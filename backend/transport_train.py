@@ -284,7 +284,7 @@ def train_to_gdf(
             "kgCO2eq": [train_dist * EF_train["infra"]],
             "EF_tot": [EF_train["infra"]],
             "colors": [color_infra],
-            "NAME": ["Infra"],
+            "NAME": ["infra"],
         }),
         gdf,
     ])
@@ -339,7 +339,7 @@ def train_to_gdf(
 
     return TripStepResult(
         step_data=StepData(
-            transport_means="Train",
+            transport_means="train",
             emissions=emissions,
             path_length=train_dist,
         ),

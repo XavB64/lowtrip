@@ -136,7 +136,7 @@ def ecar_to_gdf(
             "kgCO2eq": [route_length * EF_ecar["construction"] / passengers_nb],
             "EF_tot": [EF_ecar["construction"]],
             "colors": [color_cons],
-            "NAME": ["Construction"],
+            "NAME": ["construction"],
         }),
         gdf,
     ])
@@ -174,7 +174,7 @@ def ecar_to_gdf(
 
     return TripStepResult(
         step_data=StepData(
-            transport_means="Ecar",
+            transport_means="ecar",
             emissions=emissions,
             path_length=route_length,
         ),
@@ -191,13 +191,13 @@ def get_car_emissions(
 ) -> list[EmissionPart]:
     return [
         EmissionPart(
-            name="Construction",
+            name="construction",
             kg_co2_eq=route_length * EF_construction,
             ef_tot=EF_construction,
             color=color_construction,
         ),
         EmissionPart(
-            name="Fuel",
+            name="fuel",
             kg_co2_eq=route_length * EF_fuel,
             ef_tot=EF_fuel,
             color=color_usage,
@@ -214,13 +214,13 @@ def get_bus_emissions(
 ) -> list[EmissionPart]:
     return [
         EmissionPart(
-            name="Construction",
+            name="construction",
             kg_co2_eq=route_length * EF_construction,
             ef_tot=EF_construction,
             color=color_construction,
         ),
         EmissionPart(
-            name="Fuel",
+            name="fuel",
             kg_co2_eq=route_length * EF_fuel,
             ef_tot=EF_fuel,
             color=color_usage,
@@ -295,12 +295,12 @@ def car_bus_to_gdf(
     return CarBusResults(
         geometries=[road_geometry],
         bus_step_data=StepData(
-            transport_means="Bus",
+            transport_means="bus",
             emissions=bus_emissions,
             path_length=route_length,
         ),
         car_step_data=StepData(
-            transport_means="Car",
+            transport_means="car",
             emissions=car_emissions,
             path_length=route_length,
         ),
@@ -398,7 +398,7 @@ def car_to_gdf(
 
     return TripStepResult(
         step_data=StepData(
-            transport_means="Car",
+            transport_means="car",
             emissions=get_car_emissions(
                 route_length,
                 EF_fuel,

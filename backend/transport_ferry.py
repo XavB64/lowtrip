@@ -214,7 +214,7 @@ def ferry_to_gdf(
     tag1,
     tag2,
     EF=EF_ferry,
-    options="None",
+    options="none",
     color_usage="#ffffff",
 ) -> TripStepResult:
     """Parameters
@@ -236,13 +236,13 @@ def ferry_to_gdf(
     geod = Geod(ellps="WGS84")
     bird = geod.geometry_length(geom) / 1e3
     # Compute the good emission factor
-    if options == "None":
+    if options == "none":
         EF = EF["Seat"] + EF["Base"]
-    elif options == "Cabin":
+    elif options == "cabin":
         EF = EF["Cabin"] + EF["Base"]
-    elif options == "Vehicle":
+    elif options == "vehicle":
         EF = EF["Car"] + EF["Seat"] + EF["Base"]
-    elif options == "CabinVehicle":
+    elif options == "cabinVehicle":
         EF = EF["Car"] + EF["Cabin"] + EF["Base"]
 
     coordinates = []
@@ -254,7 +254,7 @@ def ferry_to_gdf(
 
     return TripStepResult(
         step_data=StepData(
-            transport_means="Ferry",
+            transport_means="ferry",
             emissions=[
                 EmissionPart(
                     name="Usage",
@@ -268,7 +268,7 @@ def ferry_to_gdf(
         geometries=[
             TripStepGeometry(
                 coordinates=coordinates,
-                transport_means="Ferry",
+                transport_means="ferry",
                 length=bird,
                 color=color_usage,
                 country_label=None,
@@ -306,7 +306,7 @@ def sail_to_gdf(tag1, tag2, EF=EF_sail, color_usage="#ffffff") -> TripStepResult
 
     return TripStepResult(
         step_data=StepData(
-            transport_means="Sail",
+            transport_means="sail",
             emissions=[
                 EmissionPart(
                     name="Usage",
@@ -320,7 +320,7 @@ def sail_to_gdf(tag1, tag2, EF=EF_sail, color_usage="#ffffff") -> TripStepResult
         geometries=[
             TripStepGeometry(
                 coordinates=coordinates,
-                transport_means="Sail",
+                transport_means="sail",
                 length=bird,
                 color=color_usage,
                 country_label=None,
