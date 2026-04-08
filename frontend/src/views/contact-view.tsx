@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { useTranslation } from "react-i18next";
+import { Trans, useTranslation } from "react-i18next";
 
 import Button from "common/components/Button";
 import Modal from "common/components/Modal";
@@ -63,6 +63,17 @@ const ContactView = () => {
       <div
         className={`form-control ${formHasBeenSubmitted && !emailInput ? "error" : ""}`}
       >
+        <div className="alert">
+          ⚠️{" "}
+          <Trans
+            i18nKey="contact.formIsBroken"
+            values={{ email: "lowtrip.contact@gmail.com" }}
+            components={{
+              bold: <strong />,
+            }}
+          />
+        </div>
+
         <label className="form-label">
           {t("contact.yourEmail")} <span className="red">*</span>
         </label>
@@ -117,11 +128,7 @@ const ContactView = () => {
         )}
       </div>
 
-      <Button
-        className="submit-button"
-        onClick={submitForm}
-        disabled={sendingEmail}
-      >
+      <Button className="submit-button" onClick={submitForm} disabled={true}>
         {sendingEmail ? t("contact.sendingEmail") : t("contact.sendEmail")}
       </Button>
 
