@@ -29,6 +29,7 @@ import {
   MainView,
   MethodView,
   AboutView,
+  UpdatesView,
 } from "./views";
 import "./i18n";
 import "./styles.scss";
@@ -75,6 +76,10 @@ const App = () => {
         {
           path: "/about",
           element: <AboutView />,
+        },
+        {
+          path: "/updates",
+          element: <UpdatesView />,
         },
       ],
       errorElement: <ErrorView />,

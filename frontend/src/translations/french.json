@@ -101,7 +101,8 @@
       "settings": "Paramètres",
       "dark": "Sombre",
       "light": "Clair",
-      "about": "À propos"
+      "about": "À propos",
+      "updates": "Historique"
     },
     "home": {
       "compareTravelEmissions": "Compare les émissions de ton voyage"
@@ -225,6 +226,31 @@
     "cookieBanner": {
       "message": "Nous utilisons des cookies uniquement pour comptabiliser le nombre de visiteurs. En continuant à naviguer, vous les acceptez.",
       "ok": "Ok"
+    },
+    "updates": {
+      "months": {
+        "january": "Janvier",
+        "february": "Février",
+        "march": "Mars",
+        "april": "Avril",
+        "may": "Mai",
+        "june": "Juin",
+        "july": "Juillet",
+        "august": "Août",
+        "september": "Septembre",
+        "october": "Octobre",
+        "november": "Novembre",
+        "december": "Décembre"
+      },
+      "applicationLaunch1": "Lancement de l'application",
+      "applicationLaunch2": "Gestion des transports suivants : train, avion, voiture (dont stop et voiture élétrique), bus, ferry et voile",
+      "applicationLaunch3": "Formulaire de contact",
+      "applicationLaunch4": "Méthodologie disponible",
+      "applicationLaunch5": "Application traduite en francais, anglais, allemand, espagnol et italien",
+      "introduction": "Cette page liste les principales avancées fonctionnelles de l'application. L'historique complet, et notamment technique, est disponible sur Github.",
+      "shareableLinkFeature": "Ajout du lien de partage, qui peut aussi servir à sauvergarder sa requête",
+      "title": "Historique des développements",
+      "updatePage": "Ajout de cette page d'historique"
     }
   }
 }

@@ -47,6 +47,11 @@ const navItems = [
     label: "about",
   },
   {
+    name: "Updates",
+    url: "/updates",
+    label: "updates",
+  },
+  {
     name: "Contact",
     url: "/contact",
     label: "contact",
