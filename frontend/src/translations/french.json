@@ -82,6 +82,7 @@
     },
     "contact": {
       "emailIsRequired": "Email obligatoire",
+      "formIsBroken": "Nous sommes navrés mais le formulaire est actuellement non fonctionnel. Envoyez-nous votre message directement par mail à <bold>{{email}}</bold>. Merci !",
       "subjectIsRequired": "Objet obligatoire",
       "sendEmail": "Envoie ton message",
       "sendingEmail": "Envoi en cours...",
