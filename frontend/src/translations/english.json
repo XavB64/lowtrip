@@ -21,7 +21,8 @@
       "settings": "Settings",
       "dark": "Dark",
       "light": "Light",
-      "about": "About"
+      "about": "About",
+      "updates": "Updates"
     },
     "home": {
       "compareTravelEmissions": "Compare your travel emissions"
@@ -225,6 +226,31 @@
     "cookieBanner": {
       "message": "We use cookies solely to count the number of visitors. By continuing to browse, you accept them.",
       "ok": "Got it!"
+    },
+    "updates": {
+      "months": {
+        "january": "January",
+        "february": "February",
+        "march": "March",
+        "april": "April",
+        "may": "May",
+        "june": "June",
+        "july": "July",
+        "august": "August",
+        "september": "September",
+        "october": "October",
+        "november": "November",
+        "december": "December"
+      },
+      "applicationLaunch1": "Application launch",
+      "applicationLaunch2": "Management of the following transport modes: train, plane, car (including carpooling and electric cars), bus, ferry, and sailing",
+      "applicationLaunch3": "Contact form",
+      "applicationLaunch4": "Methodology available",
+      "applicationLaunch5": "Application translated into French, English, German, Spanish, and Italian",
+      "introduction": "This page lists the main functional advances of the application. The full history, especially technical, is available on GitHub.",
+      "shareableLinkFeature": "Added shareable link, which can also be used to save a request",
+      "title": "Development History",
+      "updatePage": "Added this update history page"
     }
   }
 }
