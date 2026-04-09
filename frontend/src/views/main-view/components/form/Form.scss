@@ -75,7 +75,11 @@
         border: 1px solid lightgrey;
         border-radius: 20px;
         background: white;
-        font-size: 16px;
+        font-size: 14px;
+
+        @media (min-width: 600px) {
+          font-size: 16px;
+        }
       }
 
       .loader-wrapper {
@@ -106,7 +110,7 @@
         border-radius: 50%;
         background: gray;
         color: white;
-        font-size: 1.5rem;
+        font-size: 24px;
         appearance: none;
         border: none;
       }

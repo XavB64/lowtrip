@@ -9,6 +9,7 @@ import { useConsentContext } from "common/context/consentContext";
 import { useSimulationContext } from "common/context/simulationContext";
 import { checkIsOnMobile } from "common/utils";
 
+import Chart from "./components/Chart";
 import { stepsAreInvalid } from "./components/form/helpers/utils";
 import { LeftPanel } from "./components/left-panel";
 import Map from "./components/Map";
@@ -23,7 +24,8 @@ const MainView = ({
 }) => {
   const { consentGiven } = useConsentContext();
 
-  const { setSteps, setAlternativeSteps, submitForm } = useSimulationContext();
+  const { setSteps, setAlternativeSteps, submitForm, simulationResults } =
+    useSimulationContext();
 
   const isOnMobile = checkIsOnMobile();
 
@@ -65,16 +67,21 @@ const MainView = ({
         <Map isDarkTheme={isDarkTheme} />
 
         {isOnMobile && (
-          <IconButton
-            className={`scroll-to-top-button ${consentGiven ? "consent-given" : ""}`}
-            icon={<BiChevronUp />}
-            onClick={() => {
-              const mainBody = document.getElementById("main-body");
-              if (mainBody)
-                mainBody.scrollTo({ top: 0, left: 0, behavior: "smooth" });
-            }}
-            aria-label="scroll-to-top"
-          />
+          <>
+            <IconButton
+              className={`scroll-to-top-button ${consentGiven ? "consent-given" : ""}`}
+              icon={<BiChevronUp />}
+              onClick={() => {
+                const mainBody = document.getElementById("main-body");
+                if (mainBody)
+                  mainBody.scrollTo({ top: 0, left: 0, behavior: "smooth" });
+              }}
+              aria-label="scroll-to-top"
+            />
+            {simulationResults && (
+              <Chart simulationResults={simulationResults} />
+            )}
+          </>
         )}
       </div>
     </CacheProvider>

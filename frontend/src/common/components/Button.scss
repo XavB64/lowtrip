@@ -26,13 +26,17 @@
   padding: 4px 6px;
   border-radius: 20px;
 
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 600;
 
   background: #0097a7;
   color: white;
   outline: 2px solid transparent;
   transition-duration: 200ms;
+
+  @media (min-width: 600px) {
+    font-size: 16px;
+  }
 
   &.outline {
     background: transparent;

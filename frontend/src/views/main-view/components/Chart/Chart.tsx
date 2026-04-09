@@ -31,7 +31,6 @@ import {
 } from "recharts";
 
 import Tooltip from "common/components/Tooltip";
-import { checkIsOnMobile } from "common/utils";
 import type { Trip, SimulationResults } from "types";
 
 import CustomLabel from "./CustomLabel";
@@ -66,7 +65,7 @@ const Chart = ({
   );
 
   return (
-    <div className="chart-container">
+    <div className="chart-section">
       <div className="chart-title">
         {t(`results.${simulationType}`)}
 
@@ -107,40 +106,39 @@ const Chart = ({
         </span>
       </div>
 
-      <ResponsiveContainer height={checkIsOnMobile() ? 230 : 400} width="100%">
-        <BarChart data={chartData} margin={{ bottom: 0 }}>
-          <XAxis
-            dataKey="displayedName"
-            fontSize={checkIsOnMobile() ? 8 : 14}
-          />
-          <YAxis padding={{ top: 50 }} hide />
-          <ChartTooltip
-            formatter={(value, name) => [
-              `${Math.round(Number(value))} kg`,
-              String(name).split("__")[1],
-            ]}
-            contentStyle={{ fontSize: "12px" }}
-          />
-          {bars.map((emissionPart) => (
-            <Bar
-              key={emissionPart.emissionSource}
-              dataKey={emissionPart.emissionSource}
-              fill={emissionPart.color}
-              stackId="a"
-            >
-              <LabelList
-                dataKey="name"
-                content={
-                  <CustomLabel
-                    lastEmissionSourceByTrip={lastEmissionSourceByTrip}
-                    emissionSource={emissionPart.emissionSource}
-                  />
-                }
-              />
-            </Bar>
-          ))}
-        </BarChart>
-      </ResponsiveContainer>
+      <div className="chart-wrapper">
+        <ResponsiveContainer height="100%" width="100%">
+          <BarChart data={chartData} margin={{ bottom: 0 }}>
+            <XAxis dataKey="displayedName" fontSize={12} />
+            <YAxis padding={{ top: 50 }} hide />
+            <ChartTooltip
+              formatter={(value, name) => [
+                `${Math.round(Number(value))} kg`,
+                String(name).split("__")[1],
+              ]}
+              contentStyle={{ fontSize: "12px" }}
+            />
+            {bars.map((emissionPart) => (
+              <Bar
+                key={emissionPart.emissionSource}
+                dataKey={emissionPart.emissionSource}
+                fill={emissionPart.color}
+                stackId="a"
+              >
+                <LabelList
+                  dataKey="name"
+                  content={
+                    <CustomLabel
+                      lastEmissionSourceByTrip={lastEmissionSourceByTrip}
+                      emissionSource={emissionPart.emissionSource}
+                    />
+                  }
+                />
+              </Bar>
+            ))}
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
 
       <div className="chart-footer">
         <Tooltip content={t("results.explanation")}>

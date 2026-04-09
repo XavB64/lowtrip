@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { useMemo, useRef } from "react";
+import { useMemo } from "react";
 
 import { MapContainer } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
@@ -24,7 +24,6 @@ import { useSimulationContext } from "common/context/simulationContext";
 import { checkIsOnMobile } from "common/utils";
 import type { Step } from "types";
 
-import Chart from "../Chart";
 import MapContent from "./MapContent";
 import Legend from "./MapLegend";
 import "./Map.scss";
@@ -39,7 +38,6 @@ type MapProps = {
 };
 
 const Map = ({ isDarkTheme }: MapProps) => {
-  const chartRef = useRef<null | HTMLDivElement>(null);
   const isOnMobile = checkIsOnMobile();
 
   const { steps, alternativeSteps, simulationResults } = useSimulationContext();
@@ -53,7 +51,7 @@ const Map = ({ isDarkTheme }: MapProps) => {
 
   return (
     <div className="map-container">
-      {!isOnMobile && simulationResults && (
+      {simulationResults && (
         <Legend tripGeometries={simulationResults.tripGeometries} />
       )}
       <MapContainer
@@ -69,11 +67,6 @@ const Map = ({ isDarkTheme }: MapProps) => {
           alternativeStepsCoords={alternativeStepsCoords}
         />
       </MapContainer>
-      {simulationResults && isOnMobile && (
-        <div ref={chartRef} className="map-chart-card">
-          <Chart simulationResults={simulationResults} />
-        </div>
-      )}
     </div>
   );
 };
