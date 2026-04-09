@@ -66,7 +66,7 @@ export const LeftPanel = ({ withLogo }: LeftPanelProps) => {
   }, [simulationResults]);
 
   return (
-    <div className="left-panel">
+    <div id="left-panel" className="left-panel">
       {withLogo && (
         <div className="logo-wrapper">
           <img src={Logo} alt="Logo" className="logo" />
