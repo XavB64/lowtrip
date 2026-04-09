@@ -17,8 +17,6 @@
 
 import { LabelProps } from "recharts";
 
-import { checkIsOnMobile } from "common/utils";
-
 export type LastEmissionSourceByTrip = {
   tripLabel: string;
   totalEmissions: number;
@@ -41,8 +39,6 @@ const CustomLabel = ({
   emissionSource,
   ...props
 }: CustomLabelProps) => {
-  const isOnMobile = checkIsOnMobile();
-
   const entry = lastEmissionSourceByTrip.find(
     (entry) => entry.tripLabel === props.value,
   )!;
@@ -54,9 +50,9 @@ const CustomLabel = ({
     <>
       <text
         x={Number(props.x ?? 0) + Number(props.width ?? 0) / 2}
-        y={Number(props.y ?? 0) - (isOnMobile ? 15 : 20)}
+        y={Number(props.y ?? 0) - 20}
         textAnchor="middle"
-        fontSize={isOnMobile ? 10 : 16}
+        fontSize={12}
       >
         {Math.round(entry.totalEmissions)}
       </text>
@@ -64,7 +60,7 @@ const CustomLabel = ({
         x={Number(props.x ?? 0) + Number(props.width ?? 0) / 2}
         y={Number(props.y ?? 0) - 5}
         textAnchor="middle"
-        fontSize={isOnMobile ? 8 : 12}
+        fontSize={12}
       >
         kgCO2eq
       </text>
