@@ -68,6 +68,7 @@ class EmissionPart:
 
     kg_co2_eq: float
     ef_tot: float | None
+    distance: float
     name: str
     color: str
 

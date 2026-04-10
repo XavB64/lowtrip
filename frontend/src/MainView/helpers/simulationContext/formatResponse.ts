@@ -35,6 +35,8 @@ export const formatResponse = (
           emissionSource: emission.name,
           color: emission.color,
           emissions: emission.kg_co2_eq,
+          distance: emission.distance,
+          coefficient: emission.ef_tot,
         });
       });
 
