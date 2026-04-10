@@ -285,6 +285,7 @@ def train_to_gdf(
             "EF_tot": [EF_train["infra"]],
             "colors": [color_infra],
             "NAME": ["infra"],
+            "path_length": [train_dist]
         }),
         gdf,
     ])
@@ -326,13 +327,14 @@ def train_to_gdf(
         else:
             raise GeometryRecognitionError
 
-    emissions_data = gdf[["kgCO2eq", "colors", "NAME", "EF_tot"]].to_dict("records")
+    emissions_data = gdf[["kgCO2eq", "colors", "NAME", "EF_tot", "path_length"]].to_dict("records")
     emissions = [
         EmissionPart(
             name=emission_data["NAME"],
             kg_co2_eq=emission_data["kgCO2eq"],
             color=emission_data["colors"],
             ef_tot=emission_data["EF_tot"],
+            distance=round(emission_data["path_length"]),
         )
         for emission_data in emissions_data
     ]

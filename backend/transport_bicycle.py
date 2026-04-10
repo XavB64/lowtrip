@@ -101,6 +101,7 @@ def bicycle_to_gdf(
                 EmissionPart(
                     name="bikeBuild",
                     kg_co2_eq=EF * route_length,
+                    distance=round(route_length),
                     ef_tot=EF,
                     color=color,
                 ),

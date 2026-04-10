@@ -160,7 +160,7 @@ def ecar_to_gdf(
             ),
         )
 
-    emissions_data = gdf[["kgCO2eq", "colors", "NAME", "EF_tot"]].to_dict("records")
+    emissions_data = gdf[["kgCO2eq", "colors", "NAME", "EF_tot", "path_length"]].to_dict("records")
 
     emissions = [
         EmissionPart(
@@ -168,6 +168,7 @@ def ecar_to_gdf(
             kg_co2_eq=emission_data["kgCO2eq"],
             color=emission_data["colors"],
             ef_tot=emission_data["EF_tot"],
+            distance=round(emission_data["path_length"]),
         )
         for emission_data in emissions_data
     ]
@@ -194,12 +195,14 @@ def get_car_emissions(
             name="construction",
             kg_co2_eq=route_length * EF_construction,
             ef_tot=EF_construction,
+            distance=round(route_length),
             color=color_construction,
         ),
         EmissionPart(
             name="fuel",
             kg_co2_eq=route_length * EF_fuel,
             ef_tot=EF_fuel,
+            distance=round(route_length),
             color=color_usage,
         ),
     ]
@@ -217,12 +220,14 @@ def get_bus_emissions(
             name="construction",
             kg_co2_eq=route_length * EF_construction,
             ef_tot=EF_construction,
+            distance=round(route_length),
             color=color_construction,
         ),
         EmissionPart(
             name="fuel",
             kg_co2_eq=route_length * EF_fuel,
             ef_tot=EF_fuel,
+            distance=round(route_length),
             color=color_usage,
         ),
     ]
