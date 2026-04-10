@@ -6,7 +6,7 @@ const UpdatesView = () => {
   const { t } = useTranslation();
 
   return (
-    <div className="updates-view">
+    <div className="static-view updates-view">
       <h1 className="text-2xl font-bold mb-4">{t("updates.title")}</h1>
 
       <p>{t("updates.introduction")}</p>

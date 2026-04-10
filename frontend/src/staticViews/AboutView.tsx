@@ -11,7 +11,7 @@ const AboutView = () => {
   const { t } = useTranslation();
 
   return (
-    <div className="about">
+    <div className="static-view about">
       <div className="introduction">
         <p>{t("about.introduction1")}</p>
         <p>{t("about.introduction2")}</p>
