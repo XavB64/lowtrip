@@ -110,10 +110,8 @@
     "form": {
       "addStep": "Ajouter une étape",
       "adviceText": {
-        "compareWith": "Comparez avec...",
         "previousFormIsInvalid": "Complétez le premier voyage",
-        "main": "Renseignez {{missingParams}} puis comparez avec...",
-        "mainSecondForm": "Renseignez {{missingParams}} puis...",
+        "main": "Renseignez {{missingParams}} puis...",
         "departure": "un point de départ",
         "destination": "une destination",
         "transportMean": "un moyen de transport",
@@ -131,7 +129,7 @@
       "tabOtherTrip": "Autre voyage",
       "clearInput": "Effacer",
       "compareWithThisTrip": "Comparez avec votre premier voyage",
-      "otherTransportMeans": "D'autres moyens de transport",
+      "otherTransportMeans": "Comparez à d'autres moyens de transport",
       "computeEmissions": "Calculer les émissions",
       "anotherTrip": "Un autre voyage",
       "compareToAnotherTrip": "Comparer à un autre voyage",

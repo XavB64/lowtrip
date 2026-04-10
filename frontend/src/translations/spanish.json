@@ -28,10 +28,8 @@
     "form": {
       "addStep": "Agregar parada",
       "adviceText": {
-        "compareWith": "Comparar con...",
         "previousFormIsInvalid": "Por favor, complete el formulario anterior primero",
-        "main": "Por favor selecciona {{missingParams}} y compara con...",
-        "mainSecondForm": "Por favor selecciona {{missingParams}} y...",
+        "main": "Por favor selecciona {{missingParams}} y...",
         "departure": "una salida",
         "destination": "un destino",
         "transportMean": "un medio de transporte",
@@ -49,7 +47,7 @@
       "tabOtherTrip": "Otro viaje",
       "clearInput": "Limpiar",
       "compareWithThisTrip": "Comparar con tu primer viaje",
-      "otherTransportMeans": "Otros medios de transporte",
+      "otherTransportMeans": "Comparar con otros medios de transporte",
       "computeEmissions": "Calcular emisiones",
       "anotherTrip": "Otro viaje",
       "compareToAnotherTrip": "Comparar con otro viaje",
