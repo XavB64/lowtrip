@@ -3,8 +3,11 @@ import nextId from "react-id-generator";
 
 import type { Step } from "types";
 
-import { transportMeanIsCar, transportMeanIsFerry } from "./transports";
-import { stepsAreInvalid } from "../components/form/helpers/utils";
+import {
+  transportMeanIsCar,
+  transportMeanIsFerry,
+  stepsAreInvalid,
+} from "./utils";
 
 const simplifySteps = (steps: Step[]) =>
   steps.map((step) => {

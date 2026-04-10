@@ -19,8 +19,8 @@ import { useMemo } from "react";
 
 import { useTranslation } from "react-i18next";
 
-import { uniqBy } from "common/utils";
 import type { SimulationResults } from "types";
+import { uniqBy } from "utils";
 
 const Legend = ({
   tripGeometries,

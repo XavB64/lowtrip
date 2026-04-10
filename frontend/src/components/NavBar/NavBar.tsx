@@ -22,11 +22,11 @@ import { Link, Outlet, useLocation } from "react-router-dom";
 
 import gitLogo from "assets/github.png";
 import Logo from "assets/lowtrip_logo.png";
-import { ConsentContextProvider } from "common/context/consentContext";
+import { ConsentContextProvider } from "MainView/helpers/consentContext";
 
 import UserSettingsModal from "./UserSettingsModal";
 import UserSettingsSelector from "./UserSettingsPopover";
-import CookieBanner from "../cookie-banner";
+import CookieBanner from "../CookieBanner";
 import "./NavBar.scss";
 
 const GithubItem = ({ className }: { className?: string }) => (

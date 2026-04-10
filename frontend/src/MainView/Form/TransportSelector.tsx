@@ -26,8 +26,8 @@ import { FaFerry } from "react-icons/fa6";
 import { IoMdBicycle } from "react-icons/io";
 import { MdElectricCar, MdSailing } from "react-icons/md";
 
-import { IconButton } from "common/components/Button";
-import Tooltip from "common/components/Tooltip";
+import { IconButton } from "components/Button";
+import Tooltip from "components/Tooltip";
 import { Step, Transport } from "types";
 
 import "./TransportSelector.scss";

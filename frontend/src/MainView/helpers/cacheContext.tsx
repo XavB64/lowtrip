@@ -1,6 +1,6 @@
 import { ReactNode, createContext, useContext, useState } from "react";
 
-import { City } from "views/main-view/components/form/types";
+import { City } from "MainView/Form/types";
 
 export type Cache = Record<string, City[]>;
 

@@ -20,12 +20,12 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import Logo from "assets/lowtrip_logo.png";
-import { useSimulationContext } from "common/context/simulationContext";
-import { checkIsOnMobile } from "common/utils";
+import { useSimulationContext } from "MainView/helpers/simulationContext";
 import { TRIP_TYPE } from "types";
+import { checkIsOnMobile } from "utils";
 
 import Chart from "./Chart";
-import Form from "./form";
+import Form from "./Form";
 import "./LeftPanel.scss";
 
 type LeftPanelProps = {

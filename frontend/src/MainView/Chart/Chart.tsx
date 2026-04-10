@@ -30,12 +30,12 @@ import {
   YAxis,
 } from "recharts";
 
-import Tooltip from "common/components/Tooltip";
+import Tooltip from "components/Tooltip";
+import { generateUrlToShare } from "MainView/helpers/shareableLink";
 import type { Trip, SimulationResults } from "types";
 
 import CustomLabel from "./CustomLabel";
-import { getChartData } from "./helpers";
-import { generateUrlToShare } from "../../helpers/shareableLink";
+import getChartData from "./getChartData";
 import "./Chart.scss";
 
 /**

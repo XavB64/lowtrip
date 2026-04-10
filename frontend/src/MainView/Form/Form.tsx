@@ -20,14 +20,14 @@ import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { BiSolidPlusCircle } from "react-icons/bi";
 
-import Button from "common/components/Button";
-import Modal from "common/components/Modal";
-import { useSimulationContext } from "common/context/simulationContext";
+import Button from "components/Button";
+import Modal from "components/Modal";
+import { useSimulationContext } from "MainView/helpers/simulationContext";
 import { TRIP_TYPE } from "types";
 
-import { getAdviceTextTranslation } from "./helpers/translationHelper";
-import { stepsAreInvalid } from "./helpers/utils";
 import { StepField } from "./StepField";
+import { getAdviceTextTranslation } from "../helpers/translationHelper";
+import { stepsAreInvalid } from "../helpers/utils";
 import "./Form.scss";
 
 type FormProps = {

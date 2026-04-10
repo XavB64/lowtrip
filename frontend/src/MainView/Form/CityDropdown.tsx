@@ -3,9 +3,9 @@ import { useState, useEffect, useMemo } from "react";
 import i18n from "i18next";
 import { useTranslation } from "react-i18next";
 
-import { useCache } from "common/context/cacheContext";
-import { useDebounce } from "common/hooks";
 import { PHOTON_API_URL } from "config";
+import { useDebounce } from "hooks";
+import { useCache } from "MainView/helpers/cacheContext";
 
 import { City, PhotonApiCity } from "./types";
 

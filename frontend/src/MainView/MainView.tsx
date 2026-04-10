@@ -3,17 +3,17 @@ import { useEffect } from "react";
 import { BiChevronUp } from "react-icons/bi";
 import { useSearchParams } from "react-router-dom";
 
-import { IconButton } from "common/components/Button";
-import { CacheProvider } from "common/context/cacheContext";
-import { useConsentContext } from "common/context/consentContext";
-import { useSimulationContext } from "common/context/simulationContext";
-import { checkIsOnMobile } from "common/utils";
+import { IconButton } from "components/Button";
+import { CacheProvider } from "MainView/helpers/cacheContext";
+import { useConsentContext } from "MainView/helpers/consentContext";
+import { useSimulationContext } from "MainView/helpers/simulationContext";
+import { checkIsOnMobile } from "utils";
 
-import Chart from "./components/Chart";
-import { stepsAreInvalid } from "./components/form/helpers/utils";
-import { LeftPanel } from "./components/left-panel";
-import Map from "./components/Map";
+import Chart from "./Chart";
 import { extractPathStepsFromSimplifiedSteps } from "./helpers/shareableLink";
+import { stepsAreInvalid } from "./helpers/utils";
+import { LeftPanel } from "./LeftPanel";
+import Map from "./Map";
 
 const MainView = ({
   isDarkTheme,

@@ -19,18 +19,19 @@ import { useEffect, useMemo, useState } from "react";
 
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
-import NavbarWrapper from "./common/components/NavBar";
-import { ConsentContextProvider } from "./common/context/consentContext";
-import { SimulationProvider } from "./common/context/simulationContext";
-import { API_URL } from "./config";
+import NavbarWrapper from "components/NavBar";
+import { API_URL } from "config";
+import MainView from "MainView";
+import { ConsentContextProvider } from "MainView/helpers/consentContext";
+import { SimulationProvider } from "MainView/helpers/simulationContext";
 import {
   ContactView,
   ErrorView,
-  MainView,
   MethodView,
   AboutView,
   UpdatesView,
-} from "./views";
+} from "staticViews";
+
 import "./i18n";
 import "./styles.scss";
 

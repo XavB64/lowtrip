@@ -19,7 +19,7 @@ import { TFunction } from "i18next";
 
 import { Trip } from "types";
 
-export const getChartData = (
+const getChartData = (
   trips: Trip[],
   t: TFunction<"translation", undefined>,
 ) => {
@@ -63,3 +63,5 @@ export const getChartData = (
 
   return { chartData, bars, lastEmissionSourceByTrip };
 };
+
+export default getChartData;
