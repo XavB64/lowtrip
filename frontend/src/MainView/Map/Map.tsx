@@ -20,9 +20,9 @@ import { useMemo } from "react";
 import { MapContainer } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 
-import { useSimulationContext } from "common/context/simulationContext";
-import { checkIsOnMobile } from "common/utils";
+import { useSimulationContext } from "MainView/helpers/simulationContext";
 import type { Step } from "types";
+import { checkIsOnMobile } from "utils";
 
 import MapContent from "./MapContent";
 import Legend from "./MapLegend";

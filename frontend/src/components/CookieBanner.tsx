@@ -19,7 +19,7 @@ import { useEffect } from "react";
 
 import { useTranslation } from "react-i18next";
 
-import { useConsentContext } from "../context/consentContext";
+import { useConsentContext } from "MainView/helpers/consentContext";
 import "./CookieBanner.scss";
 
 const CookieBanner = () => {

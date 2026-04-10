@@ -3,10 +3,10 @@ import { useState, useRef, useEffect, useMemo, JSX } from "react";
 import { TFunction } from "i18next";
 import { useTranslation } from "react-i18next";
 
-import { IconButton } from "common/components/Button";
-import Tooltip from "common/components/Tooltip";
-import { checkIsOnMobile } from "common/utils";
+import { IconButton } from "components/Button";
+import Tooltip from "components/Tooltip";
 import { FerryOptions, thumbUp, Transport, type Step } from "types";
+import { checkIsOnMobile } from "utils";
 
 const getTransportOptions = (
   transport: Transport,

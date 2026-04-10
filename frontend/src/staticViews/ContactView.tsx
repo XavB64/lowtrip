@@ -2,8 +2,8 @@ import { useState } from "react";
 
 import { Trans, useTranslation } from "react-i18next";
 
-import Button from "common/components/Button";
-import Modal from "common/components/Modal";
+import Button from "components/Button";
+import Modal from "components/Modal";
 import { API_URL } from "config";
 
 import "./ContactView.scss";

@@ -19,7 +19,7 @@ import { useEffect, useState } from "react";
 
 import { BiTrash } from "react-icons/bi";
 
-import { IconButton } from "common/components/Button";
+import { IconButton } from "components/Button";
 import type { Step } from "types";
 
 import CityDropdown from "./CityDropdown";
