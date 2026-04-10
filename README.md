@@ -55,80 +55,8 @@ Emissions factors consider usage (linked to the manufacture and use of energy to
 
 All assumptions, data and sources used are available in the [methodology](https://github.com/XavB64/lowtrip/blob/main/frontend/src/assets/lowtrip_methodology.pdf) document.
 
-# How to launch the app?
-
-### Prerequisites
-
-Have docker installed
-
-### Launch the app
-
-At the root of the directory, run:
-
-```bash
-docker-compose up --build
-```
-
-You can now connect to [http://localhost:3000](http://localhost:3000) to test the application.
-
-Note: If you want to launch them in the backgroup and leave them running, you can add the flag `-d` or `--detach`.
-
-### Rebuild and restart a service
-
-At the root of the directory, run:
-
-```bash
-docker-compose up --build <service name: backend or frontend>
-```
-
-### Stop the app
-
-At the root of the directory, run:
-
-```bash
-docker-compose down
-```
-
-## How to launch the app components separately?
-
-### Prerequisites
-
-Have python & node installed
-
-### Launch the backend
-
-```bash
-cd backend
-
-# create a python environment and activate it
-python -m venv lowtrip-venv
-source lowtrip-venv/bin/activate
-
-# install the dependencies
-pip install -r requirements.txt
-
-# launch the app
-gunicorn app:app
-```
-
-You can format the code with ruff:
-```bash
-pip install ruff
-ruff format
-```
-
-### Launch the frontend
-
-
-```bash
-cd frontend
-
-# install the dependencies
-npm install
-
-# launch the app
-npm start
-```
+# How to contribute ?
+→ see CONTRIBUTING.md
 
 # How to cite this work ?
 
