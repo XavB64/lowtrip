@@ -30,10 +30,8 @@
     "form": {
       "addStep": "Add stop",
       "adviceText": {
-        "compareWith": "Compare with...",
         "previousFormIsInvalid": "Please fill the previous form first",
-        "main": "Please select {{missingParams}} and compare with...",
-        "mainSecondForm": "Please select {{missingParams}} and...",
+        "main": "Please select {{missingParams}} and...",
         "departure": "a departure",
         "destination": "a destination",
         "transportMean": "a means of transportation",
@@ -51,7 +49,7 @@
       "tabOtherTrip": "Other trip",
       "clearInput": "Clear",
       "compareWithThisTrip": "Compare with your first trip",
-      "otherTransportMeans": "Other means of transportation",
+      "otherTransportMeans": "Compare with  other means of transportation",
       "computeEmissions": "Compute emissions",
       "anotherTrip": "Another trip",
       "compareToAnotherTrip": "Compare to another trip",

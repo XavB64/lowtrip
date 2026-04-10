@@ -39,7 +39,7 @@ const Form = ({ displayedTrip, showAlternativeForm }: FormProps) => {
   const { t } = useTranslation();
 
   const {
-    steps,
+    steps: mainSteps,
     alternativeSteps,
     errorMessage,
     isLoading,
@@ -50,40 +50,42 @@ const Form = ({ displayedTrip, showAlternativeForm }: FormProps) => {
     closeErrorModal,
   } = useSimulationContext();
 
-  const formIsNotValid = useMemo(() => {
-    if (displayedTrip === TRIP_TYPE.ALTERNATIVE) {
-      const mainFormIsNotValid = stepsAreInvalid(alternativeSteps);
-      if (mainFormIsNotValid) return true;
-    }
-    return stepsAreInvalid(steps);
-  }, [displayedTrip, alternativeSteps, steps]);
+  const steps = useMemo(
+    () =>
+      displayedTrip === TRIP_TYPE.ALTERNATIVE ? alternativeSteps : mainSteps,
+    [displayedTrip, alternativeSteps, mainSteps],
+  );
 
-  const adviceText = useMemo(() => {
-    if (
-      displayedTrip === TRIP_TYPE.ALTERNATIVE &&
-      stepsAreInvalid(alternativeSteps)
-    ) {
-      return t("form.adviceText.previousFormIsInvalid");
-    }
-    return getAdviceTextTranslation(t, steps, !!alternativeSteps);
-  }, [t, displayedTrip, steps, alternativeSteps]);
+  const formIsValid = useMemo(
+    () =>
+      !stepsAreInvalid(steps) &&
+      // alternative form is valid only if the first form is also valid
+      (displayedTrip == TRIP_TYPE.MAIN || !stepsAreInvalid(mainSteps)),
+    [displayedTrip, steps, mainSteps],
+  );
+
+  const adviceText = useMemo(
+    () =>
+      displayedTrip === TRIP_TYPE.ALTERNATIVE && stepsAreInvalid(mainSteps)
+        ? t("form.adviceText.previousFormIsInvalid")
+        : getAdviceTextTranslation(t, steps),
+    [t, displayedTrip, mainSteps, alternativeSteps],
+  );
 
   return (
     <div
       className={`form ${displayedTrip === TRIP_TYPE.ALTERNATIVE ? "alternative-trip" : ""}`}
     >
-      {(displayedTrip === TRIP_TYPE.MAIN ? steps : alternativeSteps).map(
-        (step) => (
-          <StepField
-            key={`main-form-${step.id}`}
-            step={step}
-            updateStep={(index, data) =>
-              updateStep(displayedTrip, step.index, data)
-            }
-            removeStep={(index) => removeStep(displayedTrip, index)}
-          />
-        ),
-      )}
+      {steps.map((step) => (
+        <StepField
+          key={`main-form-${step.id}`}
+          step={step}
+          updateStep={(index, data) =>
+            updateStep(displayedTrip, step.index, data)
+          }
+          removeStep={(index) => removeStep(displayedTrip, index)}
+        />
+      ))}
 
       <Button
         className="add-step-button"
@@ -98,43 +100,40 @@ const Form = ({ displayedTrip, showAlternativeForm }: FormProps) => {
       <hr className="divider" aria-orientation="horizontal" />
 
       <div className="submit-section">
-        {adviceText && <p>{adviceText}</p>}
-        {displayedTrip === TRIP_TYPE.ALTERNATIVE ? (
-          stepsAreInvalid(steps) ? null : (
-            <Button
-              onClick={() => submitForm(steps, alternativeSteps)}
-              disabled={formIsNotValid}
-              loading={isLoading}
-            >
-              {t("form.compareWithThisTrip")}
-            </Button>
-          )
-        ) : (
-          <div className="buttons-row">
-            <Button
-              onClick={() => submitForm(steps)}
-              disabled={formIsNotValid}
-              loading={isLoading}
-              className="form-action-button"
-            >
-              {steps.length < 3
+        <p>{adviceText}</p>
+
+        <div className="buttons-row">
+          <Button
+            onClick={() =>
+              submitForm(
+                mainSteps,
+                displayedTrip === TRIP_TYPE.ALTERNATIVE
+                  ? alternativeSteps
+                  : undefined,
+              )
+            }
+            disabled={!formIsValid}
+            loading={isLoading}
+            className="form-action-button"
+          >
+            {displayedTrip === TRIP_TYPE.ALTERNATIVE
+              ? t("form.compareWithThisTrip")
+              : mainSteps.length < 3
                 ? t("form.otherTransportMeans")
                 : t("form.computeEmissions")}
+          </Button>
+
+          {displayedTrip !== TRIP_TYPE.ALTERNATIVE && showAlternativeForm && (
+            <Button
+              onClick={showAlternativeForm}
+              disabled={!formIsValid}
+              className="form-action-button"
+              outline
+            >
+              {t("form.compareToAnotherTrip")}
             </Button>
-            {showAlternativeForm && (
-              <Button
-                onClick={showAlternativeForm}
-                disabled={formIsNotValid}
-                className="form-action-button"
-                outline
-              >
-                {steps.length < 3
-                  ? t("form.anotherTrip")
-                  : t("form.compareToAnotherTrip")}
-              </Button>
-            )}
-          </div>
-        )}
+          )}
+        </div>
       </div>
 
       <Modal
