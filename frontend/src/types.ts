@@ -53,6 +53,7 @@ type TripResult = {
       ef_tot: number;
       kg_co2_eq: number;
       color: string;
+      distance: number;
     }[];
   } & (
     | {
@@ -155,6 +156,8 @@ export type TripStep = {
     emissionSource: string;
     color: string;
     emissions: number;
+    coefficient: number;
+    distance: number;
   }[];
   distance: number;
 } & (
