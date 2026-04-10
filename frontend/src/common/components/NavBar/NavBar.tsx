@@ -154,13 +154,11 @@ const NavbarWrapper = ({
   };
 }) => (
   <ConsentContextProvider>
-    <div className="nav-bar-wrapper">
-      <NavBar themeSettings={themeSettings} />
-      <div className="view" id="main-body">
-        <Outlet />
-      </div>
-      <CookieBanner />
+    <NavBar themeSettings={themeSettings} />
+    <div id="main-body">
+      <Outlet />
     </div>
+    <CookieBanner />
   </ConsentContextProvider>
 );
 

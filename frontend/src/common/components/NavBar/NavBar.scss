@@ -15,29 +15,13 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-.nav-bar-wrapper {
-  height: 100vh;
+#main-body {
   width: 100%;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
+  height: calc(100vh - 64px);
+  overflow: auto;
 
-  .nav-bar {
-    flex-shrink: 0;
-  }
-
-  .view {
-    flex-grow: 1;
-    width: 100%;
-    overflow: auto;
-
-    display: flex;
-    flex-direction: column;
-
-    @media (min-width: 600px) {
-      flex-direction: row;
-      overflow: hidden;
-    }
+  @media (min-width: 600px) {
+    overflow: hidden;
   }
 }
 
