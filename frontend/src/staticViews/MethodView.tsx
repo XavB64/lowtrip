@@ -82,7 +82,7 @@ const MethodView = () => {
   }, [equation]);
 
   return (
-    <div className="method-view">
+    <div className="static-view method-view">
       <h1 className="method__title">{t("method.introduction.title")}</h1>
 
       <p>{t("method.introduction.text1")}</p>

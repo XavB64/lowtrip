@@ -59,7 +59,7 @@ const ContactView = () => {
   };
 
   return (
-    <div className="contact-view">
+    <div className="static-view contact-view">
       <div
         className={`form-control ${formHasBeenSubmitted && !emailInput ? "error" : ""}`}
       >

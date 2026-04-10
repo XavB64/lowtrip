@@ -1,21 +1,4 @@
 .method-view {
-  height: 100%;
-  width: 100%;
-
-  overflow-x: hidden;
-
-  padding: 12px 8%;
-  color: #595959;
-
-  font-size: 14px;
-  text-align: left;
-
-  @media (min-width: 600px) {
-    padding-top: 64px;
-    padding-bottom: 64px;
-    font-size: 18px;
-  }
-
   .method__title {
     color: #3182ce;
     font-weight: bold;
