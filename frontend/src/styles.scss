@@ -1,3 +1,8 @@
+#root {
+  height: 100vh;
+  width: 100%;
+}
+
 *,
 *::before,
 *::after {
@@ -36,13 +41,12 @@ a {
 
 .main-view {
   width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 0px;
+  display: block;
 
   @media (min-width: 600px) {
+    height: 100%;
+    display: flex;
     flex-direction: row;
-    gap: 8px;
   }
 
   .scroll-to-top-button {
