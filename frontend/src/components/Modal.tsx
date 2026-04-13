@@ -23,16 +23,23 @@ type ModalProps = PropsWithChildren<{
   onClose: () => void;
   isOpen: boolean;
   headerTitle: string;
+  className?: string;
 }>;
 
-const Modal = ({ headerTitle, onClose, isOpen, children }: ModalProps) => {
+const Modal = ({
+  headerTitle,
+  onClose,
+  isOpen,
+  className,
+  children,
+}: ModalProps) => {
   if (!isOpen) return null;
 
   return (
     <div className="modal">
       <div className="modal__overlay" onClick={onClose} />
 
-      <div className="modal__content">
+      <div className={`modal__content ${className ?? ""}`}>
         <div className="modal__header">
           <h2 className="modal__title">{headerTitle}</h2>
 
