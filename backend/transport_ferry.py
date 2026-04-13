@@ -259,7 +259,7 @@ def ferry_to_gdf(
             emissions=[
                 EmissionPart(
                     name="usage",
-                    kg_co2_eq=EF * bird,
+                    kg_co2_eq=round(EF * bird, 2),
                     ef_tot=EF,
                     distance=round(bird),
                     color=color_usage,
@@ -314,7 +314,7 @@ def sail_to_gdf(tag1, tag2, EF=EF_sail, color_usage="#ffffff") -> TripStepResult
             emissions=[
                 EmissionPart(
                     name="Usage",
-                    kg_co2_eq=EF * bird,
+                    kg_co2_eq=round(EF * bird, 2),
                     ef_tot=EF,
                     distance=round(bird),
                     color=color_usage,

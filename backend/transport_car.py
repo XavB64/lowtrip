@@ -139,6 +139,7 @@ def ecar_to_gdf(
             "EF_tot": [EF_ecar["construction"]],
             "colors": [color_cons],
             "NAME": ["construction"],
+            "path_length": [route_length],
         }),
         gdf,
     ])
@@ -169,7 +170,7 @@ def ecar_to_gdf(
     emissions = [
         EmissionPart(
             name=emission_data["NAME"],
-            kg_co2_eq=emission_data["kgCO2eq"],
+            kg_co2_eq=round(emission_data["kgCO2eq"], 2),
             color=emission_data["colors"],
             ef_tot=emission_data["EF_tot"],
             distance=round(emission_data["path_length"]),
@@ -200,14 +201,14 @@ def get_car_emissions(
     return [
         EmissionPart(
             name="construction",
-            kg_co2_eq=route_length * EF_construction,
+            kg_co2_eq=round(route_length * EF_construction, 2),
             ef_tot=EF_construction,
             distance=round(route_length),
             color=color_construction,
         ),
         EmissionPart(
             name="fuel",
-            kg_co2_eq=route_length * EF_fuel,
+            kg_co2_eq=round(route_length * EF_fuel, 2),
             ef_tot=EF_fuel,
             distance=round(route_length),
             color=color_usage,
@@ -225,14 +226,14 @@ def get_bus_emissions(
     return [
         EmissionPart(
             name="construction",
-            kg_co2_eq=route_length * EF_construction,
+            kg_co2_eq=round(route_length * EF_construction, 2),
             ef_tot=EF_construction,
             distance=round(route_length),
             color=color_construction,
         ),
         EmissionPart(
             name="fuel",
-            kg_co2_eq=route_length * EF_fuel,
+            kg_co2_eq=round(route_length * EF_fuel, 2),
             ef_tot=EF_fuel,
             distance=round(route_length),
             color=color_usage,
