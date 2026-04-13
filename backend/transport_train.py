@@ -333,7 +333,7 @@ def train_to_gdf(
     emissions = [
         EmissionPart(
             name=emission_data["NAME"],
-            kg_co2_eq=emission_data["kgCO2eq"],
+            kg_co2_eq=round(emission_data["kgCO2eq"], 2),
             color=emission_data["colors"],
             ef_tot=emission_data["EF_tot"],
             distance=round(emission_data["path_length"]),

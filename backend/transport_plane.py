@@ -149,14 +149,14 @@ def plane_to_gdf(
         emissions=[
             EmissionPart(
                 name="kerosene",
-                kg_co2_eq=route_length_with_detour * CO2_factors + holding,
+                kg_co2_eq=round(route_length_with_detour * CO2_factors + holding, 2),
                 ef_tot=CO2_factors,
                 distance=round(route_length_with_detour),
                 color=color_usage,
             ),
             EmissionPart(
                 name="contrails",
-                kg_co2_eq=route_length_with_detour * non_CO2_factors,
+                kg_co2_eq=round(route_length_with_detour * non_CO2_factors, 2),
                 ef_tot=non_CO2_factors,
                 distance=round(route_length_with_detour),
                 color=color_contrails,
