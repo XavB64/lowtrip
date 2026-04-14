@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "country-flag-icons": "^1.6.15",
+    "country-flag-icons": "^1.6.16",
     "i18next": "^26.0.3",
     "i18next-browser-languagedetector": "^8.2.1",
     "katex": "^0.16.40",
