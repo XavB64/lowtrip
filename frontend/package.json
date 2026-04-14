@@ -39,7 +39,7 @@
     "prettier": "^3.8.2",
     "sass": "^1.98.0",
     "typescript": "^6.0.2",
-    "typescript-eslint": "^8.58.0",
+    "typescript-eslint": "^8.58.2",
     "vite": "^8.0.2"
   },
   "scripts": {
