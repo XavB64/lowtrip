@@ -37,6 +37,8 @@ import type { Trip, SimulationResults } from "types";
 import CustomLabel from "./CustomLabel";
 import getChartData from "./getChartData";
 import "./Chart.scss";
+import Button from "components/Button";
+import DetailsModal from "../DetailsModal/DetailsModal";
 
 /**
  * Corresponds to 2kg of CO2 emissions per year per person
@@ -56,6 +58,7 @@ const Chart = ({
 
   const [showCopiedLinkNotification, setShowCopiedLinkNotification] =
     useState(false);
+  const [detailsModalOpen, setDetailsModalOpen] = useState(false);
 
   const mainTrip = trips.find((trip) => trip.isMainTrip) as Trip;
 
@@ -141,6 +144,15 @@ const Chart = ({
       </div>
 
       <div className="chart-footer">
+        <Button
+          className="chart-details-button"
+          onClick={() => {
+            setDetailsModalOpen(true);
+          }}
+          outline
+        >
+          Display details
+        </Button>
         <Tooltip content={t("results.explanation")}>
           <div className="plane-explanation-tooltip">
             {t("chart.help")}
@@ -148,6 +160,14 @@ const Chart = ({
           </div>
         </Tooltip>
       </div>
+
+      <DetailsModal
+        isOpen={detailsModalOpen}
+        onClose={() => {
+          setDetailsModalOpen(false);
+        }}
+        trips={trips}
+      ></DetailsModal>
     </div>
   );
 };

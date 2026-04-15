@@ -9,6 +9,7 @@ import {
   type Step,
   thumbUp,
 } from "types";
+import { round } from "utils";
 
 export const formatResponse = (
   inputs: { mainSteps: Step[]; altSteps?: Step[] },
@@ -28,6 +29,7 @@ export const formatResponse = (
 
     trip.steps.forEach((step, index) => {
       let passengers: number | undefined;
+      let isAutoStop = false;
       if (["car", "ecar"].includes(step.transport_means)) {
         if (
           simulationType === SimulationType.mainTripVsOtherTransportMeans &&
@@ -39,10 +41,12 @@ export const formatResponse = (
             inputs[trip.name === "MAIN_TRIP" ? "mainSteps" : "altSteps"]![
               index + 1
             ];
-          passengers =
-            !!input.passengers && input.passengers !== thumbUp
-              ? Number(input.passengers)
-              : 1;
+          if (input.passengers == thumbUp) {
+            passengers = 1;
+            isAutoStop = true;
+          } else {
+            passengers = !!input.passengers ? Number(input.passengers) : 1;
+          }
         }
       }
 
@@ -61,10 +65,11 @@ export const formatResponse = (
 
       totalEmissions += stepEmissions;
       formattedSteps.push({
-        emissions: stepEmissions,
+        emissions: round(stepEmissions),
         transportMeans: step.transport_means as Transport,
         emissionParts,
         passengers,
+        isAutoStop,
       });
     });
 

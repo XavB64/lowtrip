@@ -110,6 +110,7 @@ export type TripStep = {
   emissions: number;
   transportMeans: Transport;
   passengers?: number;
+  isAutoStop?: boolean;
   emissionParts: {
     emissionSource: string;
     color: string;

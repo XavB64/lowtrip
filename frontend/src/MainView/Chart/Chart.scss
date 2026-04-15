@@ -126,6 +126,12 @@
     display: flex;
     justify-content: flex-end;
     width: 100%;
+    gap: 8px;
+
+    .chart-details-button {
+      width: 40px;
+      flex: auto;
+    }
 
     .plane-explanation-tooltip {
       display: flex;
