@@ -273,8 +273,8 @@ def train_to_gdf(
     )
 
     # Compute emissions : EF * length
-    gdf["EF_tot"] /= 1000.0  # Conversion in kg
-    gdf["kgCO2eq"] = gdf["path_length"] * gdf["EF_tot"]
+    gdf["EF"] /= 1000.0  # Conversion in kg
+    gdf["kgCO2eq"] = gdf["path_length"] * gdf["EF"]
 
     gdf["colors"] = color_usage
 
@@ -282,7 +282,7 @@ def train_to_gdf(
     gdf = pd.concat([
         pd.DataFrame({
             "kgCO2eq": [train_dist * EF_train["infra"]],
-            "EF_tot": [EF_train["infra"]],
+            "EF": [EF_train["infra"]],
             "colors": [color_infra],
             "NAME": ["infra"],
             "path_length": [train_dist]
@@ -327,13 +327,13 @@ def train_to_gdf(
         else:
             raise GeometryRecognitionError
 
-    emissions_data = gdf[["kgCO2eq", "colors", "NAME", "EF_tot", "path_length"]].to_dict("records")
+    emissions_data = gdf[["kgCO2eq", "colors", "NAME", "EF", "path_length"]].to_dict("records")
     emissions = [
         EmissionPart(
             name=emission_data["NAME"],
             kg_co2_eq=round(emission_data["kgCO2eq"], 2),
             color=emission_data["colors"],
-            ef_tot=emission_data["EF_tot"],
+            ef_tot=emission_data["EF"],
             distance=round(emission_data["path_length"]),
         )
         for emission_data in emissions_data
