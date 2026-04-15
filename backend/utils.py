@@ -112,7 +112,7 @@ def split_path_by_country(
             .groupby(iso)
             .agg(
                 NAME=("NAME", lambda x: x.iloc[0]),
-                EF_tot=(EF, lambda x: x.iloc[0]),
+                EF=(EF, lambda x: x.iloc[0]),
                 geometry=(
                     "geometry",
                     lambda x: ops.linemerge(MultiLineString(x.values)),
@@ -127,7 +127,7 @@ def split_path_by_country(
             .groupby(iso)
             .agg(
                 NAME=("NAME", lambda x: x.iloc[0]),
-                EF_tot=(EF, lambda x: x.iloc[0]),
+                EF=(EF, lambda x: x.iloc[0]),
                 geometry=(
                     "geometry",
                     lambda x: ops.linemerge(MultiLineString(x.values)),

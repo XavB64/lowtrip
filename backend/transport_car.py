@@ -121,22 +121,19 @@ def ecar_to_gdf(
     # Add colors
     gdf["colors"] = color_usage
 
-    # Handle nb passengers
     passengers_nb = int(passengers_nb)
-    # Compute emissions : EF * length
+    gdf["EF"] /= 1000.0  # Conversion in kg
+
     gdf["EF_tot"] = (
-        gdf["EF_tot"]
-        * EF_ecar["fuel"]
-        * (1 + 0.04 * (passengers_nb - 1))
-        / (1e3 * passengers_nb)
-    )  # g/kWh * kWh/km
+        gdf["EF"] * EF_ecar["fuel"] * (1 + 0.04 * (passengers_nb - 1)) / passengers_nb
+    )
     gdf["kgCO2eq"] = gdf["path_length"] * gdf["EF_tot"]
 
     # Add infra and construction
     gdf = pd.concat([
         pd.DataFrame({
             "kgCO2eq": [route_length * EF_ecar["construction"] / passengers_nb],
-            "EF_tot": [EF_ecar["construction"]],
+            "EF": [EF_ecar["construction"]],
             "colors": [color_cons],
             "NAME": ["construction"],
             "path_length": [route_length],
@@ -163,7 +160,7 @@ def ecar_to_gdf(
             ),
         )
 
-    emissions_data = gdf[["kgCO2eq", "colors", "NAME", "EF_tot", "path_length"]].to_dict(
+    emissions_data = gdf[["kgCO2eq", "colors", "NAME", "EF", "path_length"]].to_dict(
         "records",
     )
 
@@ -172,7 +169,7 @@ def ecar_to_gdf(
             name=emission_data["NAME"],
             kg_co2_eq=round(emission_data["kgCO2eq"], 2),
             color=emission_data["colors"],
-            ef_tot=emission_data["EF_tot"],
+            ef_tot=emission_data["EF"],
             distance=round(emission_data["path_length"]),
         )
         for emission_data in emissions_data
