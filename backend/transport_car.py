@@ -193,23 +193,30 @@ def ecar_to_gdf(
 
 def get_car_emissions(
     route_length: float,
-    EF_fuel: float,
-    EF_construction: float,
+    passengers_nb: str,
     color_usage: str,
     color_construction: str,
 ) -> list[EmissionPart]:
+    if passengers_nb == "👍":  # Hitch-hiking
+        EF_fuel = EF_car["fuel"] * 0.04
+        EF_construction = 0
+    else:
+        passengers_nb = int(passengers_nb)
+        EF_fuel = EF_car["fuel"] * (1 + 0.04 * (passengers_nb - 1)) / passengers_nb
+        EF_construction = EF_car["construction"] / passengers_nb
+
     return [
         EmissionPart(
             name="construction",
             kg_co2_eq=round(route_length * EF_construction, 2),
-            ef_tot=EF_construction,
+            ef_tot=EF_car["construction"],
             distance=round(route_length),
             color=color_construction,
         ),
         EmissionPart(
             name="fuel",
             kg_co2_eq=round(route_length * EF_fuel, 2),
-            ef_tot=EF_fuel,
+            ef_tot=EF_car["fuel"],
             distance=round(route_length),
             color=color_usage,
         ),
@@ -291,8 +298,7 @@ def car_bus_to_gdf(
 
     car_emissions = get_car_emissions(
         route_length,
-        EF_car["fuel"],
-        EF_car["construction"],
+        1,
         color_usage,
         color_cons,
     )
@@ -407,14 +413,6 @@ def car_to_gdf(
     ):
         return None
 
-    if passengers_nb == "👍":  # Hitch-hiking
-        EF_fuel = EF_car["fuel"] * 0.04
-        EF_cons = 0
-    else:
-        passengers_nb = int(passengers_nb)
-        EF_fuel = EF_car["fuel"] * (1 + 0.04 * (passengers_nb - 1)) / passengers_nb
-        EF_cons = EF_car["construction"] / passengers_nb
-
     geometry = get_road_geometry_data(route_length, route_geometry, color_usage)
 
     return TripStepResult(
@@ -422,8 +420,7 @@ def car_to_gdf(
             transport="car",
             emissions=get_car_emissions(
                 route_length,
-                EF_fuel,
-                EF_cons,
+                passengers_nb,
                 color_usage,
                 color_cons,
             ),
