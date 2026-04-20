@@ -3,11 +3,9 @@ import i18next from "i18next";
 import {
   ApiResponse,
   SimulationResults,
-  Transport,
   TripStep,
   SimulationType,
   type Step,
-  thumbUp,
 } from "types";
 
 export const formatResponse = (
@@ -26,29 +24,12 @@ export const formatResponse = (
     const formattedSteps: TripStep[] = [];
     let totalEmissions = 0;
 
-    trip.steps.forEach((step, index) => {
-      let passengers: number | undefined;
-      if (["car", "ecar"].includes(step.transport_means)) {
-        if (
-          simulationType === SimulationType.mainTripVsOtherTransportMeans &&
-          trip.name !== "MAIN_TRIP"
-        ) {
-          passengers = 1;
-        } else {
-          const input =
-            inputs[trip.name === "MAIN_TRIP" ? "mainSteps" : "altSteps"]![
-              index + 1
-            ];
-          passengers =
-            !!input.passengers && input.passengers !== thumbUp
-              ? Number(input.passengers)
-              : 1;
-        }
-      }
+    trip.steps.forEach((step) => {
+      const { emissions, path_length, ...rest } = step;
 
       const emissionParts: TripStep["emissionParts"] = [];
       let stepEmissions = 0;
-      step.emissions.forEach((emission) => {
+      emissions.forEach((emission) => {
         stepEmissions += emission.kg_co2_eq;
         emissionParts.push({
           emissionSource: emission.name,
@@ -60,9 +41,9 @@ export const formatResponse = (
       totalEmissions += stepEmissions;
       formattedSteps.push({
         emissions: stepEmissions,
-        transportMeans: step.transport_means as Transport,
         emissionParts,
-        passengers,
+        distance: path_length,
+        ...rest,
       });
     });
 

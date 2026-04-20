@@ -339,7 +339,7 @@ def train_to_gdf(
 
     return TripStepResult(
         step_data=TrainStepData(
-            transport_means="train",
+            transport="train",
             emissions=emissions,
             path_length=train_dist,
             coeff_upstream=EF_train["infra"],

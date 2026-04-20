@@ -145,7 +145,7 @@ def plane_to_gdf(
     non_CO2_factors = emissions_factors["combustion"] * contrails
 
     step_data = PlaneStepData(
-        transport_means="plane",
+        transport="plane",
         emissions=[
             EmissionPart(
                 name="kerosene",

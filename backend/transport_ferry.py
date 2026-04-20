@@ -255,7 +255,7 @@ def ferry_to_gdf(
 
     return TripStepResult(
         step_data=FerryStepData(
-            transport_means="ferry",
+            transport="ferry",
             emissions=[
                 EmissionPart(
                     name="usage",
@@ -309,7 +309,7 @@ def sail_to_gdf(tag1, tag2, EF=EF_sail, color_usage="#ffffff") -> TripStepResult
 
     return TripStepResult(
         step_data=SailStepData(
-            transport_means="sail",
+            transport="sail",
             emissions=[
                 EmissionPart(
                     name="Usage",
