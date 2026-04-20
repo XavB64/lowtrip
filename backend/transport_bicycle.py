@@ -22,8 +22,8 @@ import requests
 from shapely.geometry import LineString
 
 from models import (
+    BicycleStepData,
     EmissionPart,
-    StepData,
     TripStepGeometry,
     TripStepResult,
 )
@@ -95,7 +95,7 @@ def bicycle_to_gdf(
         return None
 
     return TripStepResult(
-        step_data=StepData(
+        step_data=BicycleStepData(
             transport_means="bicycle",
             emissions=[
                 EmissionPart(
@@ -106,6 +106,7 @@ def bicycle_to_gdf(
                 ),
             ],
             path_length=route_length,
+            coeff_upstream=EF,
         ),
         geometries=[
             TripStepGeometry(

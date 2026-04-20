@@ -28,7 +28,7 @@ from shapely.geometry import (
 
 from models import (
     EmissionPart,
-    StepData,
+    TrainStepData,
     TripStepGeometry,
     TripStepResult,
 )
@@ -338,10 +338,11 @@ def train_to_gdf(
     ]
 
     return TripStepResult(
-        step_data=StepData(
+        step_data=TrainStepData(
             transport_means="train",
             emissions=emissions,
             path_length=train_dist,
+            coeff_upstream=EF_train["infra"],
         ),
         geometries=geometries,
     )

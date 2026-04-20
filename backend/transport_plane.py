@@ -20,7 +20,7 @@ from shapely.geometry import LineString
 
 from models import (
     EmissionPart,
-    StepData,
+    PlaneStepData,
     TripStepGeometry,
     TripStepResult,
 )
@@ -144,7 +144,7 @@ def plane_to_gdf(
     CO2_factors = emissions_factors["combustion"] + emissions_factors["upstream"]
     non_CO2_factors = emissions_factors["combustion"] * contrails
 
-    step_data = StepData(
+    step_data = PlaneStepData(
         transport_means="plane",
         emissions=[
             EmissionPart(
@@ -161,6 +161,11 @@ def plane_to_gdf(
             ),
         ],
         path_length=route_length,
+        coeff_path_detour=detour,
+        coeff_contrails=contrails,
+        coeff_fuel=emissions_factors["combustion"],
+        coeff_upstream=emissions_factors["upstream"],
+        holding=holding,
     )
 
     return TripStepResult(

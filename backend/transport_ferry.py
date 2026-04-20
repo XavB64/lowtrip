@@ -29,7 +29,8 @@ from shapely.ops import nearest_points, unary_union
 
 from models import (
     EmissionPart,
-    StepData,
+    FerryStepData,
+    SailStepData,
     TripStepGeometry,
     TripStepResult,
 )
@@ -253,7 +254,7 @@ def ferry_to_gdf(
         coordinates.append(t)
 
     return TripStepResult(
-        step_data=StepData(
+        step_data=FerryStepData(
             transport_means="ferry",
             emissions=[
                 EmissionPart(
@@ -264,6 +265,8 @@ def ferry_to_gdf(
                 ),
             ],
             path_length=bird,
+            coeff_total=EF,
+            options=options,
         ),
         geometries=[
             TripStepGeometry(
@@ -305,7 +308,7 @@ def sail_to_gdf(tag1, tag2, EF=EF_sail, color_usage="#ffffff") -> TripStepResult
         coordinates.append(t)
 
     return TripStepResult(
-        step_data=StepData(
+        step_data=SailStepData(
             transport_means="sail",
             emissions=[
                 EmissionPart(
@@ -316,6 +319,7 @@ def sail_to_gdf(tag1, tag2, EF=EF_sail, color_usage="#ffffff") -> TripStepResult
                 ),
             ],
             path_length=bird,
+            coeff_total=EF,
         ),
         geometries=[
             TripStepGeometry(
