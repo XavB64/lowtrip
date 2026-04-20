@@ -23,8 +23,10 @@ import requests
 from shapely.geometry import LineString
 
 from models import (
+    BusStepData,
+    CarStepData,
+    EcarStepData,
     EmissionPart,
-    StepData,
     TripStepGeometry,
     TripStepResult,
 )
@@ -43,8 +45,8 @@ class CarBusResults:
     """Dataclass for car and bus emissions and road geometry."""
 
     geometries: list[TripStepGeometry]
-    bus_step_data: StepData
-    car_step_data: StepData
+    bus_step_data: BusStepData
+    car_step_data: CarStepData
 
 
 OSM_ROUTER_URL = "http://router.project-osrm.org/route/v1/driving"
@@ -173,10 +175,13 @@ def ecar_to_gdf(
     ]
 
     return TripStepResult(
-        step_data=StepData(
+        step_data=EcarStepData(
             transport_means="ecar",
             emissions=emissions,
             path_length=route_length,
+            passengers_nb=passengers_nb,
+            coeff_upstream=EF_ecar["construction"],
+            coeff_fuel=EF_ecar["fuel"],
         ),
         geometries=geometries,
     )
@@ -294,15 +299,21 @@ def car_bus_to_gdf(
 
     return CarBusResults(
         geometries=[road_geometry],
-        bus_step_data=StepData(
+        bus_step_data=BusStepData(
             transport_means="bus",
             emissions=bus_emissions,
             path_length=route_length,
+            coeff_upstream=EF_bus["fuel"],
+            coeff_fuel=EF_bus["construction"],
         ),
-        car_step_data=StepData(
+        car_step_data=CarStepData(
             transport_means="car",
             emissions=car_emissions,
             path_length=route_length,
+            passengers_nb=1,
+            is_hitch_hike=False,
+            coeff_upstream=EF_car["fuel"],
+            coeff_fuel=EF_car["construction"],
         ),
     )
 
@@ -346,10 +357,12 @@ def bus_to_gdf(
     )
 
     return TripStepResult(
-        step_data=StepData(
+        step_data=BusStepData(
             transport_means="Bus",
             emissions=emissions,
             path_length=route_length,
+            coeff_upstream=EF_bus["construction"],
+            coeff_fuel=EF_bus["fuel"],
         ),
         geometries=[road_geometry],
     )
@@ -397,7 +410,7 @@ def car_to_gdf(
     geometry = get_road_geometry_data(route_length, route_geometry, color_usage)
 
     return TripStepResult(
-        step_data=StepData(
+        step_data=CarStepData(
             transport_means="car",
             emissions=get_car_emissions(
                 route_length,
@@ -406,7 +419,11 @@ def car_to_gdf(
                 color_usage,
                 color_cons,
             ),
+            is_hitch_hike=False,
+            passengers_nb=passengers_nb,
             path_length=route_length,
+            coeff_upstream=EF_car["construction"],
+            coeff_fuel=EF_car["fuel"],
         ),
         geometries=[geometry],
     )

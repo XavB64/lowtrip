@@ -16,6 +16,12 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 from dataclasses import dataclass
+from typing import Literal
+
+
+######################
+# INPUTS
+######################
 
 
 @dataclass
@@ -40,6 +46,11 @@ class TripStep:
     options: str | None
 
 
+######################
+# OUTPUTS
+######################
+
+
 @dataclass
 class TripStepGeometry:
     """Trip step geometry."""
@@ -62,12 +73,99 @@ class EmissionPart:
 
 
 @dataclass
-class StepData:
-    """Emissions of the trip step."""
+class BaseStepData:
+    """Base step dataclass."""
 
     transport_means: str
     emissions: list[EmissionPart]
     path_length: float
+
+
+@dataclass
+class BicycleStepData(BaseStepData):
+    """Bicycle step dataclass."""
+
+    transport_means: Literal["bicycle"]
+    coeff_upstream: float
+
+
+@dataclass
+class BusStepData(BaseStepData):
+    """Bus step dataclass."""
+
+    transport_means: Literal["bus"]
+    coeff_upstream: float
+    coeff_fuel: float
+
+
+@dataclass
+class CarStepData(BaseStepData):
+    """Car step dataclass."""
+
+    transport_means: Literal["car"]
+    is_hitch_hike: bool
+    passengers_nb: int
+    coeff_upstream: float
+    coeff_fuel: float
+
+
+@dataclass
+class EcarStepData(BaseStepData):
+    """ECar step dataclass."""
+
+    transport_means: Literal["ecar"]
+    passengers_nb: int
+    coeff_upstream: float
+    coeff_fuel: float
+
+
+@dataclass
+class FerryStepData(BaseStepData):
+    """Ferry step dataclass."""
+
+    transport_means: Literal["ferry"]
+    coeff_total: float
+    options: str
+
+
+@dataclass
+class PlaneStepData(BaseStepData):
+    """Plane step dataclass."""
+
+    transport_means: Literal["plane"]
+    coeff_path_detour: float
+    coeff_contrails: float
+    coeff_fuel: float
+    coeff_upstream: float
+    holding: float
+
+
+@dataclass
+class TrainStepData(BaseStepData):
+    """Train step dataclass."""
+
+    transport_means: Literal["train"]
+    coeff_upstream: float
+
+
+@dataclass
+class SailStepData(BaseStepData):
+    """Sail step dataclass."""
+
+    transport_means: Literal["sail"]
+    coeff_total: float
+
+
+StepData = (
+    BicycleStepData
+    | BusStepData
+    | CarStepData
+    | EcarStepData
+    | FerryStepData
+    | PlaneStepData
+    | SailStepData
+    | TrainStepData
+)
 
 
 @dataclass
