@@ -345,7 +345,7 @@ def train_to_gdf(
         step_data=TrainStepData(
             transport="train",
             emissions=emissions,
-            path_length=train_dist,
+            path_length=round(train_dist),
             coeff_upstream=EF_train["infra"],
         ),
         geometries=geometries,

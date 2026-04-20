@@ -162,7 +162,7 @@ def plane_to_gdf(
                 color=color_contrails,
             ),
         ],
-        path_length=route_length,
+        path_length=round(route_length),
         coeff_path_detour=detour,
         coeff_contrails=contrails,
         coeff_fuel=emissions_factors["combustion"],
