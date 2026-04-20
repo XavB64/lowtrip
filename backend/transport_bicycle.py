@@ -96,7 +96,7 @@ def bicycle_to_gdf(
 
     return TripStepResult(
         step_data=BicycleStepData(
-            transport_means="bicycle",
+            transport="bicycle",
             emissions=[
                 EmissionPart(
                     name="bikeBuild",

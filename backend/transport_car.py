@@ -176,7 +176,7 @@ def ecar_to_gdf(
 
     return TripStepResult(
         step_data=EcarStepData(
-            transport_means="ecar",
+            transport="ecar",
             emissions=emissions,
             path_length=route_length,
             passengers_nb=passengers_nb,
@@ -300,14 +300,14 @@ def car_bus_to_gdf(
     return CarBusResults(
         geometries=[road_geometry],
         bus_step_data=BusStepData(
-            transport_means="bus",
+            transport="bus",
             emissions=bus_emissions,
             path_length=route_length,
             coeff_upstream=EF_bus["fuel"],
             coeff_fuel=EF_bus["construction"],
         ),
         car_step_data=CarStepData(
-            transport_means="car",
+            transport="car",
             emissions=car_emissions,
             path_length=route_length,
             passengers_nb=1,
@@ -358,7 +358,7 @@ def bus_to_gdf(
 
     return TripStepResult(
         step_data=BusStepData(
-            transport_means="Bus",
+            transport="Bus",
             emissions=emissions,
             path_length=route_length,
             coeff_upstream=EF_bus["construction"],
@@ -411,7 +411,7 @@ def car_to_gdf(
 
     return TripStepResult(
         step_data=CarStepData(
-            transport_means="car",
+            transport="car",
             emissions=get_car_emissions(
                 route_length,
                 EF_fuel,

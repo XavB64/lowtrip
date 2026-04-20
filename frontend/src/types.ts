@@ -45,8 +45,8 @@ type TripStepGeometry = {
 
 type TripResult = {
   name: string;
-  steps: {
-    transport_means: string;
+  steps: ({
+    transport: string;
     path_length: number;
     emissions: {
       name: string;
@@ -54,7 +54,51 @@ type TripResult = {
       kg_co2_eq: number;
       color: string;
     }[];
-  }[];
+  } & (
+    | {
+        transport: Transport.bicycle;
+        coeff_upstream: number;
+      }
+    | {
+        transport: Transport.bus;
+        coeff_upstream: number;
+        coeff_fuel: number;
+      }
+    | {
+        transport: Transport.car;
+        coeff_upstream: number;
+        coeff_fuel: number;
+        passengers_nb: number;
+        is_hitch_hike: boolean;
+      }
+    | {
+        transport: Transport.ecar;
+        coeff_upstream: number;
+        coeff_fuel: number;
+        passengers_nb: number;
+      }
+    | {
+        transport: Transport.ferry;
+        coeff_total: number;
+        options: string;
+      }
+    | {
+        transport: Transport.plane;
+        coeff_path_detour: number;
+        coeff_contrails: number;
+        coeff_fuel: number;
+        coeff_upstream: number;
+        holding: number;
+      }
+    | {
+        transport: Transport.train;
+        coeff_upstream: number;
+      }
+    | {
+        transport: Transport.sail;
+        coeff_total: number;
+      }
+  ))[];
 };
 
 export type ApiResponse = {
@@ -107,10 +151,57 @@ export type Trip = {
 
 export type TripStep = {
   emissions: number;
-  transportMeans: Transport;
-  passengers?: number;
-  emissionParts: { emissionSource: string; color: string; emissions: number }[];
-};
+  emissionParts: {
+    emissionSource: string;
+    color: string;
+    emissions: number;
+  }[];
+  distance: number;
+} & (
+  | {
+      transport: Transport.bicycle;
+      coeff_upstream: number;
+    }
+  | {
+      transport: Transport.bus;
+      coeff_upstream: number;
+      coeff_fuel: number;
+    }
+  | {
+      transport: Transport.car;
+      coeff_upstream: number;
+      coeff_fuel: number;
+      passengers_nb: number;
+      is_hitch_hike: boolean;
+    }
+  | {
+      transport: Transport.ecar;
+      coeff_upstream: number;
+      coeff_fuel: number;
+      passengers_nb: number;
+    }
+  | {
+      transport: Transport.ferry;
+      coeff_total: number;
+      options: string;
+    }
+  | {
+      transport: Transport.plane;
+      coeff_path_detour: number;
+      coeff_contrails: number;
+      coeff_fuel: number;
+      coeff_upstream: number;
+      holding: number;
+    }
+  | {
+      transport: Transport.train;
+      coeff_upstream: number;
+    }
+  | {
+      transport: Transport.sail;
+      coeff_total: number;
+    }
+);
 
 export type Geometry = {
   transportMeans: string;

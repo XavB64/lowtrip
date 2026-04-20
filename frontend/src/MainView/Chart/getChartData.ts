@@ -17,7 +17,7 @@
 
 import { TFunction } from "i18next";
 
-import { Trip } from "types";
+import { Transport, Trip } from "types";
 
 const getChartData = (
   trips: Trip[],
@@ -37,7 +37,17 @@ const getChartData = (
 
     for (let index = 0; index < trip.steps.length; index++) {
       const tripStep = trip.steps[index];
-      const stepLabel = `${trip.label}__${index + 1}. ${t("chart.transportMeans." + tripStep.transportMeans, { count: tripStep.passengers })}`;
+
+      let passengers: undefined | string | number;
+      if (
+        tripStep.transport === Transport.ecar ||
+        tripStep.transport === Transport.car
+      ) {
+        if (tripStep.transport === Transport.car && tripStep.is_hitch_hike)
+          passengers = tripStep.is_hitch_hike ? "👍" : tripStep.passengers_nb;
+        else passengers = tripStep.passengers_nb;
+      }
+      const stepLabel = `${trip.label}__${index + 1}. ${t("chart.transportMeans." + tripStep.transport, { count: passengers })}`;
 
       for (const emissionPart of tripStep.emissionParts) {
         emissionPartLabel = `${stepLabel} - ${t("chart.category." + emissionPart.emissionSource, { defaultValue: emissionPart.emissionSource })}`;

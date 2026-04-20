@@ -76,7 +76,7 @@ class EmissionPart:
 class BaseStepData:
     """Base step dataclass."""
 
-    transport_means: str
+    transport: str
     emissions: list[EmissionPart]
     path_length: float
 
@@ -85,7 +85,7 @@ class BaseStepData:
 class BicycleStepData(BaseStepData):
     """Bicycle step dataclass."""
 
-    transport_means: Literal["bicycle"]
+    transport: Literal["bicycle"]
     coeff_upstream: float
 
 
@@ -93,7 +93,7 @@ class BicycleStepData(BaseStepData):
 class BusStepData(BaseStepData):
     """Bus step dataclass."""
 
-    transport_means: Literal["bus"]
+    transport: Literal["bus"]
     coeff_upstream: float
     coeff_fuel: float
 
@@ -102,7 +102,7 @@ class BusStepData(BaseStepData):
 class CarStepData(BaseStepData):
     """Car step dataclass."""
 
-    transport_means: Literal["car"]
+    transport: Literal["car"]
     is_hitch_hike: bool
     passengers_nb: int
     coeff_upstream: float
@@ -113,7 +113,7 @@ class CarStepData(BaseStepData):
 class EcarStepData(BaseStepData):
     """ECar step dataclass."""
 
-    transport_means: Literal["ecar"]
+    transport: Literal["ecar"]
     passengers_nb: int
     coeff_upstream: float
     coeff_fuel: float
@@ -123,7 +123,7 @@ class EcarStepData(BaseStepData):
 class FerryStepData(BaseStepData):
     """Ferry step dataclass."""
 
-    transport_means: Literal["ferry"]
+    transport: Literal["ferry"]
     coeff_total: float
     options: str
 
@@ -132,7 +132,7 @@ class FerryStepData(BaseStepData):
 class PlaneStepData(BaseStepData):
     """Plane step dataclass."""
 
-    transport_means: Literal["plane"]
+    transport: Literal["plane"]
     coeff_path_detour: float
     coeff_contrails: float
     coeff_fuel: float
@@ -144,7 +144,7 @@ class PlaneStepData(BaseStepData):
 class TrainStepData(BaseStepData):
     """Train step dataclass."""
 
-    transport_means: Literal["train"]
+    transport: Literal["train"]
     coeff_upstream: float
 
 
@@ -152,7 +152,7 @@ class TrainStepData(BaseStepData):
 class SailStepData(BaseStepData):
     """Sail step dataclass."""
 
-    transport_means: Literal["sail"]
+    transport: Literal["sail"]
     coeff_total: float
 
 
