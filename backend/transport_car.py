@@ -419,7 +419,7 @@ def car_to_gdf(
                 color_usage,
                 color_cons,
             ),
-            is_hitch_hike=False,
+            is_hitch_hike=passengers_nb == "👍",
             passengers_nb=passengers_nb,
             path_length=route_length,
             coeff_upstream=EF_car["construction"],
