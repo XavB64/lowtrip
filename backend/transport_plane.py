@@ -138,7 +138,7 @@ def plane_to_gdf(
         trip_category = "long"
 
     # detour coeffient
-    route_length *= detour
+    route_length_with_detour = route_length * detour
 
     emissions_factors = EF_plane[trip_category]
     CO2_factors = emissions_factors["combustion"] + emissions_factors["upstream"]
@@ -149,16 +149,16 @@ def plane_to_gdf(
         emissions=[
             EmissionPart(
                 name="kerosene",
-                kg_co2_eq=route_length * CO2_factors + holding,
+                kg_co2_eq=route_length_with_detour * CO2_factors + holding,
                 ef_tot=CO2_factors,
-                distance=round(route_length),
+                distance=round(route_length_with_detour),
                 color=color_usage,
             ),
             EmissionPart(
                 name="contrails",
-                kg_co2_eq=route_length * non_CO2_factors,
+                kg_co2_eq=route_length_with_detour * non_CO2_factors,
                 ef_tot=non_CO2_factors,
-                distance=round(route_length),
+                distance=round(route_length_with_detour),
                 color=color_contrails,
             ),
         ],
