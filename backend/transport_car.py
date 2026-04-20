@@ -182,7 +182,7 @@ def ecar_to_gdf(
         step_data=EcarStepData(
             transport="ecar",
             emissions=emissions,
-            path_length=route_length,
+            path_length=round(route_length),
             passengers_nb=passengers_nb,
             coeff_upstream=EF_ecar["construction"],
             coeff_fuel=EF_ecar["fuel"],
@@ -310,14 +310,14 @@ def car_bus_to_gdf(
         bus_step_data=BusStepData(
             transport="bus",
             emissions=bus_emissions,
-            path_length=route_length,
+            path_length=round(route_length),
             coeff_upstream=EF_bus["fuel"],
             coeff_fuel=EF_bus["construction"],
         ),
         car_step_data=CarStepData(
             transport="car",
             emissions=car_emissions,
-            path_length=route_length,
+            path_length=round(route_length),
             passengers_nb=1,
             is_hitch_hike=False,
             coeff_upstream=EF_car["fuel"],
@@ -368,7 +368,7 @@ def bus_to_gdf(
         step_data=BusStepData(
             transport="Bus",
             emissions=emissions,
-            path_length=route_length,
+            path_length=round(route_length),
             coeff_upstream=EF_bus["construction"],
             coeff_fuel=EF_bus["fuel"],
         ),
@@ -429,7 +429,7 @@ def car_to_gdf(
             ),
             is_hitch_hike=passengers_nb == "👍",
             passengers_nb=passengers_nb,
-            path_length=route_length,
+            path_length=round(route_length),
             coeff_upstream=EF_car["construction"],
             coeff_fuel=EF_car["fuel"],
         ),

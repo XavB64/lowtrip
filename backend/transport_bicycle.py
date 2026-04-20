@@ -106,7 +106,7 @@ def bicycle_to_gdf(
                     color=color,
                 ),
             ],
-            path_length=route_length,
+            path_length=round(route_length),
             coeff_upstream=EF,
         ),
         geometries=[

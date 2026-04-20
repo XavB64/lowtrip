@@ -265,7 +265,7 @@ def ferry_to_gdf(
                     color=color_usage,
                 ),
             ],
-            path_length=bird,
+            path_length=round(bird),
             coeff_total=EF,
             options=options,
         ),
@@ -320,7 +320,7 @@ def sail_to_gdf(tag1, tag2, EF=EF_sail, color_usage="#ffffff") -> TripStepResult
                     color=color_usage,
                 ),
             ],
-            path_length=bird,
+            path_length=round(bird),
             coeff_total=EF,
         ),
         geometries=[
