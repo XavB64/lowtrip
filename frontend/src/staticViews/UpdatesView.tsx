@@ -13,7 +13,8 @@ const UpdatesView = () => {
 
       <section className="mb-6">
         <h2 className="font-semibold">{t("updates.months.april")} 2026</h2>
-        <p>{t("updates.updatePage")}</p>
+        <p>- {t("updates.updatePage")}</p>
+        <p>- {t("updates.addDetailsModal")}</p>
       </section>
 
       <section className="mb-6">

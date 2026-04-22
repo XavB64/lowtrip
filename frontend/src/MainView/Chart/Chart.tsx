@@ -30,6 +30,7 @@ import {
   YAxis,
 } from "recharts";
 
+import Button from "components/Button";
 import Tooltip from "components/Tooltip";
 import { generateUrlToShare } from "MainView/helpers/shareableLink";
 import type { Trip, SimulationResults } from "types";
@@ -37,6 +38,7 @@ import type { Trip, SimulationResults } from "types";
 import CustomLabel from "./CustomLabel";
 import getChartData from "./getChartData";
 import "./Chart.scss";
+import DetailsModal from "../DetailsModal/DetailsModal";
 
 /**
  * Corresponds to 2kg of CO2 emissions per year per person
@@ -56,6 +58,7 @@ const Chart = ({
 
   const [showCopiedLinkNotification, setShowCopiedLinkNotification] =
     useState(false);
+  const [detailsModalOpen, setDetailsModalOpen] = useState(false);
 
   const mainTrip = trips.find((trip) => trip.isMainTrip) as Trip;
 
@@ -141,13 +144,33 @@ const Chart = ({
       </div>
 
       <div className="chart-footer">
-        <Tooltip content={t("results.explanation")}>
-          <div className="plane-explanation-tooltip">
-            {t("chart.help")}
-            <BiHelpCircle className="help-icon" />
-          </div>
-        </Tooltip>
+        {simulationType === "mainTripVsOtherTransportMeans" ? (
+          <Button
+            className="chart-details-button"
+            onClick={() => {
+              setDetailsModalOpen(true);
+            }}
+            outline
+          >
+            {t("results.displayDetailsModal")}
+          </Button>
+        ) : (
+          <Tooltip content={t("results.explanation")}>
+            <div className="plane-explanation-tooltip">
+              {t("chart.help")}
+              <BiHelpCircle className="help-icon" />
+            </div>
+          </Tooltip>
+        )}
       </div>
+
+      <DetailsModal
+        isOpen={detailsModalOpen}
+        onClose={() => {
+          setDetailsModalOpen(false);
+        }}
+        trips={trips}
+      ></DetailsModal>
     </div>
   );
 };

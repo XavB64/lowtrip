@@ -7,6 +7,7 @@ import {
   SimulationType,
   type Step,
 } from "types";
+import { round } from "utils";
 
 export const formatResponse = (
   inputs: { mainSteps: Step[]; altSteps?: Step[] },
@@ -42,7 +43,7 @@ export const formatResponse = (
 
       totalEmissions += stepEmissions;
       formattedSteps.push({
-        emissions: stepEmissions,
+        emissions: round(stepEmissions),
         emissionParts,
         distance: path_length,
         ...rest,
