@@ -172,6 +172,7 @@
       "mainTripVsOtherTrip": "Emissions de tes 2 voyages",
       "mainTripVsOtherTransportMeans": "Ton voyage VS les autres moyens de transport",
       "mainTripOnly": "Les émissions de ton voyage",
+      "displayDetailsModal": "Afficher le détail des calculs",
       "explanation": "La combustion du kérosène à haute altitude entraîne la formation de nuages appelés traînées de condensation. Combiné aux émissions de NOx, ces effets hors CO2 contribuent au réchauffement climatique. Le trajet représenté reste théorique et pourrait ne pas être exploité par une compagnie aérienne. Ce mode n'est pas affiché par défaut lorsque la distance du voyage est inférieure à 300 km."
     },
     "chart": {
@@ -248,7 +249,121 @@
       "introduction": "Cette page liste les principales avancées fonctionnelles de l'application. L'historique complet, et notamment technique, est disponible sur Github.",
       "shareableLinkFeature": "Ajout du lien de partage, qui peut aussi servir à sauvergarder sa requête",
       "title": "Historique des développements",
-      "updatePage": "Ajout de cette page d'historique"
+      "updatePage": "Ajout de cette page d'historique",
+      "addDetailsModal": "Ajout de la modale de détails pour les voyages à une seule étape"
+    }
+  },
+  "detailsModal": {
+    "bicycle": {
+      "generalEquation": "ÉQUATION GÉNÉRALE & RÉSULTATS",
+      "explanations": "Les émissions totales de CO₂eq du trajet sont obtenues en multipliant la distance parcourue par un coefficient d’émission prenant uniquement en compte la fabrication du vélo (fourni par la Fédération Européenne des Cyclistes ECF).",
+      "numericalApplication": "Application numérique"
+    },
+    "bus": {
+      "generalEquation": "ÉQUATION GÉNÉRALE",
+      "generalExplanations": "Les émissions totales de CO₂eq sont calculées en additionnant les émissions liées à la construction (véhicule et infrastructures) et celles liées à la consommation de carburant :",
+      "distance": "DISTANCE",
+      "distanceExplanations": "La distance est calculée à partir d’itinéraires issus d’OpenStreetMap Routing, basés sur les données OSM.",
+      "upstreamEmissions": "ÉMISSIONS LIÉES À LA CONSTRUCTION",
+      "upstreamEmissionsExplanation": "Les émissions liées à la construction (bus et infrastructures) sont estimées en multipliant la distance par un coefficient issu de l’ADEME.",
+      "fuelEmissions": "ÉMISSIONS LIÉES À LA CONSOMMATION DE CARBURANT",
+      "fuelEmissionsExplanation": "Les émissions liées à la consommation de carburant sont calculées en multipliant la distance par un coefficient issu de l’ADEME.",
+      "total": "TOTAL"
+    },
+    "car": {
+      "generalEquation": "ÉQUATION GÉNÉRALE",
+      "generalExplanations": "Les émissions totales de CO₂eq sont calculées en additionnant les émissions liées à la construction (véhicule et infrastructures) et celles liées à la consommation de carburant. Elles sont ensuite réparties entre les passagers.",
+      "distance": "DISTANCE",
+      "distanceExplanations": "La distance est calculée à partir d’itinéraires issus d’OpenStreetMap Routing, basés sur les données OSM.",
+      "upstreamEmissions": "ÉMISSIONS LIÉES À LA CONSTRUCTION",
+      "upstreamEmissionsExplanation": "Les émissions liées à la construction (véhicule et infrastructures) sont estimées en multipliant la distance par un coefficient issu de l’ADEME.",
+      "fuelEmissions": "ÉMISSIONS LIÉES À LA CONSOMMATION DE CARBURANT",
+      "fuelEmissionsExplanation": "Le coefficient utilisé correspond à un trajet avec une seule personne dans le véhicule (fourni par l’ADEME). Il est ensuite ajusté en fonction du nombre de passagers, en ajoutant 4 % d’émissions par passager supplémentaire afin de prendre en compte le poids additionnel.",
+      "total": "TOTAL"
+    },
+    "ecar": {
+      "generalEquation": "ÉQUATION GÉNÉRALE",
+      "generalExplanations": "Les émissions totales de CO₂eq sont obtenues en additionnant les émissions liées à la construction (véhicule et infrastructures) et celles liées à la production de l’électricité consommée. Elles sont ensuite réparties entre les passagers.",
+      "upstreamEmissions": "ÉMISSIONS LIÉES À LA CONSTRUCTION",
+      "upstreamEmissionsExplanation": "Les émissions liées à la construction (véhicule et infrastructures) sont estimées en multipliant la distance par un coefficient issu de l’ADEME.",
+      "electricityProductionEmissions": "ÉMISSIONS LIÉES À LA CONSOMMATION D'ÉLECTRICITÉ",
+      "electricityProductionExplanation1": "Le coefficient utilisé pour la consommation de carburant correspond à un trajet avec une seule personne dans le véhicule (fourni par l’ADEME). Il est ensuite ajusté en fonction du nombre de passagers, en ajoutant 4 % d’émissions par passager supplémentaire afin de prendre en compte le poids additionnel.",
+      "electricityProductionExplanation2": "Le facteur d’émission chaque pays dépend de son mix énergétique, et donc de l’intensité carbone de son électricité.",
+      "numericalApplications": "Applications numériques :",
+      "total": "TOTAL"
+    },
+    "equation": {
+      "bicycle": "vélo",
+      "combustion": "combustion",
+      "construction": "construction",
+      "contrails": "traînées",
+      "country": "pays",
+      "cruise": "traversée",
+      "distance": "distance",
+      "fuel": "essence",
+      "holding": "attente",
+      "infrastructure": "infra",
+      "nonCO2": "non-CO₂",
+      "passengers": "passagers",
+      "total": "totale",
+      "upstream": "production"
+    },
+    "ferry": {
+      "generalEquation": "ÉQUATION GÉNÉRALE",
+      "generalExplanations": "Les émissions totales de CO₂eq sont obtenues en multipliant la distance parcourue par un coefficient d’émission dépendant des options choisies (siège, cabine, véhicule).",
+      "distance": "DISTANCE",
+      "distanceExplanations1": "La distance est calculée à l’aide de l’algorithme de Dijkstra (plus d’informations dans la méthodologie complète).",
+      "distanceExplanations2": "Le trajet obtenu est une approximation et peut s’éloigner des itinéraires réels, notamment lorsque les points de départ ou d’arrivée sont situés à l’intérieur des terres.",
+      "cruiseEmissions": "ÉMISSIONS DE LA TRAVERSÉE",
+      "cruiseEmissionsExplanations1": "Le coefficient d’émission dépend des options choisies (siège, cabine, véhicule) et provient de l’analyse réalisée par Maël Thomas-Quillévéré dans FuturEco.",
+      "cruiseEmissionsExplanations2": "Ce coefficient prend uniquement en compte la traversée, et pas les émissions liées au reste du cycle de vie du bateau, qui sont considérées comme très faibles devant celles de la traversée."
+    },
+    "hitchHiking": {
+      "generalEquation": "ÉQUATION GÉNÉRALE",
+      "generalExplanations1": "Dans le cas de l’auto-stop, nous faisons le choix de considérer uniquement les émissions liées à la présence du passager supplémentaire.",
+      "generalExplanations2": "Cette hypothèse simplifiée ne prend pas en compte certains effets, comme d’éventuels détours ou variations du taux de remplissage.",
+      "distance": "DISTANCE",
+      "distanceExplanations": "La distance est calculée à partir d’itinéraires issus d’OpenStreetMap Routing, basés sur les données OSM.",
+      "upstreamEmissions": "ÉMISSIONS LIÉES À LA CONSTRUCTION",
+      "upstreamEmissionsExplanation": "Les émissions liées à la construction du véhicule et des infrastructures sont considérées comme nulles, le trajet ayant lieu dans tous les cas.",
+      "fuelEmissions": "ÉMISSIONS LIÉES À LA CONSOMMATION DE CARBURANT",
+      "fuelEmissionsExplanation": "Seule la part marginale des émissions est prise en compte, estimée à 4 % des émissions standards.",
+      "total": "TOTAL"
+    },
+    "plane": {
+      "generalEquation": "ÉQUATION GÉNÉRALE",
+      "generalExplanations1": "Les émissions totales de CO₂eq sont calculées en additionnant les émissions de CO₂ (liées à la combustion du carburant) et les effets non-CO₂ (comme les traînées de condensation) :",
+      "generalExplanations2": "Les émissions liées à la construction de l’avion et des aéroports ne sont pas prises en compte, leur contribution étant considérée comme faible par rapport aux émissions du trajet lui-même.",
+      "distance": "DISTANCE",
+      "distanceExplanations": "La distance correspond à la distance à vol d’oiseau entre les points de départ et d’arrivée demandés, même en l’absence d’aéroports à ces points. Elle est ensuite augmentée d’environ {{detour_coeff}} % pour tenir compte des détours liés au trafic aérien.",
+      "CO2emissions": "ÉMISSIONS CO₂",
+      "CO2emissionsExplanations": "Les émissions de CO₂ proviennent de la combustion du carburant et de sa production (extraction, raffinage, transport). Une quantité fixe est ajoutée pour les phases d’attente en vol avant l’atterrissage, estimée à {{holding}} kg de CO₂ par passager selon ATMOSFAIR.",
+      "nonCO2emissions": "ÉMISSIONS NON-CO₂ (TRAÎNÉES)",
+      "nonCO2emissionsExplanations1": "La combustion du kérosène à haute altitude entraîne la formation de nuages appelés traînées de condensation. Combinées aux émissions de NOx, ces effets non liés au CO₂ contribuent également au réchauffement climatique.",
+      "nonCO2emissionsExplanations2": "Ils sont estimés à partir des émissions de combustion, en appliquant un facteur {{coeff_contrails}}.",
+      "total": "TOTAL"
+    },
+    "sail": {
+      "generalEquation": "ÉQUATION GÉNÉRALE",
+      "generalExplanations": "Les émissions totales de CO₂eq sont obtenues en multipliant la distance parcourue par un coefficient d’émission propre au voilier.",
+      "distance": "DISTANCE",
+      "distanceExplanations1": "La distance est calculée à l’aide de l’algorithme de Dijkstra (plus d’informations dans la méthodologie complète).",
+      "distanceExplanations2": "Le trajet obtenu est une approximation et peut s’éloigner des itinéraires réels, notamment lorsque les points de départ ou d’arrivée sont situés à l’intérieur des terres.",
+      "cruiseEmissions": "ÉMISSIONS DE LA TRAVERSÉE",
+      "cruiseEmissionsExplanations1": "Le coefficient utilisé est fourni par SailCoop et ne prend en compte que la traversée (hors cycle de vie du bateau)."
+    },
+    "train": {
+      "generalEquation": "ÉQUATION GÉNÉRALE",
+      "generalExplanations1": "Les émissions totales de CO₂eq correspondent à la somme de l’impact des infrastructures et des émissions liées à l’énergie de traction dans chaque pays traversé :",
+      "generalExplanations2": "Les facteurs d’émission proviennent de l’ADEME pour les pays européens, et du Railway Handbook pour la Chine, le Japon, les États-Unis, l’Inde et la Russie. Pour les autres pays, une valeur par défaut de 100 gCO₂/p.km est utilisée.",
+      "generalExplanations3": "Les distances sont calculées via la Railway Routing Platform.",
+      "upstreamEmissions": "ÉMISSIONS LIÉES À L'INFRASTRUCTURE",
+      "upstreamEmissionsExplanation": "Les émissions liées à l’infrastructure sont estimées en multipliant la distance totale par un coefficient représentant son impact.",
+      "tractionEnergyEmissions": "ÉMISSIONS LIÉES À L’ÉNERGIE DE TRACTION PAR PAYS",
+      "tractionEnergyExplanation1": "Les émissions sont calculées pour chaque pays traversé en multipliant la distance parcourue par un facteur d’émission reflétant l’intensité carbone de l’énergie de traction.",
+      "tractionEnergyExplanation2": "Ce facteur dépend du taux d’électrification du réseau et du mix énergétique du pays.",
+      "numericalApplications": "Applications numériques :",
+      "total": "TOTAL"
     }
   }
 }
