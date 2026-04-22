@@ -16,7 +16,7 @@ const SailSection = ({ tripStep }: SailSectionProps) => {
   useEffect(() => {
     const equations = [
       {
-        equation: `CO₂eq_{${t("equation.cruise")}} = coeff_{${t("equation.cruise")}} \\times ${t("equation.distance")}`,
+        equation: `\\text{CO₂eq}_{${t("equation.cruise")}} = \\text{coeff}_{${t("equation.cruise")}} \\times ${t("equation.distance")}`,
         center: true,
       },
       {
@@ -26,7 +26,7 @@ const SailSection = ({ tripStep }: SailSectionProps) => {
       {
         equation: `
           \\begin{aligned}
-          CO₂eq_{${t("equation.cruise")}} &= coeff_{${t("equation.cruise")}} \\times ${t("equation.distance")} \\\\
+          \\text{CO₂eq}_{${t("equation.cruise")}} &= \\text{coeff}_{${t("equation.cruise")}} \\times ${t("equation.distance")} \\\\
                         &= ${tripStep.coeff_total} \\times ${tripStep.distance}\\; km \\\\ 
                         &= ${tripStep.emissions}\\; kgCO_2eq
           \\end{aligned}`,

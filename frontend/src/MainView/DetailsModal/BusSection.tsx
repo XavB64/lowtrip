@@ -27,7 +27,7 @@ const BusSection = ({ tripStep }: BusSectionProps) => {
       {
         equation: `
           \\begin{aligned}
-          CO₂eq_{${t("equation.construction")}} &= coeff_{${t("equation.construction")}} \\times ${t("equation.distance")} \\\\
+          CO₂eq_{${t("equation.construction")}} &= \\text{coeff}_{${t("equation.construction")}} \\times ${t("equation.distance")} \\\\
                         &= ${tripStep.coeff_upstream} \\times ${tripStep.distance}\\; km \\\\
                         &= ${round(tripStep.coeff_upstream * tripStep.distance)}\\; kgCO_2eq
           \\end{aligned}`,
@@ -36,7 +36,7 @@ const BusSection = ({ tripStep }: BusSectionProps) => {
       {
         equation: `
           \\begin{aligned}
-          CO₂eq_{${t("equation.fuel")}} &= coeff_{${t("equation.fuel")}} \\times ${t("equation.distance")}\\\\
+          CO₂eq_{${t("equation.fuel")}} &= \\text{coeff}_{${t("equation.fuel")}} \\times ${t("equation.distance")}\\\\
                         &= ${tripStep.coeff_fuel}\\times ${tripStep.distance}\\; km \\\\
                         &= ${round(tripStep.coeff_fuel * tripStep.distance)}\\; kgCO_2eq
           \\end{aligned}`,

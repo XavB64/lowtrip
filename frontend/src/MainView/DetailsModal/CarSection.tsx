@@ -27,7 +27,7 @@ const CarSection = ({ tripStep }: CarSectionProps) => {
       {
         equation: `
           \\begin{aligned}
-          CO₂eq_{${t("equation.construction")}} &= coeff_{${t("equation.construction")}} \\times ${t("equation.distance")} \\\\
+          CO₂eq_{${t("equation.construction")}} &= \\text{coeff}_{${t("equation.construction")}} \\times ${t("equation.distance")} \\\\
                         &= ${tripStep.coeff_upstream} \\times ${tripStep.distance}\\; km \\\\ 
                         &= ${round(tripStep.coeff_upstream * tripStep.distance)}\\; kgCO_2eq
           \\end{aligned}`,
@@ -36,7 +36,7 @@ const CarSection = ({ tripStep }: CarSectionProps) => {
       {
         equation: `
           \\begin{aligned}
-          CO₂eq_{${t("equation.fuel")}} &= coeff_{${t("equation.fuel")}} \\times \\left(1 + 0.04 \\times (nb_{${t("equation.passengers")}} - 1)\\right) \\times ${t("equation.distance")} \\\\
+          CO₂eq_{${t("equation.fuel")}} &= \\text{coeff}_{${t("equation.fuel")}} \\times \\left(1 + 0.04 \\times (nb_{${t("equation.passengers")}} - 1)\\right) \\times ${t("equation.distance")} \\\\
                     &=${tripStep.coeff_fuel} \\times (1 + 0.04 \\times (${tripStep.passengers_nb} - 1)) \\times ${tripStep.distance}\\; km \\\\
                     &= ${round(tripStep.coeff_fuel * tripStep.distance * (1 + 0.04 * (tripStep.passengers_nb - 1)))}\\; kgCO_2eq
           \\end{aligned}`,
@@ -154,7 +154,7 @@ export const AutoStopSection = ({ tripStep }: AutoStopSectionProps) => {
       {
         equation: `
           \\begin{aligned}
-          CO₂eq_{${t("equation.fuel")}} &= coeff_{${t("equation.fuel")}} \\times0.04 \\times ${t("equation.distance")} \\\\
+          CO₂eq_{${t("equation.fuel")}} &= \\text{coeff}_{${t("equation.fuel")}} \\times0.04 \\times ${t("equation.distance")} \\\\
                     &=${tripStep.coeff_fuel} \\times 0.04 \\times ${tripStep.distance}\\; km \\\\
                     &= ${round(tripStep.coeff_fuel * tripStep.distance * 0.04)}\\; kgCO_2eq
           \\end{aligned}`,

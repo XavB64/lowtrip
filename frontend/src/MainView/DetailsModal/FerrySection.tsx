@@ -16,7 +16,7 @@ const FerrySection = ({ tripStep }: FerrySectionProps) => {
   useEffect(() => {
     const equations = [
       {
-        equation: `CO₂eq_{${t("equation.cruise")}} = coeff_{${t("equation.cruise")}} \\times ${t("equation.distance")}`,
+        equation: `CO₂eq_{${t("equation.cruise")}} = \\text{coeff}_{${t("equation.cruise")}} \\times ${t("equation.distance")}`,
         center: true,
       },
       {
@@ -26,7 +26,7 @@ const FerrySection = ({ tripStep }: FerrySectionProps) => {
       {
         equation: `
           \\begin{aligned}
-          CO₂eq_{${t("equation.cruise")}} &= coeff_{${t("equation.cruise")}} \\times ${t("equation.distance")} \\\\
+          CO₂eq_{${t("equation.cruise")}} &= \\text{coeff}_{${t("equation.cruise")}} \\times ${t("equation.distance")} \\\\
                         &= ${tripStep.coeff_total} \\times ${tripStep.distance}\\; km \\\\ 
                         &= ${tripStep.emissions}\\; kgCO_2eq
           \\end{aligned}`,
