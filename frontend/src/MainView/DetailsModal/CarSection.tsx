@@ -17,33 +17,33 @@ const CarSection = ({ tripStep }: CarSectionProps) => {
   useEffect(() => {
     const equations = [
       {
-        equation: `CO₂eq = \\frac{CO₂eq_{${t("equation.construction")}} + CO₂eq_{${t("equation.fuel")}}}{nb_{${t("equation.passengers")}}}`,
+        equation: `\\text{CO₂eq} = \\frac{\\text{CO₂eq}_{\\text{${t("equation.construction")}}} + \\text{CO₂eq}_{\\text{${t("equation.fuel")}}}}{\\text{nb}_{\\text{${t("equation.passengers")}}}}`,
         center: true,
       },
       {
-        equation: `distance = ${tripStep.distance}\\; km`,
+        equation: `\\text{${t("equation.distance")}} = ${tripStep.distance}\\; \\text{km}`,
         center: true,
       },
       {
         equation: `
           \\begin{aligned}
-          CO₂eq_{${t("equation.construction")}} &= coeff_{${t("equation.construction")}} \\times ${t("equation.distance")} \\\\
-                        &= ${tripStep.coeff_upstream} \\times ${tripStep.distance}\\; km \\\\ 
-                        &= ${round(tripStep.coeff_upstream * tripStep.distance)}\\; kgCO_2eq
+          \\text{CO₂eq}_{\\text{${t("equation.construction")}}} &= \\text{coeff}_{\\text{${t("equation.construction")}}} \\times \\text{${t("equation.distance")}} \\\\
+                        &= ${tripStep.coeff_upstream} \\times ${tripStep.distance}\\; \\text{km} \\\\ 
+                        &= ${round(tripStep.coeff_upstream * tripStep.distance)}\\; \\text{kgCO₂eq}
           \\end{aligned}`,
         center: true,
       },
       {
         equation: `
           \\begin{aligned}
-          CO₂eq_{${t("equation.fuel")}} &= coeff_{${t("equation.fuel")}} \\times \\left(1 + 0.04 \\times (nb_{${t("equation.passengers")}} - 1)\\right) \\times ${t("equation.distance")} \\\\
-                    &=${tripStep.coeff_fuel} \\times (1 + 0.04 \\times (${tripStep.passengers_nb} - 1)) \\times ${tripStep.distance}\\; km \\\\
-                    &= ${round(tripStep.coeff_fuel * tripStep.distance * (1 + 0.04 * (tripStep.passengers_nb - 1)))}\\; kgCO_2eq
+          \\text{CO₂eq}_{\\text{${t("equation.fuel")}}} &= \\text{coeff}_{\\text{${t("equation.fuel")}}} \\times \\left(1 + 0.04 \\times (\\text{nb}_{\\text{${t("equation.passengers")}}} - 1)\\right) \\times ${t("equation.distance")} \\\\
+                    &=${tripStep.coeff_fuel} \\times (1 + 0.04 \\times (${tripStep.passengers_nb} - 1)) \\times ${tripStep.distance}\\; \\text{km} \\\\
+                    &= ${round(tripStep.coeff_fuel * tripStep.distance * (1 + 0.04 * (tripStep.passengers_nb - 1)))}\\; \\text{kgCO₂eq}
           \\end{aligned}`,
         center: true,
       },
       {
-        equation: `CO₂eq = \\frac{CO₂eq_{${t("equation.construction")}} + CO₂eq_{${t("equation.fuel")}}}{nb_{${t("equation.passengers")}}} = ${tripStep.emissions}\\; kgCO_2eq`,
+        equation: `\\text{CO₂eq} = \\frac{\\text{CO₂eq}_{\\text{${t("equation.construction")}}} + \\text{CO₂eq}_{\\text{${t("equation.fuel")}}}}{\\text{nb}_{\\text{${t("equation.passengers")}}}} = ${tripStep.emissions}\\; \\text{kgCO₂eq}`,
         center: true,
       },
     ];
@@ -140,28 +140,28 @@ export const AutoStopSection = ({ tripStep }: AutoStopSectionProps) => {
   useEffect(() => {
     const equations = [
       {
-        equation: `CO₂eq = CO₂eq_{${t("equation.construction")}} + CO₂eq_{${t("equation.fuel")}}`,
+        equation: `CO₂eq = \\text{CO₂eq}_{\\text{${t("equation.construction")}}} + \\text{CO₂eq}_{\\text{${t("equation.fuel")}}}`,
         center: true,
       },
       {
-        equation: `distance = ${tripStep.emissionParts[0].distance}\\; km`,
+        equation: `distance = ${tripStep.emissionParts[0].distance}\\; \\text{km}`,
         center: true,
       },
       {
-        equation: `CO₂eq_{${t("equation.construction")}} = 0\\; kgCO_2eq`,
+        equation: `\\text{CO₂eq}_{\\text{${t("equation.construction")}}} = 0\\; \\text{kgCO₂eq}`,
         center: true,
       },
       {
         equation: `
           \\begin{aligned}
-          CO₂eq_{${t("equation.fuel")}} &= coeff_{${t("equation.fuel")}} \\times0.04 \\times ${t("equation.distance")} \\\\
-                    &=${tripStep.coeff_fuel} \\times 0.04 \\times ${tripStep.distance}\\; km \\\\
-                    &= ${round(tripStep.coeff_fuel * tripStep.distance * 0.04)}\\; kgCO_2eq
+          \\text{CO₂eq}_{\\text{${t("equation.fuel")}}} &= \\text{coeff}_{\\text{${t("equation.fuel")}}} \\times0.04 \\times ${t("equation.distance")} \\\\
+                    &=${tripStep.coeff_fuel} \\times 0.04 \\times ${tripStep.distance}\\; \\text{km} \\\\
+                    &= ${round(tripStep.coeff_fuel * tripStep.distance * 0.04)}\\; \\text{kgCO₂eq}
           \\end{aligned}`,
         center: true,
       },
       {
-        equation: `CO₂eq = CO₂eq_{${t("equation.construction")}} + CO₂eq_{${t("equation.fuel")}} = ${tripStep.emissions}\\; kgCO_2eq`,
+        equation: `CO₂eq = \\text{CO₂eq}_{\\text{${t("equation.construction")}}} + \\text{CO₂eq}_{\\text{${t("equation.fuel")}}} = ${tripStep.emissions}\\; \\text{kgCO₂eq}`,
         center: true,
       },
     ];

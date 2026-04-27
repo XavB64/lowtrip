@@ -28,19 +28,19 @@ const PlaneSection = ({ tripStep }: PlaneSectionProps) => {
 
     const equations = [
       {
-        equation: `CO₂eq = CO₂eq_{CO₂} + CO₂eq_{${t("equation.nonCO2")}}`,
+        equation: `\\text{CO₂eq} = \\text{CO₂eq}_{\\text{CO₂}} + \\text{CO₂eq}_{\\text{${t("equation.nonCO2")}}}`,
         center: true,
       },
       {
-        equation: `${t("equation.distance")} = ${distance} \\times ${coeff_path_detour} = ${realDistance} km`,
+        equation: `\\text{${t("equation.distance")}} = \\text{${distance}} \\times ${coeff_path_detour} = ${realDistance} \\text{km}`,
         center: true,
       },
       {
         equation: `
           \\begin{aligned}
-          CO₂eq_{CO₂} &= (coeff_{${t("equation.combustion")}} + coeff_{${t("equation.upstream")}}) \\times ${t("equation.distance")} + ${t("equation.holding")} \\\\
-                         &= (${coeff_fuel} + ${coeff_upstream}) \\times ${realDistance}\\; km + ${holding}\\; kgCO_2eq \\\\
-                         &= ${round((coeff_fuel + coeff_upstream) * realDistance + holding)}\\; kgCO_2eq
+          \\text{CO₂eq} &= (\\text{coeff}_{\\text{${t("equation.combustion")}}} + \\text{coeff}_{\\text{${t("equation.upstream")}}}) \\times \\text{${t("equation.distance")}} + \\text{${t("equation.holding")}} \\\\
+                         &= (${coeff_fuel} + ${coeff_upstream}) \\times ${realDistance}\\; \\text{km} + ${holding}\\; \\text{kgCO₂eq} \\\\
+                         &= ${round((coeff_fuel + coeff_upstream) * realDistance + holding)}\\; \\text{kgCO₂eq}
           \\end{aligned}
           `,
         center: true,
@@ -48,15 +48,15 @@ const PlaneSection = ({ tripStep }: PlaneSectionProps) => {
       {
         equation: `
           \\begin{aligned}
-          CO₂eq_{non-CO₂} &= (coeff_{${t("equation.combustion")}} \\times ${t("equation.distance")}) \\times coeff_{${t("equation.contrails")}} \\\\
-                         &=  (${coeff_fuel} \\times ${realDistance}\\; km) \\times ${coeff_contrails} \\\\
-                         &= ${round(coeff_fuel * realDistance * coeff_contrails)}\\; kgCO_2eq
+          \\text{CO₂eq}_{\\text{${t("equation.nonCO2")}}} &= (\\text{coeff}_{\\text{${t("equation.combustion")}}} \\times \\text{${t("equation.distance")}}) \\times \\text{coeff}_{\\text{${t("equation.contrails")}}} \\\\
+                         &=  (${coeff_fuel} \\times ${realDistance}\\; \\text{km}) \\times ${coeff_contrails} \\\\
+                         &= ${round(coeff_fuel * realDistance * coeff_contrails)}\\; \\text{kgCO₂eq}
           \\end{aligned}
           `,
         center: true,
       },
       {
-        equation: `CO_2eq = CO₂eq_{CO₂} + CO₂eq_{non-CO₂} = ${tripStep.emissions}\\; kgCO_2eq`,
+        equation: `\\text{CO₂eq} = \\text{CO₂eq}_{CO₂} + \\text{CO₂eq}_{\\text{${t("equation.nonCO2")}}} = ${tripStep.emissions}\\; \\text{kgCO₂eq}`,
         center: true,
       },
     ];
