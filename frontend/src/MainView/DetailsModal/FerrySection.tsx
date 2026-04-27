@@ -16,19 +16,19 @@ const FerrySection = ({ tripStep }: FerrySectionProps) => {
   useEffect(() => {
     const equations = [
       {
-        equation: `CO₂eq_{${t("equation.cruise")}} = coeff_{${t("equation.cruise")}} \\times ${t("equation.distance")}`,
+        equation: `\\text{CO₂eq}_{\\text{${t("equation.cruise")}}} = \\text{coeff}_{\\text{${t("equation.cruise")}}} \\times \\text{${t("equation.distance")}}`,
         center: true,
       },
       {
-        equation: `${t("equation.distance")} = ${tripStep.distance}\\; km`,
+        equation: `\\text{${t("equation.distance")}} = ${tripStep.distance}\\; \\text{km}`,
         center: true,
       },
       {
         equation: `
           \\begin{aligned}
-          CO₂eq_{${t("equation.cruise")}} &= coeff_{${t("equation.cruise")}} \\times ${t("equation.distance")} \\\\
-                        &= ${tripStep.coeff_total} \\times ${tripStep.distance}\\; km \\\\ 
-                        &= ${tripStep.emissions}\\; kgCO_2eq
+          \\text{CO₂eq}_{\\text{${t("equation.cruise")}}} &= \\text{coeff}_{\\text{${t("equation.cruise")}}} \\times \\text{${t("equation.distance")}} \\\\
+                        &= ${tripStep.coeff_total} \\times ${tripStep.distance}\\; \\text{km} \\\\ 
+                        &= ${tripStep.emissions}\\; \\text{kgCO₂eq}
           \\end{aligned}`,
         center: true,
       },

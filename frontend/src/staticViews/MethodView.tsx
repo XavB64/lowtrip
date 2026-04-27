@@ -70,8 +70,8 @@ const MethodView = () => {
 
   const equation =
     i18n.language === "fr"
-      ? "CO_2eq = \\sum_{étape} Distance(km) \\times Facteur \\: d'Émission(kgCO2eq/km)"
-      : "CO_2eq = \\sum_{step} Distance(km) \\times Emission \\: Factor(kgCO2eq/km)";
+      ? "CO₂eq = \\sum_{étape} Distance(km) \\times Facteur \\: d'Émission(kgCO₂eq/km)"
+      : "CO₂eq = \\sum_{step} Distance(km) \\times Emission \\: Factor(kgCO₂eq/km)";
 
   // Render the LaTeX equation using KaTeX
   useEffect(() => {

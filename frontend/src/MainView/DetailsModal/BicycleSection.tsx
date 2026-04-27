@@ -16,11 +16,11 @@ const BicycleSection = ({ tripStep }: BicycleSectionProps) => {
   useEffect(() => {
     const equations = [
       {
-        equation: `CO_2eq = coeff_{${t("equation.bicycle")}} \\times ${t("equation.distance")}`,
+        equation: `\\text{CO₂eq} = \\text{coeff}_{\\text{${t("equation.bicycle")}}} \\times \\text{${t("equation.distance")}}`,
         center: true,
       },
       {
-        equation: `CO_2eq = ${tripStep.coeff_upstream} \\times ${tripStep.distance}\\; km = ${tripStep.emissions}\\; kgCO_2eq`,
+        equation: `\\text{CO₂eq} = ${tripStep.coeff_upstream} \\times ${tripStep.distance}\\; \\text{km} = ${tripStep.emissions}\\; \\text{kgCO₂eq}`,
         center: true,
       },
     ];

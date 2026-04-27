@@ -19,21 +19,21 @@ const TrainSection = ({ tripStep }: TrainSectionProps) => {
 
     const equations = [
       {
-        equation: `CO_2eq = coeff_{${t("equation.infrastructure")}} \\times ${t("equation.distance")}_{${t("equation.total")}} + \\sum_{${t("equation.country")}} coeff_{${t("equation.country")}} \\times ${t("equation.distance")}_{${t("equation.country")}}`,
+        equation: `\\text{CO₂eq} = \\text{coeff}_{\\text{${t("equation.infrastructure")}}} \\times \\text{${t("equation.distance")}}_{\\text{${t("equation.total")}}} + \\sum_{\\text{${t("equation.country")}}} \\text{coeff}_{\\text{${t("equation.country")}}} \\times \\text{${t("equation.distance")}}_{\\text{${t("equation.country")}}}`,
         center: true,
       },
       {
         equation: `
           \\begin{aligned}
-          CO_2eq_{${t("equation.infrastructure")}} &= coeff_{${t("equation.infrastructure")}} \\times ${t("equation.distance")}_{${t("equation.total")}} \\\\
-                  &= ${tripStep.coeff_upstream} \\times ${tripStep.distance}\\; km \\\\
-                  &= ${round(tripStep.coeff_upstream * tripStep.distance)}\\; kgCO_2eq
+          \\text{CO₂eq}_{\\text{${t("equation.infrastructure")}}} &= \\text{coeff}_{\\text{${t("equation.infrastructure")}}} \\times \\text{${t("equation.distance")}}_{\\text{${t("equation.total")}}} \\\\
+                  &= ${tripStep.coeff_upstream} \\times ${tripStep.distance}\\; \\text{km} \\\\
+                  &= ${round(tripStep.coeff_upstream * tripStep.distance)}\\; \\text{kgCO₂eq}
           \\end{aligned}
         `,
         center: true,
       },
       {
-        equation: `CO_2eq_{${t("equation.country")}} = coeff_{${t("equation.country")}} \\times ${t("equation.distance")}_{${t("equation.country")}}`,
+        equation: `\\text{CO₂eq}_{\\text{${t("equation.country")}}} = \\text{coeff}_{\\text{${t("equation.country")}}} \\times \\text{${t("equation.distance")}}_{\\text{${t("equation.country")}}}`,
         center: true,
       },
     ];
@@ -47,14 +47,14 @@ const TrainSection = ({ tripStep }: TrainSectionProps) => {
           emissions,
         } = emissionPart;
         equations.push({
-          equation: `CO_2eq_{${country}} = ${coefficient} \\times ${distance}\\; km = ${emissions}\\; kgCO_2eq`,
+          equation: `\\text{CO₂eq}_{\\text{${country}}} = ${coefficient} \\times ${distance}\\; \\text{km} = ${emissions}\\; \\text{kgCO₂eq}`,
           center: false,
         });
       }
     });
 
     equations.push({
-      equation: `CO_2eq = CO_2eq_{${t("equation.infrastructure")}} + \\sum_{${t("equation.country")}} CO_2eq_{${t("equation.country")}} = ${tripStep.emissions}\\; kgCO_2eq`,
+      equation: `\\text{CO₂eq} = \\text{CO₂eq}_{\\text{${t("equation.infrastructure")}}} + \\sum_{\\text{${t("equation.country")}}} \\text{CO₂eq}_{\\text{${t("equation.country")}}} = ${tripStep.emissions}\\; \\text{kgCO₂eq}`,
       center: true,
     });
 
