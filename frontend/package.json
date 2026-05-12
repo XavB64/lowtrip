@@ -14,7 +14,7 @@
     "react-icons": "^5.6.0",
     "react-id-generator": "^3.0.2",
     "react-leaflet": "^5.0.0",
-    "react-router-dom": "^7.14.1",
+    "react-router-dom": "^7.15.0",
     "recharts": "^3.8.0"
   },
   "devDependencies": {
