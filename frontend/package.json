@@ -39,7 +39,7 @@
     "sass": "^1.98.0",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.59.1",
-    "vite": "^8.0.9"
+    "vite": "^8.0.12"
   },
   "scripts": {
     "start": "vite",
