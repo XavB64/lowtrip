@@ -5,7 +5,50 @@ import { useTranslation } from "react-i18next";
 
 import i18n from "i18n";
 import { Transport, TripStep } from "types";
-import { round } from "utils";
+import { compact, round } from "utils";
+
+const CompactPlaneSection = ({ tripStep, index }: PlaneSectionProps) => {
+  const { t } = useTranslation("detailsModal");
+
+  return (
+    <>
+      <section className="details-section">
+        <div className="details-section-header">
+          <span className="details-section-step">{index + 1}</span>
+          <h3 className="details-section-title">
+            {tripStep.departure} - {tripStep.arrival} {t("by")}{" "}
+            {t("transportMeans.plane")}
+          </h3>
+        </div>
+
+        <p>{t("plane.generalExplanations1")}</p>
+
+        <div className="equation-box">
+          <div id={`step-${index}-equation1`} />
+        </div>
+
+        <p>{t("plane.generalExplanations2")}</p>
+      </section>
+
+      <section className="details-section">
+        <div className="details-section-header">
+          <h3 className="details-section-title">
+            {t("numericalApplications")}
+          </h3>
+        </div>
+
+        <div className="equation-box">
+          <div id={`step-${index}-equation2`} />
+          <div id={`step-${index}-equation3`} />
+        </div>
+
+        <div className="equation-box">
+          <div id={`step-${index}-equation4`} className="blue-text" />
+        </div>
+      </section>
+    </>
+  );
+};
 
 const DetailedPlaneSection = ({ tripStep, index }: PlaneSectionProps) => {
   const { t } = useTranslation("detailsModal");
@@ -88,7 +131,7 @@ const DetailedPlaneSection = ({ tripStep, index }: PlaneSectionProps) => {
       <section className="details-section">
         <div className="details-section-header">
           <span className="details-section-step">5</span>
-          <h3 className="details-section-title">{t("plane.total")}</h3>
+          <h3 className="details-section-title">{t("total")}</h3>
         </div>
 
         <div className="equation-box">
@@ -104,7 +147,12 @@ type PlaneSectionProps = {
   index: number;
 };
 
-const PlaneSection = (props: PlaneSectionProps) => {
+const PlaneSection = ({
+  isDetailed,
+  ...props
+}: PlaneSectionProps & {
+  isDetailed: boolean;
+}) => {
   const { t } = useTranslation("detailsModal");
 
   useEffect(() => {
@@ -121,15 +169,17 @@ const PlaneSection = (props: PlaneSectionProps) => {
 
     const realDistance = Math.round(distance * coeff_path_detour);
 
-    const equations = [
+    const equations = compact([
       {
         equation: `\\text{CO₂eq} = \\text{CO₂eq}_{\\text{CO₂}} + \\text{CO₂eq}_{\\text{${t("equation.nonCO2")}}}`,
         center: true,
       },
-      {
-        equation: `\\text{${t("equation.distance")}} = \\text{${distance}} \\times ${coeff_path_detour} = ${realDistance} \\text{km}`,
-        center: true,
-      },
+      isDetailed
+        ? {
+            equation: `\\text{${t("equation.distance")}} = \\text{${distance}} \\times ${coeff_path_detour} = ${realDistance} \\text{km}`,
+            center: true,
+          }
+        : null,
       {
         equation: `
           \\begin{aligned}
@@ -154,7 +204,7 @@ const PlaneSection = (props: PlaneSectionProps) => {
         equation: `\\text{CO₂eq} = \\text{CO₂eq}_{CO₂} + \\text{CO₂eq}_{\\text{${t("equation.nonCO2")}}} = ${tripStep.emissions}\\; \\text{kgCO₂eq}`,
         center: true,
       },
-    ];
+    ]);
 
     equations.map(({ equation, center }, equationIndex) => {
       const element = document.getElementById(
@@ -168,7 +218,11 @@ const PlaneSection = (props: PlaneSectionProps) => {
     });
   }, [i18n.language, props]);
 
-  return <DetailedPlaneSection {...props} />;
+  return isDetailed ? (
+    <DetailedPlaneSection {...props} />
+  ) : (
+    <CompactPlaneSection {...props} />
+  );
 };
 
 export default PlaneSection;

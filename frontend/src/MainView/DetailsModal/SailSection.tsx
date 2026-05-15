@@ -5,6 +5,29 @@ import { useTranslation } from "react-i18next";
 
 import i18n from "i18n";
 import { Transport, TripStep } from "types";
+import { compact } from "utils";
+
+const CompactSailSection = ({ tripStep, index }: SailSectionProps) => {
+  const { t } = useTranslation("detailsModal");
+
+  return (
+    <section className="details-section">
+      <div className="details-section-header">
+        <span className="details-section-step">{index + 1}</span>
+        <h3 className="details-section-title">
+          {tripStep.departure} - {tripStep.arrival} {t("by")}{" "}
+          {t("transportMeans.sail")}
+        </h3>
+      </div>
+
+      <p>{t("sail.generalExplanations")}</p>
+
+      <div className="equation-box">
+        <div id={`step-${index}-equation1`} className="blue-text" />
+      </div>
+    </section>
+  );
+};
 
 const DetailedSailSection = ({ index }: SailSectionProps) => {
   const { t } = useTranslation("detailsModal");
@@ -62,21 +85,30 @@ type SailSectionProps = {
   index: number;
 };
 
-const SailSection = (props: SailSectionProps) => {
+const SailSection = ({
+  isDetailed,
+  ...props
+}: SailSectionProps & {
+  isDetailed: boolean;
+}) => {
   const { t } = useTranslation("detailsModal");
 
   useEffect(() => {
     const { tripStep, index } = props;
 
-    const equations = [
-      {
-        equation: `\\text{CO₂eq}_{\\text{${t("equation.cruise")}}} = \\text{coeff}_{\\text{${t("equation.cruise")}}} \\times \\text{${t("equation.distance")}}`,
-        center: true,
-      },
-      {
-        equation: `\\text{${t("equation.distance")}} = ${tripStep.distance}\\; \\text{km}`,
-        center: true,
-      },
+    const equations = compact([
+      ...(isDetailed
+        ? [
+            {
+              equation: `\\text{CO₂eq}_{\\text{${t("equation.cruise")}}} = \\text{coeff}_{\\text{${t("equation.cruise")}}} \\times \\text{${t("equation.distance")}}`,
+              center: true,
+            },
+            {
+              equation: `\\text{${t("equation.distance")}} = ${tripStep.distance}\\; \\text{km}`,
+              center: true,
+            },
+          ]
+        : []),
       {
         equation: `
           \\begin{aligned}
@@ -86,7 +118,7 @@ const SailSection = (props: SailSectionProps) => {
           \\end{aligned}`,
         center: true,
       },
-    ];
+    ]);
 
     equations.map(({ equation, center }, equationIndex) => {
       const element = document.getElementById(
@@ -100,7 +132,11 @@ const SailSection = (props: SailSectionProps) => {
     });
   }, [i18n.language, props]);
 
-  return <DetailedSailSection {...props} />;
+  return isDetailed ? (
+    <DetailedSailSection {...props} />
+  ) : (
+    <CompactSailSection {...props} />
+  );
 };
 
 export default SailSection;

@@ -5,7 +5,50 @@ import { useTranslation } from "react-i18next";
 
 import i18n from "i18n";
 import { Transport, TripStep } from "types";
-import { round } from "utils";
+import { compact, round } from "utils";
+
+const CompactCarSection = ({ tripStep, index }: CarSectionProps) => {
+  const { t } = useTranslation("detailsModal");
+
+  return (
+    <>
+      <section className="details-section">
+        <div className="details-section-header">
+          <span className="details-section-step">{index + 1}</span>
+          <h3 className="details-section-title">
+            {tripStep.departure} - {tripStep.arrival} {t("by")}{" "}
+            {t("transportMeans.car")}
+          </h3>
+        </div>
+
+        <p>{t("car.generalExplanations")}</p>
+
+        <div className="equation-box">
+          <div id={`step-${index}-equation1`} />
+        </div>
+
+        <p>{t("car.fuelEmissionsExplanation")}</p>
+      </section>
+
+      <section className="details-section">
+        <div className="details-section-header">
+          <h3 className="details-section-title">
+            {t("numericalApplications")}
+          </h3>
+        </div>
+
+        <div className="equation-box">
+          <div id={`step-${index}-equation2`} />
+          <div id={`step-${index}-equation3`} />
+        </div>
+
+        <div className="equation-box">
+          <div id={`step-${index}-equation4`} className="blue-text" />
+        </div>
+      </section>
+    </>
+  );
+};
 
 const DetailedCarSection = ({ index }: CarSectionProps) => {
   const { t } = useTranslation("detailsModal");
@@ -71,7 +114,7 @@ const DetailedCarSection = ({ index }: CarSectionProps) => {
       <section className="details-section">
         <div className="details-section-header">
           <span className="details-section-step">5</span>
-          <h3 className="details-section-title">{t("car.total")}</h3>
+          <h3 className="details-section-title">{t("total")}</h3>
         </div>
 
         <div className="equation-box">
@@ -87,21 +130,28 @@ type CarSectionProps = {
   index: number;
 };
 
-const CarSection = (props: CarSectionProps) => {
+const CarSection = ({
+  isDetailed,
+  ...props
+}: CarSectionProps & {
+  isDetailed: boolean;
+}) => {
   const { t } = useTranslation("detailsModal");
 
   useEffect(() => {
     const { tripStep, index } = props;
 
-    const equations = [
+    const equations = compact([
       {
         equation: `\\text{CO₂eq} = \\frac{\\text{CO₂eq}_{\\text{${t("equation.construction")}}} + \\text{CO₂eq}_{\\text{${t("equation.fuel")}}}}{\\text{nb}_{\\text{${t("equation.passengers")}}}}`,
         center: true,
       },
-      {
-        equation: `\\text{${t("equation.distance")}} = ${tripStep.distance}\\; \\text{km}`,
-        center: true,
-      },
+      isDetailed
+        ? {
+            equation: `\\text{${t("equation.distance")}} = ${tripStep.distance}\\; \\text{km}`,
+            center: true,
+          }
+        : null,
       {
         equation: `
           \\begin{aligned}
@@ -124,7 +174,7 @@ const CarSection = (props: CarSectionProps) => {
         equation: `\\text{CO₂eq} = \\frac{\\text{CO₂eq}_{\\text{${t("equation.construction")}}} + \\text{CO₂eq}_{\\text{${t("equation.fuel")}}}}{\\text{nb}_{\\text{${t("equation.passengers")}}}} = ${tripStep.emissions}\\; \\text{kgCO₂eq}`,
         center: true,
       },
-    ];
+    ]);
 
     equations.map(({ equation, center }, equationIndex) => {
       const element = document.getElementById(
@@ -138,7 +188,11 @@ const CarSection = (props: CarSectionProps) => {
     });
   }, [i18n.language, props]);
 
-  return <DetailedCarSection {...props} />;
+  return isDetailed ? (
+    <DetailedCarSection {...props} />
+  ) : (
+    <CompactCarSection {...props} />
+  );
 };
 
 export default CarSection;
