@@ -238,9 +238,9 @@
       "upstreamEmissions": "EMISSIONEN AUS DER HERSTELLUNG",
       "upstreamEmissionsExplanation": "Die Emissionen aus der Herstellung (Bus und Infrastruktur) werden geschätzt, indem die Distanz mit einem Koeffizienten von ADEME multipliziert wird.",
       "fuelEmissions": "EMISSIONEN AUS KRAFTSTOFFVERBRAUCH",
-      "fuelEmissionsExplanation": "Die Emissionen aus dem Kraftstoffverbrauch werden berechnet, indem die Distanz mit einem Koeffizienten von ADEME multipliziert wird.",
-      "total": "GESAMT"
+      "fuelEmissionsExplanation": "Die Emissionen aus dem Kraftstoffverbrauch werden berechnet, indem die Distanz mit einem Koeffizienten von ADEME multipliziert wird."
     },
+    "by": "mit",
     "car": {
       "generalEquation": "ALLGEMEINE GLEICHUNG",
       "generalExplanations": "Die gesamten CO₂eq-Emissionen werden berechnet, indem die Emissionen aus der Herstellung (Fahrzeug und Infrastruktur) und aus dem Kraftstoffverbrauch addiert werden. Anschließend werden sie auf die Fahrgäste verteilt.",
@@ -249,8 +249,7 @@
       "upstreamEmissions": "EMISSIONEN AUS DER HERSTELLUNG",
       "upstreamEmissionsExplanation": "Die Emissionen aus der Herstellung (Fahrzeug und Infrastruktur) werden geschätzt, indem die Distanz mit einem Koeffizienten von ADEME multipliziert wird.",
       "fuelEmissions": "EMISSIONEN AUS KRAFTSTOFFVERBRAUCH",
-      "fuelEmissionsExplanation": "Der verwendete Koeffizient entspricht einer Fahrt mit nur einer Person im Fahrzeug (bereitgestellt von ADEME). Er wird anschließend je nach Anzahl der Fahrgäste angepasst, indem pro zusätzlichem Fahrgast 4 % Emissionen hinzugefügt werden, um das zusätzliche Gewicht zu berücksichtigen.",
-      "total": "GESAMT"
+      "fuelEmissionsExplanation": "Der verwendete Koeffizient entspricht einer Fahrt mit nur einer Person im Fahrzeug (bereitgestellt von ADEME). Er wird anschließend je nach Anzahl der Fahrgäste angepasst, indem pro zusätzlichem Fahrgast 4 % Emissionen hinzugefügt werden, um das zusätzliche Gewicht zu berücksichtigen."
     },
     "ecar": {
       "generalEquation": "ALLGEMEINE GLEICHUNG",
@@ -260,8 +259,7 @@
       "electricityProductionEmissions": "EMISSIONEN AUS STROMVERBRAUCH",
       "electricityProductionExplanation1": "Der verwendete Koeffizient entspricht einer Fahrt mit nur einer Person im Fahrzeug (bereitgestellt von ADEME). Er wird anschließend je nach Anzahl der Fahrgäste angepasst, indem pro zusätzlichem Fahrgast 4 % Emissionen hinzugefügt werden, um das zusätzliche Gewicht zu berücksichtigen.",
       "electricityProductionExplanation2": "Der Emissionsfaktor jedes Landes hängt vom Energiemix und damit von der CO₂-Intensität des Stroms ab.",
-      "numericalApplications": "Numerische Anwendungen:",
-      "total": "GESAMT"
+      "numericalApplications": "Numerische Anwendungen:"
     },
     "equation": {
       "bicycle": "Fahrrad",
@@ -298,8 +296,7 @@
       "upstreamEmissions": "EMISSIONEN AUS DER HERSTELLUNG",
       "upstreamEmissionsExplanation": "Emissionen aus der Herstellung von Fahrzeug und Infrastruktur werden als null angenommen, da die Fahrt ohnehin stattgefunden hätte.",
       "fuelEmissions": "EMISSIONEN AUS KRAFTSTOFFVERBRAUCH",
-      "fuelEmissionsExplanation": "Es wird nur der marginale Anteil der Emissionen berücksichtigt, geschätzt auf 4 % der Standardemissionen.",
-      "total": "GESAMT"
+      "fuelEmissionsExplanation": "Es wird nur der marginale Anteil der Emissionen berücksichtigt, geschätzt auf 4 % der Standardemissionen."
     },
     "plane": {
       "generalEquation": "ALLGEMEINE GLEICHUNG",
@@ -311,8 +308,7 @@
       "CO2emissionsExplanations": "Die CO₂-Emissionen stammen aus der Verbrennung des Treibstoffs sowie aus dessen Produktion (Förderung, Raffination, Transport). Zusätzlich wird eine feste Menge für Warteschleifen vor der Landung hinzugefügt, geschätzt auf {{holding}} kg CO₂ pro Passagier laut ATMOSFAIR.",
       "nonCO2emissions": "NICHT-CO₂-EMISSIONEN (KONDENSSTREIFEN)",
       "nonCO2emissionsExplanations1": "In großer Höhe führt die Verbrennung von Kerosin zur Bildung von Wolken, den sogenannten Kondensstreifen. Zusammen mit NOx-Emissionen tragen diese Nicht-CO₂-Effekte ebenfalls zur globalen Erwärmung bei.",
-      "nonCO2emissionsExplanations2": "Sie werden aus den Verbrennungsemissionen geschätzt, indem ein Faktor von {{coeff_contrails}} angewendet wird.",
-      "total": "GESAMT"
+      "nonCO2emissionsExplanations2": "Sie werden aus den Verbrennungsemissionen geschätzt, indem ein Faktor von {{coeff_contrails}} angewendet wird."
     },
     "sail": {
       "generalEquation": "ALLGEMEINE GLEICHUNG",
@@ -323,6 +319,7 @@
       "cruiseEmissions": "EMISSIONEN DER ÜBERFAHRT",
       "cruiseEmissionsExplanations1": "Der verwendete Koeffizient wird von SailCoop bereitgestellt und berücksichtigt nur die Überfahrt (ohne den Lebenszyklus des Bootes)."
     },
+    "total": "GESAMT",
     "train": {
       "generalEquation": "ALLGEMEINE GLEICHUNG",
       "generalExplanations1": "Die gesamten CO₂eq-Emissionen entsprechen der Summe aus den Infrastrukturwirkungen und den Emissionen der Traktionsenergie in jedem durchquerten Land:",
@@ -333,8 +330,18 @@
       "tractionEnergyEmissions": "EMISSIONEN DER TRAKTIONSENERGIE NACH LAND",
       "tractionEnergyExplanation1": "Die Emissionen werden für jedes durchquerte Land berechnet, indem die zurückgelegte Distanz mit einem Emissionsfaktor multipliziert wird, der die CO₂-Intensität der Traktionsenergie widerspiegelt.",
       "tractionEnergyExplanation2": "Dieser Faktor hängt vom Elektrifizierungsgrad des Netzes und vom Energiemix des jeweiligen Landes ab.",
-      "numericalApplications": "Numerische Anwendungen:",
-      "total": "GESAMT"
+      "numericalApplications": "Numerische Anwendungen:"
+    },
+    "transportMeans": {
+      "train": "Zug",
+      "plane": "Flugzeug",
+      "bus": "Bus",
+      "car": "Auto",
+      "ecar": "Elektroauto",
+      "ferry": "Fähre",
+      "bicycle": "Fahrrad",
+      "sail": "Segelboot",
+      "hitchHiking": "Anhalter"
     }
   }
 }

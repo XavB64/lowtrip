@@ -18,7 +18,7 @@
 import { useMemo, useState } from "react";
 
 import { useTranslation } from "react-i18next";
-import { BiHelpCircle, BiInfoCircle } from "react-icons/bi";
+import { BiInfoCircle } from "react-icons/bi";
 import { FaShareAlt } from "react-icons/fa";
 import {
   Bar,
@@ -31,7 +31,6 @@ import {
 } from "recharts";
 
 import Button from "components/Button";
-import Tooltip from "components/Tooltip";
 import { generateUrlToShare } from "MainView/helpers/shareableLink";
 import type { Trip, SimulationResults } from "types";
 
@@ -144,24 +143,15 @@ const Chart = ({
       </div>
 
       <div className="chart-footer">
-        {simulationType === "mainTripVsOtherTransportMeans" ? (
-          <Button
-            className="chart-details-button"
-            onClick={() => {
-              setDetailsModalOpen(true);
-            }}
-            outline
-          >
-            {t("results.displayDetailsModal")}
-          </Button>
-        ) : (
-          <Tooltip content={t("results.explanation")}>
-            <div className="plane-explanation-tooltip">
-              {t("chart.help")}
-              <BiHelpCircle className="help-icon" />
-            </div>
-          </Tooltip>
-        )}
+        <Button
+          className="chart-details-button"
+          onClick={() => {
+            setDetailsModalOpen(true);
+          }}
+          outline
+        >
+          {t("results.displayDetailsModal")}
+        </Button>
       </div>
 
       <DetailsModal

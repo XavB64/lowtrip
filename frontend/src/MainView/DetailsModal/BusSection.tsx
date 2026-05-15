@@ -7,14 +7,141 @@ import i18n from "i18n";
 import { Transport, TripStep } from "types";
 import { round } from "utils";
 
-type BusSectionProps = {
-  tripStep: Extract<TripStep, { transport: Transport.bus }>;
+const CompactBusSection = ({ tripStep, index }: BusSectionProps) => {
+  const { t } = useTranslation("detailsModal");
+
+  return (
+    <>
+      <section className="details-section">
+        <div className="details-section-header">
+          <span className="details-section-step">{index + 1}</span>
+          <h3 className="details-section-title">
+            {tripStep.departure} - {tripStep.arrival} {t('by')} {t('transportMeans.bus')}
+          </h3>
+        </div>
+
+        <p>{t("bus.generalExplanations")}</p>
+
+        <div className="equation-box">
+          <div id={`step-${index}-equation1`} className="blue-text" />
+        </div>
+      </section>
+
+      <section className="details-section">
+        <div className="details-section-header">
+          <h3 className="details-section-title">
+            {t("numericalApplications")}
+          </h3>
+        </div>
+
+        <div className="equation-box">
+          <div id={`step-${index}-equation2`} />
+          <div id={`step-${index}-equation3`} />
+          <div id={`step-${index}-equation4`} />
+        </div>
+      </section>
+
+      <section className="details-section">
+        <div className="details-section-header">
+          <h3 className="details-section-title">{t("total")}</h3>
+        </div>
+
+        <div className="equation-box">
+          <div id={`step-${index}-equation5`} className="blue-text" />
+        </div>
+      </section>
+    </>
+  );
 };
 
-const BusSection = ({ tripStep }: BusSectionProps) => {
+const DetailedBusSection = ({ index }: BusSectionProps) => {
+  const { t } = useTranslation("detailsModal");
+  return (
+    <>
+      <section className="details-section">
+        <div className="details-section-header">
+          <span className="details-section-step">1</span>
+          <h3 className="details-section-title">{t("bus.generalEquation")}</h3>
+        </div>
+
+        <p>{t("bus.generalExplanations")}</p>
+
+        <div className="equation-box">
+          <div id={`step-${index}-equation1`} className="blue-text" />
+        </div>
+      </section>
+
+      <section className="details-section">
+        <div className="details-section-header">
+          <span className="details-section-step">2</span>
+          <h3 className="details-section-title">{t("bus.distance")}</h3>
+        </div>
+
+        <p>{t("bus.distanceExplanations")}</p>
+
+        <div className="equation-box">
+          <div id={`step-${index}-equation2`} />
+        </div>
+      </section>
+
+      <section className="details-section">
+        <div className="details-section-header">
+          <span className="details-section-step">3</span>
+          <h3 className="details-section-title">
+            {t("bus.upstreamEmissions")}
+          </h3>
+        </div>
+
+        <p>{t("bus.upstreamEmissionsExplanation")}</p>
+
+        <div className="equation-box">
+          <div id={`step-${index}-equation3`} />
+          <div id="equation3" />
+        </div>
+      </section>
+
+      <section className="details-section">
+        <div className="details-section-header">
+          <span className="details-section-step">4</span>
+          <h3 className="details-section-title">{t("bus.fuelEmissions")}</h3>
+        </div>
+
+        <p>{t("bus.fuelEmissionsExplanation")}</p>
+
+        <div className="equation-box">
+          <div id={`step-${index}-equation4`} />
+        </div>
+      </section>
+
+      <section className="details-section">
+        <div className="details-section-header">
+          <span className="details-section-step">5</span>
+          <h3 className="details-section-title">{t("total")}</h3>
+        </div>
+
+        <div className="equation-box">
+          <div id={`step-${index}-equation5`} className="blue-text" />
+        </div>
+      </section>
+    </>
+  );
+};
+
+type BusSectionProps = {
+  tripStep: Extract<TripStep, { transport: Transport.bus }>;
+  index: number;
+};
+
+const BusSection = ({
+  isDetailed,
+  ...props
+}: BusSectionProps & {
+  isDetailed: boolean;
+}) => {
   const { t } = useTranslation("detailsModal");
 
   useEffect(() => {
+    const { tripStep, index } = props;
     const equations = [
       {
         equation: `\\text{kgCO₂eq} = \\text{CO₂eq}_{\\text{${t("equation.construction")}}} + \\text{CO₂eq}_{\\text{\\text{${t("equation.fuel")}}}}`,
@@ -48,83 +175,22 @@ const BusSection = ({ tripStep }: BusSectionProps) => {
       },
     ];
 
-    equations.map(({ equation, center }, index) => {
-      const element = document.getElementById(`equation${index + 1}`);
+    equations.map(({ equation, center }, equationIndex) => {
+      const element = document.getElementById(
+        `step-${index}-equation${equationIndex + 1}`,
+      );
       if (element) {
         katex.render(equation, element, {
           displayMode: center,
         });
       }
     });
-  }, [i18n.language, tripStep]);
+  }, [i18n.language, props]);
 
-  return (
-    <>
-      <section className="details-section">
-        <div className="details-section-header">
-          <span className="details-section-step">1</span>
-          <h3 className="details-section-title">{t("bus.generalEquation")}</h3>
-        </div>
-
-        <p>{t("bus.generalExplanations")}</p>
-
-        <div className="equation-box">
-          <div id="equation1" className="blue-text" />
-        </div>
-      </section>
-
-      <section className="details-section">
-        <div className="details-section-header">
-          <span className="details-section-step">2</span>
-          <h3 className="details-section-title">{t("bus.distance")}</h3>
-        </div>
-
-        <p>{t("bus.distanceExplanations")}</p>
-
-        <div className="equation-box">
-          <div id="equation2" />
-        </div>
-      </section>
-
-      <section className="details-section">
-        <div className="details-section-header">
-          <span className="details-section-step">3</span>
-          <h3 className="details-section-title">
-            {t("bus.upstreamEmissions")}
-          </h3>
-        </div>
-
-        <p>{t("bus.upstreamEmissionsExplanation")}</p>
-
-        <div className="equation-box">
-          <div id="equation3" />
-        </div>
-      </section>
-
-      <section className="details-section">
-        <div className="details-section-header">
-          <span className="details-section-step">4</span>
-          <h3 className="details-section-title">{t("bus.fuelEmissions")}</h3>
-        </div>
-
-        <p>{t("bus.fuelEmissionsExplanation")}</p>
-
-        <div className="equation-box">
-          <div id="equation4" />
-        </div>
-      </section>
-
-      <section className="details-section">
-        <div className="details-section-header">
-          <span className="details-section-step">5</span>
-          <h3 className="details-section-title">{t("bus.total")}</h3>
-        </div>
-
-        <div className="equation-box">
-          <div id="equation5" className="blue-text" />
-        </div>
-      </section>
-    </>
+  return isDetailed ? (
+    <DetailedBusSection {...props} />
+  ) : (
+    <CompactBusSection {...props} />
   );
 };
 

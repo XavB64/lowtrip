@@ -238,9 +238,9 @@
       "upstreamEmissions": "EMISSIONI DI COSTRUZIONE",
       "upstreamEmissionsExplanation": "Le emissioni legate alla costruzione (autobus e infrastrutture) sono stimate moltiplicando la distanza per un coefficiente fornito da ADEME.",
       "fuelEmissions": "EMISSIONI DA CONSUMO DI CARBURANTE",
-      "fuelEmissionsExplanation": "Le emissioni legate al consumo di carburante sono calcolate moltiplicando la distanza per un coefficiente fornito da ADEME.",
-      "total": "TOTALE"
+      "fuelEmissionsExplanation": "Le emissioni legate al consumo di carburante sono calcolate moltiplicando la distanza per un coefficiente fornito da ADEME."
     },
+    "by": "da",
     "car": {
       "generalEquation": "EQUAZIONE GENERALE",
       "generalExplanations": "Le emissioni totali di CO₂eq sono calcolate sommando le emissioni legate alla costruzione (veicolo e infrastrutture) e quelle legate al consumo di carburante. Successivamente, vengono ripartite tra i passeggeri.",
@@ -249,8 +249,7 @@
       "upstreamEmissions": "EMISSIONI DI COSTRUZIONE",
       "upstreamEmissionsExplanation": "Le emissioni legate alla costruzione (veicolo e infrastrutture) sono stimate moltiplicando la distanza per un coefficiente fornito da ADEME.",
       "fuelEmissions": "EMISSIONI DA CONSUMO DI CARBURANTE",
-      "fuelEmissionsExplanation": "Il coefficiente utilizzato corrisponde a un viaggio con una sola persona nel veicolo (fornito da ADEME). Viene poi adattato in base al numero di passeggeri, aggiungendo un 4% di emissioni per ogni passeggero aggiuntivo per tenere conto del peso extra.",
-      "total": "TOTALE"
+      "fuelEmissionsExplanation": "Il coefficiente utilizzato corrisponde a un viaggio con una sola persona nel veicolo (fornito da ADEME). Viene poi adattato in base al numero di passeggeri, aggiungendo un 4% di emissioni per ogni passeggero aggiuntivo per tenere conto del peso extra."
     },
     "ecar": {
       "generalEquation": "EQUAZIONE GENERALE",
@@ -260,8 +259,7 @@
       "electricityProductionEmissions": "EMISSIONI DA CONSUMO DI ELETTRICITÀ",
       "electricityProductionExplanation1": "Il coefficiente utilizzato corrisponde a un viaggio con una sola persona nel veicolo (fornito da ADEME). Viene poi adattato in base al numero di passeggeri, aggiungendo un 4% di emissioni per ogni passeggero aggiuntivo per tenere conto del peso extra.",
       "electricityProductionExplanation2": "Il fattore di emissione di ciascun paese dipende dal suo mix energetico e quindi dall’intensità di carbonio della sua elettricità.",
-      "numericalApplications": "Applicazioni numeriche:",
-      "total": "TOTALE"
+      "numericalApplications": "Applicazioni numeriche:"
     },
     "equation": {
       "bicycle": "bicicletta",
@@ -298,8 +296,7 @@
       "upstreamEmissions": "EMISSIONI DI COSTRUZIONE",
       "upstreamEmissionsExplanation": "Le emissioni legate alla costruzione del veicolo e delle infrastrutture sono considerate nulle, poiché il viaggio sarebbe comunque avvenuto.",
       "fuelEmissions": "EMISSIONI DA CONSUMO DI CARBURANTE",
-      "fuelEmissionsExplanation": "Si considera solo la quota marginale delle emissioni, stimata pari al 4% delle emissioni standard.",
-      "total": "TOTALE"
+      "fuelEmissionsExplanation": "Si considera solo la quota marginale delle emissioni, stimata pari al 4% delle emissioni standard."
     },
     "plane": {
       "generalEquation": "EQUAZIONE GENERALE",
@@ -311,8 +308,7 @@
       "CO2emissionsExplanations": "Le emissioni di CO₂ derivano dalla combustione del carburante e dalla sua produzione (estrazione, raffinazione, trasporto). Viene aggiunta una quantità fissa per le fasi di attesa prima dell’atterraggio, stimata in {{holding}} kg di CO₂ per passeggero secondo ATMOSFAIR.",
       "nonCO2emissions": "EMISSIONI NON CO₂ (SCIE)",
       "nonCO2emissionsExplanations1": "Ad alta quota, la combustione del cherosene provoca la formazione di nubi chiamate scie di condensazione. Insieme alle emissioni di NOx, questi effetti non legati al CO₂ contribuiscono al riscaldamento globale.",
-      "nonCO2emissionsExplanations2": "Sono stimati a partire dalle emissioni di combustione applicando un fattore di {{coeff_contrails}}.",
-      "total": "TOTALE"
+      "nonCO2emissionsExplanations2": "Sono stimati a partire dalle emissioni di combustione applicando un fattore di {{coeff_contrails}}."
     },
     "sail": {
       "generalEquation": "EQUAZIONE GENERALE",
@@ -323,6 +319,7 @@
       "cruiseEmissions": "EMISSIONI DELLA TRAVERSATA",
       "cruiseEmissionsExplanations1": "Il coefficiente utilizzato è fornito da SailCoop e tiene conto solo della traversata (escludendo il ciclo di vita dell’imbarcazione)."
     },
+    "total": "TOTALE",
     "train": {
       "generalEquation": "EQUAZIONE GENERALE",
       "generalExplanations1": "Le emissioni totali di CO₂eq corrispondono alla somma dell’impatto delle infrastrutture e delle emissioni legate all’energia di trazione in ciascun paese attraversato:",
@@ -333,8 +330,18 @@
       "tractionEnergyEmissions": "EMISSIONI DELL’ENERGIA DI TRAZIONE PER PAESE",
       "tractionEnergyExplanation1": "Le emissioni sono calcolate per ciascun paese attraversato moltiplicando la distanza percorsa per un fattore che riflette l’intensità di carbonio dell’energia di trazione.",
       "tractionEnergyExplanation2": "Questo fattore dipende dal livello di elettrificazione della rete e dal mix energetico del paese.",
-      "numericalApplications": "Applicazioni numeriche:",
-      "total": "TOTALE"
+      "numericalApplications": "Applicazioni numeriche:"
+    },
+    "transportMeans": {
+      "train": "treno",
+      "plane": "aereo",
+      "bus": "autobus",
+      "car": "auto",
+      "ecar": "auto elettrica",
+      "ferry": "traghetto",
+      "bicycle": "bicicletta",
+      "sail": "barca a vela",
+       "hitchHiking": "autostop"
     }
   }
 }

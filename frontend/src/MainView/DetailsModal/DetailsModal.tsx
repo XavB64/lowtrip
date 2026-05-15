@@ -37,40 +37,49 @@ const DetailsModal = ({ trips, onClose, isOpen }: DetailsModalProps) => {
       headerTitle=""
       className="details-modal"
     >
-      <nav className="tabs">
-        {trips.map((trip) => (
-          <Button
-            key={trip.label}
-            className={`tab ${trip.label === displayedTrip.label ? "active" : ""}`}
-            onClick={() => setDisplayedTrip(trip)}
-          >
-            {trip.label}
-          </Button>
-        ))}
-      </nav>
+      {trips.length > 1 && (
+        <nav className="tabs">
+          {trips.map((trip) => (
+            <Button
+              key={trip.label}
+              className={`tab ${trip.label === displayedTrip.label ? "active" : ""}`}
+              onClick={() => setDisplayedTrip(trip)}
+            >
+              {trip.label}
+            </Button>
+          ))}
+        </nav>
+      )}
 
       <div className="tranport-sections">
         {displayedTrip.steps.map((step, index) => {
+          const props = {
+            index,
+            isDetailed: displayedTrip.steps.length === 1,
+          };
+
           if (step.transport === Transport.train)
-            return <TrainSection key={index} tripStep={step} />;
+            return <TrainSection key={index} tripStep={step} {...props} />;
           if (step.transport === Transport.plane)
-            return <PlaneSection key={index} tripStep={step} />;
+            return <PlaneSection key={index} tripStep={step} {...props} />;
           if (step.transport === Transport.car)
             return step.is_hitch_hike ? (
-              <AutoStopSection key={index} tripStep={step} />
+              <AutoStopSection key={index} tripStep={step} {...props} />
             ) : (
-              <CarSection key={index} tripStep={step} />
+              <CarSection key={index} tripStep={step} {...props} />
             );
           if (step.transport === Transport.ecar)
-            return <ElectricCarSection key={index} tripStep={step} />;
+            return (
+              <ElectricCarSection key={index} tripStep={step} {...props} />
+            );
           if (step.transport === Transport.bus)
-            return <BusSection key={index} tripStep={step} />;
+            return <BusSection key={index} tripStep={step} {...props} />;
           if (step.transport === Transport.bicycle)
-            return <BicycleSection key={index} tripStep={step} />;
+            return <BicycleSection key={index} tripStep={step} {...props} />;
           if (step.transport === Transport.ferry)
-            return <FerrySection key={index} tripStep={step} />;
+            return <FerrySection key={index} tripStep={step} {...props} />;
           if (step.transport === Transport.sail)
-            return <SailSection key={index} tripStep={step} />;
+            return <SailSection key={index} tripStep={step} {...props} />;
         })}
       </div>
     </Modal>

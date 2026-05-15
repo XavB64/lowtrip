@@ -267,9 +267,9 @@
       "upstreamEmissions": "CONSTRUCTION-RELATED EMISSIONS",
       "upstreamEmissionsExplanation": "Emissions related to construction (bus and infrastructure) are estimated by multiplying the distance by a coefficient from ADEME.",
       "fuelEmissions": "FUEL CONSUMPTION EMISSIONS",
-      "fuelEmissionsExplanation": "Emissions related to fuel consumption are calculated by multiplying the distance by a coefficient from ADEME.",
-      "total": "TOTAL"
+      "fuelEmissionsExplanation": "Emissions related to fuel consumption are calculated by multiplying the distance by a coefficient from ADEME."
     },
+    "by": "by",
     "car": {
       "generalEquation": "GENERAL EQUATION",
       "generalExplanations": "Total CO₂eq emissions are calculated by adding emissions related to construction (vehicle and infrastructure) and those related to fuel consumption. They are then shared between passengers.",
@@ -278,8 +278,7 @@
       "upstreamEmissions": "CONSTRUCTION-RELATED EMISSIONS",
       "upstreamEmissionsExplanation": "Emissions related to construction (vehicle and infrastructure) are estimated by multiplying the distance by a coefficient from ADEME.",
       "fuelEmissions": "FUEL CONSUMPTION EMISSIONS",
-      "fuelEmissionsExplanation": "The coefficient used corresponds to a trip with a single passenger in the vehicle (provided by ADEME). It is then adjusted based on the number of passengers by adding 4% emissions per additional passenger to account for extra weight.",
-      "total": "TOTAL"
+      "fuelEmissionsExplanation": "The coefficient used for fuel corresponds to a trip with a single passenger in the vehicle (provided by ADEME). It is then adjusted based on the number of passengers by adding 4% emissions per additional passenger to account for extra weight."
     },
     "ecar": {
       "generalEquation": "GENERAL EQUATION",
@@ -289,8 +288,7 @@
       "electricityProductionEmissions": "ELECTRICITY CONSUMPTION EMISSIONS",
       "electricityProductionExplanation1": "The coefficient used corresponds to a trip with a single passenger in the vehicle (provided by ADEME). It is then adjusted based on the number of passengers by adding 4% emissions per additional passenger to account for extra weight.",
       "electricityProductionExplanation2": "The emission factor depends on each country’s energy mix, and therefore on the carbon intensity of its electricity.",
-      "numericalApplications": "Numerical applications:",
-      "total": "TOTAL"
+      "numericalApplications": "Numerical applications:"
     },
     "equation": {
       "bicycle": "bicycle",
@@ -327,8 +325,7 @@
       "upstreamEmissions": "CONSTRUCTION-RELATED EMISSIONS",
       "upstreamEmissionsExplanation": "Emissions related to vehicle and infrastructure construction are considered zero, as the trip would have taken place anyway.",
       "fuelEmissions": "FUEL CONSUMPTION EMISSIONS",
-      "fuelEmissionsExplanation": "Only the marginal share of emissions is considered, estimated at 4% of standard emissions.",
-      "total": "TOTAL"
+      "fuelEmissionsExplanation": "Only the marginal share of emissions is considered, estimated at 4% of standard emissions."
     },
     "plane": {
       "generalEquation": "GENERAL EQUATION",
@@ -340,8 +337,7 @@
       "CO2emissionsExplanations": "CO₂ emissions come from fuel combustion and its production (extraction, refining, transport). A fixed amount is added for holding patterns before landing, estimated at {{holding}} kg of CO₂ per passenger according to ATMOSFAIR.",
       "nonCO2emissions": "NON-CO₂ EMISSIONS (CONTRAILS)",
       "nonCO2emissionsExplanations1": "At high altitude, fuel combustion leads to the formation of clouds known as contrails. Combined with NOx emissions, these non-CO₂ effects also contribute to global warming.",
-      "nonCO2emissionsExplanations2": "They are estimated from combustion emissions by applying a factor of {{coeff_contrails}}.",
-      "total": "TOTAL"
+      "nonCO2emissionsExplanations2": "They are estimated from combustion emissions by applying a factor of {{coeff_contrails}}."
     },
     "sail": {
       "generalEquation": "GENERAL EQUATION",
@@ -352,6 +348,7 @@
       "cruiseEmissions": "CROSSING EMISSIONS",
       "cruiseEmissionsExplanations1": "The coefficient used is provided by SailCoop and only accounts for the crossing itself (excluding the vessel’s lifecycle)."
     },
+    "total": "TOTAL",
     "train": {
       "generalEquation": "GENERAL EQUATION",
       "generalExplanations1": "Total CO₂eq emissions correspond to the sum of infrastructure impacts and emissions related to traction energy in each country crossed:",
@@ -362,8 +359,18 @@
       "tractionEnergyEmissions": "TRACTION ENERGY EMISSIONS BY COUNTRY",
       "tractionEnergyExplanation1": "Emissions are calculated for each country crossed by multiplying the distance traveled by an emission factor reflecting the carbon intensity of traction energy.",
       "tractionEnergyExplanation2": "This factor depends on the electrification rate of the network and the country’s energy mix.",
-      "numericalApplications": "Numerical applications:",
-      "total": "TOTAL"
+      "numericalApplications": "Numerical applications:"
+    },
+    "transportMeans": {
+      "train": "train",
+      "plane": "plane",
+      "bus": "bus",
+      "car": "car",
+      "ecar": "electric car",
+      "ferry": "ferry",
+      "bicycle": "bicycle",
+      "sail": "sailboat",
+       "hitchHiking": "hitchhiking"
     }
   }
 }

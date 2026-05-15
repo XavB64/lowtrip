@@ -7,67 +7,70 @@ import i18n from "i18n";
 import { Transport, TripStep } from "types";
 import { round } from "utils";
 
-type TrainSectionProps = {
-  tripStep: Extract<TripStep, { transport: Transport.train }>;
-};
-
-const TrainSection = ({ tripStep }: TrainSectionProps) => {
+const SummarizedTrainSection = ({ tripStep, index }: TrainSectionProps) => {
   const { t } = useTranslation("detailsModal");
 
-  useEffect(() => {
-    const emissionsParts = tripStep.emissionParts;
+  return (
+    <>
+      <section className="details-section">
+        <div className="details-section-header">
+          <span className="details-section-step">{index + 1}</span>
+          <h3 className="details-section-title">
+            {tripStep.departure} - {tripStep.arrival} {t("by")}{" "}
+            {t("transportMeans.train")}
+          </h3>
+        </div>
 
-    const equations = [
-      {
-        equation: `\\text{CO₂eq} = \\text{coeff}_{\\text{${t("equation.infrastructure")}}} \\times \\text{${t("equation.distance")}}_{\\text{${t("equation.total")}}} + \\sum_{\\text{${t("equation.country")}}} \\text{coeff}_{\\text{${t("equation.country")}}} \\times \\text{${t("equation.distance")}}_{\\text{${t("equation.country")}}}`,
-        center: true,
-      },
-      {
-        equation: `
-          \\begin{aligned}
-          \\text{CO₂eq}_{\\text{${t("equation.infrastructure")}}} &= \\text{coeff}_{\\text{${t("equation.infrastructure")}}} \\times \\text{${t("equation.distance")}}_{\\text{${t("equation.total")}}} \\\\
-                  &= ${tripStep.coeff_upstream} \\times ${tripStep.distance}\\; \\text{km} \\\\
-                  &= ${round(tripStep.coeff_upstream * tripStep.distance)}\\; \\text{kgCO₂eq}
-          \\end{aligned}
-        `,
-        center: true,
-      },
-      {
-        equation: `\\text{CO₂eq}_{\\text{${t("equation.country")}}} = \\text{coeff}_{\\text{${t("equation.country")}}} \\times \\text{${t("equation.distance")}}_{\\text{${t("equation.country")}}}`,
-        center: true,
-      },
-    ];
+        <p>{t("train.generalExplanations1")}</p>
 
-    emissionsParts.forEach((emissionPart) => {
-      if (emissionPart.emissionSource !== "infra") {
-        const {
-          emissionSource: country,
-          coefficient,
-          distance,
-          emissions,
-        } = emissionPart;
-        equations.push({
-          equation: `\\text{CO₂eq}_{\\text{${country}}} = ${coefficient} \\times ${distance}\\; \\text{km} = ${emissions}\\; \\text{kgCO₂eq}`,
-          center: false,
-        });
-      }
-    });
+        <div className="equation-box">
+          <div id={`step-${index}-equation1`} className="blue-text" />
+        </div>
 
-    equations.push({
-      equation: `\\text{CO₂eq} = \\text{CO₂eq}_{\\text{${t("equation.infrastructure")}}} + \\sum_{\\text{${t("equation.country")}}} \\text{CO₂eq}_{\\text{${t("equation.country")}}} = ${tripStep.emissions}\\; \\text{kgCO₂eq}`,
-      center: true,
-    });
+        <p>{t("train.generalExplanations2")}</p>
+        <br />
+        <p>{t("train.generalExplanations3")}</p>
+      </section>
 
-    // render equations
-    equations.map(({ equation, center }, index) => {
-      const element = document.getElementById(`equation${index + 1}`);
-      if (element) {
-        katex.render(equation, element, {
-          displayMode: center,
-        });
-      }
-    });
-  }, [i18n.language, tripStep]);
+      <section className="details-section">
+        <div className="details-section-header">
+          <h3 className="details-section-title">
+            {t("train.numericalApplications")}
+          </h3>
+        </div>
+
+        <div className="equation-box">
+          <div id={`step-${index}-equation2`} />
+          {tripStep.emissionParts
+            .filter(({ emissionSource }) => emissionSource !== "infra")
+            .map((emissionPart, partIndex) => (
+              <div
+                id={`step-${index}-equation${3 + partIndex}`}
+                key={emissionPart.emissionSource}
+                className="equation-by-country"
+              />
+            ))}
+        </div>
+      </section>
+
+      <section className="details-section">
+        <div className="details-section-header">
+          <h3 className="details-section-title">{t("total")}</h3>
+        </div>
+
+        <div className="equation-box">
+          <div
+            id={`step-${index}-equation${3 + tripStep.emissionParts.length - 1}`}
+            className="blue-text"
+          />
+        </div>
+      </section>
+    </>
+  );
+};
+
+const DetailedTrainSection = ({ tripStep }: TrainSectionProps) => {
+  const { t } = useTranslation("detailsModal");
 
   return (
     <>
@@ -139,7 +142,7 @@ const TrainSection = ({ tripStep }: TrainSectionProps) => {
       <section className="details-section">
         <div className="details-section-header">
           <span className="details-section-step">4</span>
-          <h3 className="details-section-title">{t("train.total")}</h3>
+          <h3 className="details-section-title">{t("total")}</h3>
         </div>
 
         <div className="equation-box">
@@ -153,4 +156,84 @@ const TrainSection = ({ tripStep }: TrainSectionProps) => {
   );
 };
 
+type TrainSectionProps = {
+  tripStep: Extract<TripStep, { transport: Transport.train }>;
+  index: number;
+};
+
+const TrainSection = ({
+  isDetailed,
+  ...props
+}: TrainSectionProps & {
+  isDetailed: boolean;
+}) => {
+  const { t } = useTranslation("detailsModal");
+
+  useEffect(() => {
+    const { tripStep, index } = props;
+    const emissionsParts = tripStep.emissionParts;
+
+    const equations = [
+      {
+        equation: `\\text{CO₂eq} = \\text{coeff}_{\\text{${t("equation.infrastructure")}}} \\times \\text{${t("equation.distance")}}_{\\text{${t("equation.total")}}} + \\sum_{\\text{${t("equation.country")}}} \\text{coeff}_{\\text{${t("equation.country")}}} \\times \\text{${t("equation.distance")}}_{\\text{${t("equation.country")}}}`,
+        center: true,
+      },
+      {
+        equation: `
+          \\begin{aligned}
+          \\text{CO₂eq}_{\\text{${t("equation.infrastructure")}}} &= \\text{coeff}_{\\text{${t("equation.infrastructure")}}} \\times \\text{${t("equation.distance")}}_{\\text{${t("equation.total")}}} \\\\
+                  &= ${tripStep.coeff_upstream} \\times ${tripStep.distance}\\; \\text{km} \\\\
+                  &= ${round(tripStep.coeff_upstream * tripStep.distance)}\\; \\text{kgCO₂eq}
+          \\end{aligned}
+        `,
+        center: true,
+      },
+    ];
+
+    if (isDetailed) {
+      equations.push({
+        equation: `\\text{CO₂eq}_{\\text{${t("equation.country")}}} = \\text{coeff}_{\\text{${t("equation.country")}}} \\times \\text{${t("equation.distance")}}_{\\text{${t("equation.country")}}}`,
+        center: true,
+      });
+    }
+
+    emissionsParts.forEach((emissionPart) => {
+      if (emissionPart.emissionSource !== "infra") {
+        const {
+          emissionSource: country,
+          coefficient,
+          distance,
+          emissions,
+        } = emissionPart;
+        equations.push({
+          equation: `\\text{CO₂eq}_{\\text{${country}}} = ${coefficient} \\times ${distance}\\; \\text{km} = ${emissions}\\; \\text{kgCO₂eq}`,
+          center: false,
+        });
+      }
+    });
+
+    equations.push({
+      equation: `\\text{CO₂eq} = \\text{CO₂eq}_{\\text{${t("equation.infrastructure")}}} + \\sum_{\\text{${t("equation.country")}}} \\text{CO₂eq}_{\\text{${t("equation.country")}}} = ${tripStep.emissions}\\; \\text{kgCO₂eq}`,
+      center: true,
+    });
+
+    // render equations
+    equations.map(({ equation, center }, equationIndex) => {
+      const element = document.getElementById(
+        `step-${index}-equation${equationIndex + 1}`,
+      );
+      if (element) {
+        katex.render(equation, element, {
+          displayMode: center,
+        });
+      }
+    });
+  }, [i18n.language, props]);
+
+  return isDetailed ? (
+    <DetailedTrainSection {...props} />
+  ) : (
+    <SummarizedTrainSection {...props} />
+  );
+};
 export default TrainSection;

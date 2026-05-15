@@ -267,9 +267,9 @@
       "upstreamEmissions": "ÉMISSIONS LIÉES À LA CONSTRUCTION",
       "upstreamEmissionsExplanation": "Les émissions liées à la construction (bus et infrastructures) sont estimées en multipliant la distance par un coefficient issu de l’ADEME.",
       "fuelEmissions": "ÉMISSIONS LIÉES À LA CONSOMMATION DE CARBURANT",
-      "fuelEmissionsExplanation": "Les émissions liées à la consommation de carburant sont calculées en multipliant la distance par un coefficient issu de l’ADEME.",
-      "total": "TOTAL"
+      "fuelEmissionsExplanation": "Les émissions liées à la consommation de carburant sont calculées en multipliant la distance par un coefficient issu de l’ADEME."
     },
+    "by": "en",
     "car": {
       "generalEquation": "ÉQUATION GÉNÉRALE",
       "generalExplanations": "Les émissions totales de CO₂eq sont calculées en additionnant les émissions liées à la construction (véhicule et infrastructures) et celles liées à la consommation de carburant. Elles sont ensuite réparties entre les passagers.",
@@ -278,8 +278,7 @@
       "upstreamEmissions": "ÉMISSIONS LIÉES À LA CONSTRUCTION",
       "upstreamEmissionsExplanation": "Les émissions liées à la construction (véhicule et infrastructures) sont estimées en multipliant la distance par un coefficient issu de l’ADEME.",
       "fuelEmissions": "ÉMISSIONS LIÉES À LA CONSOMMATION DE CARBURANT",
-      "fuelEmissionsExplanation": "Le coefficient utilisé correspond à un trajet avec une seule personne dans le véhicule (fourni par l’ADEME). Il est ensuite ajusté en fonction du nombre de passagers, en ajoutant 4 % d’émissions par passager supplémentaire afin de prendre en compte le poids additionnel.",
-      "total": "TOTAL"
+      "fuelEmissionsExplanation": "Le coefficient utilisé pour la consommation de carburant correspond à un trajet avec une seule personne dans le véhicule (fourni par l’ADEME). Il est ensuite ajusté en fonction du nombre de passagers, en ajoutant 4 % d’émissions par passager supplémentaire afin de prendre en compte le poids additionnel."
     },
     "ecar": {
       "generalEquation": "ÉQUATION GÉNÉRALE",
@@ -289,8 +288,7 @@
       "electricityProductionEmissions": "ÉMISSIONS LIÉES À LA CONSOMMATION D'ÉLECTRICITÉ",
       "electricityProductionExplanation1": "Le coefficient utilisé pour la consommation de carburant correspond à un trajet avec une seule personne dans le véhicule (fourni par l’ADEME). Il est ensuite ajusté en fonction du nombre de passagers, en ajoutant 4 % d’émissions par passager supplémentaire afin de prendre en compte le poids additionnel.",
       "electricityProductionExplanation2": "Le facteur d’émission chaque pays dépend de son mix énergétique, et donc de l’intensité carbone de son électricité.",
-      "numericalApplications": "Applications numériques :",
-      "total": "TOTAL"
+      "numericalApplications": "Applications numériques :"
     },
     "equation": {
       "bicycle": "vélo",
@@ -327,9 +325,9 @@
       "upstreamEmissions": "ÉMISSIONS LIÉES À LA CONSTRUCTION",
       "upstreamEmissionsExplanation": "Les émissions liées à la construction du véhicule et des infrastructures sont considérées comme nulles, le trajet ayant lieu dans tous les cas.",
       "fuelEmissions": "ÉMISSIONS LIÉES À LA CONSOMMATION DE CARBURANT",
-      "fuelEmissionsExplanation": "Seule la part marginale des émissions est prise en compte, estimée à 4 % des émissions standards.",
-      "total": "TOTAL"
+      "fuelEmissionsExplanation": "Seule la part marginale des émissions est prise en compte, estimée à 4 % des émissions standards."
     },
+    "numericalApplications": "Applications numériques :",
     "plane": {
       "generalEquation": "ÉQUATION GÉNÉRALE",
       "generalExplanations1": "Les émissions totales de CO₂eq sont calculées en additionnant les émissions de CO₂ (liées à la combustion du carburant) et les effets non-CO₂ (comme les traînées de condensation) :",
@@ -340,8 +338,7 @@
       "CO2emissionsExplanations": "Les émissions de CO₂ proviennent de la combustion du carburant et de sa production (extraction, raffinage, transport). Une quantité fixe est ajoutée pour les phases d’attente en vol avant l’atterrissage, estimée à {{holding}} kg de CO₂ par passager selon ATMOSFAIR.",
       "nonCO2emissions": "ÉMISSIONS NON-CO₂ (TRAÎNÉES)",
       "nonCO2emissionsExplanations1": "La combustion du kérosène à haute altitude entraîne la formation de nuages appelés traînées de condensation. Combinées aux émissions de NOx, ces effets non liés au CO₂ contribuent également au réchauffement climatique.",
-      "nonCO2emissionsExplanations2": "Ils sont estimés à partir des émissions de combustion, en appliquant un facteur {{coeff_contrails}}.",
-      "total": "TOTAL"
+      "nonCO2emissionsExplanations2": "Ils sont estimés à partir des émissions de combustion, en appliquant un facteur {{coeff_contrails}}."
     },
     "sail": {
       "generalEquation": "ÉQUATION GÉNÉRALE",
@@ -352,6 +349,7 @@
       "cruiseEmissions": "ÉMISSIONS DE LA TRAVERSÉE",
       "cruiseEmissionsExplanations1": "Le coefficient utilisé est fourni par SailCoop et ne prend en compte que la traversée (hors cycle de vie du bateau)."
     },
+    "total": "TOTAL",
     "train": {
       "generalEquation": "ÉQUATION GÉNÉRALE",
       "generalExplanations1": "Les émissions totales de CO₂eq correspondent à la somme de l’impact des infrastructures et des émissions liées à l’énergie de traction dans chaque pays traversé :",
@@ -362,8 +360,18 @@
       "tractionEnergyEmissions": "ÉMISSIONS LIÉES À L’ÉNERGIE DE TRACTION PAR PAYS",
       "tractionEnergyExplanation1": "Les émissions sont calculées pour chaque pays traversé en multipliant la distance parcourue par un facteur d’émission reflétant l’intensité carbone de l’énergie de traction.",
       "tractionEnergyExplanation2": "Ce facteur dépend du taux d’électrification du réseau et du mix énergétique du pays.",
-      "numericalApplications": "Applications numériques :",
-      "total": "TOTAL"
+      "numericalApplications": "Applications numériques :"
+    },
+    "transportMeans": {
+      "train": "train",
+      "plane": "avion",
+      "bus": "bus",
+      "car": "voiture",
+      "ecar": "voiture électrique",
+      "ferry": "ferry",
+      "bicycle": "vélo",
+      "sail": "voilier",
+      "hitchHiking": "auto-stop"
     }
   }
 }

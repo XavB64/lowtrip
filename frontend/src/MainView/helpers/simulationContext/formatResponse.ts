@@ -25,7 +25,12 @@ export const formatResponse = (
     const formattedSteps: TripStep[] = [];
     let totalEmissions = 0;
 
-    trip.steps.forEach((step) => {
+    const inputSteps =
+      trip.name !== "SECOND_TRIP"
+        ? inputs.mainSteps
+        : (inputs.altSteps as Step[]);
+
+    trip.steps.forEach((step, index) => {
       const { emissions, path_length, ...rest } = step;
 
       const emissionParts: TripStep["emissionParts"] = [];
@@ -46,6 +51,8 @@ export const formatResponse = (
         emissions: round(stepEmissions),
         emissionParts,
         distance: path_length,
+        departure: inputSteps[index].locationName!,
+        arrival: inputSteps[index + 1].locationName!,
         ...rest,
       });
     });
