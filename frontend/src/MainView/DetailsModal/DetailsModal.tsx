@@ -6,9 +6,10 @@ import { Transport, Trip } from "types";
 
 import BicycleSection from "./BicycleSection";
 import BusSection from "./BusSection";
-import CarSection, { AutoStopSection } from "./CarSection";
+import CarSection from "./CarSection";
 import ElectricCarSection from "./ElectricCarSection";
 import FerrySection from "./FerrySection";
+import HitchHikingSection from "./HitchHikingSection";
 import PlaneSection from "./PlaneSection";
 import SailSection from "./SailSection";
 import TrainSection from "./TrainSection";
@@ -56,7 +57,7 @@ const DetailsModal = ({ trips, onClose, isOpen }: DetailsModalProps) => {
             return <PlaneSection key={index} tripStep={step} />;
           if (step.transport === Transport.car)
             return step.is_hitch_hike ? (
-              <AutoStopSection key={index} tripStep={step} />
+              <HitchHikingSection key={index} tripStep={step} />
             ) : (
               <CarSection key={index} tripStep={step} />
             );
