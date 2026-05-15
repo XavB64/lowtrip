@@ -4,9 +4,10 @@ import Button from "components/Button";
 import Modal from "components/Modal";
 import { Transport, Trip } from "types";
 
+import AutoStopSection from "./AutoStopSection";
 import BicycleSection from "./BicycleSection";
 import BusSection from "./BusSection";
-import CarSection, { AutoStopSection } from "./CarSection";
+import CarSection from "./CarSection";
 import ElectricCarSection from "./ElectricCarSection";
 import FerrySection from "./FerrySection";
 import PlaneSection from "./PlaneSection";

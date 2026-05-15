@@ -4,46 +4,41 @@ import katex from "katex";
 import { useTranslation } from "react-i18next";
 
 import i18n from "i18n";
-import { Transport, TripStep } from "types";
+import { TripStep, Transport } from "types";
 import { round } from "utils";
 
-type CarSectionProps = {
+type AutoStopSectionProps = {
   tripStep: Extract<TripStep, { transport: Transport.car }>;
 };
 
-const CarSection = ({ tripStep }: CarSectionProps) => {
+const AutoStopSection = ({ tripStep }: AutoStopSectionProps) => {
   const { t } = useTranslation("detailsModal");
 
   useEffect(() => {
     const equations = [
       {
-        equation: `\\text{CO₂eq} = \\frac{\\text{CO₂eq}_{\\text{${t("equation.construction")}}} + \\text{CO₂eq}_{\\text{${t("equation.fuel")}}}}{\\text{nb}_{\\text{${t("equation.passengers")}}}}`,
+        equation: `CO₂eq = \\text{CO₂eq}_{\\text{${t("equation.construction")}}} + \\text{CO₂eq}_{\\text{${t("equation.fuel")}}}`,
         center: true,
       },
       {
-        equation: `\\text{${t("equation.distance")}} = ${tripStep.distance}\\; \\text{km}`,
+        equation: `distance = ${tripStep.emissionParts[0].distance}\\; \\text{km}`,
         center: true,
       },
       {
-        equation: `
-          \\begin{aligned}
-          \\text{CO₂eq}_{\\text{${t("equation.construction")}}} &= \\text{coeff}_{\\text{${t("equation.construction")}}} \\times \\text{${t("equation.distance")}} \\\\
-                        &= ${tripStep.coeff_upstream} \\times ${tripStep.distance}\\; \\text{km} \\\\ 
-                        &= ${round(tripStep.coeff_upstream * tripStep.distance)}\\; \\text{kgCO₂eq}
-          \\end{aligned}`,
+        equation: `\\text{CO₂eq}_{\\text{${t("equation.construction")}}} = 0\\; \\text{kgCO₂eq}`,
         center: true,
       },
       {
         equation: `
           \\begin{aligned}
-          \\text{CO₂eq}_{\\text{${t("equation.fuel")}}} &= \\text{coeff}_{\\text{${t("equation.fuel")}}} \\times \\left(1 + 0.04 \\times (\\text{nb}_{\\text{${t("equation.passengers")}}} - 1)\\right) \\times ${t("equation.distance")} \\\\
-                    &=${tripStep.coeff_fuel} \\times (1 + 0.04 \\times (${tripStep.passengers_nb} - 1)) \\times ${tripStep.distance}\\; \\text{km} \\\\
-                    &= ${round(tripStep.coeff_fuel * tripStep.distance * (1 + 0.04 * (tripStep.passengers_nb - 1)))}\\; \\text{kgCO₂eq}
+          \\text{CO₂eq}_{\\text{${t("equation.fuel")}}} &= \\text{coeff}_{\\text{${t("equation.fuel")}}} \\times0.04 \\times ${t("equation.distance")} \\\\
+                    &=${tripStep.coeff_fuel} \\times 0.04 \\times ${tripStep.distance}\\; \\text{km} \\\\
+                    &= ${round(tripStep.coeff_fuel * tripStep.distance * 0.04)}\\; \\text{kgCO₂eq}
           \\end{aligned}`,
         center: true,
       },
       {
-        equation: `\\text{CO₂eq} = \\frac{\\text{CO₂eq}_{\\text{${t("equation.construction")}}} + \\text{CO₂eq}_{\\text{${t("equation.fuel")}}}}{\\text{nb}_{\\text{${t("equation.passengers")}}}} = ${tripStep.emissions}\\; \\text{kgCO₂eq}`,
+        equation: `CO₂eq = \\text{CO₂eq}_{\\text{${t("equation.construction")}}} + \\text{CO₂eq}_{\\text{${t("equation.fuel")}}} = ${tripStep.emissions}\\; \\text{kgCO₂eq}`,
         center: true,
       },
     ];
@@ -63,10 +58,14 @@ const CarSection = ({ tripStep }: CarSectionProps) => {
       <section className="details-section">
         <div className="details-section-header">
           <span className="details-section-step">1</span>
-          <h3 className="details-section-title">{t("car.generalEquation")}</h3>
+          <h3 className="details-section-title">
+            {t("hitchHiking.generalEquation")}
+          </h3>
         </div>
 
-        <p>{t("car.generalExplanations")}</p>
+        <p>{t("hitchHiking.generalExplanations1")}</p>
+        <br />
+        <p>{t("hitchHiking.generalExplanations2")}</p>
 
         <div className="equation-box">
           <div id="equation1" className="blue-text" />
@@ -77,25 +76,26 @@ const CarSection = ({ tripStep }: CarSectionProps) => {
       <section className="details-section">
         <div className="details-section-header">
           <span className="details-section-step">2</span>
-          <h3 className="details-section-title">{t("car.distance")}</h3>
+          <h3 className="details-section-title">{t("hitchHiking.distance")}</h3>
         </div>
 
-        <p>{t("car.distanceExplanations")}</p>
+        <p>{t("hitchHiking.distanceExplanations")}</p>
 
         <div className="equation-box">
           <div id="equation2" />
         </div>
       </section>
 
+      {/* Construction */}
       <section className="details-section">
         <div className="details-section-header">
           <span className="details-section-step">3</span>
           <h3 className="details-section-title">
-            {t("car.upstreamEmissions")}
+            {t("hitchHiking.upstreamEmissions")}
           </h3>
         </div>
 
-        <p>{t("car.upstreamEmissionsExplanation")}</p>
+        <p>{t("hitchHiking.upstreamEmissionsExplanation")}</p>
 
         <div className="equation-box">
           <div id="equation3" />
@@ -106,10 +106,12 @@ const CarSection = ({ tripStep }: CarSectionProps) => {
       <section className="details-section">
         <div className="details-section-header">
           <span className="details-section-step">4</span>
-          <h3 className="details-section-title">{t("car.fuelEmissions")}</h3>
+          <h3 className="details-section-title">
+            {t("hitchHiking.fuelEmissions")}
+          </h3>
         </div>
 
-        <p>{t("car.fuelEmissionsExplanation")}</p>
+        <p>{t("hitchHiking.fuelEmissionsExplanation")}</p>
 
         <div className="equation-box">
           <div id="equation4" />
@@ -119,7 +121,7 @@ const CarSection = ({ tripStep }: CarSectionProps) => {
       <section className="details-section">
         <div className="details-section-header">
           <span className="details-section-step">5</span>
-          <h3 className="details-section-title">{t("car.total")}</h3>
+          <h3 className="details-section-title">{t("hitchHiking.total")}</h3>
         </div>
 
         <div className="equation-box">
@@ -130,5 +132,4 @@ const CarSection = ({ tripStep }: CarSectionProps) => {
   );
 };
 
-
-export default CarSection;
+export default AutoStopSection;
