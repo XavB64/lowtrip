@@ -5,7 +5,66 @@ import { useTranslation } from "react-i18next";
 
 import i18n from "i18n";
 import { Transport, TripStep } from "types";
-import { round } from "utils";
+import { compact, round } from "utils";
+
+const CompactElectricCarSection = ({
+  tripStep,
+  index,
+}: ElectricCarSectionProps) => {
+  const { t } = useTranslation("detailsModal");
+
+  return (
+    <>
+      <section className="details-section">
+        <div className="details-section-header">
+          <span className="details-section-step">{index + 1}</span>
+          <h3 className="details-section-title">
+            {tripStep.departure} - {tripStep.arrival} {t("by")}{" "}
+            {t("transportMeans.ecar")}
+          </h3>
+        </div>
+
+        <p>{t("ecar.generalExplanations")}</p>
+
+        <div className="equation-box">
+          <div id={`step-${index}-equation1`} />
+        </div>
+
+        <p>{t("ecar.electricityProductionExplanation1")}</p>
+        <p>{t("ecar.electricityProductionExplanation2")}</p>
+      </section>
+
+      <section className="details-section">
+        <div className="details-section-header">
+          <h3 className="details-section-title">
+            {t("numericalApplications")}
+          </h3>
+        </div>
+
+        <div className="equation-box">
+          <div id={`step-${index}-equation2`} />
+          <div id={`step-${index}-equation3`} />
+          {tripStep.emissionParts
+            .filter(({ emissionSource }) => emissionSource !== "construction")
+            .map((emissionPart, partIndex) => (
+              <div
+                id={`step-${index}-equation${4 + partIndex}`}
+                key={emissionPart.emissionSource}
+                className="equation-by-country"
+              />
+            ))}
+        </div>
+
+        <div className="equation-box">
+          <div
+            id={`step-${index}-equation${4 + tripStep.emissionParts.length - 1}`}
+            className="blue-text"
+          />
+        </div>
+      </section>
+    </>
+  );
+};
 
 const DetailedElectricCarSection = ({
   tripStep,
@@ -68,6 +127,7 @@ const DetailedElectricCarSection = ({
               <div
                 id={`step-${index}-equation${4 + partIndex}`}
                 key={emissionPart.emissionSource}
+                className="equation-by-country"
               />
             ))}
         </div>
@@ -76,7 +136,7 @@ const DetailedElectricCarSection = ({
       <section className="details-section">
         <div className="details-section-header">
           <span className="details-section-step">4</span>
-          <h3 className="details-section-title">{t("ecar.total")}</h3>
+          <h3 className="details-section-title">{t("total")}</h3>
         </div>
 
         <div className="equation-box">
@@ -95,13 +155,18 @@ type ElectricCarSectionProps = {
   index: number;
 };
 
-const ElectricCarSection = (props: ElectricCarSectionProps) => {
+const ElectricCarSection = ({
+  isDetailed,
+  ...props
+}: ElectricCarSectionProps & {
+  isDetailed: boolean;
+}) => {
   const { t } = useTranslation("detailsModal");
 
   useEffect(() => {
     const { tripStep, index } = props;
 
-    const equations = [
+    const equations = compact([
       {
         equation: `CO₂eq = \\frac{CO₂eq_{${t("equation.construction")}} + \\sum_{${t("equation.country")}} \\left(\\text{coeff}_{${t("equation.country")}} \\times ${t("equation.distance")}{${t("equation.country")}}\\right)}{nb_{${t("equation.passengers")}}}`,
         center: true,
@@ -119,7 +184,7 @@ const ElectricCarSection = (props: ElectricCarSectionProps) => {
         equation: `CO_2eq_{${t("equation.country")}} = \\text{coeff}_{${t("equation.consommation")}} \\times \\left(1 + 0.04 \\times (nb_{${t("equation.passengers")}} - 1)\\right) \\times \\text{coeff}_{${t("equation.country")}} \\times ${t("equation.distance")}_{${t("equation.country")}}`,
         center: true,
       },
-    ];
+    ]);
 
     tripStep.emissionParts.forEach((emissionPart) => {
       if (emissionPart.emissionSource !== "construction") {
@@ -148,7 +213,11 @@ const ElectricCarSection = (props: ElectricCarSectionProps) => {
     });
   }, [i18n.language, props]);
 
-  return <DetailedElectricCarSection {...props} />;
+  return isDetailed ? (
+    <DetailedElectricCarSection {...props} />
+  ) : (
+    <CompactElectricCarSection {...props} />
+  );
 };
 
 export default ElectricCarSection;

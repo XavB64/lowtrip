@@ -11,7 +11,13 @@ type BicycleSectionProps = {
   index: number;
 };
 
-const BicycleSection = ({ tripStep, index }: BicycleSectionProps) => {
+const BicycleSection = ({
+  isDetailed,
+  tripStep,
+  index,
+}: BicycleSectionProps & {
+  isDetailed: boolean;
+}) => {
   const { t } = useTranslation("detailsModal");
 
   useEffect(() => {
@@ -39,27 +45,27 @@ const BicycleSection = ({ tripStep, index }: BicycleSectionProps) => {
   }, [i18n.language, tripStep]);
 
   return (
-    <>
-      <section className="details-section">
-        <div className="details-section-header">
-          <span className="details-section-step">1</span>
-          <h3 className="details-section-title">
-            {t("bicycle.generalEquation")}
-          </h3>
-        </div>
+    <section className="details-section">
+      <div className="details-section-header">
+        <span className="details-section-step">{index + 1}</span>
+        <h3 className="details-section-title">
+          {isDetailed
+            ? t("bicycle.generalEquation")
+            : `${tripStep.departure} - ${tripStep.arrival} ${t("by")} ${t("transportMeans.bicycle")}`}
+        </h3>
+      </div>
 
-        <p>{t("bicycle.explanations")}</p>
+      <p>{t("bicycle.explanations")}</p>
 
-        <div className="equation-box">
-          <div id={`step-${index}-equation1`} className="blue-text" />
-        </div>
+      <div className="equation-box">
+        <div id={`step-${index}-equation1`} className="blue-text" />
+      </div>
 
-        <p> {t("bicycle.numericalApplication")}</p>
-        <div className="equation-box">
-          <div id={`step-${index}-equation2`} className="blue-text" />
-        </div>
-      </section>
-    </>
+      <p> {t("bicycle.numericalApplication")}</p>
+      <div className="equation-box">
+        <div id={`step-${index}-equation2`} className="blue-text" />
+      </div>
+    </section>
   );
 };
 

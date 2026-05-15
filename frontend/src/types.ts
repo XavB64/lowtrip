@@ -160,6 +160,8 @@ export type TripStep = {
     distance: number;
   }[];
   distance: number;
+  departure: string;
+  arrival: string;
 } & (
   | {
       transport: Transport.bicycle;
