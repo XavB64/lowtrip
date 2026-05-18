@@ -6,7 +6,7 @@ import { useTranslation } from "react-i18next";
 import i18n from "i18n";
 import { Transport, TripStep } from "types";
 
-const DetailedFerrySection = () => {
+const DetailedFerrySection = ({ index }: FerrySectionProps) => {
   const { t } = useTranslation("detailsModal");
 
   return (
@@ -22,7 +22,7 @@ const DetailedFerrySection = () => {
         <p>{t("ferry.generalExplanations")}</p>
 
         <div className="equation-box">
-          <div id="equation1" className="blue-text" />
+          <div id={`step-${index}-equation1`} className="blue-text" />
         </div>
       </section>
 
@@ -38,7 +38,7 @@ const DetailedFerrySection = () => {
         <p>{t("ferry.distanceExplanations2")}</p>
 
         <div className="equation-box">
-          <div id="equation2" />
+          <div id={`step-${index}-equation2`} />
         </div>
       </section>
 
@@ -56,7 +56,7 @@ const DetailedFerrySection = () => {
         <p>{t("ferry.cruiseEmissionsExplanations2")}</p>
 
         <div className="equation-box">
-          <div id="equation3" className="blue-text" />
+          <div id={`step-${index}-equation3`} className="blue-text" />
         </div>
       </section>
     </>
@@ -65,12 +65,15 @@ const DetailedFerrySection = () => {
 
 type FerrySectionProps = {
   tripStep: Extract<TripStep, { transport: Transport.ferry }>;
+  index: number;
 };
 
-const FerrySection = ({ tripStep }: FerrySectionProps) => {
+const FerrySection = (props: FerrySectionProps) => {
   const { t } = useTranslation("detailsModal");
 
   useEffect(() => {
+    const { tripStep, index } = props;
+
     const equations = [
       {
         equation: `\\text{CO₂eq}_{\\text{${t("equation.cruise")}}} = \\text{coeff}_{\\text{${t("equation.cruise")}}} \\times \\text{${t("equation.distance")}}`,
@@ -91,17 +94,19 @@ const FerrySection = ({ tripStep }: FerrySectionProps) => {
       },
     ];
 
-    equations.map(({ equation, center }, index) => {
-      const element = document.getElementById(`equation${index + 1}`);
+    equations.map(({ equation, center }, equationIndex) => {
+      const element = document.getElementById(
+        `step-${index}-equation${equationIndex + 1}`,
+      );
       if (element) {
         katex.render(equation, element, {
           displayMode: center,
         });
       }
     });
-  }, [i18n.language, tripStep]);
+  }, [i18n.language, props]);
 
-  return <DetailedFerrySection />;
+  return <DetailedFerrySection {...props} />;
 };
 
 export default FerrySection;

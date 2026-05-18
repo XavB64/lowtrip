@@ -8,9 +8,10 @@ import { Transport, TripStep } from "types";
 
 type BicycleSectionProps = {
   tripStep: Extract<TripStep, { transport: Transport.bicycle }>;
+  index: number;
 };
 
-const BicycleSection = ({ tripStep }: BicycleSectionProps) => {
+const BicycleSection = ({ tripStep, index }: BicycleSectionProps) => {
   const { t } = useTranslation("detailsModal");
 
   useEffect(() => {
@@ -25,8 +26,10 @@ const BicycleSection = ({ tripStep }: BicycleSectionProps) => {
       },
     ];
 
-    equations.map(({ equation, center }, index) => {
-      const element = document.getElementById(`equation${index + 1}`);
+    equations.map(({ equation, center }, equationIndex) => {
+      const element = document.getElementById(
+        `step-${index}-equation${equationIndex + 1}`,
+      );
       if (element) {
         katex.render(equation, element, {
           displayMode: center,
@@ -48,12 +51,12 @@ const BicycleSection = ({ tripStep }: BicycleSectionProps) => {
         <p>{t("bicycle.explanations")}</p>
 
         <div className="equation-box">
-          <div id="equation1" className="blue-text" />
+          <div id={`step-${index}-equation1`} className="blue-text" />
         </div>
 
         <p> {t("bicycle.numericalApplication")}</p>
         <div className="equation-box">
-          <div id="equation2" className="blue-text" />
+          <div id={`step-${index}-equation2`} className="blue-text" />
         </div>
       </section>
     </>

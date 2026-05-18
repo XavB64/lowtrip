@@ -7,7 +7,7 @@ import i18n from "i18n";
 import { TripStep, Transport } from "types";
 import { round } from "utils";
 
-const DetailedHitchHikingSection = () => {
+const DetailedHitchHikingSection = ({ index }: HitchHikingSectionProps) => {
   const { t } = useTranslation("detailsModal");
 
   return (
@@ -25,7 +25,7 @@ const DetailedHitchHikingSection = () => {
         <p>{t("hitchHiking.generalExplanations2")}</p>
 
         <div className="equation-box">
-          <div id="equation1" className="blue-text" />
+          <div id={`step-${index}-equation1`} className="blue-text" />
         </div>
       </section>
 
@@ -39,7 +39,7 @@ const DetailedHitchHikingSection = () => {
         <p>{t("hitchHiking.distanceExplanations")}</p>
 
         <div className="equation-box">
-          <div id="equation2" />
+          <div id={`step-${index}-equation2`} />
         </div>
       </section>
 
@@ -55,7 +55,7 @@ const DetailedHitchHikingSection = () => {
         <p>{t("hitchHiking.upstreamEmissionsExplanation")}</p>
 
         <div className="equation-box">
-          <div id="equation3" />
+          <div id={`step-${index}-equation3`} />
         </div>
       </section>
 
@@ -71,7 +71,7 @@ const DetailedHitchHikingSection = () => {
         <p>{t("hitchHiking.fuelEmissionsExplanation")}</p>
 
         <div className="equation-box">
-          <div id="equation4" />
+          <div id={`step-${index}-equation4`} />
         </div>
       </section>
 
@@ -82,7 +82,7 @@ const DetailedHitchHikingSection = () => {
         </div>
 
         <div className="equation-box">
-          <div id="equation5" className="blue-text" />
+          <div id={`step-${index}-equation5`} className="blue-text" />
         </div>
       </section>
     </div>
@@ -91,12 +91,15 @@ const DetailedHitchHikingSection = () => {
 
 type HitchHikingSectionProps = {
   tripStep: Extract<TripStep, { transport: Transport.car }>;
+  index: number;
 };
 
-const HitchHikingSection = ({ tripStep }: HitchHikingSectionProps) => {
+const HitchHikingSection = (props: HitchHikingSectionProps) => {
   const { t } = useTranslation("detailsModal");
 
   useEffect(() => {
+    const { tripStep, index } = props;
+
     const equations = [
       {
         equation: `CO₂eq = \\text{CO₂eq}_{\\text{${t("equation.construction")}}} + \\text{CO₂eq}_{\\text{${t("equation.fuel")}}}`,
@@ -125,17 +128,19 @@ const HitchHikingSection = ({ tripStep }: HitchHikingSectionProps) => {
       },
     ];
 
-    equations.map(({ equation, center }, index) => {
-      const element = document.getElementById(`equation${index + 1}`);
+    equations.map(({ equation, center }, equationIndex) => {
+      const element = document.getElementById(
+        `step-${index}-equation${equationIndex + 1}`,
+      );
       if (element) {
         katex.render(equation, element, {
           displayMode: center,
         });
       }
     });
-  }, [i18n.language, tripStep]);
+  }, [i18n.language, props]);
 
-  return <DetailedHitchHikingSection />;
+  return <DetailedHitchHikingSection {...props} />;
 };
 
 export default HitchHikingSection;
