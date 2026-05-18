@@ -369,7 +369,7 @@ def bus_to_gdf(
 
     return TripStepResult(
         step_data=BusStepData(
-            transport="Bus",
+            transport="bus",
             emissions=emissions,
             path_length=round(route_length),
             coeff_upstream=EF_bus["construction"],
