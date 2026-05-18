@@ -7,7 +7,7 @@ import i18n from "i18n";
 import { Transport, TripStep } from "types";
 import { round } from "utils";
 
-const DetailedCarSection = () => {
+const DetailedCarSection = ({ index }: CarSectionProps) => {
   const { t } = useTranslation("detailsModal");
 
   return (
@@ -21,7 +21,7 @@ const DetailedCarSection = () => {
         <p>{t("car.generalExplanations")}</p>
 
         <div className="equation-box">
-          <div id="equation1" className="blue-text" />
+          <div id={`step-${index}-equation1`} className="blue-text" />
         </div>
       </section>
 
@@ -35,7 +35,7 @@ const DetailedCarSection = () => {
         <p>{t("car.distanceExplanations")}</p>
 
         <div className="equation-box">
-          <div id="equation2" />
+          <div id={`step-${index}-equation2`} />
         </div>
       </section>
 
@@ -50,7 +50,7 @@ const DetailedCarSection = () => {
         <p>{t("car.upstreamEmissionsExplanation")}</p>
 
         <div className="equation-box">
-          <div id="equation3" />
+          <div id={`step-${index}-equation3`} />
         </div>
       </section>
 
@@ -64,7 +64,7 @@ const DetailedCarSection = () => {
         <p>{t("car.fuelEmissionsExplanation")}</p>
 
         <div className="equation-box">
-          <div id="equation4" />
+          <div id={`step-${index}-equation4`} />
         </div>
       </section>
 
@@ -75,7 +75,7 @@ const DetailedCarSection = () => {
         </div>
 
         <div className="equation-box">
-          <div id="equation5" className="blue-text" />
+          <div id={`step-${index}-equation5`} className="blue-text" />
         </div>
       </section>
     </div>
@@ -84,12 +84,15 @@ const DetailedCarSection = () => {
 
 type CarSectionProps = {
   tripStep: Extract<TripStep, { transport: Transport.car }>;
+  index: number;
 };
 
-const CarSection = ({ tripStep }: CarSectionProps) => {
+const CarSection = (props: CarSectionProps) => {
   const { t } = useTranslation("detailsModal");
 
   useEffect(() => {
+    const { tripStep, index } = props;
+
     const equations = [
       {
         equation: `\\text{CO₂eq} = \\frac{\\text{CO₂eq}_{\\text{${t("equation.construction")}}} + \\text{CO₂eq}_{\\text{${t("equation.fuel")}}}}{\\text{nb}_{\\text{${t("equation.passengers")}}}}`,
@@ -123,17 +126,19 @@ const CarSection = ({ tripStep }: CarSectionProps) => {
       },
     ];
 
-    equations.map(({ equation, center }, index) => {
-      const element = document.getElementById(`equation${index + 1}`);
+    equations.map(({ equation, center }, equationIndex) => {
+      const element = document.getElementById(
+        `step-${index}-equation${equationIndex + 1}`,
+      );
       if (element) {
         katex.render(equation, element, {
           displayMode: center,
         });
       }
     });
-  }, [i18n.language, tripStep]);
+  }, [i18n.language, props]);
 
-  return <DetailedCarSection />;
+  return <DetailedCarSection {...props} />;
 };
 
 export default CarSection;

@@ -6,7 +6,7 @@ import { useTranslation } from "react-i18next";
 import i18n from "i18n";
 import { Transport, TripStep } from "types";
 
-const DetailedSailSection = () => {
+const DetailedSailSection = ({ index }: SailSectionProps) => {
   const { t } = useTranslation("detailsModal");
 
   return (
@@ -20,7 +20,7 @@ const DetailedSailSection = () => {
         <p>{t("sail.generalExplanations")}</p>
 
         <div className="equation-box">
-          <div id="equation1" className="blue-text" />
+          <div id={`step-${index}-equation1`} className="blue-text" />
         </div>
       </section>
 
@@ -36,7 +36,7 @@ const DetailedSailSection = () => {
         <p>{t("sail.distanceExplanations2")}</p>
 
         <div className="equation-box">
-          <div id="equation2" />
+          <div id={`step-${index}-equation2`} />
         </div>
       </section>
 
@@ -50,7 +50,7 @@ const DetailedSailSection = () => {
         <p>{t("sail.cruiseEmissionsExplanations1")}</p>
 
         <div className="equation-box">
-          <div id="equation3" className="blue-text" />
+          <div id={`step-${index}-equation3`} className="blue-text" />
         </div>
       </section>
     </>
@@ -59,12 +59,15 @@ const DetailedSailSection = () => {
 
 type SailSectionProps = {
   tripStep: Extract<TripStep, { transport: Transport.sail }>;
+  index: number;
 };
 
-const SailSection = ({ tripStep }: SailSectionProps) => {
+const SailSection = (props: SailSectionProps) => {
   const { t } = useTranslation("detailsModal");
 
   useEffect(() => {
+    const { tripStep, index } = props;
+
     const equations = [
       {
         equation: `\\text{CO₂eq}_{\\text{${t("equation.cruise")}}} = \\text{coeff}_{\\text{${t("equation.cruise")}}} \\times \\text{${t("equation.distance")}}`,
@@ -85,17 +88,19 @@ const SailSection = ({ tripStep }: SailSectionProps) => {
       },
     ];
 
-    equations.map(({ equation, center }, index) => {
-      const element = document.getElementById(`equation${index + 1}`);
+    equations.map(({ equation, center }, equationIndex) => {
+      const element = document.getElementById(
+        `step-${index}-equation${equationIndex + 1}`,
+      );
       if (element) {
         katex.render(equation, element, {
           displayMode: center,
         });
       }
     });
-  }, [i18n.language, tripStep]);
+  }, [i18n.language, props]);
 
-  return <DetailedSailSection />;
+  return <DetailedSailSection {...props} />;
 };
 
 export default SailSection;

@@ -7,7 +7,10 @@ import i18n from "i18n";
 import { Transport, TripStep } from "types";
 import { round } from "utils";
 
-const DetailedElectricCarSection = ({ tripStep }: ElectricCarSectionProps) => {
+const DetailedElectricCarSection = ({
+  tripStep,
+  index,
+}: ElectricCarSectionProps) => {
   const { t } = useTranslation("detailsModal");
 
   return (
@@ -21,7 +24,7 @@ const DetailedElectricCarSection = ({ tripStep }: ElectricCarSectionProps) => {
         <p>{t("ecar.generalExplanations")}</p>
 
         <div className="equation-box">
-          <div id="equation1" className="blue-text" />
+          <div id={`step-${index}-equation1`} className="blue-text" />
         </div>
       </section>
 
@@ -36,7 +39,7 @@ const DetailedElectricCarSection = ({ tripStep }: ElectricCarSectionProps) => {
         <p>{t("ecar.upstreamEmissionsExplanation")}</p>
 
         <div className="equation-box">
-          <div id="equation2" />
+          <div id={`step-${index}-equation2`} />
         </div>
       </section>
 
@@ -53,7 +56,7 @@ const DetailedElectricCarSection = ({ tripStep }: ElectricCarSectionProps) => {
         <p>{t("ecar.electricityProductionExplanation2")}</p>
 
         <div className="equation-box">
-          <div id="equation3" />
+          <div id={`step-${index}-equation3`} />
         </div>
 
         <p>{t("ecar.numericalApplications")}</p>
@@ -61,9 +64,9 @@ const DetailedElectricCarSection = ({ tripStep }: ElectricCarSectionProps) => {
         <div className="equation-box">
           {tripStep.emissionParts
             .filter(({ emissionSource }) => emissionSource !== "construction")
-            .map((emissionPart, index) => (
+            .map((emissionPart, partIndex) => (
               <div
-                id={`equation${4 + index}`}
+                id={`step-${index}-equation${4 + partIndex}`}
                 key={emissionPart.emissionSource}
               />
             ))}
@@ -78,7 +81,7 @@ const DetailedElectricCarSection = ({ tripStep }: ElectricCarSectionProps) => {
 
         <div className="equation-box">
           <div
-            id={`equation${4 + tripStep.emissionParts.length - 1}`}
+            id={`step-${index}-equation${4 + tripStep.emissionParts.length - 1}`}
             className="blue-text"
           />
         </div>
@@ -89,12 +92,15 @@ const DetailedElectricCarSection = ({ tripStep }: ElectricCarSectionProps) => {
 
 type ElectricCarSectionProps = {
   tripStep: Extract<TripStep, { transport: Transport.ecar }>;
+  index: number;
 };
 
-const ElectricCarSection = ({ tripStep }: ElectricCarSectionProps) => {
+const ElectricCarSection = (props: ElectricCarSectionProps) => {
   const { t } = useTranslation("detailsModal");
 
   useEffect(() => {
+    const { tripStep, index } = props;
+
     const equations = [
       {
         equation: `CO₂eq = \\frac{CO₂eq_{${t("equation.construction")}} + \\sum_{${t("equation.country")}} \\left(\\text{coeff}_{${t("equation.country")}} \\times ${t("equation.distance")}{${t("equation.country")}}\\right)}{nb_{${t("equation.passengers")}}}`,
@@ -130,17 +136,19 @@ const ElectricCarSection = ({ tripStep }: ElectricCarSectionProps) => {
       center: true,
     });
 
-    equations.map(({ equation, center }, index) => {
-      const element = document.getElementById(`equation${index + 1}`);
+    equations.map(({ equation, center }, equationIndex) => {
+      const element = document.getElementById(
+        `step-${index}-equation${equationIndex + 1}`,
+      );
       if (element) {
         katex.render(equation, element, {
           displayMode: center,
         });
       }
     });
-  }, [i18n.language, tripStep]);
+  }, [i18n.language, props]);
 
-  return <DetailedElectricCarSection tripStep={tripStep} />;
+  return <DetailedElectricCarSection {...props} />;
 };
 
 export default ElectricCarSection;
