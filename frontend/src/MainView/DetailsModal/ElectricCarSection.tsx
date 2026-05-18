@@ -168,20 +168,20 @@ const ElectricCarSection = ({
 
     const equations = compact([
       {
-        equation: `CO₂eq = \\frac{CO₂eq_{${t("equation.construction")}} + \\sum_{${t("equation.country")}} \\left(\\text{coeff}_{${t("equation.country")}} \\times ${t("equation.distance")}{${t("equation.country")}}\\right)}{nb_{${t("equation.passengers")}}}`,
+        equation: `\\text{CO₂eq} = \\frac{\\text{CO₂eq}_{\\text{${t("equation.construction")}}} + \\sum_{\\text{${t("equation.country")}}} \\left(\\text{\\text{coeff}}_{\\text{${t("equation.country")}}} \\times \\text{${t("equation.distance")}}_{\\text{${t("equation.country")}}}\\right)}{\\text{nb}_{\\text{${t("equation.passengers")}}}}`,
         center: true,
       },
       {
         equation: `
           \\begin{aligned}
-          CO₂eq_{${t("equation.construction")}} &= \\text{coeff}_{${t("equation.construction")}} \\times ${t("equation.distance")}_{${t("equation.total")}} \\\\
-                        &= ${tripStep.coeff_upstream} \\times ${tripStep.distance}\\; km \\\\ 
+          \\text{CO₂eq}_{\\text{${t("equation.construction")}}} &= \\text{coeff}_{\\text{${t("equation.construction")}}} \\times \\text{${t("equation.distance")}}_{\\text{${t("equation.total")}}} \\\\
+                        &= ${tripStep.coeff_upstream} \\times ${tripStep.distance}\\; \\text{km} \\\\ 
                         &= ${round(tripStep.coeff_upstream * tripStep.distance)}\\; \\text{kgCO₂eq}
           \\end{aligned}`,
         center: true,
       },
       {
-        equation: `CO_2eq_{${t("equation.country")}} = \\text{coeff}_{${t("equation.consommation")}} \\times \\left(1 + 0.04 \\times (nb_{${t("equation.passengers")}} - 1)\\right) \\times \\text{coeff}_{${t("equation.country")}} \\times ${t("equation.distance")}_{${t("equation.country")}}`,
+        equation: `\\text{CO₂eq}_{\\text{${t("equation.country")}}} = \\text{coeff}_{\\text{${t("equation.fuel")}}} \\times \\left(1 + 0.04 \\times (\\text{nb}_{\\text{${t("equation.passengers")}}} - 1)\\right) \\times \\text{coeff}_{\\text{${t("equation.country")}}} \\times \\text{${t("equation.distance")}}_{\\text{${t("equation.country")}}}`,
         center: true,
       },
     ]);
@@ -190,14 +190,14 @@ const ElectricCarSection = ({
       if (emissionPart.emissionSource !== "construction") {
         const { emissionSource: country, coefficient, distance } = emissionPart;
         equations.push({
-          equation: `CO_2eq_{${country}} = ${tripStep.coeff_fuel} \\times \\left(1 + 0.04 \\times (${tripStep.passengers_nb} - 1)\\right) \\times ${round(coefficient, 3)} \\times ${distance}\\; km = ${round(coefficient * (1 + 0.04 * (tripStep.passengers_nb! - 1)) * distance * tripStep.coeff_fuel)}\\; \\text{kgCO₂eq}`,
+          equation: `\\text{CO₂eq}_{\\text{${country}}} = ${tripStep.coeff_fuel} \\times \\left(1 + 0.04 \\times (${tripStep.passengers_nb} - 1)\\right) \\times ${round(coefficient, 3)} \\times ${distance}\\; \\text{km} = ${round(coefficient * (1 + 0.04 * (tripStep.passengers_nb! - 1)) * distance * tripStep.coeff_fuel)}\\; \\text{kgCO₂eq}`,
           center: false,
         });
       }
     });
 
     equations.push({
-      equation: `CO₂eq = \\frac{CO₂eq_{${t("equation.construction")}} + CO₂eq_{${t("equation.fuel")}}}{nb_{${t("equation.passengers")}}} = ${tripStep.emissions}\\; \\text{kgCO₂eq}`,
+      equation: `\\text{CO₂eq} = \\frac{\\text{CO₂eq}_{\\text{${t("equation.construction")}}} + \\text{CO₂eq}_{\\text{${t("equation.fuel")}}}}{\\text{nb}_{\\text{${t("equation.passengers")}}}} = ${tripStep.emissions}\\; \\text{kgCO₂eq}`,
       center: true,
     });
 

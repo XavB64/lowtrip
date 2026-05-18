@@ -287,7 +287,7 @@
       "upstreamEmissionsExplanation": "Les émissions liées à la construction (véhicule et infrastructures) sont estimées en multipliant la distance par un coefficient issu de l’ADEME.",
       "electricityProductionEmissions": "ÉMISSIONS LIÉES À LA CONSOMMATION D'ÉLECTRICITÉ",
       "electricityProductionExplanation1": "Le coefficient utilisé pour la consommation de carburant correspond à un trajet avec une seule personne dans le véhicule (fourni par l’ADEME). Il est ensuite ajusté en fonction du nombre de passagers, en ajoutant 4 % d’émissions par passager supplémentaire afin de prendre en compte le poids additionnel.",
-      "electricityProductionExplanation2": "Le facteur d’émission chaque pays dépend de son mix énergétique, et donc de l’intensité carbone de son électricité.",
+      "electricityProductionExplanation2": "Le facteur d’émission de chaque pays dépend de l’intensité carbone de son électricité, et donc de son mix énergétique.",
       "numericalApplications": "Applications numériques :"
     },
     "equation": {
@@ -298,7 +298,7 @@
       "country": "pays",
       "cruise": "traversée",
       "distance": "distance",
-      "fuel": "essence",
+      "fuel": "carburant",
       "holding": "attente",
       "infrastructure": "infra",
       "nonCO2": "non-CO₂",
