@@ -137,7 +137,7 @@ const BusSection = ({
 
     const equations = compact([
       {
-        equation: `\\text{kgCO₂eq} = \\text{CO₂eq}_{\\text{${t("equation.construction")}}} + \\text{CO₂eq}_{\\text{\\text{${t("equation.fuel")}}}}`,
+        equation: `\\text{CO₂eq} = \\text{CO₂eq}_{\\text{${t("equation.construction")}}} + \\text{CO₂eq}_{\\text{\\text{${t("equation.fuel")}}}}`,
         center: true,
       },
       isDetailed
@@ -165,7 +165,7 @@ const BusSection = ({
         center: true,
       },
       {
-        equation: `\\text{kgCO₂eq} = \\text{CO₂eq}_{\\text{${t("equation.construction")}}} + \\text{CO₂eq}_{\\text{${t("equation.fuel")}}} = ${tripStep.emissions}\\; \\text{kgCO₂eq}`,
+        equation: `\\text{CO₂eq} = \\text{CO₂eq}_{\\text{${t("equation.construction")}}} + \\text{CO₂eq}_{\\text{${t("equation.fuel")}}} = ${tripStep.emissions}\\; \\text{kgCO₂eq}`,
         center: true,
       },
     ]);

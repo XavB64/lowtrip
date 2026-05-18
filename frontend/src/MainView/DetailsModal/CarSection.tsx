@@ -164,7 +164,7 @@ const CarSection = ({
       {
         equation: `
           \\begin{aligned}
-          \\text{CO₂eq}_{\\text{${t("equation.fuel")}}} &= \\text{coeff}_{\\text{${t("equation.fuel")}}} \\times \\left(1 + 0.04 \\times (\\text{nb}_{\\text{${t("equation.passengers")}}} - 1)\\right) \\times ${t("equation.distance")} \\\\
+          \\text{CO₂eq}_{\\text{${t("equation.fuel")}}} &= \\text{coeff}_{\\text{${t("equation.fuel")}}} \\times \\left(1 + 0.04 \\times (\\text{nb}_{\\text{${t("equation.passengers")}}} - 1)\\right) \\times \\text{${t("equation.distance")}} \\\\
                     &=${tripStep.coeff_fuel} \\times (1 + 0.04 \\times (${tripStep.passengers_nb} - 1)) \\times ${tripStep.distance}\\; \\text{km} \\\\
                     &= ${round(tripStep.coeff_fuel * tripStep.distance * (1 + 0.04 * (tripStep.passengers_nb - 1)))}\\; \\text{kgCO₂eq}
           \\end{aligned}`,

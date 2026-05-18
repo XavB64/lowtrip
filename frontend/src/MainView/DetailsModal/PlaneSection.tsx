@@ -201,7 +201,7 @@ const PlaneSection = ({
         center: true,
       },
       {
-        equation: `\\text{CO₂eq} = \\text{CO₂eq}_{CO₂} + \\text{CO₂eq}_{\\text{${t("equation.nonCO2")}}} = ${tripStep.emissions}\\; \\text{kgCO₂eq}`,
+        equation: `\\text{CO₂eq} = \\text{CO₂eq}_{\\text{CO₂}} + \\text{CO₂eq}_{\\text{${t("equation.nonCO2")}}} = ${tripStep.emissions}\\; \\text{kgCO₂eq}`,
         center: true,
       },
     ]);
