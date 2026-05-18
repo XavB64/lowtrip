@@ -58,7 +58,6 @@ type TripResult = {
       name: string;
       ef_tot: number;
       kg_co2_eq: number;
-      color: string;
       distance: number;
     }[];
   } & (

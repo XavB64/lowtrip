@@ -9,6 +9,49 @@ import {
 } from "types";
 import { round } from "utils";
 
+type ColorMap = {
+  usage: string;
+  contrails: string;
+  upstream: string;
+};
+
+const MAIN_COLORS = {
+  contrails: "#7de4f0",
+  usage: "#4accdb",
+  upstream: "#006773",
+};
+
+const ALTERNATIVE_COLORS = {
+  contrails: "#ffd1d9",
+  usage: "#f299a9",
+  upstream: "#df4562",
+};
+
+const DIRECT_COLORS = {
+  contrails: "#febc78",
+  usage: "#E69138",
+  upstream: "#B45E06",
+};
+
+const getColorMap = (tripName: string) => {
+  if (tripName === "MAIN_TRIP") return MAIN_COLORS;
+  if (tripName === "SECOND_TRIP") return ALTERNATIVE_COLORS;
+  return DIRECT_COLORS;
+};
+
+const getEmissionColor = (colorMap: ColorMap, emissionSouce: string) => {
+  switch (emissionSouce) {
+    case "contrails":
+      return colorMap.contrails;
+    case "construction":
+    case "infra":
+    case "bikeBuild":
+      return colorMap.upstream;
+    default:
+      return colorMap.usage;
+  }
+};
+
 export const formatResponse = (
   inputs: { mainSteps: Step[]; altSteps?: Step[] },
   data: ApiResponse,
@@ -25,6 +68,8 @@ export const formatResponse = (
     const formattedSteps: TripStep[] = [];
     let totalEmissions = 0;
 
+    const colorMap = getColorMap(trip.name);
+
     const inputSteps =
       trip.name !== "SECOND_TRIP"
         ? inputs.mainSteps
@@ -39,7 +84,7 @@ export const formatResponse = (
         stepEmissions += emission.kg_co2_eq;
         emissionParts.push({
           emissionSource: emission.name,
-          color: emission.color,
+          color: getEmissionColor(colorMap, emission.name),
           emissions: emission.kg_co2_eq,
           distance: emission.distance,
           coefficient: emission.ef_tot,
