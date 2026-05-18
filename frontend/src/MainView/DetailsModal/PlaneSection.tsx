@@ -170,49 +170,34 @@ const PlaneSection = ({
     const realDistance = Math.round(distance * coeff_path_detour);
 
     const equations = compact([
-      {
-        equation: `\\text{CO₂eq} = \\text{CO₂eq}_{\\text{CO₂}} + \\text{CO₂eq}_{\\text{${t("equation.nonCO2")}}}`,
-        center: true,
-      },
+      `\\text{CO₂eq} = \\text{CO₂eq}_{\\text{CO₂}} + \\text{CO₂eq}_{\\text{${t("equation.nonCO2")}}}`,
       isDetailed
-        ? {
-            equation: `\\text{${t("equation.distance")}} = \\text{${distance}} \\times ${coeff_path_detour} = ${realDistance} \\text{km}`,
-            center: true,
-          }
+        ? `\\text{${t("equation.distance")}} = \\text{${distance}} \\times ${coeff_path_detour} = ${realDistance} \\text{km}`
         : null,
-      {
-        equation: `
+      `
           \\begin{aligned}
           \\text{CO₂eq} &= (\\text{coeff}_{\\text{${t("equation.combustion")}}} + \\text{coeff}_{\\text{${t("equation.upstream")}}}) \\times \\text{${t("equation.distance")}} + \\text{${t("equation.holding")}} \\\\
                          &= (${coeff_fuel} + ${coeff_upstream}) \\times ${realDistance}\\; \\text{km} + ${holding}\\; \\text{kgCO₂eq} \\\\
                          &= ${round((coeff_fuel + coeff_upstream) * realDistance + holding)}\\; \\text{kgCO₂eq}
           \\end{aligned}
           `,
-        center: true,
-      },
-      {
-        equation: `
+      `
           \\begin{aligned}
           \\text{CO₂eq}_{\\text{${t("equation.nonCO2")}}} &= (\\text{coeff}_{\\text{${t("equation.combustion")}}} \\times \\text{${t("equation.distance")}}) \\times \\text{coeff}_{\\text{${t("equation.contrails")}}} \\\\
                          &=  (${coeff_fuel} \\times ${realDistance}\\; \\text{km}) \\times ${coeff_contrails} \\\\
                          &= ${round(coeff_fuel * realDistance * coeff_contrails)}\\; \\text{kgCO₂eq}
           \\end{aligned}
           `,
-        center: true,
-      },
-      {
-        equation: `\\text{CO₂eq} = \\text{CO₂eq}_{\\text{CO₂}} + \\text{CO₂eq}_{\\text{${t("equation.nonCO2")}}} = ${tripStep.emissions}\\; \\text{kgCO₂eq}`,
-        center: true,
-      },
+      `\\text{CO₂eq} = \\text{CO₂eq}_{CO₂} + \\text{CO₂eq}_{\\text{${t("equation.nonCO2")}}} = ${tripStep.emissions}\\; \\text{kgCO₂eq}`,
     ]);
 
-    equations.map(({ equation, center }, equationIndex) => {
+    equations.map((equation, equationIndex) => {
       const element = document.getElementById(
         `step-${index}-equation${equationIndex + 1}`,
       );
       if (element) {
         katex.render(equation, element, {
-          displayMode: center,
+          displayMode: true,
         });
       }
     });

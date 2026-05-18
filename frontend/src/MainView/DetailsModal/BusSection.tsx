@@ -136,47 +136,30 @@ const BusSection = ({
     const { tripStep, index } = props;
 
     const equations = compact([
-      {
-        equation: `\\text{CO₂eq} = \\text{CO₂eq}_{\\text{${t("equation.construction")}}} + \\text{CO₂eq}_{\\text{\\text{${t("equation.fuel")}}}}`,
-        center: true,
-      },
+      `\\text{CO₂eq} = \\text{CO₂eq}_{\\text{${t("equation.construction")}}} + \\text{CO₂eq}_{\\text{\\text{${t("equation.fuel")}}}}`,
       isDetailed
-        ? {
-            equation: `\\text{distance}= ${tripStep.distance}\\; \\text{km}`,
-            center: true,
-          }
+        ? `\\text{distance}= ${tripStep.distance}\\; \\text{km}`
         : null,
-      {
-        equation: `
-          \\begin{aligned}
-          \\text{CO₂eq}_{\\text{${t("equation.construction")}}} &= \\text{coeff}_{\\text{${t("equation.construction")}}} \\times \\text{${t("equation.distance")}} \\\\
-                        &= ${tripStep.coeff_upstream} \\times ${tripStep.distance}\\; \\text{km} \\\\
-                        &= ${round(tripStep.coeff_upstream * tripStep.distance)}\\; \\text{kgCO₂eq}
-          \\end{aligned}`,
-        center: true,
-      },
-      {
-        equation: `
-          \\begin{aligned}
-          \\text{CO₂eq}_{\\text{${t("equation.fuel")}}} &= \\text{coeff}_{\\text{${t("equation.fuel")}}} \\times \\text{${t("equation.distance")}}\\\\
-                        &= ${tripStep.coeff_fuel}\\times ${tripStep.distance}\\; \\text{km} \\\\
-                        &= ${round(tripStep.coeff_fuel * tripStep.distance)}\\; \\text{kgCO₂eq}
-          \\end{aligned}`,
-        center: true,
-      },
-      {
-        equation: `\\text{CO₂eq} = \\text{CO₂eq}_{\\text{${t("equation.construction")}}} + \\text{CO₂eq}_{\\text{${t("equation.fuel")}}} = ${tripStep.emissions}\\; \\text{kgCO₂eq}`,
-        center: true,
-      },
+      `\\begin{aligned}
+        \\text{CO₂eq}_{\\text{${t("equation.construction")}}} &= \\text{coeff}_{\\text{${t("equation.construction")}}} \\times \\text{${t("equation.distance")}} \\\\
+                      &= ${tripStep.coeff_upstream} \\times ${tripStep.distance}\\; \\text{km} \\\\
+                      &= ${round(tripStep.coeff_upstream * tripStep.distance)}\\; \\text{kgCO₂eq}
+        \\end{aligned}`,
+      `\\begin{aligned}
+        \\text{CO₂eq}_{\\text{${t("equation.fuel")}}} &= \\text{coeff}_{\\text{${t("equation.fuel")}}} \\times \\text{${t("equation.distance")}}\\\\
+                      &= ${tripStep.coeff_fuel}\\times ${tripStep.distance}\\; \\text{km} \\\\
+                      &= ${round(tripStep.coeff_fuel * tripStep.distance)}\\; \\text{kgCO₂eq}
+        \\end{aligned}`,
+      `\\text{CO₂eq} = \\text{CO₂eq}_{\\text{${t("equation.construction")}}} + \\text{CO₂eq}_{\\text{${t("equation.fuel")}}} = ${tripStep.emissions}\\; \\text{kgCO₂eq}`,
     ]);
 
-    equations.map(({ equation, center }, equationIndex) => {
+    equations.map((equation, equationIndex) => {
       const element = document.getElementById(
         `step-${index}-equation${equationIndex + 1}`,
       );
       if (element) {
         katex.render(equation, element, {
-          displayMode: center,
+          displayMode: true,
         });
       }
     });

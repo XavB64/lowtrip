@@ -22,23 +22,17 @@ const BicycleSection = ({
 
   useEffect(() => {
     const equations = [
-      {
-        equation: `\\text{CO₂eq} = \\text{coeff}_{\\text{${t("equation.bicycle")}}} \\times \\text{${t("equation.distance")}}`,
-        center: true,
-      },
-      {
-        equation: `\\text{CO₂eq} = ${tripStep.coeff_upstream} \\times ${tripStep.distance}\\; \\text{km} = ${tripStep.emissions}\\; \\text{kgCO₂eq}`,
-        center: true,
-      },
+      `\\text{CO₂eq} = \\text{coeff}_{\\text{${t("equation.bicycle")}}} \\times \\text{${t("equation.distance")}}`,
+      `\\text{CO₂eq} = ${tripStep.coeff_upstream} \\times ${tripStep.distance}\\; \\text{km} = ${tripStep.emissions}\\; \\text{kgCO₂eq}`,
     ];
 
-    equations.map(({ equation, center }, equationIndex) => {
+    equations.map((equation, equationIndex) => {
       const element = document.getElementById(
         `step-${index}-equation${equationIndex + 1}`,
       );
       if (element) {
         katex.render(equation, element, {
-          displayMode: center,
+          displayMode: true,
         });
       }
     });

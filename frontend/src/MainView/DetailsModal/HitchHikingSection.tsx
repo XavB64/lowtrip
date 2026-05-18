@@ -152,42 +152,26 @@ const HitchHikingSection = ({
     const { tripStep, index } = props;
 
     const equations = compact([
-      {
-        equation: `\\text{CO₂eq} = \\text{CO₂eq}_{\\text{${t("equation.construction")}}} + \\text{CO₂eq}_{\\text{${t("equation.fuel")}}}`,
-        center: true,
-      },
+      `\\text{CO₂eq} = \\text{CO₂eq}_{\\text{${t("equation.construction")}}} + \\text{CO₂eq}_{\\text{${t("equation.fuel")}}}`,
       isDetailed
-        ? {
-            equation: `\\text{distance} = ${tripStep.emissionParts[0].distance}\\; \\text{km}`,
-            center: true,
-          }
+        ? `\\text{distance} = ${tripStep.emissionParts[0].distance}\\; \\text{km}`
         : null,
-      {
-        equation: `\\text{CO₂eq}_{\\text{${t("equation.construction")}}} = 0\\; \\text{kgCO₂eq}`,
-        center: true,
-      },
-      {
-        equation: `
-          \\begin{aligned}
+      `\\text{CO₂eq}_{\\text{${t("equation.construction")}}} = 0\\; \\text{kgCO₂eq}`,
+      `          \\begin{aligned}
           \\text{CO₂eq}_{\\text{${t("equation.fuel")}}} &= \\text{coeff}_{\\text{${t("equation.fuel")}}} \\times0.04 \\times \\text{${t("equation.distance")}} \\\\
                     &=${tripStep.coeff_fuel} \\times 0.04 \\times ${tripStep.distance}\\; \\text{km} \\\\
                     &= ${round(tripStep.coeff_fuel * tripStep.distance * 0.04)}\\; \\text{kgCO₂eq}
           \\end{aligned}`,
-        center: true,
-      },
-      {
-        equation: `\\text{CO₂eq} = \\text{CO₂eq}_{\\text{${t("equation.construction")}}} + \\text{CO₂eq}_{\\text{${t("equation.fuel")}}} = ${tripStep.emissions}\\; \\text{kgCO₂eq}`,
-        center: true,
-      },
+      `\\text{CO₂eq} = \\text{CO₂eq}_{\\text{${t("equation.construction")}}} + \\text{CO₂eq}_{\\text{${t("equation.fuel")}}} = ${tripStep.emissions}\\; \\text{kgCO₂eq}`,
     ]);
 
-    equations.map(({ equation, center }, equationIndex) => {
+    equations.map((equation, equationIndex) => {
       const element = document.getElementById(
         `step-${index}-equation${equationIndex + 1}`,
       );
       if (element) {
         katex.render(equation, element, {
-          displayMode: center,
+          displayMode: true,
         });
       }
     });
