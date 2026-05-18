@@ -7,69 +7,8 @@ import i18n from "i18n";
 import { Transport, TripStep } from "types";
 import { round } from "utils";
 
-type PlaneSectionProps = {
-  tripStep: Extract<TripStep, { transport: Transport.plane }>;
-};
-
-const PlaneSection = ({ tripStep }: PlaneSectionProps) => {
+const DetailedPlaneSection = ({ tripStep }: PlaneSectionProps) => {
   const { t } = useTranslation("detailsModal");
-
-  useEffect(() => {
-    const {
-      distance,
-      coeff_fuel,
-      coeff_upstream,
-      coeff_contrails,
-      coeff_path_detour,
-      holding,
-    } = tripStep;
-
-    const realDistance = Math.round(distance * coeff_path_detour);
-
-    const equations = [
-      {
-        equation: `\\text{CO₂eq} = \\text{CO₂eq}_{\\text{CO₂}} + \\text{CO₂eq}_{\\text{${t("equation.nonCO2")}}}`,
-        center: true,
-      },
-      {
-        equation: `\\text{${t("equation.distance")}} = \\text{${distance}} \\times ${coeff_path_detour} = ${realDistance} \\text{km}`,
-        center: true,
-      },
-      {
-        equation: `
-          \\begin{aligned}
-          \\text{CO₂eq} &= (\\text{coeff}_{\\text{${t("equation.combustion")}}} + \\text{coeff}_{\\text{${t("equation.upstream")}}}) \\times \\text{${t("equation.distance")}} + \\text{${t("equation.holding")}} \\\\
-                         &= (${coeff_fuel} + ${coeff_upstream}) \\times ${realDistance}\\; \\text{km} + ${holding}\\; \\text{kgCO₂eq} \\\\
-                         &= ${round((coeff_fuel + coeff_upstream) * realDistance + holding)}\\; \\text{kgCO₂eq}
-          \\end{aligned}
-          `,
-        center: true,
-      },
-      {
-        equation: `
-          \\begin{aligned}
-          \\text{CO₂eq}_{\\text{${t("equation.nonCO2")}}} &= (\\text{coeff}_{\\text{${t("equation.combustion")}}} \\times \\text{${t("equation.distance")}}) \\times \\text{coeff}_{\\text{${t("equation.contrails")}}} \\\\
-                         &=  (${coeff_fuel} \\times ${realDistance}\\; \\text{km}) \\times ${coeff_contrails} \\\\
-                         &= ${round(coeff_fuel * realDistance * coeff_contrails)}\\; \\text{kgCO₂eq}
-          \\end{aligned}
-          `,
-        center: true,
-      },
-      {
-        equation: `\\text{CO₂eq} = \\text{CO₂eq}_{CO₂} + \\text{CO₂eq}_{\\text{${t("equation.nonCO2")}}} = ${tripStep.emissions}\\; \\text{kgCO₂eq}`,
-        center: true,
-      },
-    ];
-
-    equations.map(({ equation, center }, index) => {
-      const element = document.getElementById(`equation${index + 1}`);
-      if (element) {
-        katex.render(equation, element, {
-          displayMode: center,
-        });
-      }
-    });
-  }, [i18n.language, tripStep]);
 
   return (
     <>
@@ -158,6 +97,73 @@ const PlaneSection = ({ tripStep }: PlaneSectionProps) => {
       </section>
     </>
   );
+};
+
+type PlaneSectionProps = {
+  tripStep: Extract<TripStep, { transport: Transport.plane }>;
+};
+
+const PlaneSection = ({ tripStep }: PlaneSectionProps) => {
+  const { t } = useTranslation("detailsModal");
+
+  useEffect(() => {
+    const {
+      distance,
+      coeff_fuel,
+      coeff_upstream,
+      coeff_contrails,
+      coeff_path_detour,
+      holding,
+    } = tripStep;
+
+    const realDistance = Math.round(distance * coeff_path_detour);
+
+    const equations = [
+      {
+        equation: `\\text{CO₂eq} = \\text{CO₂eq}_{\\text{CO₂}} + \\text{CO₂eq}_{\\text{${t("equation.nonCO2")}}}`,
+        center: true,
+      },
+      {
+        equation: `\\text{${t("equation.distance")}} = \\text{${distance}} \\times ${coeff_path_detour} = ${realDistance} \\text{km}`,
+        center: true,
+      },
+      {
+        equation: `
+          \\begin{aligned}
+          \\text{CO₂eq} &= (\\text{coeff}_{\\text{${t("equation.combustion")}}} + \\text{coeff}_{\\text{${t("equation.upstream")}}}) \\times \\text{${t("equation.distance")}} + \\text{${t("equation.holding")}} \\\\
+                         &= (${coeff_fuel} + ${coeff_upstream}) \\times ${realDistance}\\; \\text{km} + ${holding}\\; \\text{kgCO₂eq} \\\\
+                         &= ${round((coeff_fuel + coeff_upstream) * realDistance + holding)}\\; \\text{kgCO₂eq}
+          \\end{aligned}
+          `,
+        center: true,
+      },
+      {
+        equation: `
+          \\begin{aligned}
+          \\text{CO₂eq}_{\\text{${t("equation.nonCO2")}}} &= (\\text{coeff}_{\\text{${t("equation.combustion")}}} \\times \\text{${t("equation.distance")}}) \\times \\text{coeff}_{\\text{${t("equation.contrails")}}} \\\\
+                         &=  (${coeff_fuel} \\times ${realDistance}\\; \\text{km}) \\times ${coeff_contrails} \\\\
+                         &= ${round(coeff_fuel * realDistance * coeff_contrails)}\\; \\text{kgCO₂eq}
+          \\end{aligned}
+          `,
+        center: true,
+      },
+      {
+        equation: `\\text{CO₂eq} = \\text{CO₂eq}_{CO₂} + \\text{CO₂eq}_{\\text{${t("equation.nonCO2")}}} = ${tripStep.emissions}\\; \\text{kgCO₂eq}`,
+        center: true,
+      },
+    ];
+
+    equations.map(({ equation, center }, index) => {
+      const element = document.getElementById(`equation${index + 1}`);
+      if (element) {
+        katex.render(equation, element, {
+          displayMode: center,
+        });
+      }
+    });
+  }, [i18n.language, tripStep]);
+
+  return <DetailedPlaneSection tripStep={tripStep} />;
 };
 
 export default PlaneSection;
