@@ -23,6 +23,7 @@ from models import (
     PlaneStepData,
     TripStepGeometry,
     TripStepResult,
+    TripType,
 )
 
 
@@ -105,6 +106,7 @@ def great_circle_geometry(
 def plane_to_gdf(
     departure_coords: tuple[float, float],
     arrival_coords: tuple[float, float],
+    trip_type: TripType,
     EF_plane=EF_plane,
     contrails=CONTRAILS_COEFF,
     holding=HOLD,
@@ -179,6 +181,7 @@ def plane_to_gdf(
                 length=route_length,
                 color=color_usage,
                 country_label=None,
+                trip_type=trip_type,
             ),
         ],
     )
