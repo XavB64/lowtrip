@@ -1,5 +1,9 @@
 export const thumbUp = "👍";
 
+/*****************
+ *  INPUT TYPES  *
+ *****************/
+
 export enum TRIP_TYPE {
   MAIN = "main",
   ALTERNATIVE = "alternative",
@@ -24,8 +28,6 @@ export enum Transport {
   ferry = "ferry",
   bicycle = "bicycle",
   sail = "sail",
-  myTrip = "myTrip",
-  otherTrip = "otherTrip",
 }
 
 export enum FerryOptions {
@@ -34,6 +36,10 @@ export enum FerryOptions {
   vehicle = "vehicle",
   cabinVehicle = "cabinVehicle",
 }
+
+/*****************
+ *  API TYPES    *
+ *****************/
 
 type TripStepGeometry = {
   color: string;
@@ -103,45 +109,14 @@ type TripResult = {
 };
 
 export type ApiResponse = {
-  my_trip: string;
-  direct_trip?: string;
-  alternative_trip?: string;
   error: string;
   geometries: TripStepGeometry[];
   trips: TripResult[];
 };
 
-export type MyTripData = {
-  NAME: string;
-  colors: string;
-  kgCO2eq: number;
-  "Mean of Transport": Transport;
-  step: number;
-};
-
-export type DirectTripData = {
-  ISO2: string;
-  NAME: string;
-  EF_tot: number;
-  colors: string;
-  path_length: number;
-  kgCO2eq: number;
-  "Mean of Transport": Transport;
-  Type: string;
-};
-
-export enum EmissionsCategory {
-  infra = "infra",
-  construction = "construction",
-  fuel = "fuel",
-  kerosene = "kerosene",
-  contrails = "contrails",
-  bikeBuild = "bikeBuild",
-  none = "none",
-  cabin = "cabin",
-  vehicle = "vehicle",
-  cabinVehicle = "cabinVehicle",
-}
+/**************************
+ * FRONTEND OUTPUT TYPES  *
+ ***************************/
 
 export type Trip = {
   steps: TripStep[];
