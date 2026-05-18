@@ -199,7 +199,7 @@ const TrainSection = ({
           emissions,
         } = emissionPart;
         equations.push({
-          equation: `\\text{CO₂eq}_{\\text{${country}}} = ${coefficient} \\times ${distance}\\; \\text{km} = ${emissions}\\; \\text{kgCO₂eq}`,
+          equation: `\\text{CO₂eq}_{\\text{${country.toLowerCase()}}} = ${coefficient} \\times ${distance}\\; \\text{km} = ${emissions}\\; \\text{kgCO₂eq}`,
           displayMode: false,
         });
       }
