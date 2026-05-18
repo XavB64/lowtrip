@@ -167,10 +167,9 @@ const TrainSection = ({
     const { tripStep, index } = props;
     const emissionsParts = tripStep.emissionParts;
 
-    const equations = [
+    const equations: { equation: string; displayMode?: boolean }[] = [
       {
         equation: `\\text{CO₂eq} = \\text{coeff}_{\\text{${t("equation.infrastructure")}}} \\times \\text{${t("equation.distance")}}_{\\text{${t("equation.total")}}} + \\sum_{\\text{${t("equation.country")}}} \\text{coeff}_{\\text{${t("equation.country")}}} \\times \\text{${t("equation.distance")}}_{\\text{${t("equation.country")}}}`,
-        center: true,
       },
       {
         equation: isDetailed
@@ -182,14 +181,12 @@ const TrainSection = ({
           \\end{aligned}
         `
           : `\\text{CO₂eq}_{\\text{${t("equation.infrastructure")}}} = ${tripStep.coeff_upstream} \\times ${tripStep.distance}\\; \\text{km} = ${round(tripStep.coeff_upstream * tripStep.distance)}\\; \\text{kgCO₂eq}`,
-        center: true,
       },
     ];
 
     if (isDetailed) {
       equations.push({
         equation: `\\text{CO₂eq}_{\\text{${t("equation.country")}}} = \\text{coeff}_{\\text{${t("equation.country")}}} \\times \\text{${t("equation.distance")}}_{\\text{${t("equation.country")}}}`,
-        center: true,
       });
     }
 
@@ -203,25 +200,22 @@ const TrainSection = ({
         } = emissionPart;
         equations.push({
           equation: `\\text{CO₂eq}_{\\text{${country}}} = ${coefficient} \\times ${distance}\\; \\text{km} = ${emissions}\\; \\text{kgCO₂eq}`,
-          center: false,
+          displayMode: false,
         });
       }
     });
 
     equations.push({
       equation: `\\text{CO₂eq} = \\text{CO₂eq}_{\\text{${t("equation.infrastructure")}}} + \\sum_{\\text{${t("equation.country")}}} \\text{CO₂eq}_{\\text{${t("equation.country")}}} = ${tripStep.emissions}\\; \\text{kgCO₂eq}`,
-      center: true,
     });
 
     // render equations
-    equations.map(({ equation, center }, equationIndex) => {
+    equations.map(({ equation, displayMode = true }, equationIndex) => {
       const element = document.getElementById(
         `step-${index}-equation${equationIndex + 1}`,
       );
       if (element) {
-        katex.render(equation, element, {
-          displayMode: center,
-        });
+        katex.render(equation, element, { displayMode });
       }
     });
   }, [i18n.language, props]);

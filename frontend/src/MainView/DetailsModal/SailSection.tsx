@@ -99,34 +99,25 @@ const SailSection = ({
     const equations = compact([
       ...(isDetailed
         ? [
-            {
-              equation: `\\text{CO₂eq}_{\\text{${t("equation.cruise")}}} = \\text{coeff}_{\\text{${t("equation.cruise")}}} \\times \\text{${t("equation.distance")}}`,
-              center: true,
-            },
-            {
-              equation: `\\text{${t("equation.distance")}} = ${tripStep.distance}\\; \\text{km}`,
-              center: true,
-            },
+            `\\text{CO₂eq}_{\\text{${t("equation.cruise")}}} = \\text{coeff}_{\\text{${t("equation.cruise")}}} \\times \\text{${t("equation.distance")}}`,
+            `\\text{${t("equation.distance")}} = ${tripStep.distance}\\; \\text{km}`,
           ]
         : []),
-      {
-        equation: `
+      `
           \\begin{aligned}
           \\text{CO₂eq}_{\\text{${t("equation.cruise")}}} &= \\text{coeff}_{\\text{${t("equation.cruise")}}} \\times \\text{${t("equation.distance")}} \\\\
                         &= ${tripStep.coeff_total} \\times ${tripStep.distance}\\; \\text{km} \\\\ 
                         &= ${tripStep.emissions}\\; \\text{kgCO₂eq}
           \\end{aligned}`,
-        center: true,
-      },
     ]);
 
-    equations.map(({ equation, center }, equationIndex) => {
+    equations.map((equation, equationIndex) => {
       const element = document.getElementById(
         `step-${index}-equation${equationIndex + 1}`,
       );
       if (element) {
         katex.render(equation, element, {
-          displayMode: center,
+          displayMode: true,
         });
       }
     });

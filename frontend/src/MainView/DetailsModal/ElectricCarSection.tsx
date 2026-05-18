@@ -166,10 +166,9 @@ const ElectricCarSection = ({
   useEffect(() => {
     const { tripStep, index } = props;
 
-    const equations = compact([
+    const equations: { equation: string; displayMode?: boolean }[] = compact([
       {
         equation: `\\text{CO₂eq} = \\frac{\\text{CO₂eq}_{\\text{${t("equation.construction")}}} + \\sum_{\\text{${t("equation.country")}}} \\left(\\text{\\text{coeff}}_{\\text{${t("equation.country")}}} \\times \\text{${t("equation.distance")}}_{\\text{${t("equation.country")}}}\\right)}{\\text{nb}_{\\text{${t("equation.passengers")}}}}`,
-        center: true,
       },
       {
         equation: `
@@ -178,11 +177,9 @@ const ElectricCarSection = ({
                         &= ${tripStep.coeff_upstream} \\times ${tripStep.distance}\\; \\text{km} \\\\ 
                         &= ${round(tripStep.coeff_upstream * tripStep.distance)}\\; \\text{kgCO₂eq}
           \\end{aligned}`,
-        center: true,
       },
       {
         equation: `\\text{CO₂eq}_{\\text{${t("equation.country")}}} = \\text{coeff}_{\\text{${t("equation.fuel")}}} \\times \\left(1 + 0.04 \\times (\\text{nb}_{\\text{${t("equation.passengers")}}} - 1)\\right) \\times \\text{coeff}_{\\text{${t("equation.country")}}} \\times \\text{${t("equation.distance")}}_{\\text{${t("equation.country")}}}`,
-        center: true,
       },
     ]);
 
@@ -191,24 +188,21 @@ const ElectricCarSection = ({
         const { emissionSource: country, coefficient, distance } = emissionPart;
         equations.push({
           equation: `\\text{CO₂eq}_{\\text{${country}}} = ${tripStep.coeff_fuel} \\times \\left(1 + 0.04 \\times (${tripStep.passengers_nb} - 1)\\right) \\times ${round(coefficient, 3)} \\times ${distance}\\; \\text{km} = ${round(coefficient * (1 + 0.04 * (tripStep.passengers_nb! - 1)) * distance * tripStep.coeff_fuel)}\\; \\text{kgCO₂eq}`,
-          center: false,
+          displayMode: false,
         });
       }
     });
 
     equations.push({
       equation: `\\text{CO₂eq} = \\frac{\\text{CO₂eq}_{\\text{${t("equation.construction")}}} + \\text{CO₂eq}_{\\text{${t("equation.fuel")}}}}{\\text{nb}_{\\text{${t("equation.passengers")}}}} = ${tripStep.emissions}\\; \\text{kgCO₂eq}`,
-      center: true,
     });
 
-    equations.map(({ equation, center }, equationIndex) => {
+    equations.map(({ equation, displayMode = true }, equationIndex) => {
       const element = document.getElementById(
         `step-${index}-equation${equationIndex + 1}`,
       );
       if (element) {
-        katex.render(equation, element, {
-          displayMode: center,
-        });
+        katex.render(equation, element, { displayMode });
       }
     });
   }, [i18n.language, props]);
