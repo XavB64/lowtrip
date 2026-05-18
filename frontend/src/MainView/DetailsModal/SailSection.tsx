@@ -6,43 +6,8 @@ import { useTranslation } from "react-i18next";
 import i18n from "i18n";
 import { Transport, TripStep } from "types";
 
-type SailSectionProps = {
-  tripStep: Extract<TripStep, { transport: Transport.sail }>;
-};
-
-const SailSection = ({ tripStep }: SailSectionProps) => {
+const DetailedSailSection = () => {
   const { t } = useTranslation("detailsModal");
-
-  useEffect(() => {
-    const equations = [
-      {
-        equation: `\\text{CO₂eq}_{\\text{${t("equation.cruise")}}} = \\text{coeff}_{\\text{${t("equation.cruise")}}} \\times \\text{${t("equation.distance")}}`,
-        center: true,
-      },
-      {
-        equation: `\\text{${t("equation.distance")}} = ${tripStep.distance}\\; \\text{km}`,
-        center: true,
-      },
-      {
-        equation: `
-          \\begin{aligned}
-          \\text{CO₂eq}_{\\text{${t("equation.cruise")}}} &= \\text{coeff}_{\\text{${t("equation.cruise")}}} \\times \\text{${t("equation.distance")}} \\\\
-                        &= ${tripStep.coeff_total} \\times ${tripStep.distance}\\; \\text{km} \\\\ 
-                        &= ${tripStep.emissions}\\; \\text{kgCO₂eq}
-          \\end{aligned}`,
-        center: true,
-      },
-    ];
-
-    equations.map(({ equation, center }, index) => {
-      const element = document.getElementById(`equation${index + 1}`);
-      if (element) {
-        katex.render(equation, element, {
-          displayMode: center,
-        });
-      }
-    });
-  }, [i18n.language, tripStep]);
 
   return (
     <>
@@ -90,6 +55,47 @@ const SailSection = ({ tripStep }: SailSectionProps) => {
       </section>
     </>
   );
+};
+
+type SailSectionProps = {
+  tripStep: Extract<TripStep, { transport: Transport.sail }>;
+};
+
+const SailSection = ({ tripStep }: SailSectionProps) => {
+  const { t } = useTranslation("detailsModal");
+
+  useEffect(() => {
+    const equations = [
+      {
+        equation: `\\text{CO₂eq}_{\\text{${t("equation.cruise")}}} = \\text{coeff}_{\\text{${t("equation.cruise")}}} \\times \\text{${t("equation.distance")}}`,
+        center: true,
+      },
+      {
+        equation: `\\text{${t("equation.distance")}} = ${tripStep.distance}\\; \\text{km}`,
+        center: true,
+      },
+      {
+        equation: `
+          \\begin{aligned}
+          \\text{CO₂eq}_{\\text{${t("equation.cruise")}}} &= \\text{coeff}_{\\text{${t("equation.cruise")}}} \\times \\text{${t("equation.distance")}} \\\\
+                        &= ${tripStep.coeff_total} \\times ${tripStep.distance}\\; \\text{km} \\\\ 
+                        &= ${tripStep.emissions}\\; \\text{kgCO₂eq}
+          \\end{aligned}`,
+        center: true,
+      },
+    ];
+
+    equations.map(({ equation, center }, index) => {
+      const element = document.getElementById(`equation${index + 1}`);
+      if (element) {
+        katex.render(equation, element, {
+          displayMode: center,
+        });
+      }
+    });
+  }, [i18n.language, tripStep]);
+
+  return <DetailedSailSection />;
 };
 
 export default SailSection;

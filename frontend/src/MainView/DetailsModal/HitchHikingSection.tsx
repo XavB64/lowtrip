@@ -7,51 +7,8 @@ import i18n from "i18n";
 import { TripStep, Transport } from "types";
 import { round } from "utils";
 
-type HitchHikingSectionProps = {
-  tripStep: Extract<TripStep, { transport: Transport.car }>;
-};
-
-const HitchHikingSection = ({ tripStep }: HitchHikingSectionProps) => {
+const DetailedHitchHikingSection = () => {
   const { t } = useTranslation("detailsModal");
-
-  useEffect(() => {
-    const equations = [
-      {
-        equation: `CO₂eq = \\text{CO₂eq}_{\\text{${t("equation.construction")}}} + \\text{CO₂eq}_{\\text{${t("equation.fuel")}}}`,
-        center: true,
-      },
-      {
-        equation: `distance = ${tripStep.emissionParts[0].distance}\\; \\text{km}`,
-        center: true,
-      },
-      {
-        equation: `\\text{CO₂eq}_{\\text{${t("equation.construction")}}} = 0\\; \\text{kgCO₂eq}`,
-        center: true,
-      },
-      {
-        equation: `
-          \\begin{aligned}
-          \\text{CO₂eq}_{\\text{${t("equation.fuel")}}} &= \\text{coeff}_{\\text{${t("equation.fuel")}}} \\times0.04 \\times ${t("equation.distance")} \\\\
-                    &=${tripStep.coeff_fuel} \\times 0.04 \\times ${tripStep.distance}\\; \\text{km} \\\\
-                    &= ${round(tripStep.coeff_fuel * tripStep.distance * 0.04)}\\; \\text{kgCO₂eq}
-          \\end{aligned}`,
-        center: true,
-      },
-      {
-        equation: `CO₂eq = \\text{CO₂eq}_{\\text{${t("equation.construction")}}} + \\text{CO₂eq}_{\\text{${t("equation.fuel")}}} = ${tripStep.emissions}\\; \\text{kgCO₂eq}`,
-        center: true,
-      },
-    ];
-
-    equations.map(({ equation, center }, index) => {
-      const element = document.getElementById(`equation${index + 1}`);
-      if (element) {
-        katex.render(equation, element, {
-          displayMode: center,
-        });
-      }
-    });
-  }, [i18n.language, tripStep]);
 
   return (
     <div className="space-y-4 text-sm">
@@ -130,6 +87,55 @@ const HitchHikingSection = ({ tripStep }: HitchHikingSectionProps) => {
       </section>
     </div>
   );
+};
+
+type HitchHikingSectionProps = {
+  tripStep: Extract<TripStep, { transport: Transport.car }>;
+};
+
+const HitchHikingSection = ({ tripStep }: HitchHikingSectionProps) => {
+  const { t } = useTranslation("detailsModal");
+
+  useEffect(() => {
+    const equations = [
+      {
+        equation: `CO₂eq = \\text{CO₂eq}_{\\text{${t("equation.construction")}}} + \\text{CO₂eq}_{\\text{${t("equation.fuel")}}}`,
+        center: true,
+      },
+      {
+        equation: `distance = ${tripStep.emissionParts[0].distance}\\; \\text{km}`,
+        center: true,
+      },
+      {
+        equation: `\\text{CO₂eq}_{\\text{${t("equation.construction")}}} = 0\\; \\text{kgCO₂eq}`,
+        center: true,
+      },
+      {
+        equation: `
+          \\begin{aligned}
+          \\text{CO₂eq}_{\\text{${t("equation.fuel")}}} &= \\text{coeff}_{\\text{${t("equation.fuel")}}} \\times0.04 \\times ${t("equation.distance")} \\\\
+                    &=${tripStep.coeff_fuel} \\times 0.04 \\times ${tripStep.distance}\\; \\text{km} \\\\
+                    &= ${round(tripStep.coeff_fuel * tripStep.distance * 0.04)}\\; \\text{kgCO₂eq}
+          \\end{aligned}`,
+        center: true,
+      },
+      {
+        equation: `CO₂eq = \\text{CO₂eq}_{\\text{${t("equation.construction")}}} + \\text{CO₂eq}_{\\text{${t("equation.fuel")}}} = ${tripStep.emissions}\\; \\text{kgCO₂eq}`,
+        center: true,
+      },
+    ];
+
+    equations.map(({ equation, center }, index) => {
+      const element = document.getElementById(`equation${index + 1}`);
+      if (element) {
+        katex.render(equation, element, {
+          displayMode: center,
+        });
+      }
+    });
+  }, [i18n.language, tripStep]);
+
+  return <DetailedHitchHikingSection />;
 };
 
 export default HitchHikingSection;

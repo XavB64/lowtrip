@@ -7,67 +7,8 @@ import i18n from "i18n";
 import { Transport, TripStep } from "types";
 import { round } from "utils";
 
-type TrainSectionProps = {
-  tripStep: Extract<TripStep, { transport: Transport.train }>;
-};
-
-const TrainSection = ({ tripStep }: TrainSectionProps) => {
+const DetailedTrainSection = ({ tripStep }: TrainSectionProps) => {
   const { t } = useTranslation("detailsModal");
-
-  useEffect(() => {
-    const emissionsParts = tripStep.emissionParts;
-
-    const equations = [
-      {
-        equation: `\\text{CO₂eq} = \\text{coeff}_{\\text{${t("equation.infrastructure")}}} \\times \\text{${t("equation.distance")}}_{\\text{${t("equation.total")}}} + \\sum_{\\text{${t("equation.country")}}} \\text{coeff}_{\\text{${t("equation.country")}}} \\times \\text{${t("equation.distance")}}_{\\text{${t("equation.country")}}}`,
-        center: true,
-      },
-      {
-        equation: `
-          \\begin{aligned}
-          \\text{CO₂eq}_{\\text{${t("equation.infrastructure")}}} &= \\text{coeff}_{\\text{${t("equation.infrastructure")}}} \\times \\text{${t("equation.distance")}}_{\\text{${t("equation.total")}}} \\\\
-                  &= ${tripStep.coeff_upstream} \\times ${tripStep.distance}\\; \\text{km} \\\\
-                  &= ${round(tripStep.coeff_upstream * tripStep.distance)}\\; \\text{kgCO₂eq}
-          \\end{aligned}
-        `,
-        center: true,
-      },
-      {
-        equation: `\\text{CO₂eq}_{\\text{${t("equation.country")}}} = \\text{coeff}_{\\text{${t("equation.country")}}} \\times \\text{${t("equation.distance")}}_{\\text{${t("equation.country")}}}`,
-        center: true,
-      },
-    ];
-
-    emissionsParts.forEach((emissionPart) => {
-      if (emissionPart.emissionSource !== "infra") {
-        const {
-          emissionSource: country,
-          coefficient,
-          distance,
-          emissions,
-        } = emissionPart;
-        equations.push({
-          equation: `\\text{CO₂eq}_{\\text{${country}}} = ${coefficient} \\times ${distance}\\; \\text{km} = ${emissions}\\; \\text{kgCO₂eq}`,
-          center: false,
-        });
-      }
-    });
-
-    equations.push({
-      equation: `\\text{CO₂eq} = \\text{CO₂eq}_{\\text{${t("equation.infrastructure")}}} + \\sum_{\\text{${t("equation.country")}}} \\text{CO₂eq}_{\\text{${t("equation.country")}}} = ${tripStep.emissions}\\; \\text{kgCO₂eq}`,
-      center: true,
-    });
-
-    // render equations
-    equations.map(({ equation, center }, index) => {
-      const element = document.getElementById(`equation${index + 1}`);
-      if (element) {
-        katex.render(equation, element, {
-          displayMode: center,
-        });
-      }
-    });
-  }, [i18n.language, tripStep]);
 
   return (
     <>
@@ -151,6 +92,71 @@ const TrainSection = ({ tripStep }: TrainSectionProps) => {
       </section>
     </>
   );
+};
+
+type TrainSectionProps = {
+  tripStep: Extract<TripStep, { transport: Transport.train }>;
+};
+
+const TrainSection = ({ tripStep }: TrainSectionProps) => {
+  const { t } = useTranslation("detailsModal");
+
+  useEffect(() => {
+    const emissionsParts = tripStep.emissionParts;
+
+    const equations = [
+      {
+        equation: `\\text{CO₂eq} = \\text{coeff}_{\\text{${t("equation.infrastructure")}}} \\times \\text{${t("equation.distance")}}_{\\text{${t("equation.total")}}} + \\sum_{\\text{${t("equation.country")}}} \\text{coeff}_{\\text{${t("equation.country")}}} \\times \\text{${t("equation.distance")}}_{\\text{${t("equation.country")}}}`,
+        center: true,
+      },
+      {
+        equation: `
+          \\begin{aligned}
+          \\text{CO₂eq}_{\\text{${t("equation.infrastructure")}}} &= \\text{coeff}_{\\text{${t("equation.infrastructure")}}} \\times \\text{${t("equation.distance")}}_{\\text{${t("equation.total")}}} \\\\
+                  &= ${tripStep.coeff_upstream} \\times ${tripStep.distance}\\; \\text{km} \\\\
+                  &= ${round(tripStep.coeff_upstream * tripStep.distance)}\\; \\text{kgCO₂eq}
+          \\end{aligned}
+        `,
+        center: true,
+      },
+      {
+        equation: `\\text{CO₂eq}_{\\text{${t("equation.country")}}} = \\text{coeff}_{\\text{${t("equation.country")}}} \\times \\text{${t("equation.distance")}}_{\\text{${t("equation.country")}}}`,
+        center: true,
+      },
+    ];
+
+    emissionsParts.forEach((emissionPart) => {
+      if (emissionPart.emissionSource !== "infra") {
+        const {
+          emissionSource: country,
+          coefficient,
+          distance,
+          emissions,
+        } = emissionPart;
+        equations.push({
+          equation: `\\text{CO₂eq}_{\\text{${country}}} = ${coefficient} \\times ${distance}\\; \\text{km} = ${emissions}\\; \\text{kgCO₂eq}`,
+          center: false,
+        });
+      }
+    });
+
+    equations.push({
+      equation: `\\text{CO₂eq} = \\text{CO₂eq}_{\\text{${t("equation.infrastructure")}}} + \\sum_{\\text{${t("equation.country")}}} \\text{CO₂eq}_{\\text{${t("equation.country")}}} = ${tripStep.emissions}\\; \\text{kgCO₂eq}`,
+      center: true,
+    });
+
+    // render equations
+    equations.map(({ equation, center }, index) => {
+      const element = document.getElementById(`equation${index + 1}`);
+      if (element) {
+        katex.render(equation, element, {
+          displayMode: center,
+        });
+      }
+    });
+  }, [i18n.language, tripStep]);
+
+  return <DetailedTrainSection tripStep={tripStep} />;
 };
 
 export default TrainSection;

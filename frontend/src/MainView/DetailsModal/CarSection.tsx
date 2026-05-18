@@ -7,56 +7,8 @@ import i18n from "i18n";
 import { Transport, TripStep } from "types";
 import { round } from "utils";
 
-type CarSectionProps = {
-  tripStep: Extract<TripStep, { transport: Transport.car }>;
-};
-
-const CarSection = ({ tripStep }: CarSectionProps) => {
+const DetailedCarSection = () => {
   const { t } = useTranslation("detailsModal");
-
-  useEffect(() => {
-    const equations = [
-      {
-        equation: `\\text{CO₂eq} = \\frac{\\text{CO₂eq}_{\\text{${t("equation.construction")}}} + \\text{CO₂eq}_{\\text{${t("equation.fuel")}}}}{\\text{nb}_{\\text{${t("equation.passengers")}}}}`,
-        center: true,
-      },
-      {
-        equation: `\\text{${t("equation.distance")}} = ${tripStep.distance}\\; \\text{km}`,
-        center: true,
-      },
-      {
-        equation: `
-          \\begin{aligned}
-          \\text{CO₂eq}_{\\text{${t("equation.construction")}}} &= \\text{coeff}_{\\text{${t("equation.construction")}}} \\times \\text{${t("equation.distance")}} \\\\
-                        &= ${tripStep.coeff_upstream} \\times ${tripStep.distance}\\; \\text{km} \\\\ 
-                        &= ${round(tripStep.coeff_upstream * tripStep.distance)}\\; \\text{kgCO₂eq}
-          \\end{aligned}`,
-        center: true,
-      },
-      {
-        equation: `
-          \\begin{aligned}
-          \\text{CO₂eq}_{\\text{${t("equation.fuel")}}} &= \\text{coeff}_{\\text{${t("equation.fuel")}}} \\times \\left(1 + 0.04 \\times (\\text{nb}_{\\text{${t("equation.passengers")}}} - 1)\\right) \\times ${t("equation.distance")} \\\\
-                    &=${tripStep.coeff_fuel} \\times (1 + 0.04 \\times (${tripStep.passengers_nb} - 1)) \\times ${tripStep.distance}\\; \\text{km} \\\\
-                    &= ${round(tripStep.coeff_fuel * tripStep.distance * (1 + 0.04 * (tripStep.passengers_nb - 1)))}\\; \\text{kgCO₂eq}
-          \\end{aligned}`,
-        center: true,
-      },
-      {
-        equation: `\\text{CO₂eq} = \\frac{\\text{CO₂eq}_{\\text{${t("equation.construction")}}} + \\text{CO₂eq}_{\\text{${t("equation.fuel")}}}}{\\text{nb}_{\\text{${t("equation.passengers")}}}} = ${tripStep.emissions}\\; \\text{kgCO₂eq}`,
-        center: true,
-      },
-    ];
-
-    equations.map(({ equation, center }, index) => {
-      const element = document.getElementById(`equation${index + 1}`);
-      if (element) {
-        katex.render(equation, element, {
-          displayMode: center,
-        });
-      }
-    });
-  }, [i18n.language, tripStep]);
 
   return (
     <div className="space-y-4 text-sm">
@@ -128,6 +80,60 @@ const CarSection = ({ tripStep }: CarSectionProps) => {
       </section>
     </div>
   );
+};
+
+type CarSectionProps = {
+  tripStep: Extract<TripStep, { transport: Transport.car }>;
+};
+
+const CarSection = ({ tripStep }: CarSectionProps) => {
+  const { t } = useTranslation("detailsModal");
+
+  useEffect(() => {
+    const equations = [
+      {
+        equation: `\\text{CO₂eq} = \\frac{\\text{CO₂eq}_{\\text{${t("equation.construction")}}} + \\text{CO₂eq}_{\\text{${t("equation.fuel")}}}}{\\text{nb}_{\\text{${t("equation.passengers")}}}}`,
+        center: true,
+      },
+      {
+        equation: `\\text{${t("equation.distance")}} = ${tripStep.distance}\\; \\text{km}`,
+        center: true,
+      },
+      {
+        equation: `
+          \\begin{aligned}
+          \\text{CO₂eq}_{\\text{${t("equation.construction")}}} &= \\text{coeff}_{\\text{${t("equation.construction")}}} \\times \\text{${t("equation.distance")}} \\\\
+                        &= ${tripStep.coeff_upstream} \\times ${tripStep.distance}\\; \\text{km} \\\\ 
+                        &= ${round(tripStep.coeff_upstream * tripStep.distance)}\\; \\text{kgCO₂eq}
+          \\end{aligned}`,
+        center: true,
+      },
+      {
+        equation: `
+          \\begin{aligned}
+          \\text{CO₂eq}_{\\text{${t("equation.fuel")}}} &= \\text{coeff}_{\\text{${t("equation.fuel")}}} \\times \\left(1 + 0.04 \\times (\\text{nb}_{\\text{${t("equation.passengers")}}} - 1)\\right) \\times ${t("equation.distance")} \\\\
+                    &=${tripStep.coeff_fuel} \\times (1 + 0.04 \\times (${tripStep.passengers_nb} - 1)) \\times ${tripStep.distance}\\; \\text{km} \\\\
+                    &= ${round(tripStep.coeff_fuel * tripStep.distance * (1 + 0.04 * (tripStep.passengers_nb - 1)))}\\; \\text{kgCO₂eq}
+          \\end{aligned}`,
+        center: true,
+      },
+      {
+        equation: `\\text{CO₂eq} = \\frac{\\text{CO₂eq}_{\\text{${t("equation.construction")}}} + \\text{CO₂eq}_{\\text{${t("equation.fuel")}}}}{\\text{nb}_{\\text{${t("equation.passengers")}}}} = ${tripStep.emissions}\\; \\text{kgCO₂eq}`,
+        center: true,
+      },
+    ];
+
+    equations.map(({ equation, center }, index) => {
+      const element = document.getElementById(`equation${index + 1}`);
+      if (element) {
+        katex.render(equation, element, {
+          displayMode: center,
+        });
+      }
+    });
+  }, [i18n.language, tripStep]);
+
+  return <DetailedCarSection />;
 };
 
 export default CarSection;

@@ -7,56 +7,8 @@ import i18n from "i18n";
 import { Transport, TripStep } from "types";
 import { round } from "utils";
 
-type BusSectionProps = {
-  tripStep: Extract<TripStep, { transport: Transport.bus }>;
-};
-
-const BusSection = ({ tripStep }: BusSectionProps) => {
+const DetailedBusSection = () => {
   const { t } = useTranslation("detailsModal");
-
-  useEffect(() => {
-    const equations = [
-      {
-        equation: `\\text{kgCO₂eq} = \\text{CO₂eq}_{\\text{${t("equation.construction")}}} + \\text{CO₂eq}_{\\text{\\text{${t("equation.fuel")}}}}`,
-        center: true,
-      },
-      {
-        equation: `\\text{distance}= ${tripStep.distance}\\; \\text{km}`,
-        center: true,
-      },
-      {
-        equation: `
-          \\begin{aligned}
-          \\text{CO₂eq}_{\\text{${t("equation.construction")}}} &= \\text{coeff}_{\\text{${t("equation.construction")}}} \\times \\text{${t("equation.distance")}} \\\\
-                        &= ${tripStep.coeff_upstream} \\times ${tripStep.distance}\\; \\text{km} \\\\
-                        &= ${round(tripStep.coeff_upstream * tripStep.distance)}\\; \\text{kgCO₂eq}
-          \\end{aligned}`,
-        center: true,
-      },
-      {
-        equation: `
-          \\begin{aligned}
-          \\text{CO₂eq}_{\\text{${t("equation.fuel")}}} &= \\text{coeff}_{\\text{${t("equation.fuel")}}} \\times \\text{${t("equation.distance")}}\\\\
-                        &= ${tripStep.coeff_fuel}\\times ${tripStep.distance}\\; \\text{km} \\\\
-                        &= ${round(tripStep.coeff_fuel * tripStep.distance)}\\; \\text{kgCO₂eq}
-          \\end{aligned}`,
-        center: true,
-      },
-      {
-        equation: `\\text{kgCO₂eq} = \\text{CO₂eq}_{\\text{${t("equation.construction")}}} + \\text{CO₂eq}_{\\text{${t("equation.fuel")}}} = ${tripStep.emissions}\\; \\text{kgCO₂eq}`,
-        center: true,
-      },
-    ];
-
-    equations.map(({ equation, center }, index) => {
-      const element = document.getElementById(`equation${index + 1}`);
-      if (element) {
-        katex.render(equation, element, {
-          displayMode: center,
-        });
-      }
-    });
-  }, [i18n.language, tripStep]);
 
   return (
     <>
@@ -126,6 +78,60 @@ const BusSection = ({ tripStep }: BusSectionProps) => {
       </section>
     </>
   );
+};
+
+type BusSectionProps = {
+  tripStep: Extract<TripStep, { transport: Transport.bus }>;
+};
+
+const BusSection = ({ tripStep }: BusSectionProps) => {
+  const { t } = useTranslation("detailsModal");
+
+  useEffect(() => {
+    const equations = [
+      {
+        equation: `\\text{kgCO₂eq} = \\text{CO₂eq}_{\\text{${t("equation.construction")}}} + \\text{CO₂eq}_{\\text{\\text{${t("equation.fuel")}}}}`,
+        center: true,
+      },
+      {
+        equation: `\\text{distance}= ${tripStep.distance}\\; \\text{km}`,
+        center: true,
+      },
+      {
+        equation: `
+          \\begin{aligned}
+          \\text{CO₂eq}_{\\text{${t("equation.construction")}}} &= \\text{coeff}_{\\text{${t("equation.construction")}}} \\times \\text{${t("equation.distance")}} \\\\
+                        &= ${tripStep.coeff_upstream} \\times ${tripStep.distance}\\; \\text{km} \\\\
+                        &= ${round(tripStep.coeff_upstream * tripStep.distance)}\\; \\text{kgCO₂eq}
+          \\end{aligned}`,
+        center: true,
+      },
+      {
+        equation: `
+          \\begin{aligned}
+          \\text{CO₂eq}_{\\text{${t("equation.fuel")}}} &= \\text{coeff}_{\\text{${t("equation.fuel")}}} \\times \\text{${t("equation.distance")}}\\\\
+                        &= ${tripStep.coeff_fuel}\\times ${tripStep.distance}\\; \\text{km} \\\\
+                        &= ${round(tripStep.coeff_fuel * tripStep.distance)}\\; \\text{kgCO₂eq}
+          \\end{aligned}`,
+        center: true,
+      },
+      {
+        equation: `\\text{kgCO₂eq} = \\text{CO₂eq}_{\\text{${t("equation.construction")}}} + \\text{CO₂eq}_{\\text{${t("equation.fuel")}}} = ${tripStep.emissions}\\; \\text{kgCO₂eq}`,
+        center: true,
+      },
+    ];
+
+    equations.map(({ equation, center }, index) => {
+      const element = document.getElementById(`equation${index + 1}`);
+      if (element) {
+        katex.render(equation, element, {
+          displayMode: center,
+        });
+      }
+    });
+  }, [i18n.language, tripStep]);
+
+  return <DetailedBusSection />;
 };
 
 export default BusSection;
