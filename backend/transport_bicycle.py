@@ -26,6 +26,7 @@ from models import (
     EmissionPart,
     TripStepGeometry,
     TripStepResult,
+    TripType,
 )
 from parameters import EF_bicycle, val_perimeter
 from utils import validate_geom
@@ -65,6 +66,7 @@ def find_bicycle(
 def bicycle_to_gdf(
     departure_coords: tuple[float, float],
     arrival_coords: tuple[float, float],
+    trip_type: TripType,
     EF=EF_bicycle,
     color="#ffffff",
     validate=val_perimeter,
@@ -116,6 +118,7 @@ def bicycle_to_gdf(
                 length=route_length,
                 color=color,
                 country_label=None,
+                trip_type=trip_type,
             ),
         ],
     )

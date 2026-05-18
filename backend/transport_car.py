@@ -29,6 +29,7 @@ from models import (
     EmissionPart,
     TripStepGeometry,
     TripStepResult,
+    TripType,
 )
 from parameters import (
     EF_bus,
@@ -88,6 +89,7 @@ def find_route(
 def ecar_to_gdf(
     departure_coords: tuple[float, float],
     arrival_coords: tuple[float, float],
+    trip_type: TripType,
     passengers_nb=1,
     validate=val_perimeter,
     color_usage="#ffffff",
@@ -157,6 +159,7 @@ def ecar_to_gdf(
                 color=color_usage,
                 length=row["path_length"],
                 country_label=row["NAME"],
+                trip_type=trip_type,
             ),
         )
 
@@ -249,6 +252,7 @@ def get_road_geometry_data(
     route_length: float,
     route_geometry: LineString,
     color_usage: str,
+    trip_type: TripType,
 ):
     return TripStepGeometry(
         coordinates=[[list(coord) for coord in route_geometry.coords]],
@@ -256,6 +260,7 @@ def get_road_geometry_data(
         color=color_usage,
         length=route_length,
         country_label=None,
+        trip_type=trip_type,
     )
 
 
@@ -291,7 +296,12 @@ def car_bus_to_gdf(
     ):
         return None
 
-    road_geometry = get_road_geometry_data(route_length, route_geometry, color_usage)
+    road_geometry = get_road_geometry_data(
+        route_length,
+        route_geometry,
+        color_usage,
+        "DIRECT_TRIP",
+    )
 
     car_emissions = get_car_emissions(
         route_length,
@@ -332,6 +342,7 @@ def car_bus_to_gdf(
 def bus_to_gdf(
     departure_coords: tuple[float, float],
     arrival_coords: tuple[float, float],
+    trip_type: TripType,
     EF_bus=EF_bus,
     validate=val_perimeter,
     color_usage="#ffffff",
@@ -358,7 +369,12 @@ def bus_to_gdf(
     ):
         return None
 
-    road_geometry = get_road_geometry_data(route_length, route_geometry, color_usage)
+    road_geometry = get_road_geometry_data(
+        route_length,
+        route_geometry,
+        color_usage,
+        trip_type,
+    )
     emissions = get_bus_emissions(
         route_length,
         EF_bus["fuel"],
@@ -382,6 +398,7 @@ def bus_to_gdf(
 def car_to_gdf(
     departure_coords: tuple[float, float],
     arrival_coords: tuple[float, float],
+    trip_type: TripType,
     EF_car=EF_car,
     validate=val_perimeter,
     passengers_nb=1,
@@ -410,7 +427,12 @@ def car_to_gdf(
     ):
         return None
 
-    geometry = get_road_geometry_data(route_length, route_geometry, color_usage)
+    geometry = get_road_geometry_data(
+        route_length,
+        route_geometry,
+        color_usage,
+        trip_type,
+    )
 
     return TripStepResult(
         step_data=CarStepData(

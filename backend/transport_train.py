@@ -31,6 +31,7 @@ from models import (
     TrainStepData,
     TripStepGeometry,
     TripStepResult,
+    TripType,
 )
 from parameters import (
     EF_train,
@@ -216,6 +217,7 @@ def find_train(
 def train_to_gdf(
     departure_coords: tuple[float, float],
     arrival_coords: tuple[float, float],
+    trip_type: TripType,
     perims=search_perimeter,
     EF_train=EF_train,
     validate=val_perimeter,
@@ -309,6 +311,7 @@ def train_to_gdf(
                     length=geo["path_length"],
                     color=geo["colors"],
                     country_label=geo["NAME"],
+                    trip_type=trip_type,
                 ),
             )
         elif type(geo["geometry"]) is MultiLineString:
@@ -322,6 +325,7 @@ def train_to_gdf(
                     length=geo["path_length"],
                     color=geo["colors"],
                     country_label=geo["NAME"],
+                    trip_type=trip_type,
                 ),
             )
         else:

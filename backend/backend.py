@@ -30,6 +30,7 @@ from models import (
     TripResult,
     TripStep,
     TripStepGeometry,
+    TripType,
 )
 from parameters import (
     colors_custom,
@@ -76,6 +77,7 @@ def compute_custom_trip_emissions(
     """
     emissions_data: list[StepData] = []
     geometries: list[TripStepGeometry] = []
+    trip_type: TripType = "MAIN_TRIP" if name == "MAIN_TRIP" else "SECOND_TRIP"
 
     for idx in range(len(trip_inputs) - 1):  # We loop until last departure
         # Departure coordinates
@@ -95,6 +97,7 @@ def compute_custom_trip_emissions(
             results = train_to_gdf(
                 departure_coordinates,
                 arrival_coordinates,
+                trip_type,
                 color_usage=cmap["Train"],
                 color_infra=cmap["Cons_infra"],
             )
@@ -103,6 +106,7 @@ def compute_custom_trip_emissions(
             results = bus_to_gdf(
                 departure_coordinates,
                 arrival_coordinates,
+                trip_type,
                 color_usage=cmap["Road"],
                 color_cons=cmap["Cons_infra"],
             )
@@ -111,6 +115,7 @@ def compute_custom_trip_emissions(
             results = car_to_gdf(
                 departure_coordinates,
                 arrival_coordinates,
+                trip_type,
                 passengers_nb=arrival.passengers_nb,
                 color_usage=cmap["Road"],
                 color_cons=cmap["Cons_infra"],
@@ -120,6 +125,7 @@ def compute_custom_trip_emissions(
             results = ecar_to_gdf(
                 departure_coordinates,
                 arrival_coordinates,
+                trip_type,
                 passengers_nb=arrival.passengers_nb,
                 color_usage=cmap["Road"],
                 color_cons=cmap["Cons_infra"],
@@ -129,6 +135,7 @@ def compute_custom_trip_emissions(
             results = bicycle_to_gdf(
                 departure_coordinates,
                 arrival_coordinates,
+                trip_type,
                 color=cmap["Bicycle"],
             )
 
@@ -136,6 +143,7 @@ def compute_custom_trip_emissions(
             results = plane_to_gdf(
                 departure_coordinates,
                 arrival_coordinates,
+                trip_type,
                 color_usage=cmap["Plane"],
                 color_contrails=cmap["Contrails"],
             )
@@ -144,6 +152,7 @@ def compute_custom_trip_emissions(
             results = ferry_to_gdf(
                 departure_coordinates,
                 arrival_coordinates,
+                trip_type,
                 color_usage=cmap["Ferry"],
                 options=arrival.options,
             )
@@ -152,6 +161,7 @@ def compute_custom_trip_emissions(
             results = sail_to_gdf(
                 departure_coordinates,
                 arrival_coordinates,
+                trip_type,
                 color_usage=cmap["Ferry"],
             )
 
@@ -196,6 +206,7 @@ def compute_direct_trips_emissions(inputs: list[TripStep], cmap=colors_direct):
             train_results = train_to_gdf(
                 departure_coordinates,
                 arrival_coordinates,
+                "DIRECT_TRIP",
                 color_usage=cmap["Train"],
                 color_infra=cmap["Cons_infra"],
             )
@@ -227,6 +238,7 @@ def compute_direct_trips_emissions(inputs: list[TripStep], cmap=colors_direct):
             plane_result = plane_to_gdf(
                 departure_coordinates,
                 arrival_coordinates,
+                "DIRECT_TRIP",
                 color_usage=cmap["Plane"],
                 color_contrails=cmap["Contrails"],
             )

@@ -132,13 +132,15 @@ export const formatResponse = (
         ? "road_with_country"
         : geometry.transport_means.toLowerCase();
 
+    const colorMap = getColorMap(geometry.trip_type);
+
     return geometry.coordinates.map((coords) => ({
       label: i18next.t(`chart.paths.${transportMeans}_with_details`, {
         countryLabel: geometry.country_label,
         length: Math.round(geometry.length),
       }),
       transportMeans: geometry.transport_means,
-      color: geometry.color,
+      color: colorMap.usage,
       coordinates: coords,
     }));
   });

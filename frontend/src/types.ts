@@ -42,7 +42,7 @@ export enum FerryOptions {
  *****************/
 
 type TripStepGeometry = {
-  color: string;
+  trip_type: "MAIN_TRIP" | "SECOND_TRIP" | "DIRECT_TRIP";
   coordinates: [number, number][][];
   transport_means: string;
   length: number;

@@ -33,6 +33,7 @@ from models import (
     SailStepData,
     TripStepGeometry,
     TripStepResult,
+    TripType,
 )
 from parameters import (
     EF_ferry,
@@ -214,6 +215,7 @@ def gdf_lines(start, end, add_canal=True):
 def ferry_to_gdf(
     tag1,
     tag2,
+    trip_type: TripType,
     EF=EF_ferry,
     options="none",
     color_usage="#ffffff",
@@ -276,12 +278,19 @@ def ferry_to_gdf(
                 length=bird,
                 color=color_usage,
                 country_label=None,
+                trip_type=trip_type,
             ),
         ],
     )
 
 
-def sail_to_gdf(tag1, tag2, EF=EF_sail, color_usage="#ffffff") -> TripStepResult:
+def sail_to_gdf(
+    tag1,
+    tag2,
+    trip_type: TripType,
+    EF=EF_sail,
+    color_usage="#ffffff",
+) -> TripStepResult:
     """Parameters
         - tag1, tag2
         - EF : emission factor in gCO2/pkm for ferry
@@ -330,6 +339,7 @@ def sail_to_gdf(tag1, tag2, EF=EF_sail, color_usage="#ffffff") -> TripStepResult
                 length=bird,
                 color=color_usage,
                 country_label=None,
+                trip_type=trip_type,
             ),
         ],
     )

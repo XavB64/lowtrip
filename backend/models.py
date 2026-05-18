@@ -50,6 +50,8 @@ class TripStep:
 # OUTPUTS
 ######################
 
+TripType = Literal["MAIN_TRIP", "SECOND_TRIP", "DIRECT_TRIP"]
+
 
 @dataclass
 class TripStepGeometry:
@@ -60,6 +62,7 @@ class TripStepGeometry:
     length: float
     color: str
     country_label: str | None
+    trip_type: TripType
 
 
 @dataclass
