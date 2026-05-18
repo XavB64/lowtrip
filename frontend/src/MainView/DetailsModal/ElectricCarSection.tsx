@@ -187,7 +187,7 @@ const ElectricCarSection = ({
       if (emissionPart.emissionSource !== "construction") {
         const { emissionSource: country, coefficient, distance } = emissionPart;
         equations.push({
-          equation: `\\text{CO₂eq}_{\\text{${country}}} = ${tripStep.coeff_fuel} \\times \\left(1 + 0.04 \\times (${tripStep.passengers_nb} - 1)\\right) \\times ${round(coefficient, 3)} \\times ${distance}\\; \\text{km} = ${round(coefficient * (1 + 0.04 * (tripStep.passengers_nb! - 1)) * distance * tripStep.coeff_fuel)}\\; \\text{kgCO₂eq}`,
+          equation: `\\text{CO₂eq}_{\\text{${country.toLowerCase()}}} = ${tripStep.coeff_fuel} \\times \\left(1 + 0.04 \\times (${tripStep.passengers_nb} - 1)\\right) \\times ${round(coefficient, 3)} \\times ${distance}\\; \\text{km} = ${round(coefficient * (1 + 0.04 * (tripStep.passengers_nb! - 1)) * distance * tripStep.coeff_fuel)}\\; \\text{kgCO₂eq}`,
           displayMode: false,
         });
       }
