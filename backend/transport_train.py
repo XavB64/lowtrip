@@ -34,7 +34,6 @@ from models import (
     TripType,
 )
 from parameters import (
-    EF_train,
     search_perimeter,
     train_s,
     train_t,
@@ -45,6 +44,13 @@ from utils import (
     split_path_by_country,
     validate_geom,
 )
+
+
+# Train emissions factors (kgCO2e / passenger.km).
+# Sources: SNCF "INFORMATION SUR LA QUANTITE DE GAZ A EFFET DE SERRE EMISE A l'OCCASION D'UNE
+# PRESTATION DE TRANSPORT" (2024)
+# https://medias.sncf.com/sncfcom/rse/methodologie-generale-infoges.pdf
+EF_TRAIN_INFRA = 0.0065
 
 
 class GeometryRecognitionError(Exception):
@@ -214,7 +220,6 @@ def train_to_gdf(
     arrival_coords: tuple[float, float],
     trip_type: TripType,
     perims=search_perimeter,
-    EF_train=EF_train,
     validate=val_perimeter,
 ):
     """Find the train path between 2 points and compute the emissions of the path.
@@ -273,8 +278,8 @@ def train_to_gdf(
     # Add infra emissions
     gdf = pd.concat([
         pd.DataFrame({
-            "kgCO2eq": [train_dist * EF_train["infra"]],
-            "EF": [EF_train["infra"]],
+            "kgCO2eq": [train_dist * EF_TRAIN_INFRA],
+            "EF": [EF_TRAIN_INFRA],
             "NAME": ["infra"],
             "path_length": [train_dist],
         }),
@@ -333,7 +338,7 @@ def train_to_gdf(
             transport="train",
             emissions=emissions,
             path_length=round(train_dist),
-            coeff_upstream=EF_train["infra"],
+            coeff_upstream=EF_TRAIN_INFRA,
         ),
         geometries=geometries,
     )

@@ -32,25 +32,29 @@ from models import (
     TripType,
 )
 from parameters import (
-    EF_bus,
-    EF_car,
-    EF_ecar,
     route_s,
     val_perimeter,
 )
 from utils import split_path_by_country, validate_geom as validate_geometry
 
 
-@dataclass
-class CarBusResults:
-    """Dataclass for car and bus emissions and road geometry."""
-
-    geometries: list[TripStepGeometry]
-    bus_step_data: BusStepData
-    car_step_data: CarStepData
-
-
 OSM_ROUTER_URL = "http://router.project-osrm.org/route/v1/driving"
+
+
+# Car emissions factors (kgCO2e / km).
+# Source: ADEME Base Carbone (2024)
+EF_CAR_CONSTRUCTION = 0.0256
+EF_CAR_FUEL = 0.192
+
+# Bus emissions factors (kgCO2e / passenger.km).
+# Source: ADEME Base Carbone (2024)
+EF_BUS_CONSTRUCTION = 0.00442
+EF_BUS_FUEL = 0.025
+
+# Electric car emissions factors (kgCO2e / km).
+EF_ECAR_CONSTRUCTION = 0.0836
+# Source: EV Database (2024) - https://ev-database.org/cheatsheet/energy-consumption-electric-car
+EF_ECAR_FUEL = 0.187
 
 
 def find_route(
@@ -121,15 +125,15 @@ def ecar_to_gdf(
     gdf["EF"] /= 1000.0  # Conversion in kg
 
     gdf["EF_tot"] = (
-        gdf["EF"] * EF_ecar["fuel"] * (1 + 0.04 * (passengers_nb - 1)) / passengers_nb
+        gdf["EF"] * EF_ECAR_FUEL * (1 + 0.04 * (passengers_nb - 1)) / passengers_nb
     )
     gdf["kgCO2eq"] = gdf["path_length"] * gdf["EF_tot"]
 
     # Add infra and construction
     gdf = pd.concat([
         pd.DataFrame({
-            "kgCO2eq": [route_length * EF_ecar["construction"] / passengers_nb],
-            "EF": [EF_ecar["construction"]],
+            "kgCO2eq": [route_length * EF_ECAR_CONSTRUCTION / passengers_nb],
+            "EF": [EF_ECAR_CONSTRUCTION],
             "NAME": ["construction"],
             "path_length": [route_length],
         }),
@@ -175,8 +179,8 @@ def ecar_to_gdf(
             emissions=emissions,
             path_length=round(route_length),
             passengers_nb=passengers_nb,
-            coeff_upstream=EF_ecar["construction"],
-            coeff_fuel=EF_ecar["fuel"],
+            coeff_upstream=EF_ECAR_CONSTRUCTION,
+            coeff_fuel=EF_ECAR_FUEL,
         ),
         geometries=geometries,
     )
@@ -187,24 +191,24 @@ def get_car_emissions(
     passengers_nb: str,
 ) -> list[EmissionPart]:
     if passengers_nb == "👍":  # Hitch-hiking
-        EF_fuel = EF_car["fuel"] * 0.04
+        EF_fuel = EF_CAR_FUEL * 0.04
         EF_construction = 0
     else:
         passengers_nb = int(passengers_nb)
-        EF_fuel = EF_car["fuel"] * (1 + 0.04 * (passengers_nb - 1)) / passengers_nb
-        EF_construction = EF_car["construction"] / passengers_nb
+        EF_fuel = EF_CAR_FUEL * (1 + 0.04 * (passengers_nb - 1)) / passengers_nb
+        EF_construction = EF_CAR_CONSTRUCTION / passengers_nb
 
     return [
         EmissionPart(
             name="construction",
             kg_co2_eq=round(route_length * EF_construction, 2),
-            ef_tot=EF_car["construction"],
+            ef_tot=EF_CAR_CONSTRUCTION,
             distance=round(route_length),
         ),
         EmissionPart(
             name="fuel",
             kg_co2_eq=round(route_length * EF_fuel, 2),
-            ef_tot=EF_car["fuel"],
+            ef_tot=EF_CAR_FUEL,
             distance=round(route_length),
         ),
     ]
@@ -212,20 +216,18 @@ def get_car_emissions(
 
 def get_bus_emissions(
     route_length: float,
-    EF_fuel: float,
-    EF_construction: float,
 ) -> list[EmissionPart]:
     return [
         EmissionPart(
             name="construction",
-            kg_co2_eq=round(route_length * EF_construction, 2),
-            ef_tot=EF_construction,
+            kg_co2_eq=round(route_length * EF_BUS_CONSTRUCTION, 2),
+            ef_tot=EF_BUS_CONSTRUCTION,
             distance=round(route_length),
         ),
         EmissionPart(
             name="fuel",
-            kg_co2_eq=round(route_length * EF_fuel, 2),
-            ef_tot=EF_fuel,
+            kg_co2_eq=round(route_length * EF_BUS_FUEL, 2),
+            ef_tot=EF_BUS_FUEL,
             distance=round(route_length),
         ),
     ]
@@ -245,11 +247,18 @@ def get_road_geometry_data(
     )
 
 
+@dataclass
+class CarBusResults:
+    """Dataclass for car and bus emissions and road geometry."""
+
+    geometries: list[TripStepGeometry]
+    bus_step_data: BusStepData
+    car_step_data: CarStepData
+
+
 def car_bus_to_gdf(
     departure_coords: tuple[float, float],
     arrival_coords: tuple[float, float],
-    EF_car=EF_car,
-    EF_bus=EF_bus,
     validate=val_perimeter,
 ) -> CarBusResults | None:
     """ONLY FOR FIRST FORM (optimization).
@@ -287,8 +296,6 @@ def car_bus_to_gdf(
 
     bus_emissions = get_bus_emissions(
         route_length,
-        EF_bus["fuel"],
-        EF_bus["construction"],
     )
 
     return CarBusResults(
@@ -297,8 +304,8 @@ def car_bus_to_gdf(
             transport="bus",
             emissions=bus_emissions,
             path_length=round(route_length),
-            coeff_upstream=EF_bus["fuel"],
-            coeff_fuel=EF_bus["construction"],
+            coeff_upstream=EF_BUS_CONSTRUCTION,
+            coeff_fuel=EF_BUS_FUEL,
         ),
         car_step_data=CarStepData(
             transport="car",
@@ -306,8 +313,8 @@ def car_bus_to_gdf(
             path_length=round(route_length),
             passengers_nb=1,
             is_hitch_hike=False,
-            coeff_upstream=EF_car["fuel"],
-            coeff_fuel=EF_car["construction"],
+            coeff_upstream=EF_CAR_CONSTRUCTION,
+            coeff_fuel=EF_CAR_FUEL,
         ),
     )
 
@@ -316,7 +323,6 @@ def bus_to_gdf(
     departure_coords: tuple[float, float],
     arrival_coords: tuple[float, float],
     trip_type: TripType,
-    EF_bus=EF_bus,
     validate=val_perimeter,
 ) -> TripStepResult | None:
     """Parameters
@@ -346,8 +352,6 @@ def bus_to_gdf(
     )
     emissions = get_bus_emissions(
         route_length,
-        EF_bus["fuel"],
-        EF_bus["construction"],
     )
 
     return TripStepResult(
@@ -355,8 +359,8 @@ def bus_to_gdf(
             transport="bus",
             emissions=emissions,
             path_length=round(route_length),
-            coeff_upstream=EF_bus["construction"],
-            coeff_fuel=EF_bus["fuel"],
+            coeff_upstream=EF_BUS_CONSTRUCTION,
+            coeff_fuel=EF_BUS_FUEL,
         ),
         geometries=[road_geometry],
     )
@@ -366,7 +370,6 @@ def car_to_gdf(
     departure_coords: tuple[float, float],
     arrival_coords: tuple[float, float],
     trip_type: TripType,
-    EF_car=EF_car,
     validate=val_perimeter,
     passengers_nb=1,
 ) -> TripStepResult | None:
@@ -407,8 +410,8 @@ def car_to_gdf(
             is_hitch_hike=passengers_nb == "👍",
             passengers_nb=passengers_nb,
             path_length=round(route_length),
-            coeff_upstream=EF_car["construction"],
-            coeff_fuel=EF_car["fuel"],
+            coeff_upstream=EF_CAR_CONSTRUCTION,
+            coeff_fuel=EF_CAR_FUEL,
         ),
         geometries=[geometry],
     )
