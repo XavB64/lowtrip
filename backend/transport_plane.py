@@ -15,6 +15,8 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+from dataclasses import dataclass
+
 from pyproj import Geod
 from shapely.geometry import LineString
 
@@ -27,35 +29,53 @@ from models import (
 )
 
 
-EF_plane = {
-    "short": {
-        "construction": 0.00038,
-        "upstream": 0.0242,
-        "combustion": 0.117,
-        "infra": 0.0003,
-    },
-    "medium": {
-        "construction": 0.00036,
-        "upstream": 0.0176,
-        "combustion": 0.0848,
-        "infra": 0.0003,
-    },
-    "long": {
-        "construction": 0.00026,
-        "upstream": 0.0143,
-        "combustion": 0.0687,
-        "infra": 0.0003,
-    },
-}
-
-
 # Number of points in plane geometry
 POINTS_NB = 100
 
-# Additional emissions from plane
-CONTRAILS_COEFF = 2
-HOLD = 3.81  # kg/p
+
+@dataclass(frozen=True)
+class PlaneEmissionFactors:
+    """Dataclass for plane emission factors. Values depend on the length of the flight."""
+
+    construction: float
+    upstream: float
+    combustion: float
+    infra: float
+
+
+# Plane emissions factors (kgCO2e / passenger.km)
+# SHORT < 1000km < MEDIUM < 3500km < LONG
+# Source: ADEME Base Carbone (2024)
+EF_PLANE_SHORT = PlaneEmissionFactors(
+    construction=0.00038,
+    upstream=0.0242,
+    combustion=0.117,
+    infra=0.0003,
+)
+EF_PLANE_MEDIUM = PlaneEmissionFactors(
+    construction=0.00036,
+    upstream=0.0176,
+    combustion=0.0848,
+    infra=0.0003,
+)
+EF_PLANE_LONG = PlaneEmissionFactors(
+    construction=0.00026,
+    upstream=0.0143,
+    combustion=0.0687,
+    infra=0.0003,
+)
+
+# Source: https://www.sciencedirect.com/science/article/pii/S0966692318305544
 DETOUR_COEFF = 1.076
+
+# Additional CO2 emissions (kg) due to holding patterns
+# Source: ATMOSFAIR
+# https://www.atmosfair.de/wp-content/uploads/flight-emissionscalculator-documentation-calculationmethodology.pdf
+HOLD = 3.81  # kg/p
+
+# Coefficient to apply to take into account non-CO2 effects
+# Sources: ADEME and IPCC
+CONTRAILS_COEFF = 2
 
 
 def great_circle_geometry(
@@ -107,16 +127,9 @@ def plane_to_gdf(
     departure_coords: tuple[float, float],
     arrival_coords: tuple[float, float],
     trip_type: TripType,
-    EF_plane=EF_plane,
-    contrails=CONTRAILS_COEFF,
-    holding=HOLD,
-    detour=DETOUR_COEFF,
 ) -> TripStepResult:
     """Parameters
         - departure_coords, arrival_coords
-        - EF : emission factor in gCO2/pkm for plane depending on journey length
-        - contrails : coefficient to apply to take into account non-CO2 effects
-        - holding : additional CO2 emissions (kg) due to holding patterns
     return:
         - full dataframe for plane, geometry for CO2 only (optimization).
 
@@ -128,26 +141,24 @@ def plane_to_gdf(
     )
 
     # Different emission factors depending on the trip length
+    emissions_factors = EF_PLANE_LONG
     if route_length < 1000:
-        trip_category = "short"
+        emissions_factors = EF_PLANE_SHORT
     elif route_length < 3500:
-        trip_category = "medium"
-    else:
-        trip_category = "long"
+        emissions_factors = EF_PLANE_MEDIUM
 
     # detour coeffient
-    route_length_with_detour = route_length * detour
+    route_length_with_detour = route_length * DETOUR_COEFF
 
-    emissions_factors = EF_plane[trip_category]
-    CO2_factors = emissions_factors["combustion"] + emissions_factors["upstream"]
-    non_CO2_factors = emissions_factors["combustion"] * contrails
+    CO2_factors = emissions_factors.combustion + emissions_factors.upstream
+    non_CO2_factors = emissions_factors.combustion * CONTRAILS_COEFF
 
     step_data = PlaneStepData(
         transport="plane",
         emissions=[
             EmissionPart(
                 name="kerosene",
-                kg_co2_eq=round(route_length_with_detour * CO2_factors + holding, 2),
+                kg_co2_eq=round(route_length_with_detour * CO2_factors + HOLD, 2),
                 ef_tot=CO2_factors,
                 distance=round(route_length_with_detour),
             ),
@@ -159,11 +170,11 @@ def plane_to_gdf(
             ),
         ],
         path_length=round(route_length),
-        coeff_path_detour=detour,
-        coeff_contrails=contrails,
-        coeff_fuel=emissions_factors["combustion"],
-        coeff_upstream=emissions_factors["upstream"],
-        holding=holding,
+        coeff_path_detour=DETOUR_COEFF,
+        coeff_contrails=CONTRAILS_COEFF,
+        coeff_fuel=emissions_factors.combustion,
+        coeff_upstream=emissions_factors.upstream,
+        holding=HOLD,
     )
 
     return TripStepResult(

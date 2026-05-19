@@ -36,10 +36,22 @@ from models import (
     TripType,
 )
 from parameters import (
-    EF_ferry,
-    EF_sail,
     train_intensity,
 )
+
+
+# Ferry emissions factors (kgCO2e / passenger.km).
+# Source: Future.eco, analysis by Maël Thomas-Quillévéré
+# https://futur.eco/documentation/transport/ferry/empreinte-par-km-volume
+
+EF_FERRY_CABIN = 0.11
+EF_FERRY_SEAT = 0.008
+EF_FERRY_BASE = 0.08
+EF_FERRY_CAR = 0.114
+
+# Sailboat emissions factor (kgCO2e / passenger.km).
+# Source: Sailcoop
+EF_SAIL = 0.069
 
 
 def get_shortest_path(line_gdf, start, end):
@@ -209,7 +221,6 @@ def ferry_to_gdf(
     departure_coords: tuple[float, float],
     arrival_coords: tuple[float, float],
     trip_type: TripType,
-    EF=EF_ferry,
     options="none",
 ) -> TripStepResult:
     """Parameters
@@ -230,13 +241,13 @@ def ferry_to_gdf(
 
     # Compute the good emission factor
     if options == "none":
-        EF = EF["Seat"] + EF["Base"]
+        EF = EF_FERRY_SEAT + EF_FERRY_BASE
     elif options == "cabin":
-        EF = EF["Cabin"] + EF["Base"]
+        EF = EF_FERRY_CABIN + EF_FERRY_BASE
     elif options == "vehicle":
-        EF = EF["Car"] + EF["Seat"] + EF["Base"]
+        EF = EF_FERRY_CAR + EF_FERRY_SEAT + EF_FERRY_BASE
     elif options == "cabinVehicle":
-        EF = EF["Car"] + EF["Cabin"] + EF["Base"]
+        EF = EF_FERRY_CAR + EF_FERRY_CABIN + EF_FERRY_BASE
 
     coordinates = []
     for l in geom.geoms:
@@ -276,7 +287,6 @@ def sail_to_gdf(
     departure_coords: tuple[float, float],
     arrival_coords: tuple[float, float],
     trip_type: TripType,
-    EF=EF_sail,
 ) -> TripStepResult:
     """Parameters
         - departure_coords, arrival_coords
@@ -308,13 +318,13 @@ def sail_to_gdf(
             emissions=[
                 EmissionPart(
                     name="Usage",
-                    kg_co2_eq=round(EF * bird, 2),
-                    ef_tot=EF,
+                    kg_co2_eq=round(EF_SAIL * bird, 2),
+                    ef_tot=EF_SAIL,
                     distance=round(bird),
                 ),
             ],
             path_length=round(bird),
-            coeff_total=EF,
+            coeff_total=EF_SAIL,
         ),
         geometries=[
             TripStepGeometry(

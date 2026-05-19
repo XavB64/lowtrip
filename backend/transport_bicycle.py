@@ -28,9 +28,14 @@ from models import (
     TripStepResult,
     TripType,
 )
-from parameters import EF_bicycle, val_perimeter
+from parameters import val_perimeter
 from utils import validate_geom
 
+
+# Bicycle manufacturing emissions (kgCO2e/km).
+# Source: European Cyclists' Federation, 2024.
+# https://ecf.com/news-and-events/news/how-much-co2-does-cycling-really-save
+EF_BICYCLE_MANUFACTURING = 0.005
 
 API_KEY = os.environ.get("BICYCLE_API_KEY")
 OPEN_ROUTE_SERVICE = "https://api.openrouteservice.org/v2/directions/cycling-regular"
@@ -78,12 +83,10 @@ def bicycle_to_gdf(
     departure_coords: tuple[float, float],
     arrival_coords: tuple[float, float],
     trip_type: TripType,
-    EF=EF_bicycle,
     validate=val_perimeter,
 ) -> TripStepResult | None:
     """Parameters
         - departure_coords, arrival_coords
-        - EF_bus, float emission factor for bike by pkm
         - validate
 
     Return:
@@ -110,13 +113,13 @@ def bicycle_to_gdf(
             emissions=[
                 EmissionPart(
                     name="bikeBuild",
-                    kg_co2_eq=round(EF * route_length, 2),
+                    kg_co2_eq=round(EF_BICYCLE_MANUFACTURING * route_length, 2),
                     distance=round(route_length),
-                    ef_tot=EF,
+                    ef_tot=EF_BICYCLE_MANUFACTURING,
                 ),
             ],
             path_length=round(route_length),
-            coeff_upstream=EF,
+            coeff_upstream=EF_BICYCLE_MANUFACTURING,
         ),
         geometries=[
             TripStepGeometry(

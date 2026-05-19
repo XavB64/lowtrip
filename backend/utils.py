@@ -65,13 +65,19 @@ def split_path_by_country(
     )
 
     if method == "train":
+        # Sources:
+        # - European countries: ADEME Base Carbone (2024)
+        # - China, Japan, USA, India & Russia: Railway Handbook produced by the International
+        #   and Environmental Agency and the Union of Railways (2017, https://uic.org/IMG/pdf/handbook_iea-uic_2017_web3.pdf)
+        # - other countries: 100gCO2 /p.km by default
+        data = train_intensity
         iso = "ISO2"
         EF = "EF_tot"
-        data = train_intensity
     else:  # ecar
+        # Source: Our World in Data (2024) - https://ourworldindata.org/electricity-mix
+        data = carbon_intensity_electricity
         iso = "Code"
         EF = "mix"
-        data = carbon_intensity_electricity
 
     # Split by geometry
     gdf.name = "geometry"
