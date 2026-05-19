@@ -68,13 +68,11 @@ def bicycle_to_gdf(
     arrival_coords: tuple[float, float],
     trip_type: TripType,
     EF=EF_bicycle,
-    color="#ffffff",
     validate=val_perimeter,
 ) -> TripStepResult | None:
     """Parameters
         - departure_coords, arrival_coords
         - EF_bus, float emission factor for bike by pkm
-        - color, color in hex of path and bar chart
         - validate
 
     Return:
@@ -105,7 +103,6 @@ def bicycle_to_gdf(
                     kg_co2_eq=round(EF * route_length, 2),
                     distance=round(route_length),
                     ef_tot=EF,
-                    color=color,
                 ),
             ],
             path_length=round(route_length),
@@ -116,7 +113,6 @@ def bicycle_to_gdf(
                 coordinates=[[list(coord) for coord in route_geometry.coords]],
                 transport_means="bicycle",
                 length=route_length,
-                color=color,
                 country_label=None,
                 trip_type=trip_type,
             ),

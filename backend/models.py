@@ -60,7 +60,6 @@ class TripStepGeometry:
     coordinates: list[list[float]]
     transport_means: str
     length: float
-    color: str
     country_label: str | None
     trip_type: TripType
 
@@ -73,7 +72,6 @@ class EmissionPart:
     ef_tot: float | None
     distance: float
     name: str
-    color: str
 
 
 @dataclass

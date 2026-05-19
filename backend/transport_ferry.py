@@ -218,12 +218,10 @@ def ferry_to_gdf(
     trip_type: TripType,
     EF=EF_ferry,
     options="none",
-    color_usage="#ffffff",
 ) -> TripStepResult:
     """Parameters
         - tag1, tag2
         - EF : emission factor in gCO2/pkm for ferry
-        - color : color for path and bar chart
     return:
         - full dataframe for ferry.
 
@@ -264,7 +262,6 @@ def ferry_to_gdf(
                     kg_co2_eq=round(EF * bird, 2),
                     ef_tot=EF,
                     distance=round(bird),
-                    color=color_usage,
                 ),
             ],
             path_length=round(bird),
@@ -276,7 +273,6 @@ def ferry_to_gdf(
                 coordinates=coordinates,
                 transport_means="ferry",
                 length=bird,
-                color=color_usage,
                 country_label=None,
                 trip_type=trip_type,
             ),
@@ -289,12 +285,10 @@ def sail_to_gdf(
     tag2,
     trip_type: TripType,
     EF=EF_sail,
-    color_usage="#ffffff",
 ) -> TripStepResult:
     """Parameters
         - tag1, tag2
         - EF : emission factor in gCO2/pkm for ferry
-        - color : color for path and bar chart
     return:
         - full dataframe for ferry.
 
@@ -326,7 +320,6 @@ def sail_to_gdf(
                     kg_co2_eq=round(EF * bird, 2),
                     ef_tot=EF,
                     distance=round(bird),
-                    color=color_usage,
                 ),
             ],
             path_length=round(bird),
@@ -337,7 +330,6 @@ def sail_to_gdf(
                 coordinates=coordinates,
                 transport_means="sail",
                 length=bird,
-                color=color_usage,
                 country_label=None,
                 trip_type=trip_type,
             ),

@@ -92,13 +92,10 @@ def ecar_to_gdf(
     trip_type: TripType,
     passengers_nb=1,
     validate=val_perimeter,
-    color_usage="#ffffff",
-    color_cons="#ffffff",
 ):
     """Parameters
         - departure_coords, arrival_coords
         - validate
-        - colormap, list of colors
     return:
         - full dataframe for trains.
 
@@ -120,9 +117,6 @@ def ecar_to_gdf(
         real_path_length=route_length,
     )
 
-    # Add colors
-    gdf["colors"] = color_usage
-
     passengers_nb = int(passengers_nb)
     gdf["EF"] /= 1000.0  # Conversion in kg
 
@@ -136,7 +130,6 @@ def ecar_to_gdf(
         pd.DataFrame({
             "kgCO2eq": [route_length * EF_ecar["construction"] / passengers_nb],
             "EF": [EF_ecar["construction"]],
-            "colors": [color_cons],
             "NAME": ["construction"],
             "path_length": [route_length],
         }),
@@ -146,7 +139,7 @@ def ecar_to_gdf(
     gdf["length"] = str(int(route_length)) + "km (" + gdf["NAME"] + ")"
     gdf.reset_index(inplace=True)
 
-    geo_ecar = gdf[["colors", "label", "geometry", "path_length", "NAME"]].dropna(
+    geo_ecar = gdf[["label", "geometry", "path_length", "NAME"]].dropna(
         axis=0,
     )
 
@@ -156,14 +149,13 @@ def ecar_to_gdf(
             TripStepGeometry(
                 coordinates=[[list(coord) for coord in row["geometry"].coords]],
                 transport_means="Road",
-                color=color_usage,
                 length=row["path_length"],
                 country_label=row["NAME"],
                 trip_type=trip_type,
             ),
         )
 
-    emissions_data = gdf[["kgCO2eq", "colors", "NAME", "EF", "path_length"]].to_dict(
+    emissions_data = gdf[["kgCO2eq", "NAME", "EF", "path_length"]].to_dict(
         "records",
     )
 
@@ -171,7 +163,6 @@ def ecar_to_gdf(
         EmissionPart(
             name=emission_data["NAME"],
             kg_co2_eq=round(emission_data["kgCO2eq"], 2),
-            color=emission_data["colors"],
             ef_tot=emission_data["EF"],
             distance=round(emission_data["path_length"]),
         )
@@ -194,8 +185,6 @@ def ecar_to_gdf(
 def get_car_emissions(
     route_length: float,
     passengers_nb: str,
-    color_usage: str,
-    color_construction: str,
 ) -> list[EmissionPart]:
     if passengers_nb == "👍":  # Hitch-hiking
         EF_fuel = EF_car["fuel"] * 0.04
@@ -211,14 +200,12 @@ def get_car_emissions(
             kg_co2_eq=round(route_length * EF_construction, 2),
             ef_tot=EF_car["construction"],
             distance=round(route_length),
-            color=color_construction,
         ),
         EmissionPart(
             name="fuel",
             kg_co2_eq=round(route_length * EF_fuel, 2),
             ef_tot=EF_car["fuel"],
             distance=round(route_length),
-            color=color_usage,
         ),
     ]
 
@@ -227,8 +214,6 @@ def get_bus_emissions(
     route_length: float,
     EF_fuel: float,
     EF_construction: float,
-    color_usage: str,
-    color_construction: str,
 ) -> list[EmissionPart]:
     return [
         EmissionPart(
@@ -236,14 +221,12 @@ def get_bus_emissions(
             kg_co2_eq=round(route_length * EF_construction, 2),
             ef_tot=EF_construction,
             distance=round(route_length),
-            color=color_construction,
         ),
         EmissionPart(
             name="fuel",
             kg_co2_eq=round(route_length * EF_fuel, 2),
             ef_tot=EF_fuel,
             distance=round(route_length),
-            color=color_usage,
         ),
     ]
 
@@ -251,13 +234,11 @@ def get_bus_emissions(
 def get_road_geometry_data(
     route_length: float,
     route_geometry: LineString,
-    color_usage: str,
     trip_type: TripType,
 ):
     return TripStepGeometry(
         coordinates=[[list(coord) for coord in route_geometry.coords]],
         transport_means="Road",
-        color=color_usage,
         length=route_length,
         country_label=None,
         trip_type=trip_type,
@@ -270,8 +251,6 @@ def car_bus_to_gdf(
     EF_car=EF_car,
     EF_bus=EF_bus,
     validate=val_perimeter,
-    color_usage="#ffffff",
-    color_cons="#ffffff",
 ) -> CarBusResults | None:
     """ONLY FOR FIRST FORM (optimization).
 
@@ -280,7 +259,6 @@ def car_bus_to_gdf(
         - departure_coords, arrival_coords
         - EF_car, float emission factor for one car by km
         - EF_bus, float emission factor for bus by pkm
-        - color, color in hex of path and bar chart
         - validate
     return:
         - CarBusResults or None
@@ -299,23 +277,18 @@ def car_bus_to_gdf(
     road_geometry = get_road_geometry_data(
         route_length,
         route_geometry,
-        color_usage,
         "DIRECT_TRIP",
     )
 
     car_emissions = get_car_emissions(
         route_length,
         1,
-        color_usage,
-        color_cons,
     )
 
     bus_emissions = get_bus_emissions(
         route_length,
         EF_bus["fuel"],
         EF_bus["construction"],
-        color_usage,
-        color_cons,
     )
 
     return CarBusResults(
@@ -345,13 +318,10 @@ def bus_to_gdf(
     trip_type: TripType,
     EF_bus=EF_bus,
     validate=val_perimeter,
-    color_usage="#ffffff",
-    color_cons="#ffffff",
 ) -> TripStepResult | None:
     """Parameters
         - departure_coords, arrival_coords
         - EF_bus, float emission factor for bus by pkm
-        - color, color in hex of path and bar chart
         - validate
 
     Returns
@@ -372,15 +342,12 @@ def bus_to_gdf(
     road_geometry = get_road_geometry_data(
         route_length,
         route_geometry,
-        color_usage,
         trip_type,
     )
     emissions = get_bus_emissions(
         route_length,
         EF_bus["fuel"],
         EF_bus["construction"],
-        color_usage,
-        color_cons,
     )
 
     return TripStepResult(
@@ -402,13 +369,10 @@ def car_to_gdf(
     EF_car=EF_car,
     validate=val_perimeter,
     passengers_nb=1,
-    color_usage="#ffffff",
-    color_cons="#ffffff",
 ) -> TripStepResult | None:
     """Parameters
         - departure_coords, arrival_coords
         - EF_car, float emission factor for one car by km
-        - color, color in hex of path and bar chart
         - validate
         - nb, number of passenger in the car (used only for custom trip).
 
@@ -430,7 +394,6 @@ def car_to_gdf(
     geometry = get_road_geometry_data(
         route_length,
         route_geometry,
-        color_usage,
         trip_type,
     )
 
@@ -440,8 +403,6 @@ def car_to_gdf(
             emissions=get_car_emissions(
                 route_length,
                 passengers_nb,
-                color_usage,
-                color_cons,
             ),
             is_hitch_hike=passengers_nb == "👍",
             passengers_nb=passengers_nb,

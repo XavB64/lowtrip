@@ -33,8 +33,6 @@ from models import (
     TripType,
 )
 from parameters import (
-    colors_custom,
-    colors_direct,
     min_plane_dist,
 )
 from transport_bicycle import bicycle_to_gdf
@@ -57,7 +55,6 @@ from transport_train import train_to_gdf
 def compute_custom_trip_emissions(
     name: str,
     trip_inputs: list[TripStep],
-    cmap=colors_custom,
 ):
     """Parameters
     ----------
@@ -98,8 +95,6 @@ def compute_custom_trip_emissions(
                 departure_coordinates,
                 arrival_coordinates,
                 trip_type,
-                color_usage=cmap["Train"],
-                color_infra=cmap["Cons_infra"],
             )
 
         elif transport_means == "bus":
@@ -107,8 +102,6 @@ def compute_custom_trip_emissions(
                 departure_coordinates,
                 arrival_coordinates,
                 trip_type,
-                color_usage=cmap["Road"],
-                color_cons=cmap["Cons_infra"],
             )
 
         elif transport_means == "car":
@@ -117,8 +110,6 @@ def compute_custom_trip_emissions(
                 arrival_coordinates,
                 trip_type,
                 passengers_nb=arrival.passengers_nb,
-                color_usage=cmap["Road"],
-                color_cons=cmap["Cons_infra"],
             )
 
         elif transport_means == "ecar":
@@ -127,8 +118,6 @@ def compute_custom_trip_emissions(
                 arrival_coordinates,
                 trip_type,
                 passengers_nb=arrival.passengers_nb,
-                color_usage=cmap["Road"],
-                color_cons=cmap["Cons_infra"],
             )
 
         elif transport_means == "bicycle":
@@ -136,7 +125,6 @@ def compute_custom_trip_emissions(
                 departure_coordinates,
                 arrival_coordinates,
                 trip_type,
-                color=cmap["Bicycle"],
             )
 
         elif transport_means == "plane":
@@ -144,8 +132,6 @@ def compute_custom_trip_emissions(
                 departure_coordinates,
                 arrival_coordinates,
                 trip_type,
-                color_usage=cmap["Plane"],
-                color_contrails=cmap["Contrails"],
             )
 
         elif transport_means == "ferry":
@@ -153,7 +139,6 @@ def compute_custom_trip_emissions(
                 departure_coordinates,
                 arrival_coordinates,
                 trip_type,
-                color_usage=cmap["Ferry"],
                 options=arrival.options,
             )
 
@@ -162,7 +147,6 @@ def compute_custom_trip_emissions(
                 departure_coordinates,
                 arrival_coordinates,
                 trip_type,
-                color_usage=cmap["Ferry"],
             )
 
         if results is None:  # Step is not successful
@@ -175,7 +159,7 @@ def compute_custom_trip_emissions(
     return TripResult(name=name, steps=emissions_data), geometries
 
 
-def compute_direct_trips_emissions(inputs: list[TripStep], cmap=colors_direct):
+def compute_direct_trips_emissions(inputs: list[TripStep]):
     """Compute emissions for the same trip, but with other transport means given the initial transport means used,
     the departure and arrival coordinates.
 
@@ -207,19 +191,14 @@ def compute_direct_trips_emissions(inputs: list[TripStep], cmap=colors_direct):
                 departure_coordinates,
                 arrival_coordinates,
                 "DIRECT_TRIP",
-                color_usage=cmap["Train"],
-                color_infra=cmap["Cons_infra"],
             )
             if train_results is not None:
                 trips.append(TripResult(name="TRAIN", steps=[train_results.step_data]))
                 geometries += train_results.geometries
 
-        cmap_road = colors_custom if transport_means == "ecar" else cmap
         road_results = car_bus_to_gdf(
             departure_coordinates,
             arrival_coordinates,
-            color_usage=cmap_road["Road"],
-            color_cons=cmap_road["Cons_infra"],
         )
 
         if road_results is not None:
@@ -239,8 +218,6 @@ def compute_direct_trips_emissions(inputs: list[TripStep], cmap=colors_direct):
                 departure_coordinates,
                 arrival_coordinates,
                 "DIRECT_TRIP",
-                color_usage=cmap["Plane"],
-                color_contrails=cmap["Contrails"],
             )
             trips.append(TripResult(name="PLANE", steps=[plane_result.step_data]))
             geometries += plane_result.geometries
