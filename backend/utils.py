@@ -160,19 +160,24 @@ def validate_geom(tag1, tag2, geom, th):
         boolean (True valid geometry / False wrong geometry).
     """
     geod = Geod(ellps="WGS84")
+
     # To compute distances
     # Creating geometries for departure
     ecart = LineString([tag1, list(geom.coords)[0]])
+
     # Maybe geod can compute length between 2 points directly
     if geod.geometry_length(ecart) / 1e3 > th:
         print("Departure is not valid")
         return False
+
     # Arrival
     ecart = LineString([tag2, list(geom.coords)[-1]])
+
     # Maybe geod can compute length between 2 points directly
     if geod.geometry_length(ecart) / 1e3 > th:
         print("Arrival is not valid")
         return False
+
     # If we arrive here both dep and arr were validated
     return True
 

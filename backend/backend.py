@@ -69,23 +69,20 @@ def compute_custom_trip_emissions(
     Raises
     ------
     ValueError
-        Si l'étape échoue avec le moyen de transport donné.
+        If no path is found with the given transport means.
 
     """
     emissions_data: list[StepData] = []
     geometries: list[TripStepGeometry] = []
     trip_type: TripType = "MAIN_TRIP" if name == "MAIN_TRIP" else "SECOND_TRIP"
 
-    for idx in range(len(trip_inputs) - 1):  # We loop until last departure
-        # Departure coordinates
+    for idx in range(len(trip_inputs) - 1):
         depature = trip_inputs[idx]
         departure_coordinates = (depature.lon, depature.lat)
 
-        # Arrival coordinates
         arrival = trip_inputs[idx + 1]
         arrival_coordinates = (arrival.lon, arrival.lat)
 
-        # Mean of transport
         transport_means = arrival.transport_means
         results = None
 

@@ -174,26 +174,22 @@ def find_train(
         - success, boolean
 
     """
-    # format lon, lat
     # Build the request url
     if method == "trainmap":
-        # trainmap
         url = (
             f"https://trainmap.ntag.fr/api/route?dep={departure_coords[0]},{departure_coords[1]}&arr={arrival_coords[0]},{arrival_coords[1]}&simplify="
             + train_t
         )  # 1 to simplify it
+
     else:
-        # signal
         url = (
             f"https://signal.eu.org/osm/eu/route/v1/train/{departure_coords[0]},{departure_coords[1]};{arrival_coords[0]},{arrival_coords[1]}?overview="
             + train_s
             + "&geometries=geojson"
         )  # simplified
+
     # Send the GET request
-    # import time
-    # s = time.time()
     response = requests.get(url)
-    # print(time.time() - s)
 
     # Check if the request was not successful
     if response.status_code != HTTPStatus.OK:
@@ -202,10 +198,9 @@ def find_train(
         # We will try to request again with overpass
         return geometry, success, train_dist
 
-    print("Path retrieved!")
     if method == "trainmap":
         geometry = LineString(response.json()["geometry"]["coordinates"][0])
-    else:  # signal
+    else:
         train_dist = response.json()["routes"][0]["distance"] / 1e3  # km
         geometry = LineString(response.json()["routes"][0]["geometry"]["coordinates"])
 

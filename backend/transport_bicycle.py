@@ -36,11 +36,24 @@ API_KEY = os.environ.get("BICYCLE_API_KEY")
 OPEN_ROUTE_SERVICE = "https://api.openrouteservice.org/v2/directions/cycling-regular"
 
 
-def find_bicycle(
+def find_bicycle_route(
     departure_coords: tuple[float, float],
     arrival_coords: tuple[float, float],
 ):
-    ### Open route service
+    """Fetches a bicycle route between two geographic coordinates using
+    the OpenRouteService API.
+
+    Args:
+        departure_coords: Departure coordinates as (longitude, latitude).
+        arrival_coords: Arrival coordinates as (longitude, latitude).
+
+    Returns:
+        A tuple containing:
+            - simplified route geometry.
+            - a boolean indicating whether a route was successfully found.
+            - route distance in kilometers.
+
+    """
     response = requests.get(
         f"{OPEN_ROUTE_SERVICE}?api_key={API_KEY}&start={departure_coords[0]},{departure_coords[1]}&end={arrival_coords[0]},{arrival_coords[1]}",
     )
@@ -57,8 +70,6 @@ def find_bicycle(
         preserve_topology=False,
     )
     route_length = route["properties"]["summary"]["distance"] / 1e3  # km
-
-    # print(f"Bicycle length: {round(route_length, 1)}km")
 
     return route_geometry, True, route_length
 
@@ -80,8 +91,7 @@ def bicycle_to_gdf(
         - TripStepResult or None
 
     """
-    # Route OSRM - create a separate function
-    route_geometry, success, route_length = find_bicycle(
+    route_geometry, success, route_length = find_bicycle_route(
         departure_coords,
         arrival_coords,
     )
