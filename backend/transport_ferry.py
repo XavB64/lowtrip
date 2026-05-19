@@ -43,12 +43,12 @@ from parameters import (
 
 
 def get_shortest_path(line_gdf, start, end):
-    # s = time.time()
     # To graph
     graph = momepy.gdf_to_nx(line_gdf, approach="primal", multigraph=False)
-    # print(graph.nodes)
+
     # Shortest path
     path = nx.shortest_path(graph, source=start, target=end, weight="mm_len")
+
     # Extract the edge geometries of the shortest path
     shortest_path_edges = [(path[i], path[i + 1]) for i in range(len(path) - 1)]
     shortest_path_geometries = [
@@ -57,7 +57,6 @@ def get_shortest_path(line_gdf, start, end):
         if "geometry" in graph.get_edge_data(u, v)
     ]
 
-    # print('network : ', round(time.time() - s, 3))
     # Merge the geometries of the edges in the shortest path
     return unary_union(shortest_path_geometries)
 
@@ -76,19 +75,18 @@ def create_coast(world=train_intensity, buffer=0):
 
 def get_line_coast(point, coast):
     """Coast the full shapely geometry."""
-    # Get linestring to get to the see
+    # Get linestring to get to the sea
     nearest_point_on_line = nearest_points(Point(point), coast)[1]
 
     # Create a new linestring connecting the two points
     new_linestring = LineString([Point(point), nearest_point_on_line])
-    # print(list(new_linestring.coords))
 
     return new_linestring  # noqa: RET504
 
 
-def extend_line(line, additional_length=0.001, start=False):  # , start=True
+def extend_line(line, additional_length=0.001, start=False):
     # Define the additional length you want to add to the LineString
-    # additional_length = 0.2
+
     # Get the coordinates of the first and last points of the LineString
     start_point = line.coords[0]
     end_point = line.coords[-1]
@@ -121,6 +119,7 @@ def extend_line(line, additional_length=0.001, start=False):  # , start=True
         # We extend from the start also
         # Create a new LineString with the extended length
         extended_line = LineString([new_start_point, *line.coords[1:], new_end_point])
+
     else:
         extended_line = LineString([start_point, *line.coords[1:], new_end_point])
 
@@ -130,8 +129,6 @@ def extend_line(line, additional_length=0.001, start=False):  # , start=True
 def get_sea_lines(start, end, world=train_intensity, nb=20, exp=10):
     # We use train because it's already loaded
     # Create a mesh
-    # Possibility to optimize the mesh ?
-    # s = time.time()
     quadri = []
     for lon in np.linspace(
         min(start[0], end[0]) - exp,
@@ -163,11 +160,8 @@ def get_sea_lines(start, end, world=train_intensity, nb=20, exp=10):
         world[["geometry"]],
         how="difference",
         keep_geom_type=False,
-    )  # .explore(), crs='epsg:4326')
+    )
 
-    # Need to extend lines ? seems not
-    # sea['geometry'] = sea['geometry'].apply(lambda x : extend_line(x, additional_length=0.001))
-    # print('Get sea lines : ', round(time.time() - s, 3))
     return sea.explode()
 
 
@@ -193,7 +187,6 @@ def gdf_lines(start, end, add_canal=True):
         )
 
     # Combine
-    # s = time.time()
     sea_lines = list(get_sea_lines(start, end).geometry.values)
     full_edge = unary_union(
         coast_exp0
@@ -203,39 +196,38 @@ def gdf_lines(start, end, add_canal=True):
         # Extend the lines for the shortest path to the sea
         [extend_line(k, start=True) for k in sea_lines[:-1]]
         +
-        # Don't extend direct conection
+        # Don't extend direct connection
         [sea_lines[-1]],
     )  # get the lines where ferry can navigate
-    # print('Extend line : ', round(time.time() - s, 3))
+
     return gpd.GeoDataFrame(
         geometry=gpd.GeoSeries(full_edge),
-    ).explode()  # , crs='epsg:4326'
+    ).explode()
 
 
 def ferry_to_gdf(
-    tag1,
-    tag2,
+    departure_coords: tuple[float, float],
+    arrival_coords: tuple[float, float],
     trip_type: TripType,
     EF=EF_ferry,
     options="none",
 ) -> TripStepResult:
     """Parameters
-        - tag1, tag2
+        - departure_coords, arrival_coords
         - EF : emission factor in gCO2/pkm for ferry
     return:
         - full dataframe for ferry.
 
     """
     # Compute geometry
-    # Convert the inputs in float
-    start = tuple([float(x) for x in tag1])
-    end = tuple([float(x) for x in tag2])
-    # Here new function
+    start = tuple([float(x) for x in departure_coords])
+    end = tuple([float(x) for x in arrival_coords])
     geom = get_shortest_path(gdf_lines(start, end), start, end)
-    # geom = LineString([tag1, tag2])
+
     # Compute the true distance
     geod = Geod(ellps="WGS84")
     bird = geod.geometry_length(geom) / 1e3
+
     # Compute the good emission factor
     if options == "none":
         EF = EF["Seat"] + EF["Base"]
@@ -281,25 +273,24 @@ def ferry_to_gdf(
 
 
 def sail_to_gdf(
-    tag1,
-    tag2,
+    departure_coords: tuple[float, float],
+    arrival_coords: tuple[float, float],
     trip_type: TripType,
     EF=EF_sail,
 ) -> TripStepResult:
     """Parameters
-        - tag1, tag2
+        - departure_coords, arrival_coords
         - EF : emission factor in gCO2/pkm for ferry
     return:
         - full dataframe for ferry.
 
     """
     # Compute geometry
-    # Convert the inputs in float
-    start = tuple([float(x) for x in tag1])
-    end = tuple([float(x) for x in tag2])
-    # Here new function
+    start = tuple([float(x) for x in departure_coords])
+    end = tuple([float(x) for x in arrival_coords])
+
     geom = get_shortest_path(gdf_lines(start, end), start, end)
-    # geom = LineString([tag1, tag2])
+
     # Compute the true distance
     geod = Geod(ellps="WGS84")
     bird = geod.geometry_length(geom) / 1e3

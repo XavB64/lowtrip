@@ -59,7 +59,7 @@ class TripStepGeometry:
 
     coordinates: list[list[float]]
     transport_means: str
-    length: float
+    length: float  # in km
     country_label: str | None
     trip_type: TripType
 
@@ -68,9 +68,9 @@ class TripStepGeometry:
 class EmissionPart:
     """Emission dataclass."""
 
-    kg_co2_eq: float
+    kg_co2_eq: float  # in kgCO2
     ef_tot: float | None
-    distance: float
+    distance: float  # in km
     name: str
 
 
@@ -80,7 +80,7 @@ class BaseStepData:
 
     transport: str
     emissions: list[EmissionPart]
-    path_length: float
+    path_length: float  # in km
 
 
 @dataclass
