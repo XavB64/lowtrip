@@ -30,7 +30,6 @@ from flask_cors import CORS
 import requests
 
 from backend import compute_custom_trip_emissions, compute_direct_trips_emissions
-from parameters import colors_alternative
 from utils import extract_path_steps_from_payload
 
 
@@ -70,7 +69,6 @@ def main():
             second_trip, second_trip_geometries = compute_custom_trip_emissions(
                 "SECOND_TRIP",
                 alternative_trip_inputs,
-                cmap=colors_alternative,
             )
             trips = [main_trip, second_trip]
             geometries += second_trip_geometries

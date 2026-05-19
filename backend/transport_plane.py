@@ -111,16 +111,12 @@ def plane_to_gdf(
     contrails=CONTRAILS_COEFF,
     holding=HOLD,
     detour=DETOUR_COEFF,
-    color_usage="#ffffff",
-    color_contrails="#ffffff",
 ) -> TripStepResult:
     """Parameters
         - departure_coords, arrival_coords
         - EF : emission factor in gCO2/pkm for plane depending on journey length
         - contrails : coefficient to apply to take into account non-CO2 effects
         - holding : additional CO2 emissions (kg) due to holding patterns
-        - color : color for path and bar chart
-        - color_contrails : color for non CO2-effects in bar chart
     return:
         - full dataframe for plane, geometry for CO2 only (optimization).
 
@@ -154,14 +150,12 @@ def plane_to_gdf(
                 kg_co2_eq=round(route_length_with_detour * CO2_factors + holding, 2),
                 ef_tot=CO2_factors,
                 distance=round(route_length_with_detour),
-                color=color_usage,
             ),
             EmissionPart(
                 name="contrails",
                 kg_co2_eq=round(route_length_with_detour * non_CO2_factors, 2),
                 ef_tot=non_CO2_factors,
                 distance=round(route_length_with_detour),
-                color=color_contrails,
             ),
         ],
         path_length=round(route_length),
@@ -179,7 +173,6 @@ def plane_to_gdf(
                 coordinates=[[list(coord) for coord in plane_geometry.coords]],
                 transport_means="Flight",
                 length=route_length,
-                color=color_usage,
                 country_label=None,
                 trip_type=trip_type,
             ),

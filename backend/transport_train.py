@@ -221,9 +221,7 @@ def train_to_gdf(
     perims=search_perimeter,
     EF_train=EF_train,
     validate=val_perimeter,
-    color_usage="#ffffff",
-    color_infra="#ffffff",
-):  # charte_mollow
+):
     """Find the train path between 2 points and compute the emissions of the path.
 
     Parameters
@@ -231,7 +229,6 @@ def train_to_gdf(
         - departure_coords, arrival_coords
         - perims
         - validate
-        - colormap, list of colors
 
     Returns
     -------
@@ -278,27 +275,21 @@ def train_to_gdf(
     gdf["EF"] /= 1000.0  # Conversion in kg
     gdf["kgCO2eq"] = gdf["path_length"] * gdf["EF"]
 
-    gdf["colors"] = color_usage
-
     # Add infra emissions
     gdf = pd.concat([
         pd.DataFrame({
             "kgCO2eq": [train_dist * EF_train["infra"]],
             "EF": [EF_train["infra"]],
-            "colors": [color_infra],
             "NAME": ["infra"],
             "path_length": [train_dist],
         }),
         gdf,
     ])
 
-    # Add infra
     gdf.reset_index(inplace=True)
 
     geo_train = (
-        gdf[["colors", "geometry", "path_length", "NAME"]]
-        .dropna(axis=0)
-        .to_dict("records")
+        gdf[["geometry", "path_length", "NAME"]].dropna(axis=0).to_dict("records")
     )
 
     geometries = []
@@ -309,7 +300,6 @@ def train_to_gdf(
                     coordinates=[[list(coord) for coord in geo["geometry"].coords]],
                     transport_means="Railway",
                     length=geo["path_length"],
-                    color=geo["colors"],
                     country_label=geo["NAME"],
                     trip_type=trip_type,
                 ),
@@ -323,7 +313,6 @@ def train_to_gdf(
                     coordinates=coordinates,
                     transport_means="Railway",
                     length=geo["path_length"],
-                    color=geo["colors"],
                     country_label=geo["NAME"],
                     trip_type=trip_type,
                 ),
@@ -331,14 +320,13 @@ def train_to_gdf(
         else:
             raise GeometryRecognitionError
 
-    emissions_data = gdf[["kgCO2eq", "colors", "NAME", "EF", "path_length"]].to_dict(
+    emissions_data = gdf[["kgCO2eq", "NAME", "EF", "path_length"]].to_dict(
         "records",
     )
     emissions = [
         EmissionPart(
             name=emission_data["NAME"],
             kg_co2_eq=round(emission_data["kgCO2eq"], 2),
-            color=emission_data["colors"],
             ef_tot=emission_data["EF"],
             distance=round(emission_data["path_length"]),
         )
