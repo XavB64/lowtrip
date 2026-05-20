@@ -30,16 +30,13 @@ from shapely.geometry.base import BaseGeometry
 
 from models import (
     CountryRouteSegment,
+    CountrySplitConfig,
     TripPayload,
     TripStep,
     TripStepGeometry,
     TripType,
 )
-from parameters import (
-    carbon_intensity_electricity,
-    GEOD,
-    train_intensity,
-)
+from parameters import GEOD
 
 
 # Not really accurate but good enough and fast for some purposes
@@ -65,8 +62,8 @@ class GeometryRecognitionError(Exception):
 
 def split_path_by_country(
     path: LineString,
-    method: str,
     real_path_length: float,
+    country_split_config: CountrySplitConfig,
     trip_type: TripType,
     sea_threshold=5,
 ) -> tuple[list[CountryRouteSegment], list[TripStepGeometry]]:
@@ -83,10 +80,9 @@ def split_path_by_country(
 
     Args:
         path: Route geometry as a LineString.
-        method: Transport method used to select the emission factor dataset
-            (e.g. "train" or "ecar").
         real_path_length: Total route length in kilometers used to rescale
             computed geometry lengths.
+        country_split_config: Configuration depending on the means of transport.
         trip_type: Type of trip associated with the generated geometries.
         sea_threshold: Minimum unmatched segment length in kilometers before
             reassignment to the nearest country.
@@ -107,31 +103,16 @@ def split_path_by_country(
         crs="epsg:4326",
     )
 
-    if method == "train":
-        # Sources:
-        # - European countries: ADEME Base Carbone (2024)
-        # - China, Japan, USA, India & Russia: Railway Handbook produced by the International
-        #   and Environmental Agency and the Union of Railways (2017, https://uic.org/IMG/pdf/handbook_iea-uic_2017_web3.pdf)
-        # - other countries: 100gCO2 /p.km by default
-        data = train_intensity
-        iso = "ISO2"
-        EF = "EF_tot"
-    else:  # ecar
-        # Source: Our World in Data (2024) - https://ourworldindata.org/electricity-mix
-        data = carbon_intensity_electricity
-        iso = "Code"
-        EF = "mix"
-
     # Split by geometry
     gdf.name = "geometry"
     res = gpd.overlay(
         gpd.GeoDataFrame(gdf, geometry="geometry", crs="epsg:4326"),
-        data,
+        country_split_config.dataset,
         how="intersection",
     )
     diff = gpd.overlay(
         gpd.GeoDataFrame(gdf, geometry="geometry", crs="epsg:4326"),
-        data,
+        country_split_config.dataset,
         how="difference",
     )
 
@@ -150,7 +131,7 @@ def split_path_by_country(
 
         # Filter depending is the gap is long enough to be taken into account and join with nearest country
         test = diff_2[diff_2.length > kilometer_to_degree(sea_threshold)].sjoin_nearest(
-            data,
+            country_split_config.dataset,
             how="left",
         )
 
@@ -158,10 +139,10 @@ def split_path_by_country(
         u = (
             pd
             .concat([res.explode(), test.explode()])
-            .groupby(iso)
+            .groupby(country_split_config.iso_column)
             .agg(
                 NAME=("NAME", lambda x: x.iloc[0]),
-                EF=(EF, lambda x: x.iloc[0]),
+                EF=(country_split_config.emission_factor_column, lambda x: x.iloc[0]),
                 geometry=(
                     "geometry",
                     lambda x: ops.linemerge(MultiLineString(x.values)),
@@ -173,10 +154,10 @@ def split_path_by_country(
         u = (
             res
             .explode()
-            .groupby(iso)
+            .groupby(country_split_config.iso_column)
             .agg(
                 NAME=("NAME", lambda x: x.iloc[0]),
-                EF=(EF, lambda x: x.iloc[0]),
+                EF=(country_split_config.emission_factor_column, lambda x: x.iloc[0]),
                 geometry=(
                     "geometry",
                     lambda x: ops.linemerge(MultiLineString(x.values)),

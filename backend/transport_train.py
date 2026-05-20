@@ -26,11 +26,13 @@ from shapely.geometry import (
 )
 
 from models import (
+    CountrySplitConfig,
     EmissionPart,
     TrainStepData,
     TripStepResult,
     TripType,
 )
+from parameters import train_intensity
 from utils import (
     kilometer_to_degree,
     m_to_km,
@@ -44,6 +46,13 @@ from utils import (
 # PRESTATION DE TRANSPORT" (2024)
 # https://medias.sncf.com/sncfcom/rse/methodologie-generale-infoges.pdf
 EF_TRAIN_INFRA = 0.0065
+
+
+TRAIN_COUNTRY_SPLIT_CONFIG = CountrySplitConfig(
+    dataset=train_intensity,
+    iso_column="ISO2",
+    emission_factor_column="EF_tot",
+)
 
 
 class GeometryRecognitionError(Exception):
@@ -252,8 +261,8 @@ def compute_train_trip(
     # Split path by country and compute the length and the emission factor for each part of the path
     country_route_segments, geometries = split_path_by_country(
         geometry,
-        method="train",
-        real_path_length=train_dist,
+        train_dist,
+        TRAIN_COUNTRY_SPLIT_CONFIG,
         trip_type=trip_type,
     )
 
