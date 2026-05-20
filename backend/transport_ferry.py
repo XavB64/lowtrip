@@ -38,6 +38,7 @@ from parameters import (
     GEOD,
     train_intensity,
 )
+from utils import m_to_km
 
 
 # Ferry emissions factors (kgCO2e / passenger.km).
@@ -236,7 +237,7 @@ def ferry_to_gdf(
     geom = get_shortest_path(gdf_lines(start, end), start, end)
 
     # Compute the true distance
-    bird = GEOD.geometry_length(geom) / 1e3
+    bird = m_to_km(GEOD.geometry_length(geom))
 
     # Compute the good emission factor
     if options == "none":
@@ -301,7 +302,7 @@ def sail_to_gdf(
     geom = get_shortest_path(gdf_lines(start, end), start, end)
 
     # Compute the true distance
-    bird = GEOD.geometry_length(geom) / 1e3
+    bird = m_to_km(GEOD.geometry_length(geom))
 
     coordinates = []
     for l in geom.geoms:

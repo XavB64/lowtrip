@@ -27,6 +27,7 @@ from models import (
     TripType,
 )
 from parameters import GEOD
+from utils import m_to_km
 
 
 # Number of points in plane geometry
@@ -118,7 +119,7 @@ def great_circle_geometry(
     else:
         l = [[lon, lat] for lon, lat in zip(r.lons, r.lats)]
 
-    return LineString(l), r.dist / 1e3  # in km
+    return LineString(l), m_to_km(r.dist)
 
 
 def plane_to_gdf(

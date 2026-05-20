@@ -42,11 +42,15 @@ def kilometer_to_degree(km):
     return c * km
 
 
+def m_to_km(d):
+    return d / 1000
+
+
 def compute_distance_between_2_points(
     point1: tuple[float, float],
     point2: tuple[float, float],
 ):
-    return GEOD.geometry_length(LineString([point1, point2])) / 1000
+    return m_to_km(GEOD.geometry_length(LineString([point1, point2])))
 
 
 def split_path_by_country(
@@ -153,7 +157,8 @@ def split_path_by_country(
     # Compute the length of each part of the path
     l_length = []
     for geom in gdf.geometry.values:
-        l_length.append(GEOD.geometry_length(geom) / 1e3)
+        part_length = m_to_km(GEOD.geometry_length(geom))
+        l_length.append(part_length)
     gdf["path_length"] = l_length
 
     # Rescale the length with train_dist (especially when simplified = True)
@@ -181,12 +186,18 @@ def validate_geometry(
         ``True`` if the geometry is valid, otherwise ``False``.
 
     """
-    departure_error_distance = compute_distance_between_2_points(departure_coords, list(geometry.coords)[0])
+    departure_error_distance = compute_distance_between_2_points(
+        departure_coords,
+        list(geometry.coords)[0],
+    )
     if departure_error_distance > distance_threshold:
         print("Departure is not valid")
         return False
 
-    arrival_error_distance = compute_distance_between_2_points(arrival_coords, list(geometry.coords)[-1])
+    arrival_error_distance = compute_distance_between_2_points(
+        arrival_coords,
+        list(geometry.coords)[-1],
+    )
     if arrival_error_distance > distance_threshold:
         print("Arrival is not valid")
         return False

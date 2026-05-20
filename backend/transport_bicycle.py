@@ -28,7 +28,7 @@ from models import (
     TripStepResult,
     TripType,
 )
-from utils import validate_geometry
+from utils import m_to_km, validate_geometry
 
 
 # Bicycle manufacturing emissions (kgCO2e/km).
@@ -73,7 +73,7 @@ def find_bicycle_route(
         0.05,
         preserve_topology=False,
     )
-    route_length = route["properties"]["summary"]["distance"] / 1e3  # km
+    route_length = m_to_km(route["properties"]["summary"]["distance"])
 
     return route_geometry, True, route_length
 
