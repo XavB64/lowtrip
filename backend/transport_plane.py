@@ -17,7 +17,6 @@
 
 from dataclasses import dataclass
 
-from pyproj import Geod
 from shapely.geometry import LineString
 
 from models import (
@@ -27,6 +26,7 @@ from models import (
     TripStepResult,
     TripType,
 )
+from parameters import GEOD
 
 
 # Number of points in plane geometry
@@ -92,11 +92,9 @@ def great_circle_geometry(
         - Geodesic distance in km
 
     """
-    geod = Geod(ellps="WGS84")
-
     # returns a list of longitude/latitude pairs describing n points equally spaced
     # intermediate points along the geodesic between the initial and terminus points.
-    r = geod.inv_intermediate(
+    r = GEOD.inv_intermediate(
         lon1=float(departure_coords[0]),
         lat1=float(departure_coords[1]),
         lon2=float(arrival_coords[0]),

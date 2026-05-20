@@ -19,12 +19,6 @@
 ### Librairies ######
 #####################
 
-# Classic
-from pyproj import Geod
-
-# Geometry
-from shapely.geometry import LineString
-
 from models import (
     StepData,
     TripResult,
@@ -43,6 +37,7 @@ from transport_car import (
 from transport_ferry import ferry_to_gdf, sail_to_gdf
 from transport_plane import plane_to_gdf
 from transport_train import train_to_gdf
+from utils import compute_distance_between_2_points
 
 
 ######################
@@ -206,8 +201,10 @@ def compute_direct_trips_emissions(inputs: list[TripStep]):
 
     # Compute plane emissions only for trips longer than 300km
     if transport_means != "plane":
-        bird_path = LineString([departure_coordinates, arrival_coordinates])
-        bird_distance = Geod(ellps="WGS84").geometry_length(bird_path) / 1e3
+        bird_distance = compute_distance_between_2_points(
+            departure_coordinates,
+            arrival_coordinates,
+        )
         if bird_distance > PLANE_MIN_DISTANCE:
             plane_result = plane_to_gdf(
                 departure_coordinates,
