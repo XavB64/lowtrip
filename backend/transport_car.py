@@ -61,15 +61,19 @@ def find_route(
     departure_coords: tuple[float, float],
     arrival_coords: tuple[float, float],
 ):
-    """Find road path between 2 points
-    parameters:
-        - departure_coords, arrival_coords : list or tuple like ; (lon, lat).
+    """Find a road route between two coordinates.
 
-    Returns
-    -------
-        - route_geometry : shapely geometry linestring
-        - route_length : float, distance in km
-        - success : boolean
+    Uses the routing provider to compute a route geometry and its total distance.
+
+    Args:
+        departure_coords: Departure coordinates as (longitude, latitude).
+        arrival_coords: Arrival coordinates as (longitude, latitude).
+
+    Returns:
+        A tuple containing:
+            - The route geometry as a LineString.
+            - The route distance in kilometers.
+            - Whether the route was successfully computed.
 
     """
     response = requests.get(
@@ -81,9 +85,7 @@ def find_route(
         return route_geometry, route_length, success
 
     route = response.json()["routes"][0]
-    route_geometry = LineString(
-        route["geometry"]["coordinates"],
-    )
+    route_geometry = LineString(route["geometry"]["coordinates"])
     route_length = m_to_km(route["distance"])
     success = True
 
