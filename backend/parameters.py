@@ -11,11 +11,5 @@ carbon_intensity_electricity = gpd.read_file(
     "static/carbon_intensity_electricity.geojson",
 )
 
-
-##########
-## Plane##
-##########
-
-
-# Min distance for plane comparison
-min_plane_dist = 300  # km
+# Minimun distance for plane comparison
+PLANE_MIN_DISTANCE = 300  # km

@@ -32,9 +32,7 @@ from models import (
     TripStepGeometry,
     TripType,
 )
-from parameters import (
-    min_plane_dist,
-)
+from parameters import PLANE_MIN_DISTANCE
 from transport_bicycle import bicycle_to_gdf
 from transport_car import (
     bus_to_gdf,
@@ -210,7 +208,7 @@ def compute_direct_trips_emissions(inputs: list[TripStep]):
     if transport_means != "plane":
         bird_path = LineString([departure_coordinates, arrival_coordinates])
         bird_distance = Geod(ellps="WGS84").geometry_length(bird_path) / 1e3
-        if bird_distance > min_plane_dist:
+        if bird_distance > PLANE_MIN_DISTANCE:
             plane_result = plane_to_gdf(
                 departure_coordinates,
                 arrival_coordinates,
