@@ -28,7 +28,6 @@ from models import (
     TripStepResult,
     TripType,
 )
-from parameters import val_perimeter
 from utils import validate_geometry
 
 
@@ -83,11 +82,9 @@ def bicycle_to_gdf(
     departure_coords: tuple[float, float],
     arrival_coords: tuple[float, float],
     trip_type: TripType,
-    validate=val_perimeter,
 ) -> TripStepResult | None:
     """Parameters
         - departure_coords, arrival_coords
-        - validate
 
     Return:
     ------
@@ -103,7 +100,6 @@ def bicycle_to_gdf(
         departure_coords,
         arrival_coords,
         route_geometry,
-        validate,
     ):
         return None
 

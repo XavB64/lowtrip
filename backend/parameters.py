@@ -11,9 +11,6 @@ carbon_intensity_electricity = gpd.read_file(
     "static/carbon_intensity_electricity.geojson",
 )
 
-# Validation perimeter
-val_perimeter = 100  # km
-
 
 # Threshold for unmatched train geometries (sea)
 sea_threshold = 5  # km

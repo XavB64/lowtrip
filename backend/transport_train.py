@@ -33,7 +33,6 @@ from models import (
     TripStepResult,
     TripType,
 )
-from parameters import val_perimeter
 from utils import (
     kilometer_to_degree,
     split_path_by_country,
@@ -213,14 +212,12 @@ def train_to_gdf(
     departure_coords: tuple[float, float],
     arrival_coords: tuple[float, float],
     trip_type: TripType,
-    validate=val_perimeter,
 ):
     """Find the train path between 2 points and compute the emissions of the path.
 
     Parameters
     ----------
         - departure_coords, arrival_coords
-        - validate
 
     Returns
     -------
@@ -251,7 +248,6 @@ def train_to_gdf(
             geometry,
             crs="epsg:4326",
         ).values[0],
-        validate,
     ):
         return None
 
