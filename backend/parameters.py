@@ -14,8 +14,6 @@ carbon_intensity_electricity = gpd.read_file(
 # Validation perimeter
 val_perimeter = 100  # km
 
-# Search areas
-search_perimeter = [0.2, 5]  # km
 
 # Threshold for unmatched train geometries (sea)
 sea_threshold = 5  # km
