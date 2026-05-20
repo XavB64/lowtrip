@@ -105,67 +105,59 @@ def split_path_by_country(
 
     # Split by geometry
     gdf.name = "geometry"
-    res = gpd.overlay(
+    intersections = gpd.overlay(
         gpd.GeoDataFrame(gdf, geometry="geometry", crs="epsg:4326"),
         country_split_config.dataset,
         how="intersection",
     )
-    diff = gpd.overlay(
+    unmatched_segments = gpd.overlay(
         gpd.GeoDataFrame(gdf, geometry="geometry", crs="epsg:4326"),
         country_split_config.dataset,
         how="difference",
     )
 
     # Check if the unmatched data is significant
-    if diff.length.sum() > kilometer_to_degree(sea_threshold):
-        print("Sea detected")
-        # In case we have bridges / tunnels across sea:
-        # Distinction depending on linestring / multilinestring
-        if diff.geometry[0].geom_type == "MultiLineString":
-            diff_2 = gpd.GeoDataFrame(list(diff.geometry.values[0].geoms))
-        else:
-            diff_2 = gpd.GeoDataFrame(list(diff.geometry.values))
+    if unmatched_segments.length.sum() < kilometer_to_degree(sea_threshold):
+        segments_to_aggregate = intersections.explode()
 
-        diff_2.columns = ["geometry"]
-        diff_2 = diff_2.set_geometry("geometry", crs="epsg:4326")
+    else:
+        print("Sea detected")
+
+        # In case we have bridges / tunnels across sea:
+        if unmatched_segments.geometry.iloc[0].geom_type == "MultiLineString":
+            sea_segments = gpd.GeoDataFrame(
+                list(unmatched_segments.geometry.iloc[0].geoms),
+            )
+        else:
+            sea_segments = gpd.GeoDataFrame(list(unmatched_segments.geometry.values))
+
+        sea_segments.columns = ["geometry"]
+        sea_segments = sea_segments.set_geometry("geometry", crs="epsg:4326")
 
         # Filter depending is the gap is long enough to be taken into account and join with nearest country
-        test = diff_2[diff_2.length > kilometer_to_degree(sea_threshold)].sjoin_nearest(
+        nearest_country_segments = sea_segments[
+            sea_segments.length > kilometer_to_degree(sea_threshold)
+        ].sjoin_nearest(
             country_split_config.dataset,
             how="left",
         )
 
-        # Aggregation per country and combining geometries
-        u = (
-            pd
-            .concat([res.explode(), test.explode()])
-            .groupby(country_split_config.iso_column)
-            .agg(
-                NAME=("NAME", lambda x: x.iloc[0]),
-                EF=(country_split_config.emission_factor_column, lambda x: x.iloc[0]),
-                geometry=(
-                    "geometry",
-                    lambda x: ops.linemerge(MultiLineString(x.values)),
-                ),
-            )
-        )
+        segments_to_aggregate = pd.concat([
+            intersections.explode(),
+            nearest_country_segments.explode(),
+        ])
 
-    else:
-        u = (
-            res
-            .explode()
-            .groupby(country_split_config.iso_column)
-            .agg(
-                NAME=("NAME", lambda x: x.iloc[0]),
-                EF=(country_split_config.emission_factor_column, lambda x: x.iloc[0]),
-                geometry=(
-                    "geometry",
-                    lambda x: ops.linemerge(MultiLineString(x.values)),
-                ),
-            )
-        )
-
-    gdf = gpd.GeoDataFrame(u, geometry="geometry", crs="epsg:4326").reset_index()
+    # Aggregation per country and combining geometries
+    aggregated_segments = segments_to_aggregate.groupby(
+        country_split_config.iso_column,
+    ).agg(
+        NAME=("NAME", "first"),
+        EF=(country_split_config.emission_factor_column, "first"),
+        geometry=(
+            "geometry",
+            lambda x: ops.linemerge(MultiLineString(x.values)),
+        ),
+    )
 
     raw_segments = [
         CountryRouteSegment(
@@ -174,7 +166,7 @@ def split_path_by_country(
             geometry=row["geometry"],
             path_length_km=m_to_km(GEOD.geometry_length(row["geometry"])),
         )
-        for _, row in gdf.iterrows()
+        for _, row in aggregated_segments.iterrows()
     ]
 
     total_length = sum(segment.path_length_km for segment in raw_segments)
