@@ -11,13 +11,6 @@ carbon_intensity_electricity = gpd.read_file(
     "static/carbon_intensity_electricity.geojson",
 )
 
-# Geometries from API
-simplified = True
-if simplified:
-    train_s, train_t, route_s = "simplified", "1", "simplified"
-else:
-    train_s, train_t, route_s = "full", "0", "full"
-
 # Validation perimeter
 val_perimeter = 100  # km
 

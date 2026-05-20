@@ -31,10 +31,7 @@ from models import (
     TripStepResult,
     TripType,
 )
-from parameters import (
-    route_s,
-    val_perimeter,
-)
+from parameters import val_perimeter
 from utils import split_path_by_country, validate_geom as validate_geometry
 
 
@@ -73,7 +70,7 @@ def find_route(
 
     """
     response = requests.get(
-        f"{OSM_ROUTER_URL}/{departure_coords[0]},{departure_coords[1]};{arrival_coords[0]},{arrival_coords[1]}?overview={route_s}&geometries=geojson",
+        f"{OSM_ROUTER_URL}/{departure_coords[0]},{departure_coords[1]};{arrival_coords[0]},{arrival_coords[1]}?overview=simplified&geometries=geojson",
     )
 
     if response.status_code != HTTPStatus.OK:

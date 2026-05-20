@@ -35,8 +35,6 @@ from models import (
 )
 from parameters import (
     search_perimeter,
-    train_s,
-    train_t,
     val_perimeter,
 )
 from utils import (
@@ -182,17 +180,13 @@ def find_train(
     """
     # Build the request url
     if method == "trainmap":
-        url = (
-            f"https://trainmap.ntag.fr/api/route?dep={departure_coords[0]},{departure_coords[1]}&arr={arrival_coords[0]},{arrival_coords[1]}&simplify="
-            + train_t
-        )  # 1 to simplify it
+        url = f"https://trainmap.ntag.fr/api/route?dep={departure_coords[0]},{departure_coords[1]}&arr={arrival_coords[0]},{arrival_coords[1]}&simplify=1"
 
     else:
         url = (
-            f"https://signal.eu.org/osm/eu/route/v1/train/{departure_coords[0]},{departure_coords[1]};{arrival_coords[0]},{arrival_coords[1]}?overview="
-            + train_s
-            + "&geometries=geojson"
-        )  # simplified
+            f"https://signal.eu.org/osm/eu/route/v1/train/{departure_coords[0]},{departure_coords[1]};{arrival_coords[0]},{arrival_coords[1]}"
+            "?overview=simplified&geometries=geojson"
+        )
 
     # Send the GET request
     response = requests.get(url)
