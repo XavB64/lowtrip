@@ -18,7 +18,6 @@
 from dataclasses import dataclass
 from http import HTTPStatus
 
-import pandas as pd
 import requests
 from shapely.geometry import LineString
 
@@ -121,10 +120,26 @@ def compute_ecar_trip(
     trip_type: TripType,
     passengers_nb=1,
 ):
-    """Parameters
-        - departure_coords, arrival_coords
-    return:
-        - full dataframe for trains.
+    """Compute an electric car trip between two coordinates.
+
+    Finds a road route, validates its geometry, and computes the associated
+    transport emissions and trip metadata.
+
+    The route is split by country to apply country-specific electricity
+    emission factors based on the distance traveled in each country.
+
+    Emissions are adjusted according to the number of passengers by adding
+    4% additional emissions per extra passenger.
+
+    Args:
+        departure_coords: Departure coordinates as (longitude, latitude).
+        arrival_coords: Arrival coordinates as (longitude, latitude).
+        trip_type: Type of trip to compute.
+        passengers_nb: Number of passengers in the vehicle.
+
+    Returns:
+        A ``TripStepResult`` containing the route geometry and emissions
+        data, or ``None`` if no valid route could be found.
 
     """
     route_geometry, route_length, success = find_route(departure_coords, arrival_coords)
@@ -133,62 +148,39 @@ def compute_ecar_trip(
         return None
 
     # We need to filter by country and add length / Emission factors
-    gdf = split_path_by_country(
+    country_route_segments, geometries = split_path_by_country(
         route_geometry,
         method="ecar",
         real_path_length=route_length,
+        trip_type=trip_type,
     )
 
     passengers_nb = int(passengers_nb)
     passenger_adjustment_factor = compute_passenger_adjustment_factor(passengers_nb)
-    gdf["EF"] /= 1000.0  # Conversion in kg
-
-    gdf["EF_tot"] = gdf["EF"] * EF_ECAR_FUEL * passenger_adjustment_factor
-    gdf["kgCO2eq"] = gdf["path_length"] * gdf["EF_tot"]
-
-    # Add infra and construction
-    gdf = pd.concat([
-        pd.DataFrame({
-            "kgCO2eq": [route_length * EF_ECAR_CONSTRUCTION / passengers_nb],
-            "EF": [EF_ECAR_CONSTRUCTION],
-            "NAME": ["construction"],
-            "path_length": [route_length],
-        }),
-        gdf,
-    ])
-    gdf["label"] = "Road"
-    gdf["length"] = str(int(route_length)) + "km (" + gdf["NAME"] + ")"
-    gdf.reset_index(inplace=True)
-
-    geo_ecar = gdf[["label", "geometry", "path_length", "NAME"]].dropna(
-        axis=0,
-    )
-
-    geometries = []
-    for _, row in geo_ecar.iterrows():
-        geometries.append(
-            TripStepGeometry(
-                coordinates=[[list(coord) for coord in row["geometry"].coords]],
-                transport_means="Road",
-                length=row["path_length"],
-                country_label=row["NAME"],
-                trip_type=trip_type,
-            ),
-        )
-
-    emissions_data = gdf[["kgCO2eq", "NAME", "EF", "path_length"]].to_dict(
-        "records",
-    )
 
     emissions = [
         EmissionPart(
-            name=emission_data["NAME"],
-            kg_co2_eq=round(emission_data["kgCO2eq"], 2),
-            ef_tot=emission_data["EF"],
-            distance=round(emission_data["path_length"]),
+            name=segment.country_name,
+            kg_co2_eq=round(
+                segment.emission_factor
+                * EF_ECAR_FUEL
+                * passenger_adjustment_factor
+                * segment.path_length_km,
+                2,
+            ),
+            ef_tot=segment.emission_factor,
+            distance=round(segment.path_length_km),
         )
-        for emission_data in emissions_data
+        for segment in country_route_segments
     ]
+    emissions.append(
+        EmissionPart(
+            name="construction",
+            kg_co2_eq=round(route_length * EF_ECAR_CONSTRUCTION / passengers_nb),
+            ef_tot=EF_ECAR_CONSTRUCTION,
+            distance=round(route_length),
+        ),
+    )
 
     return TripStepResult(
         step_data=EcarStepData(

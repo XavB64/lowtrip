@@ -22,14 +22,12 @@ import pandas as pd
 import requests
 from shapely.geometry import (
     LineString,
-    MultiLineString,
     Point,
 )
 
 from models import (
     EmissionPart,
     TrainStepData,
-    TripStepGeometry,
     TripStepResult,
     TripType,
 )
@@ -226,7 +224,6 @@ def compute_train_trip(
 
     Raises
     ------
-    GeometryRecognitionError
         If the geometry is not recognized.
 
     """
@@ -252,74 +249,31 @@ def compute_train_trip(
     ):
         return None
 
-    # Split path by country and compute for each part of the path, the length and the emission factor
-    gdf = split_path_by_country(
+    # Split path by country and compute the length and the emission factor for each part of the path
+    country_route_segments, geometries = split_path_by_country(
         geometry,
         method="train",
         real_path_length=train_dist,
+        trip_type=trip_type,
     )
 
-    # Compute emissions : EF * length
-    gdf["EF"] /= 1000.0  # Conversion in kg
-    gdf["kgCO2eq"] = gdf["path_length"] * gdf["EF"]
-
-    # Add infra emissions
-    gdf = pd.concat([
-        pd.DataFrame({
-            "kgCO2eq": [train_dist * EF_TRAIN_INFRA],
-            "EF": [EF_TRAIN_INFRA],
-            "NAME": ["infra"],
-            "path_length": [train_dist],
-        }),
-        gdf,
-    ])
-
-    gdf.reset_index(inplace=True)
-
-    geo_train = (
-        gdf[["geometry", "path_length", "NAME"]].dropna(axis=0).to_dict("records")
-    )
-
-    geometries = []
-    for geo in geo_train:
-        if type(geo["geometry"]) is LineString:
-            geometries.append(
-                TripStepGeometry(
-                    coordinates=[[list(coord) for coord in geo["geometry"].coords]],
-                    transport_means="Railway",
-                    length=geo["path_length"],
-                    country_label=geo["NAME"],
-                    trip_type=trip_type,
-                ),
-            )
-        elif type(geo["geometry"]) is MultiLineString:
-            coordinates = []
-            for l in geo["geometry"].geoms:
-                coordinates.append([list(coord) for coord in l.coords])
-            geometries.append(
-                TripStepGeometry(
-                    coordinates=coordinates,
-                    transport_means="Railway",
-                    length=geo["path_length"],
-                    country_label=geo["NAME"],
-                    trip_type=trip_type,
-                ),
-            )
-        else:
-            raise GeometryRecognitionError
-
-    emissions_data = gdf[["kgCO2eq", "NAME", "EF", "path_length"]].to_dict(
-        "records",
-    )
     emissions = [
         EmissionPart(
-            name=emission_data["NAME"],
-            kg_co2_eq=round(emission_data["kgCO2eq"], 2),
-            ef_tot=emission_data["EF"],
-            distance=round(emission_data["path_length"]),
+            name=segment.country_name,
+            kg_co2_eq=round(segment.emission_factor * segment.path_length_km, 2),
+            ef_tot=segment.emission_factor,
+            distance=round(segment.path_length_km),
         )
-        for emission_data in emissions_data
+        for segment in country_route_segments
     ]
+    emissions.append(
+        EmissionPart(
+            name="infra",
+            kg_co2_eq=round(train_dist * EF_TRAIN_INFRA),
+            ef_tot=EF_TRAIN_INFRA,
+            distance=round(train_dist),
+        ),
+    )
 
     return TripStepResult(
         step_data=TrainStepData(
