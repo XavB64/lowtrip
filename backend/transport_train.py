@@ -33,10 +33,7 @@ from models import (
     TripStepResult,
     TripType,
 )
-from parameters import (
-    search_perimeter,
-    val_perimeter,
-)
+from parameters import val_perimeter
 from utils import (
     kilometer_to_degree,
     split_path_by_country,
@@ -60,7 +57,7 @@ def flatten_list_of_tuples(lst):
     return [item for tup in lst for item in tup[::-1]]
 
 
-def find_nearest(lon, lat, perim):
+def find_nearest(lon, lat, search_perimeter: float):
     """This function find the nearest node for train raiway in the OSM network using Overpass API
     parameters:
         - lon, lat : coordinates in degree of the point
@@ -69,7 +66,9 @@ def find_nearest(lon, lat, perim):
         - new coordinates(lat, lon).
     """
     # Extend the area around the point
-    buff = list(Point(lon, lat).buffer(kilometer_to_degree(perim)).exterior.coords)
+    buff = list(
+        Point(lon, lat).buffer(kilometer_to_degree(search_perimeter)).exterior.coords,
+    )
     # Request Overpass API turbo data :
     l = flatten_list_of_tuples(buff)
 
@@ -105,7 +104,6 @@ def find_nearest(lon, lat, perim):
 def extend_search(
     departure_coords: tuple[float, float],
     arrival_coords: tuple[float, float],
-    perims,
 ):
     """Function to use when the train path is not found directly by the API.
     We search for nearby coordinates and request it again.
@@ -113,41 +111,43 @@ def extend_search(
     Parameters
     ----------
         - departure_coords, arrival_coords : list or tuple like with coordinates (lon, lat)
-        - perims : list-like ; perimeters to search for with overpass API
     return:
         - gdf (geoseries)
         - success (bool)
 
     """
+    SEARCH_PERIMETERS = [0.2, 5]  # km
+
     # We extend the search progressively
-    for perim in perims:
+    for search_perimeter in SEARCH_PERIMETERS:
         # Departure
         new_departure_coords = find_nearest(
             departure_coords[0],
             departure_coords[1],
-            perim,
+            search_perimeter,
         )
         if new_departure_coords != False:
             # Then we found a better place, we can stop the loop
             break
+
     # Maybe here try to check if the API is not already working
     if new_departure_coords == False:
         # Then we will find nothing
         gdf = pd.DataFrame()
         success = False
         train_dist = None
-    # return None, False
+
     else:
         # We can retry the API
         gdf, success, train_dist = find_train(new_departure_coords, arrival_coords)
         if success == False:
             # We can change arrival_coords
-            for perim in perims:  # Could be up to 10k  ~ size of Bdx
-                # Arrival
+            for search_perimeter in SEARCH_PERIMETERS:
+                # Could be up to 10k  ~ size of Bdx
                 new_arrival_coords = find_nearest(
                     arrival_coords[0],
                     arrival_coords[1],
-                    perim,
+                    search_perimeter,
                 )
                 if new_arrival_coords != False:
                     break
@@ -213,7 +213,6 @@ def train_to_gdf(
     departure_coords: tuple[float, float],
     arrival_coords: tuple[float, float],
     trip_type: TripType,
-    perims=search_perimeter,
     validate=val_perimeter,
 ):
     """Find the train path between 2 points and compute the emissions of the path.
@@ -221,7 +220,6 @@ def train_to_gdf(
     Parameters
     ----------
         - departure_coords, arrival_coords
-        - perims
         - validate
 
     Returns
@@ -243,7 +241,6 @@ def train_to_gdf(
         geometry, success, train_dist = extend_search(
             departure_coords,
             arrival_coords,
-            perims,
         )
 
     # Validation part for train
