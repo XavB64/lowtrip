@@ -161,7 +161,7 @@ def validate_geometry(
     departure_coords: tuple[float, float],
     arrival_coords: tuple[float, float],
     geometry: BaseGeometry | None,
-    distance_threshold,
+    distance_threshold=100,
 ):
     """Validate that the route geometry matches the requested coordinates by checking
     that the departure and arrival of geometries are close enough to the ones requested.

@@ -31,7 +31,6 @@ from models import (
     TripStepResult,
     TripType,
 )
-from parameters import val_perimeter
 from utils import split_path_by_country, validate_geometry
 
 
@@ -92,11 +91,9 @@ def ecar_to_gdf(
     arrival_coords: tuple[float, float],
     trip_type: TripType,
     passengers_nb=1,
-    validate=val_perimeter,
 ):
     """Parameters
         - departure_coords, arrival_coords
-        - validate
     return:
         - full dataframe for trains.
 
@@ -107,7 +104,6 @@ def ecar_to_gdf(
         departure_coords,
         arrival_coords,
         route_geometry,
-        validate,
     ):
         return None
 
@@ -256,16 +252,12 @@ class CarBusResults:
 def car_bus_to_gdf(
     departure_coords: tuple[float, float],
     arrival_coords: tuple[float, float],
-    validate=val_perimeter,
 ) -> CarBusResults | None:
     """ONLY FOR FIRST FORM (optimization).
 
     Parameters
     ----------
         - departure_coords, arrival_coords
-        - EF_car, float emission factor for one car by km
-        - EF_bus, float emission factor for bus by pkm
-        - validate
     return:
         - CarBusResults or None
 
@@ -276,7 +268,6 @@ def car_bus_to_gdf(
         departure_coords,
         arrival_coords,
         route_geometry,
-        validate,
     ):
         return None
 
@@ -320,12 +311,10 @@ def bus_to_gdf(
     departure_coords: tuple[float, float],
     arrival_coords: tuple[float, float],
     trip_type: TripType,
-    validate=val_perimeter,
 ) -> TripStepResult | None:
     """Parameters
         - departure_coords, arrival_coords
         - EF_bus, float emission factor for bus by pkm
-        - validate
 
     Returns
     -------
@@ -338,7 +327,6 @@ def bus_to_gdf(
         departure_coords,
         arrival_coords,
         route_geometry,
-        validate,
     ):
         return None
 
@@ -367,13 +355,11 @@ def car_to_gdf(
     departure_coords: tuple[float, float],
     arrival_coords: tuple[float, float],
     trip_type: TripType,
-    validate=val_perimeter,
     passengers_nb=1,
 ) -> TripStepResult | None:
     """Parameters
         - departure_coords, arrival_coords
         - EF_car, float emission factor for one car by km
-        - validate
         - nb, number of passenger in the car (used only for custom trip).
 
     Returns
@@ -387,7 +373,6 @@ def car_to_gdf(
         departure_coords,
         arrival_coords,
         route_geometry,
-        validate,
     ):
         return None
 
