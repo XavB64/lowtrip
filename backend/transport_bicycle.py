@@ -63,13 +63,12 @@ def find_bicycle_route(
     )
 
     if response.status_code != HTTPStatus.OK:
-        route_geometry, route, route_length = None, False, None
-        return route_geometry, route, route_length
+        route_geometry, success, route_length = None, False, None
+        return route_geometry, success, route_length
 
     # Simplify the geometry
     route = response.json()["features"][0]
-    geometry = route["geometry"]
-    route_geometry = LineString(geometry["coordinates"]).simplify(
+    route_geometry = LineString(route["geometry"]["coordinates"]).simplify(
         0.05,
         preserve_topology=False,
     )
@@ -83,12 +82,19 @@ def compute_bicycle_trip(
     arrival_coords: tuple[float, float],
     trip_type: TripType,
 ) -> TripStepResult | None:
-    """Parameters
-        - departure_coords, arrival_coords
+    """Computes a bicycle trip between two coordinates.
 
-    Return:
-    ------
-        - TripStepResult or None
+    Finds a bicycle route with OPEN_ROUTE_SERVICE, validates its geometry,
+    and computes the associated transport emissions.
+
+    Args:
+        departure_coords: Departure coordinates as (longitude, latitude).
+        arrival_coords: Arrival coordinates as (longitude, latitude).
+        trip_type: Type of trip to compute.
+
+    Returns:
+        A ``TripStepResult`` containing the route geometry and emissions
+        data, or ``None`` if no valid route could be found.
 
     """
     route_geometry, success, route_length = find_bicycle_route(
