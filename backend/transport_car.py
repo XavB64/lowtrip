@@ -86,9 +86,16 @@ def find_route(
 
     route = response.json()["routes"][0]
     route_geometry = LineString(route["geometry"]["coordinates"])
+
+    if not validate_geometry(
+        departure_coords,
+        arrival_coords,
+        route_geometry,
+    ):
+        return None, None, False
+
     route_length = m_to_km(route["distance"])
     success = True
-
     return route_geometry, route_length, success
 
 
@@ -106,11 +113,7 @@ def compute_ecar_trip(
     """
     route_geometry, route_length, success = find_route(departure_coords, arrival_coords)
 
-    if not success or not validate_geometry(
-        departure_coords,
-        arrival_coords,
-        route_geometry,
-    ):
+    if not success:
         return None
 
     # We need to filter by country and add length / Emission factors
@@ -232,20 +235,6 @@ def get_bus_emissions(
     ]
 
 
-def get_road_geometry_data(
-    route_length: float,
-    route_geometry: LineString,
-    trip_type: TripType,
-):
-    return TripStepGeometry(
-        coordinates=[[list(coord) for coord in route_geometry.coords]],
-        transport_means="Road",
-        length=route_length,
-        country_label=None,
-        trip_type=trip_type,
-    )
-
-
 @dataclass
 class CarBusResults:
     """Dataclass for car and bus emissions and road geometry."""
@@ -270,17 +259,15 @@ def compute_car_and_bus_trip(
     """
     route_geometry, route_length, success = find_route(departure_coords, arrival_coords)
 
-    if not success or not validate_geometry(
-        departure_coords,
-        arrival_coords,
-        route_geometry,
-    ):
+    if not success:
         return None
 
-    road_geometry = get_road_geometry_data(
-        route_length,
-        route_geometry,
-        "DIRECT_TRIP",
+    road_geometry = TripStepGeometry(
+        coordinates=[[list(coord) for coord in route_geometry.coords]],
+        transport_means="Road",
+        length=route_length,
+        country_label=None,
+        trip_type="DIRECT_TRIP",
     )
 
     car_emissions = get_car_emissions(
@@ -329,17 +316,15 @@ def compute_bus_trip(
     """
     route_geometry, route_length, success = find_route(departure_coords, arrival_coords)
 
-    if not success or not validate_geometry(
-        departure_coords,
-        arrival_coords,
-        route_geometry,
-    ):
+    if not success:
         return None
 
-    road_geometry = get_road_geometry_data(
-        route_length,
-        route_geometry,
-        trip_type,
+    road_geometry = TripStepGeometry(
+        coordinates=[[list(coord) for coord in route_geometry.coords]],
+        transport_means="Road",
+        length=route_length,
+        country_label=None,
+        trip_type=trip_type,
     )
     emissions = get_bus_emissions(
         route_length,
@@ -375,17 +360,15 @@ def compute_car_trip(
     """
     route_geometry, route_length, success = find_route(departure_coords, arrival_coords)
 
-    if not success or not validate_geometry(
-        departure_coords,
-        arrival_coords,
-        route_geometry,
-    ):
+    if not success:
         return None
 
-    geometry = get_road_geometry_data(
-        route_length,
-        route_geometry,
-        trip_type,
+    geometry = TripStepGeometry(
+        coordinates=[[list(coord) for coord in route_geometry.coords]],
+        transport_means="Road",
+        length=route_length,
+        country_label=None,
+        trip_type=trip_type,
     )
 
     return TripStepResult(
