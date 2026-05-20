@@ -209,7 +209,7 @@ def find_train(
     return geometry, success, train_dist
 
 
-def train_to_gdf(
+def compute_train_trip(
     departure_coords: tuple[float, float],
     arrival_coords: tuple[float, float],
     trip_type: TripType,
