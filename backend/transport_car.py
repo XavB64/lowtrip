@@ -56,6 +56,10 @@ EF_ECAR_CONSTRUCTION = 0.0836
 # Source: EV Database (2024) - https://ev-database.org/cheatsheet/energy-consumption-electric-car
 EF_ECAR_FUEL = 0.187
 
+# Additional vehicle emissions generated per extra passenger.
+# Used to adjust transport emissions based on occupancy.
+EXTRA_PASSENGER_EMISSION_FACTOR = 0.04
+
 
 def find_route(
     departure_coords: tuple[float, float],
@@ -99,6 +103,18 @@ def find_route(
     return route_geometry, route_length, success
 
 
+def compute_passenger_adjustment_factor(
+    passengers_nb: int,
+) -> float:
+    """Compute the emission adjustment factor based on passenger count.
+
+    Each additional passenger increases total vehicle emissions by 4% while
+    sharing emissions across all passengers.
+
+    """
+    return (1 + EXTRA_PASSENGER_EMISSION_FACTOR * (passengers_nb - 1)) / passengers_nb
+
+
 def compute_ecar_trip(
     departure_coords: tuple[float, float],
     arrival_coords: tuple[float, float],
@@ -124,11 +140,10 @@ def compute_ecar_trip(
     )
 
     passengers_nb = int(passengers_nb)
+    passenger_adjustment_factor = compute_passenger_adjustment_factor(passengers_nb)
     gdf["EF"] /= 1000.0  # Conversion in kg
 
-    gdf["EF_tot"] = (
-        gdf["EF"] * EF_ECAR_FUEL * (1 + 0.04 * (passengers_nb - 1)) / passengers_nb
-    )
+    gdf["EF_tot"] = gdf["EF"] * EF_ECAR_FUEL * passenger_adjustment_factor
     gdf["kgCO2eq"] = gdf["path_length"] * gdf["EF_tot"]
 
     # Add infra and construction
@@ -193,11 +208,12 @@ def get_car_emissions(
     passengers_nb: str,
 ) -> list[EmissionPart]:
     if passengers_nb == "👍":  # Hitch-hiking
-        EF_fuel = EF_CAR_FUEL * 0.04
+        EF_fuel = EF_CAR_FUEL * EXTRA_PASSENGER_EMISSION_FACTOR
         EF_construction = 0
     else:
         passengers_nb = int(passengers_nb)
-        EF_fuel = EF_CAR_FUEL * (1 + 0.04 * (passengers_nb - 1)) / passengers_nb
+        passenger_adjustment_factor = compute_passenger_adjustment_factor(passengers_nb)
+        EF_fuel = EF_CAR_FUEL * passenger_adjustment_factor
         EF_construction = EF_CAR_CONSTRUCTION / passengers_nb
 
     return [
