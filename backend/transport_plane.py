@@ -122,7 +122,7 @@ def great_circle_geometry(
     return LineString(l), m_to_km(r.dist)
 
 
-def plane_to_gdf(
+def compute_plane_trip(
     departure_coords: tuple[float, float],
     arrival_coords: tuple[float, float],
     trip_type: TripType,

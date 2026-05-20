@@ -78,7 +78,7 @@ def find_bicycle_route(
     return route_geometry, True, route_length
 
 
-def bicycle_to_gdf(
+def compute_bicycle_trip(
     departure_coords: tuple[float, float],
     arrival_coords: tuple[float, float],
     trip_type: TripType,

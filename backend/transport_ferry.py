@@ -218,7 +218,7 @@ def gdf_lines(start, end, add_canal=True):
     ).explode()
 
 
-def ferry_to_gdf(
+def compute_ferry_trip(
     departure_coords: tuple[float, float],
     arrival_coords: tuple[float, float],
     trip_type: TripType,
@@ -283,7 +283,7 @@ def ferry_to_gdf(
     )
 
 
-def sail_to_gdf(
+def compute_sail_trip(
     departure_coords: tuple[float, float],
     arrival_coords: tuple[float, float],
     trip_type: TripType,

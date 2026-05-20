@@ -90,7 +90,7 @@ def find_route(
     return route_geometry, route_length, success
 
 
-def ecar_to_gdf(
+def compute_ecar_trip(
     departure_coords: tuple[float, float],
     arrival_coords: tuple[float, float],
     trip_type: TripType,
@@ -253,7 +253,7 @@ class CarBusResults:
     car_step_data: CarStepData
 
 
-def car_bus_to_gdf(
+def compute_car_and_bus_trip(
     departure_coords: tuple[float, float],
     arrival_coords: tuple[float, float],
 ) -> CarBusResults | None:
@@ -311,7 +311,7 @@ def car_bus_to_gdf(
     )
 
 
-def bus_to_gdf(
+def compute_bus_trip(
     departure_coords: tuple[float, float],
     arrival_coords: tuple[float, float],
     trip_type: TripType,
@@ -355,7 +355,7 @@ def bus_to_gdf(
     )
 
 
-def car_to_gdf(
+def compute_car_trip(
     departure_coords: tuple[float, float],
     arrival_coords: tuple[float, float],
     trip_type: TripType,

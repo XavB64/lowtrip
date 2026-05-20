@@ -27,16 +27,16 @@ from models import (
     TripType,
 )
 from parameters import PLANE_MIN_DISTANCE
-from transport_bicycle import bicycle_to_gdf
+from transport_bicycle import compute_bicycle_trip
 from transport_car import (
-    bus_to_gdf,
-    car_bus_to_gdf,
-    car_to_gdf,
-    ecar_to_gdf,
+    compute_bus_trip,
+    compute_car_and_bus_trip,
+    compute_car_trip,
+    compute_ecar_trip,
 )
-from transport_ferry import ferry_to_gdf, sail_to_gdf
-from transport_plane import plane_to_gdf
-from transport_train import train_to_gdf
+from transport_ferry import compute_ferry_trip, compute_sail_trip
+from transport_plane import compute_plane_trip
+from transport_train import compute_train_trip
 from utils import compute_distance_between_2_points
 
 
@@ -81,21 +81,21 @@ def compute_custom_trip_emissions(
 
         # Compute depending on the mean of transport
         if transport_means == "train":
-            results = train_to_gdf(
+            results = compute_train_trip(
                 departure_coordinates,
                 arrival_coordinates,
                 trip_type,
             )
 
         elif transport_means == "bus":
-            results = bus_to_gdf(
+            results = compute_bus_trip(
                 departure_coordinates,
                 arrival_coordinates,
                 trip_type,
             )
 
         elif transport_means == "car":
-            results = car_to_gdf(
+            results = compute_car_trip(
                 departure_coordinates,
                 arrival_coordinates,
                 trip_type,
@@ -103,7 +103,7 @@ def compute_custom_trip_emissions(
             )
 
         elif transport_means == "ecar":
-            results = ecar_to_gdf(
+            results = compute_ecar_trip(
                 departure_coordinates,
                 arrival_coordinates,
                 trip_type,
@@ -111,21 +111,21 @@ def compute_custom_trip_emissions(
             )
 
         elif transport_means == "bicycle":
-            results = bicycle_to_gdf(
+            results = compute_bicycle_trip(
                 departure_coordinates,
                 arrival_coordinates,
                 trip_type,
             )
 
         elif transport_means == "plane":
-            results = plane_to_gdf(
+            results = compute_plane_trip(
                 departure_coordinates,
                 arrival_coordinates,
                 trip_type,
             )
 
         elif transport_means == "ferry":
-            results = ferry_to_gdf(
+            results = compute_ferry_trip(
                 departure_coordinates,
                 arrival_coordinates,
                 trip_type,
@@ -133,7 +133,7 @@ def compute_custom_trip_emissions(
             )
 
         elif transport_means == "sail":
-            results = sail_to_gdf(
+            results = compute_sail_trip(
                 departure_coordinates,
                 arrival_coordinates,
                 trip_type,
@@ -177,7 +177,7 @@ def compute_direct_trips_emissions(inputs: list[TripStep]):
     # Compute train and road emissions except if the initial transport means is Ferry or Sail
     if transport_means not in {"ferry", "sail"}:
         if transport_means != "train":
-            train_results = train_to_gdf(
+            train_results = compute_train_trip(
                 departure_coordinates,
                 arrival_coordinates,
                 "DIRECT_TRIP",
@@ -186,7 +186,7 @@ def compute_direct_trips_emissions(inputs: list[TripStep]):
                 trips.append(TripResult(name="TRAIN", steps=[train_results.step_data]))
                 geometries += train_results.geometries
 
-        road_results = car_bus_to_gdf(
+        road_results = compute_car_and_bus_trip(
             departure_coordinates,
             arrival_coordinates,
         )
@@ -206,7 +206,7 @@ def compute_direct_trips_emissions(inputs: list[TripStep]):
             arrival_coordinates,
         )
         if bird_distance > PLANE_MIN_DISTANCE:
-            plane_result = plane_to_gdf(
+            plane_result = compute_plane_trip(
                 departure_coordinates,
                 arrival_coordinates,
                 "DIRECT_TRIP",
