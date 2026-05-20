@@ -18,6 +18,7 @@
 from dataclasses import dataclass
 from typing import Literal
 
+import geopandas as gpd
 from shapely.geometry.base import BaseGeometry
 
 
@@ -46,6 +47,17 @@ class TripStep:
     transport_means: str
     passengers_nb: str | None
     options: str | None
+
+
+@dataclass(frozen=True)
+class CountrySplitConfig:
+    """Configuration for the function split_path_by_country (depends on the
+    means of transport).
+    """
+
+    dataset: gpd.GeoDataFrame
+    iso_column: str
+    emission_factor_column: str
 
 
 @dataclass(frozen=True)

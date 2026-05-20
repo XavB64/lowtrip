@@ -24,12 +24,14 @@ from shapely.geometry import LineString
 from models import (
     BusStepData,
     CarStepData,
+    CountrySplitConfig,
     EcarStepData,
     EmissionPart,
     TripStepGeometry,
     TripStepResult,
     TripType,
 )
+from parameters import carbon_intensity_electricity
 from utils import (
     m_to_km,
     split_path_by_country,
@@ -54,6 +56,12 @@ EF_BUS_FUEL = 0.025
 EF_ECAR_CONSTRUCTION = 0.0836
 # Source: EV Database (2024) - https://ev-database.org/cheatsheet/energy-consumption-electric-car
 EF_ECAR_FUEL = 0.187
+
+ECAR_COUNTRY_SPLIT_CONFIG = CountrySplitConfig(
+    dataset=carbon_intensity_electricity,
+    iso_column="Code",
+    emission_factor_column="mix",
+)
 
 # Additional vehicle emissions generated per extra passenger.
 # Used to adjust transport emissions based on occupancy.
@@ -150,8 +158,8 @@ def compute_ecar_trip(
     # We need to filter by country and add length / Emission factors
     country_route_segments, geometries = split_path_by_country(
         route_geometry,
-        method="ecar",
-        real_path_length=route_length,
+        route_length,
+        ECAR_COUNTRY_SPLIT_CONFIG,
         trip_type=trip_type,
     )
 
