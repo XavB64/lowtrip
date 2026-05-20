@@ -35,6 +35,7 @@ from models import (
 )
 from utils import (
     kilometer_to_degree,
+    m_to_km,
     split_path_by_country,
     validate_geometry,
 )
@@ -200,7 +201,7 @@ def find_train(
     if method == "trainmap":
         geometry = LineString(response.json()["geometry"]["coordinates"][0])
     else:
-        train_dist = response.json()["routes"][0]["distance"] / 1e3  # km
+        train_dist = m_to_km(response.json()["routes"][0]["distance"])
         geometry = LineString(response.json()["routes"][0]["geometry"]["coordinates"])
 
     success = True

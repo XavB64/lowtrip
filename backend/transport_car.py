@@ -31,7 +31,11 @@ from models import (
     TripStepResult,
     TripType,
 )
-from utils import split_path_by_country, validate_geometry
+from utils import (
+    m_to_km,
+    split_path_by_country,
+    validate_geometry,
+)
 
 
 OSM_ROUTER_URL = "http://router.project-osrm.org/route/v1/driving"
@@ -80,7 +84,7 @@ def find_route(
     route_geometry = LineString(
         route["geometry"]["coordinates"],
     )
-    route_length = route["distance"] / 1e3  # In km
+    route_length = m_to_km(route["distance"])
     success = True
 
     return route_geometry, route_length, success
