@@ -12,10 +12,6 @@ carbon_intensity_electricity = gpd.read_file(
 )
 
 
-# Threshold for unmatched train geometries (sea)
-sea_threshold = 5  # km
-
-
 ##########
 ## Plane##
 ##########
