@@ -32,7 +32,6 @@ from shapely.geometry.base import BaseGeometry
 from models import TripPayload, TripStep
 from parameters import (
     carbon_intensity_electricity,
-    sea_threshold as default_sea_threshold,
     train_intensity,
 )
 
@@ -47,7 +46,7 @@ def split_path_by_country(
     path: LineString,
     method: str,
     real_path_length: float,
-    sea_threshold=default_sea_threshold,
+    sea_threshold=5,
 ):
     """Split the path by country and compute the length of each of its parts.
 
@@ -55,7 +54,7 @@ def split_path_by_country(
     ----------
         - path : path geometry in LineString
         - mode : train / ecar
-        - th : threshold to remove unmatched gaps between countries that are too small (km)
+        - sea_threshold : threshold to remove unmatched gaps between countries that are too small (km)
     return:
         - geodataframe of path parts by countries
 
