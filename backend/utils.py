@@ -27,6 +27,7 @@ from pyproj import Geod
 # Web
 from shapely import ops
 from shapely.geometry import LineString, MultiLineString
+from shapely.geometry.base import BaseGeometry
 
 from models import TripPayload, TripStep
 from parameters import (
@@ -156,31 +157,41 @@ def split_path_by_country(
     return gdf.drop(iso, axis=1)
 
 
-def validate_geom(tag1, tag2, geom, th):
-    """Verify that the departure and arrival of geometries are close enough to the ones requested
-    parameters:
-        - tag1, tag2 : requested coordinates
-        - geom : shapely geometry answered
-        - th : threshold (km) for which we reject the geometry
-    return:
-        boolean (True valid geometry / False wrong geometry).
+def validate_geometry(
+    departure_coords: tuple[float, float],
+    arrival_coords: tuple[float, float],
+    geometry: BaseGeometry | None,
+    distance_threshold,
+):
+    """Validate that the route geometry matches the requested coordinates by checking
+    that the departure and arrival of geometries are close enough to the ones requested.
+
+    Args:
+        departure_coords: Requested departure coordinates.
+        arrival_coords: Requested arrival coordinates.
+        geometry: Route geometry to validate.
+        distance_threshold: Maximum allowed distance in kilometers.
+
+    Returns:
+        ``True`` if the geometry is valid, otherwise ``False``.
+
     """
     geod = Geod(ellps="WGS84")
 
     # To compute distances
     # Creating geometries for departure
-    ecart = LineString([tag1, list(geom.coords)[0]])
+    ecart = LineString([departure_coords, list(geometry.coords)[0]])
 
     # Maybe geod can compute length between 2 points directly
-    if geod.geometry_length(ecart) / 1e3 > th:
+    if geod.geometry_length(ecart) / 1e3 > distance_threshold:
         print("Departure is not valid")
         return False
 
     # Arrival
-    ecart = LineString([tag2, list(geom.coords)[-1]])
+    ecart = LineString([arrival_coords, list(geometry.coords)[-1]])
 
     # Maybe geod can compute length between 2 points directly
-    if geod.geometry_length(ecart) / 1e3 > th:
+    if geod.geometry_length(ecart) / 1e3 > distance_threshold:
         print("Arrival is not valid")
         return False
 

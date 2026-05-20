@@ -29,7 +29,7 @@ from models import (
     TripType,
 )
 from parameters import val_perimeter
-from utils import validate_geom
+from utils import validate_geometry
 
 
 # Bicycle manufacturing emissions (kgCO2e/km).
@@ -99,7 +99,7 @@ def bicycle_to_gdf(
         arrival_coords,
     )
 
-    if not success or not validate_geom(
+    if not success or not validate_geometry(
         departure_coords,
         arrival_coords,
         route_geometry,
