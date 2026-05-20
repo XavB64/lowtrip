@@ -3,6 +3,10 @@
 ######################
 
 import geopandas as gpd
+from pyproj import Geod
+
+
+GEOD = Geod(ellps="WGS84")
 
 
 # Load world datasets

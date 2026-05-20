@@ -22,7 +22,6 @@ from flask import abort
 import geopandas as gpd
 import numpy as np
 import pandas as pd
-from pyproj import Geod
 
 # Web
 from shapely import ops
@@ -32,6 +31,7 @@ from shapely.geometry.base import BaseGeometry
 from models import TripPayload, TripStep
 from parameters import (
     carbon_intensity_electricity,
+    GEOD,
     train_intensity,
 )
 
@@ -40,6 +40,13 @@ from parameters import (
 def kilometer_to_degree(km):
     c = 180 / (np.pi * 6371)  # Earth radius (km)
     return c * km
+
+
+def compute_distance_between_2_points(
+    point1: tuple[float, float],
+    point2: tuple[float, float],
+):
+    return GEOD.geometry_length(LineString([point1, point2])) / 1000
 
 
 def split_path_by_country(
@@ -145,9 +152,8 @@ def split_path_by_country(
 
     # Compute the length of each part of the path
     l_length = []
-    geod = Geod(ellps="WGS84")
     for geom in gdf.geometry.values:
-        l_length.append(geod.geometry_length(geom) / 1e3)
+        l_length.append(GEOD.geometry_length(geom) / 1e3)
     gdf["path_length"] = l_length
 
     # Rescale the length with train_dist (especially when simplified = True)
@@ -175,26 +181,16 @@ def validate_geometry(
         ``True`` if the geometry is valid, otherwise ``False``.
 
     """
-    geod = Geod(ellps="WGS84")
-
-    # To compute distances
-    # Creating geometries for departure
-    ecart = LineString([departure_coords, list(geometry.coords)[0]])
-
-    # Maybe geod can compute length between 2 points directly
-    if geod.geometry_length(ecart) / 1e3 > distance_threshold:
+    departure_error_distance = compute_distance_between_2_points(departure_coords, list(geometry.coords)[0])
+    if departure_error_distance > distance_threshold:
         print("Departure is not valid")
         return False
 
-    # Arrival
-    ecart = LineString([arrival_coords, list(geometry.coords)[-1]])
-
-    # Maybe geod can compute length between 2 points directly
-    if geod.geometry_length(ecart) / 1e3 > distance_threshold:
+    arrival_error_distance = compute_distance_between_2_points(arrival_coords, list(geometry.coords)[-1])
+    if arrival_error_distance > distance_threshold:
         print("Arrival is not valid")
         return False
 
-    # If we arrive here both dep and arr were validated
     return True
 
 

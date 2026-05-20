@@ -19,7 +19,6 @@ import geopandas as gpd
 import momepy
 import networkx as nx
 import numpy as np
-from pyproj import Geod
 from shapely.geometry import (
     CAP_STYLE,
     LineString,
@@ -36,6 +35,7 @@ from models import (
     TripType,
 )
 from parameters import (
+    GEOD,
     train_intensity,
 )
 
@@ -236,8 +236,7 @@ def ferry_to_gdf(
     geom = get_shortest_path(gdf_lines(start, end), start, end)
 
     # Compute the true distance
-    geod = Geod(ellps="WGS84")
-    bird = geod.geometry_length(geom) / 1e3
+    bird = GEOD.geometry_length(geom) / 1e3
 
     # Compute the good emission factor
     if options == "none":
@@ -302,8 +301,7 @@ def sail_to_gdf(
     geom = get_shortest_path(gdf_lines(start, end), start, end)
 
     # Compute the true distance
-    geod = Geod(ellps="WGS84")
-    bird = geod.geometry_length(geom) / 1e3
+    bird = GEOD.geometry_length(geom) / 1e3
 
     coordinates = []
     for l in geom.geoms:
