@@ -32,7 +32,7 @@ from models import (
     TripType,
 )
 from parameters import val_perimeter
-from utils import split_path_by_country, validate_geom as validate_geometry
+from utils import split_path_by_country, validate_geometry
 
 
 OSM_ROUTER_URL = "http://router.project-osrm.org/route/v1/driving"

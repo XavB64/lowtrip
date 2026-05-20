@@ -37,7 +37,7 @@ from parameters import val_perimeter
 from utils import (
     kilometer_to_degree,
     split_path_by_country,
-    validate_geom,
+    validate_geometry,
 )
 
 
@@ -244,7 +244,7 @@ def train_to_gdf(
         )
 
     # Validation part for train
-    if not success or not validate_geom(
+    if not success or not validate_geometry(
         departure_coords,
         arrival_coords,
         gpd.GeoSeries(
