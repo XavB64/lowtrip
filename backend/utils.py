@@ -28,7 +28,13 @@ from shapely import ops
 from shapely.geometry import LineString, MultiLineString
 from shapely.geometry.base import BaseGeometry
 
-from models import TripPayload, TripStep
+from models import (
+    CountryRouteSegment,
+    TripPayload,
+    TripStep,
+    TripStepGeometry,
+    TripType,
+)
 from parameters import (
     carbon_intensity_electricity,
     GEOD,
@@ -53,21 +59,47 @@ def compute_distance_between_2_points(
     return m_to_km(GEOD.geometry_length(LineString([point1, point2])))
 
 
+class GeometryRecognitionError(Exception):
+    """Exception raised when the geometry is not recognized."""
+
+
 def split_path_by_country(
     path: LineString,
     method: str,
     real_path_length: float,
+    trip_type: TripType,
     sea_threshold=5,
-):
-    """Split the path by country and compute the length of each of its parts.
+) -> tuple[list[CountryRouteSegment], list[TripStepGeometry]]:
+    """Split a route by country and compute country-specific route segments.
 
-    Parameters
-    ----------
-        - path : path geometry in LineString
-        - mode : train / ecar
-        - sea_threshold : threshold to remove unmatched gaps between countries that are too small (km)
-    return:
-        - geodataframe of path parts by countries
+    The route geometry is intersected with country boundaries to determine
+    the distance traveled in each country. Country-specific emission
+    factors are then attached to each segment depending on the transport
+    method.
+
+    Unmatched route parts (typically sea crossings, bridges, or tunnels)
+    can optionally be reassigned to the nearest country when their length
+    exceeds the sea_threshold.
+
+    Args:
+        path: Route geometry as a LineString.
+        method: Transport method used to select the emission factor dataset
+            (e.g. "train" or "ecar").
+        real_path_length: Total route length in kilometers used to rescale
+            computed geometry lengths.
+        trip_type: Type of trip associated with the generated geometries.
+        sea_threshold: Minimum unmatched segment length in kilometers before
+            reassignment to the nearest country.
+
+    Returns:
+        A tuple containing:
+            - A list of CountryRouteSegment with country-specific
+            emission factors and traveled distances.
+            - A list of TripStepGeometry for frontend trip rendering.
+
+    Raises:
+        GeometryRecognitionError:
+            If a route geometry cannot be converted to trip coordinates.
 
     """
     gdf = gpd.GeoSeries(
@@ -154,17 +186,62 @@ def split_path_by_country(
 
     gdf = gpd.GeoDataFrame(u, geometry="geometry", crs="epsg:4326").reset_index()
 
-    # Compute the length of each part of the path
-    l_length = []
-    for geom in gdf.geometry.values:
-        part_length = m_to_km(GEOD.geometry_length(geom))
-        l_length.append(part_length)
-    gdf["path_length"] = l_length
+    raw_segments = [
+        CountryRouteSegment(
+            country_name=row["NAME"],
+            emission_factor=row["EF"] / 1000,  # conversion in kg
+            geometry=row["geometry"],
+            path_length_km=m_to_km(GEOD.geometry_length(row["geometry"])),
+        )
+        for _, row in gdf.iterrows()
+    ]
 
-    # Rescale the length with train_dist (especially when simplified = True)
-    gdf["path_length"] *= real_path_length / gdf["path_length"].sum()
+    total_length = sum(segment.path_length_km for segment in raw_segments)
+    scale_factor = real_path_length / total_length
 
-    return gdf.drop(iso, axis=1)
+    segments = []
+    geometries = []
+
+    for segment in raw_segments:
+        # rescale segment_length with real_path_length
+        segment_length = segment.path_length_km * scale_factor
+
+        # compute country route segment
+        segments.append(
+            CountryRouteSegment(
+                country_name=segment.country_name,
+                emission_factor=segment.emission_factor,
+                geometry=segment.geometry,
+                path_length_km=segment_length,
+            ),
+        )
+
+        # compute trip step geometry
+        if isinstance(segment.geometry, LineString):
+            coordinates = [
+                [list(coord) for coord in segment.geometry.coords],
+            ]
+
+        elif isinstance(segment.geometry, MultiLineString):
+            coordinates = [
+                [list(coord) for coord in line.coords]
+                for line in segment.geometry.geoms
+            ]
+
+        else:
+            raise GeometryRecognitionError
+
+        geometries.append(
+            TripStepGeometry(
+                coordinates=coordinates,
+                transport_means="Railway",
+                length=segment_length,
+                country_label=segment.country_name,
+                trip_type=trip_type,
+            ),
+        )
+
+    return segments, geometries
 
 
 def validate_geometry(

@@ -18,6 +18,8 @@
 from dataclasses import dataclass
 from typing import Literal
 
+from shapely.geometry.base import BaseGeometry
+
 
 ######################
 # INPUTS
@@ -44,6 +46,16 @@ class TripStep:
     transport_means: str
     passengers_nb: str | None
     options: str | None
+
+
+@dataclass(frozen=True)
+class CountryRouteSegment:
+    """Segment of route in a specific country."""
+
+    country_name: str
+    emission_factor: float
+    geometry: BaseGeometry
+    path_length_km: float
 
 
 ######################
