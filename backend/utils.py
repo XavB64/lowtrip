@@ -260,8 +260,8 @@ def extract_path_steps_from_payload(trip_payload: TripPayload) -> list[TripStep]
     for i in range(len(trip_payload["lon"])):
         result.append(
             TripStep(
-                lon=trip_payload["lon"][i],
-                lat=trip_payload["lat"][i],
+                lon=float(trip_payload["lon"][i]),
+                lat=float(trip_payload["lat"][i]),
                 transport_means=trip_payload["transp"][i],
                 passengers_nb=(
                     int(trip_payload["nb"][i]) if trip_payload["nb"][i] else None

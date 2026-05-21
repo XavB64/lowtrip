@@ -232,9 +232,11 @@ def compute_ferry_trip(
 
     """
     # Compute geometry
-    start = tuple([float(x) for x in departure_coords])
-    end = tuple([float(x) for x in arrival_coords])
-    geom = get_shortest_path(gdf_lines(start, end), start, end)
+    geom = get_shortest_path(
+        gdf_lines(departure_coords, arrival_coords),
+        departure_coords,
+        arrival_coords,
+    )
 
     # Compute the true distance
     bird = m_to_km(GEOD.geometry_length(geom))
@@ -296,10 +298,11 @@ def compute_sail_trip(
 
     """
     # Compute geometry
-    start = tuple([float(x) for x in departure_coords])
-    end = tuple([float(x) for x in arrival_coords])
-
-    geom = get_shortest_path(gdf_lines(start, end), start, end)
+    geom = get_shortest_path(
+        gdf_lines(departure_coords, arrival_coords),
+        departure_coords,
+        arrival_coords,
+    )
 
     # Compute the true distance
     bird = m_to_km(GEOD.geometry_length(geom))
