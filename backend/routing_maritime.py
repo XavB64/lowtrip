@@ -138,15 +138,22 @@ def get_sea_lines(start, end, world=train_intensity, nb=20, exp=10):
     return sea.explode()
 
 
-def build_shore_connection(point, coast):
-    """Coast the full shapely geometry."""
-    # Get linestring to get to the sea
-    nearest_point_on_line = nearest_points(Point(point), coast)[1]
+def build_shore_connection(
+    coordinates: tuple[float, float],
+    coast: BaseGeometry,
+) -> LineString:
+    """Build a connection line between a point and the nearest coastline.
 
-    # Create a new linestring connecting the two points
-    new_linestring = LineString([Point(point), nearest_point_on_line])
+    The generated line is slightly extended to ensure proper connectivity
+    with the maritime routing network.
 
-    return extend_line(new_linestring)
+    """
+    point = Point(coordinates)
+
+    nearest_coast_point = nearest_points(point, coast)[1]
+
+    shore_connection = LineString([point, nearest_coast_point])
+    return extend_line(shore_connection)
 
 
 def build_direct_sea_connection(
