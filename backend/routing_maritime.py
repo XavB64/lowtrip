@@ -15,6 +15,8 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+from functools import lru_cache
+
 import geopandas as gpd
 import momepy
 import networkx as nx
@@ -55,16 +57,33 @@ LINE_EXTENSION_FACTOR = 0.001
 """Small geometric extension applied to maritime segments to avoid disconnected routing graph edges."""
 
 
-def create_coast(world=train_intensity, buffer=0):
-    """World is the dataset from geopandas, already loaded for trains and ecar
-    Return a list of geometries as well as the overall multi geometry.
+@lru_cache(maxsize=1)
+def build_coast_geometry() -> tuple[BaseGeometry, list[BaseGeometry]]:
+    """Build coastline geometries used for maritime routing.
+
+    The coastline is derived from the land geometry dataset by:
+    - buffering land polygons to fix invalid geometries
+    - extracting the outer boundary of the resulting geometry
+    - splitting the boundary into individual line segments
+
+    These segments are used in the maritime routing graph to connect
+    sea mesh structures with coastal entry and exit points.
+
+    The result is cached after the first computation using functools.lru_cache
+    to avoid expensive recomputation during routing operations.
+
+    Returns:
+        A tuple containing:
+            - A Shapely geometry representing the full coastline
+            - A list of LineString segments composing the coastline
+
     """
     coast_lines = unary_union(
-        world.buffer(buffer, cap_style=CAP_STYLE.square).geometry,
+        train_intensity.buffer(0, cap_style=CAP_STYLE.square).geometry,
     ).boundary
-    # To shapely list
-    coast_exp = list(gpd.GeoSeries(coast_lines).explode().values)
-    return coast_lines, coast_exp
+    coast_segments = list(coast_lines.geoms)
+
+    return coast_lines, coast_segments
 
 
 def extend_point(
@@ -163,7 +182,10 @@ def build_maritime_mesh(
         keep_geom_type=False,
     ).explode()
 
-    return [extend_line(segment, extend_start=True) for segment in navigable_segments.geometry]
+    return [
+        extend_line(segment, extend_start=True)
+        for segment in navigable_segments.geometry
+    ]
 
 
 def build_shore_connection(
@@ -231,7 +253,7 @@ def build_maritime_network(
         A GeoDataFrame containing navigable maritime segments.
 
     """
-    coast_geometry, coast_segments = create_coast()
+    coast_geometry, coast_segments = build_coast_geometry()
 
     # Build maritime mesh
     sea_mesh_segments = build_maritime_mesh(
