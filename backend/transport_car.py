@@ -15,7 +15,6 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from dataclasses import dataclass
 from http import HTTPStatus
 
 import requests
@@ -209,130 +208,11 @@ def compute_ecar_trip(
     )
 
 
-def get_car_emissions(
-    route_length: float,
-    passengers_nb: str,
-) -> list[EmissionPart]:
-    if passengers_nb == "👍":  # Hitch-hiking
-        EF_fuel = EF_CAR_FUEL * EXTRA_PASSENGER_EMISSION_FACTOR
-        EF_construction = 0
-    else:
-        passengers_nb = int(passengers_nb)
-        passenger_adjustment_factor = compute_passenger_adjustment_factor(passengers_nb)
-        EF_fuel = EF_CAR_FUEL * passenger_adjustment_factor
-        EF_construction = EF_CAR_CONSTRUCTION / passengers_nb
-
-    return [
-        EmissionPart(
-            name="construction",
-            kg_co2_eq=round(route_length * EF_construction, 2),
-            ef_tot=EF_CAR_CONSTRUCTION,
-            distance=round(route_length),
-        ),
-        EmissionPart(
-            name="fuel",
-            kg_co2_eq=round(route_length * EF_fuel, 2),
-            ef_tot=EF_CAR_FUEL,
-            distance=round(route_length),
-        ),
-    ]
-
-
-def get_bus_emissions(
-    route_length: float,
-) -> list[EmissionPart]:
-    return [
-        EmissionPart(
-            name="construction",
-            kg_co2_eq=round(route_length * EF_BUS_CONSTRUCTION, 2),
-            ef_tot=EF_BUS_CONSTRUCTION,
-            distance=round(route_length),
-        ),
-        EmissionPart(
-            name="fuel",
-            kg_co2_eq=round(route_length * EF_BUS_FUEL, 2),
-            ef_tot=EF_BUS_FUEL,
-            distance=round(route_length),
-        ),
-    ]
-
-
-@dataclass
-class CarBusResults:
-    """Dataclass for car and bus emissions and road geometry."""
-
-    geometries: list[TripStepGeometry]
-    bus_step_data: BusStepData
-    car_step_data: CarStepData
-
-
-def compute_car_and_bus_trip(
-    departure_coords: tuple[float, float],
-    arrival_coords: tuple[float, float],
-) -> CarBusResults | None:
-    """Compute both car and bus trips for the same road route.
-
-    This function is used as an optimization to avoid computing the same
-    road geometry multiple times when comparing transport modes. The route
-    is fetched once and reused to calculate both car and bus emissions.
-
-    Args:
-        departure_coords: Departure coordinates as (longitude, latitude).
-        arrival_coords: Arrival coordinates as (longitude, latitude).
-
-    Returns:
-        A ``CarBusResults`` object containing the shared route geometry and
-        the computed emissions for both transport modes, or ``None`` if no
-        valid route could be found.
-
-    """
-    route_geometry, route_length, success = find_route(departure_coords, arrival_coords)
-
-    if not success:
-        return None
-
-    road_geometry = TripStepGeometry(
-        coordinates=[[list(coord) for coord in route_geometry.coords]],
-        transport_means="Road",
-        length=route_length,
-        country_label=None,
-        trip_type="DIRECT_TRIP",
-    )
-
-    car_emissions = get_car_emissions(
-        route_length,
-        1,
-    )
-
-    bus_emissions = get_bus_emissions(
-        route_length,
-    )
-
-    return CarBusResults(
-        geometries=[road_geometry],
-        bus_step_data=BusStepData(
-            transport="bus",
-            emissions=bus_emissions,
-            path_length=round(route_length),
-            coeff_upstream=EF_BUS_CONSTRUCTION,
-            coeff_fuel=EF_BUS_FUEL,
-        ),
-        car_step_data=CarStepData(
-            transport="car",
-            emissions=car_emissions,
-            path_length=round(route_length),
-            passengers_nb=1,
-            is_hitch_hike=False,
-            coeff_upstream=EF_CAR_CONSTRUCTION,
-            coeff_fuel=EF_CAR_FUEL,
-        ),
-    )
-
-
 def compute_bus_trip(
     departure_coords: tuple[float, float],
     arrival_coords: tuple[float, float],
     trip_type: TripType,
+    precomputed_route_length_km: float | None = None,
 ) -> TripStepResult | None:
     """Compute a bus trip between two coordinates.
 
@@ -349,27 +229,50 @@ def compute_bus_trip(
         departure_coords: Departure coordinates as (longitude, latitude).
         arrival_coords: Arrival coordinates as (longitude, latitude).
         trip_type: Type of trip to compute.
+        precomputed_route_length_km: Optional precomputed route length in
+            kilometers used to avoid recomputing the road itinerary.
 
     Returns:
         A ``TripStepResult`` containing the route geometry and emissions
         data, or ``None`` if no valid route could be found.
 
     """
-    route_geometry, route_length, success = find_route(departure_coords, arrival_coords)
+    if precomputed_route_length_km:
+        route_length = precomputed_route_length_km
+        geometries = []
+    else:
+        route_geometry, route_length, success = find_route(
+            departure_coords,
+            arrival_coords,
+        )
 
-    if not success:
-        return None
+        if not success:
+            return None
 
-    road_geometry = TripStepGeometry(
-        coordinates=[[list(coord) for coord in route_geometry.coords]],
-        transport_means="Road",
-        length=route_length,
-        country_label=None,
-        trip_type=trip_type,
-    )
-    emissions = get_bus_emissions(
-        route_length,
-    )
+        geometries = [
+            TripStepGeometry(
+                coordinates=[[list(coord) for coord in route_geometry.coords]],
+                transport_means="Road",
+                length=route_length,
+                country_label=None,
+                trip_type=trip_type,
+            ),
+        ]
+
+    emissions = [
+        EmissionPart(
+            name="construction",
+            kg_co2_eq=round(route_length * EF_BUS_CONSTRUCTION, 2),
+            ef_tot=EF_BUS_CONSTRUCTION,
+            distance=round(route_length),
+        ),
+        EmissionPart(
+            name="fuel",
+            kg_co2_eq=round(route_length * EF_BUS_FUEL, 2),
+            ef_tot=EF_BUS_FUEL,
+            distance=round(route_length),
+        ),
+    ]
 
     return TripStepResult(
         step_data=BusStepData(
@@ -379,7 +282,7 @@ def compute_bus_trip(
             coeff_upstream=EF_BUS_CONSTRUCTION,
             coeff_fuel=EF_BUS_FUEL,
         ),
-        geometries=[road_geometry],
+        geometries=geometries,
     )
 
 
@@ -388,6 +291,7 @@ def compute_car_trip(
     arrival_coords: tuple[float, float],
     trip_type: TripType,
     passengers_nb=1,
+    precomputed_route_length_km: float | None = None,
 ) -> TripStepResult | None:
     """Compute a car trip between two coordinates.
 
@@ -410,37 +314,69 @@ def compute_car_trip(
         arrival_coords: Arrival coordinates as (longitude, latitude).
         trip_type: Type of trip to compute.
         passengers_nb: Number of passengers in the vehicle.
+        precomputed_route_length_km: Optional precomputed route length in
+            kilometers used to avoid recomputing the road itinerary.
 
     Returns:
         A ``TripStepResult`` containing the route geometry and emissions
         data, or ``None`` if no valid route could be found.
 
     """
-    route_geometry, route_length, success = find_route(departure_coords, arrival_coords)
+    if precomputed_route_length_km is not None:
+        route_length = precomputed_route_length_km
+        geometries = []
+    else:
+        route_geometry, route_length, success = find_route(
+            departure_coords,
+            arrival_coords,
+        )
 
-    if not success:
-        return None
+        if not success:
+            return None
 
-    geometry = TripStepGeometry(
-        coordinates=[[list(coord) for coord in route_geometry.coords]],
-        transport_means="Road",
-        length=route_length,
-        country_label=None,
-        trip_type=trip_type,
-    )
+        geometries = [
+            TripStepGeometry(
+                coordinates=[[list(coord) for coord in route_geometry.coords]],
+                transport_means="Road",
+                length=route_length,
+                country_label=None,
+                trip_type=trip_type,
+            ),
+        ]
+
+    if passengers_nb == "👍":  # Hitch-hiking
+        EF_fuel = EF_CAR_FUEL * EXTRA_PASSENGER_EMISSION_FACTOR
+        EF_construction = 0
+    else:
+        passengers_nb = int(passengers_nb)
+        passenger_adjustment_factor = compute_passenger_adjustment_factor(passengers_nb)
+        EF_fuel = EF_CAR_FUEL * passenger_adjustment_factor
+        EF_construction = EF_CAR_CONSTRUCTION / passengers_nb
+
+    emissions = [
+        EmissionPart(
+            name="construction",
+            kg_co2_eq=round(route_length * EF_construction, 2),
+            ef_tot=EF_CAR_CONSTRUCTION,
+            distance=round(route_length),
+        ),
+        EmissionPart(
+            name="fuel",
+            kg_co2_eq=round(route_length * EF_fuel, 2),
+            ef_tot=EF_CAR_FUEL,
+            distance=round(route_length),
+        ),
+    ]
 
     return TripStepResult(
         step_data=CarStepData(
             transport="car",
-            emissions=get_car_emissions(
-                route_length,
-                passengers_nb,
-            ),
+            emissions=emissions,
             is_hitch_hike=passengers_nb == "👍",
             passengers_nb=passengers_nb,
             path_length=round(route_length),
             coeff_upstream=EF_CAR_CONSTRUCTION,
             coeff_fuel=EF_CAR_FUEL,
         ),
-        geometries=[geometry],
+        geometries=geometries,
     )
