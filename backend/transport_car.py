@@ -131,13 +131,19 @@ def compute_ecar_trip(
     """Compute an electric car trip between two coordinates.
 
     Finds a road route, validates its geometry, and computes the associated
-    transport emissions and trip metadata.
+    transport emissions.
+
+    Emissions are computed for 1 passenger only, as:
+    -  the sum of:
+        - vehicle construction emissions
+        - fuel/electricity consumption emissions, which depends on the country.
+    - divided by the number of passengers.
 
     The route is split by country to apply country-specific electricity
     emission factors based on the distance traveled in each country.
 
-    Emissions are adjusted according to the number of passengers by adding
-    4% additional emissions per extra passenger.
+    Fuel/Electricity emissions are adjusted according to the number of passengers
+    by adding 4% additional emissions per extra passenger.
 
     Args:
         departure_coords: Departure coordinates as (longitude, latitude).
@@ -264,13 +270,20 @@ def compute_car_and_bus_trip(
     departure_coords: tuple[float, float],
     arrival_coords: tuple[float, float],
 ) -> CarBusResults | None:
-    """ONLY FOR FIRST FORM (optimization).
+    """Compute both car and bus trips for the same road route.
 
-    Parameters
-    ----------
-        - departure_coords, arrival_coords
-    return:
-        - CarBusResults or None
+    This function is used as an optimization to avoid computing the same
+    road geometry multiple times when comparing transport modes. The route
+    is fetched once and reused to calculate both car and bus emissions.
+
+    Args:
+        departure_coords: Departure coordinates as (longitude, latitude).
+        arrival_coords: Arrival coordinates as (longitude, latitude).
+
+    Returns:
+        A ``CarBusResults`` object containing the shared route geometry and
+        the computed emissions for both transport modes, or ``None`` if no
+        valid route could be found.
 
     """
     route_geometry, route_length, success = find_route(departure_coords, arrival_coords)
@@ -321,13 +334,25 @@ def compute_bus_trip(
     arrival_coords: tuple[float, float],
     trip_type: TripType,
 ) -> TripStepResult | None:
-    """Parameters
-        - departure_coords, arrival_coords
-        - EF_bus, float emission factor for bus by pkm
+    """Compute a bus trip between two coordinates.
 
-    Returns
-    -------
-        - full dataframe for bus or None
+    Finds a road route, validates its geometry, and computes the
+    associated transport emissions.
+
+    Bus emissions are computed as the sum of:
+    - vehicle construction emissions,
+    - fuel consumption emissions.
+
+    Road infrastructure emissions are not included in the calculation.
+
+    Args:
+        departure_coords: Departure coordinates as (longitude, latitude).
+        arrival_coords: Arrival coordinates as (longitude, latitude).
+        trip_type: Type of trip to compute.
+
+    Returns:
+        A ``TripStepResult`` containing the route geometry and emissions
+        data, or ``None`` if no valid route could be found.
 
     """
     route_geometry, route_length, success = find_route(departure_coords, arrival_coords)
@@ -364,14 +389,31 @@ def compute_car_trip(
     trip_type: TripType,
     passengers_nb=1,
 ) -> TripStepResult | None:
-    """Parameters
-        - departure_coords, arrival_coords
-        - EF_car, float emission factor for one car by km
-        - nb, number of passenger in the car (used only for custom trip).
+    """Compute a car trip between two coordinates.
 
-    Returns
-    -------
-        - full dataframe for car or None
+    Finds a road route, validates its geometry, and computes the
+    associated transport emissions and trip metadata.
+
+    Car emissions are computed for 1 passenger only, as:
+    -  the sum of:
+        - vehicle construction emissions
+        - fuel consumption emissions
+    - divided by the number of passengers.
+
+    Fuel consumption emissions are adjusted according to the number of passengers
+    by adding 4% additional emissions per extra passenger.
+
+    Road infrastructure emissions are not included in the calculation.
+
+    Args:
+        departure_coords: Departure coordinates as (longitude, latitude).
+        arrival_coords: Arrival coordinates as (longitude, latitude).
+        trip_type: Type of trip to compute.
+        passengers_nb: Number of passengers in the vehicle.
+
+    Returns:
+        A ``TripStepResult`` containing the route geometry and emissions
+        data, or ``None`` if no valid route could be found.
 
     """
     route_geometry, route_length, success = find_route(departure_coords, arrival_coords)
