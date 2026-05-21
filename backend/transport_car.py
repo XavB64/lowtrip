@@ -26,6 +26,7 @@ from models import (
     CountrySplitConfig,
     EcarStepData,
     EmissionPart,
+    HitchHikingStepData,
     TripStepGeometry,
     TripStepResult,
     TripType,
@@ -168,7 +169,6 @@ def compute_ecar_trip(
         trip_type=trip_type,
     )
 
-    passengers_nb = int(passengers_nb)
     passenger_adjustment_factor = compute_passenger_adjustment_factor(passengers_nb)
 
     emissions = [
@@ -344,14 +344,9 @@ def compute_car_trip(
             ),
         ]
 
-    if passengers_nb == "👍":  # Hitch-hiking
-        EF_fuel = EF_CAR_FUEL * EXTRA_PASSENGER_EMISSION_FACTOR
-        EF_construction = 0
-    else:
-        passengers_nb = int(passengers_nb)
-        passenger_adjustment_factor = compute_passenger_adjustment_factor(passengers_nb)
-        EF_fuel = EF_CAR_FUEL * passenger_adjustment_factor
-        EF_construction = EF_CAR_CONSTRUCTION / passengers_nb
+    passenger_adjustment_factor = compute_passenger_adjustment_factor(passengers_nb)
+    EF_fuel = EF_CAR_FUEL * passenger_adjustment_factor
+    EF_construction = EF_CAR_CONSTRUCTION / passengers_nb
 
     emissions = [
         EmissionPart(
@@ -372,10 +367,77 @@ def compute_car_trip(
         step_data=CarStepData(
             transport="car",
             emissions=emissions,
-            is_hitch_hike=passengers_nb == "👍",
             passengers_nb=passengers_nb,
             path_length=round(route_length),
             coeff_upstream=EF_CAR_CONSTRUCTION,
+            coeff_fuel=EF_CAR_FUEL,
+        ),
+        geometries=geometries,
+    )
+
+
+def compute_hitch_hiking_trip(
+    departure_coords: tuple[float, float],
+    arrival_coords: tuple[float, float],
+    trip_type: TripType,
+) -> TripStepResult | None:
+    """Compute a hitchhiking trip between two coordinates.
+
+    Finds a road route, validates its geometry, and computes the
+    associated transport emissions and trip metadata.
+
+    For hitchhiking, only the emissions attributable to the additional
+    passenger are considered. Vehicle construction emissions are excluded,
+    as the trip is assumed to occur regardless of the hitchhiking
+    passenger.
+
+    Fuel emissions are computed as 4% of standard car fuel emissions.
+
+    Road infrastructure emissions are not included in the calculation.
+
+    Args:
+        departure_coords: Departure coordinates as (longitude, latitude).
+        arrival_coords: Arrival coordinates as (longitude, latitude).
+        trip_type: Type of trip to compute.
+
+    Returns:
+        A ``TripStepResult`` containing the route geometry and emissions
+        data, or ``None`` if no valid route could be found.
+
+    """
+    route_geometry, route_length, success = find_route(
+        departure_coords,
+        arrival_coords,
+    )
+
+    if not success:
+        return None
+
+    geometries = [
+        TripStepGeometry(
+            coordinates=[[list(coord) for coord in route_geometry.coords]],
+            transport_means="Road",
+            length=route_length,
+            country_label=None,
+            trip_type=trip_type,
+        ),
+    ]
+
+    EF_fuel = EF_CAR_FUEL * EXTRA_PASSENGER_EMISSION_FACTOR
+
+    return TripStepResult(
+        step_data=HitchHikingStepData(
+            transport="hitchHiking",
+            emissions=[
+                EmissionPart(
+                    name="fuel",
+                    kg_co2_eq=round(route_length * EF_fuel, 2),
+                    ef_tot=EF_fuel,
+                    distance=round(route_length),
+                ),
+            ],
+            path_length=round(route_length),
+            coeff_hitch_hike=EXTRA_PASSENGER_EMISSION_FACTOR,
             coeff_fuel=EF_CAR_FUEL,
         ),
         geometries=geometries,

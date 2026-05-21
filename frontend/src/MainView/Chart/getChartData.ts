@@ -43,10 +43,9 @@ const getChartData = (
         tripStep.transport === Transport.ecar ||
         tripStep.transport === Transport.car
       ) {
-        if (tripStep.transport === Transport.car && tripStep.is_hitch_hike)
-          passengers = tripStep.is_hitch_hike ? "👍" : tripStep.passengers_nb;
-        else passengers = tripStep.passengers_nb;
+        passengers = tripStep.passengers_nb;
       }
+
       const stepLabel = `${trip.label}__${index + 1}. ${t("chart.transportMeans." + tripStep.transport, { count: passengers })}`;
 
       for (const emissionPart of tripStep.emissionParts) {

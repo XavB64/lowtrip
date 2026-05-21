@@ -88,7 +88,11 @@ const TransportSelector = ({
           <TransportWithOptions
             key={transport}
             updateStep={updateStep}
-            isSelected={transport === step.transportMean}
+            isSelected={
+              step.transportMean === Transport.hitchHiking
+                ? transport === Transport.car
+                : transport === step.transportMean
+            }
             step={step}
             icon={icon}
             transport={transport}

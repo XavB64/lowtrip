@@ -110,6 +110,7 @@
         "car": "Car",
         "ecar": "eCar",
         "bus": "Bus",
+        "hitchHiking": "Hitch-hiking",
         "train": "Train",
         "ferry": "Ferry",
         "bicycle": "Bicycle",
