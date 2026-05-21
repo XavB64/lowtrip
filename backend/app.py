@@ -77,6 +77,7 @@ def main():
         elif len(main_trip_inputs) == 2:
             direct_trips, direct_trips_geometries = compute_direct_trips_emissions(
                 main_trip_inputs,
+                main_trip.steps[0].path_length,
             )
             geometries += direct_trips_geometries
             trips = [main_trip, *direct_trips]

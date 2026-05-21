@@ -30,7 +30,6 @@ from parameters import PLANE_MIN_DISTANCE
 from transport_bicycle import compute_bicycle_trip
 from transport_car import (
     compute_bus_trip,
-    compute_car_and_bus_trip,
     compute_car_trip,
     compute_ecar_trip,
 )
@@ -149,7 +148,10 @@ def compute_custom_trip_emissions(
     return TripResult(name=name, steps=emissions_data), geometries
 
 
-def compute_direct_trips_emissions(inputs: list[TripStep]):
+def compute_direct_trips_emissions(
+    inputs: list[TripStep],
+    main_trip_path_length: float,
+):
     """Compute emissions for the same trip, but with other transport means given the initial transport means used,
     the departure and arrival coordinates.
 
@@ -186,18 +188,30 @@ def compute_direct_trips_emissions(inputs: list[TripStep]):
                 trips.append(TripResult(name="TRAIN", steps=[train_results.step_data]))
                 geometries += train_results.geometries
 
-        road_results = compute_car_and_bus_trip(
-            departure_coordinates,
-            arrival_coordinates,
+        road_path_length = (
+            main_trip_path_length if transport_means in {"bus", "car", "ecar"} else None
         )
 
-        if road_results is not None:
-            if transport_means != "bus":
-                trips.append(TripResult(name="BUS", steps=[road_results.bus_step_data]))
-            if transport_means != "car":
-                trips.append(TripResult(name="CAR", steps=[road_results.car_step_data]))
-            if transport_means not in {"bus", "car", "ecar"}:
-                geometries += road_results.geometries
+        if transport_means != "bus":
+            bus_results = compute_bus_trip(
+                departure_coordinates,
+                arrival_coordinates,
+                "DIRECT_TRIP",
+                precomputed_route_length_km=road_path_length,
+            )
+            trips.append(TripResult(name="BUS", steps=[bus_results.step_data]))
+            if road_path_length is None and len(bus_results.geometries) > 0:
+                geometries += bus_results.geometries
+                road_path_length = bus_results.geometries[0].length
+
+        if transport_means != "car":
+            car_results = compute_car_trip(
+                departure_coordinates,
+                arrival_coordinates,
+                "DIRECT_TRIP",
+                precomputed_route_length_km=road_path_length,
+            )
+            trips.append(TripResult(name="CAR", steps=[car_results.step_data]))
 
     # Compute plane emissions only for trips longer than 300km
     if transport_means != "plane":
