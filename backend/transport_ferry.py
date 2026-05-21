@@ -24,7 +24,7 @@ from models import (
     TripType,
 )
 from parameters import GEOD
-from routing_maritime import gdf_lines, get_shortest_path
+from routing_maritime import get_shortest_path
 from utils import get_coordinates_from_base_geometry, m_to_km
 
 
@@ -56,12 +56,7 @@ def compute_ferry_trip(
 
     """
     # Compute geometry
-    path_geometry = get_shortest_path(
-        gdf_lines(departure_coords, arrival_coords),
-        departure_coords,
-        arrival_coords,
-    )
-
+    path_geometry = get_shortest_path(departure_coords, arrival_coords)
     path_length = m_to_km(GEOD.geometry_length(path_geometry))
     coordinates = get_coordinates_from_base_geometry(path_geometry)
 
@@ -114,12 +109,7 @@ def compute_sail_trip(
 
     """
     # Compute geometry
-    path_geometry = get_shortest_path(
-        gdf_lines(departure_coords, arrival_coords),
-        departure_coords,
-        arrival_coords,
-    )
-
+    path_geometry = get_shortest_path(departure_coords, arrival_coords)
     path_length = m_to_km(GEOD.geometry_length(path_geometry))
     coordinates = get_coordinates_from_base_geometry(path_geometry)
 

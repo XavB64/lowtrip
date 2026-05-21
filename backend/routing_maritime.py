@@ -24,11 +24,27 @@ from shapely.geometry import (
     LineString,
     Point,
 )
+from shapely.geometry.base import BaseGeometry
 from shapely.ops import nearest_points, unary_union
 
-from parameters import (
-    train_intensity,
-)
+from parameters import train_intensity
+
+
+PANAMA_CANAL = LineString([
+    (-79.51006995072298, 8.872893100443669),
+    (-80.05324567583347, 9.517999845306024),
+])
+
+SUEZ_CANAL = LineString([
+    (33.91896382986125, 27.263740326941672),
+    (32.505571710241114, 29.64748606563672),
+    (32.42803964605657, 32.58754502651166),
+])
+
+MARITIME_CANALS = [
+    PANAMA_CANAL,
+    SUEZ_CANAL,
+]
 
 
 def create_coast(world=train_intensity, buffer=0):
@@ -111,8 +127,6 @@ def get_sea_lines(start, end, world=train_intensity, nb=20, exp=10):
                 (max(start[0], end[0]) + exp + 10, lat),
             ]),
         )
-    # Add also the direct path
-    quadri.append(LineString([start, end]))
     # Cut the geometries where there is sea
     sea = gpd.overlay(
         gpd.GeoDataFrame(geometry=gpd.GeoSeries(quadri)),
@@ -124,7 +138,7 @@ def get_sea_lines(start, end, world=train_intensity, nb=20, exp=10):
     return sea.explode()
 
 
-def get_line_coast(point, coast):
+def build_shore_connection(point, coast):
     """Coast the full shapely geometry."""
     # Get linestring to get to the sea
     nearest_point_on_line = nearest_points(Point(point), coast)[1]
@@ -132,52 +146,100 @@ def get_line_coast(point, coast):
     # Create a new linestring connecting the two points
     new_linestring = LineString([Point(point), nearest_point_on_line])
 
-    return new_linestring  # noqa: RET504
+    return extend_line(new_linestring)
 
 
-def gdf_lines(start, end, add_canal=True):
-    # Get coast lines
-    coast_lines0, coast_exp0 = create_coast(buffer=0)
-    canal = []
-    if add_canal:
-        # Panama
-        canal.append(
-            LineString([
-                (-79.51006995072298, 8.872893100443669),
-                (-80.05324567583347, 9.517999845306024),
-            ]),
-        )
-        # Suez
-        canal.append(
-            LineString([
-                (33.91896382986125, 27.263740326941672),
-                (32.505571710241114, 29.64748606563672),
-                (32.42803964605657, 32.58754502651166),
-            ]),
-        )
+def build_direct_sea_connection(
+    departure_coords: tuple[float, float],
+    arrival_coords: tuple[float, float],
+    land_geometries: gpd.GeoDataFrame = train_intensity,
+) -> BaseGeometry:
+    """Build the direct maritime connection between two points.
 
-    # Combine
-    sea_lines = list(get_sea_lines(start, end).geometry.values)
-    full_edge = unary_union(
-        coast_exp0
-        + canal
-        + [extend_line(get_line_coast(p, coast_lines0)) for p in [start, end]]
-        +
-        # Extend the lines for the shortest path to the sea
-        [extend_line(k, start=True) for k in sea_lines[:-1]]
-        +
-        # Don't extend direct connection
-        [sea_lines[-1]],
-    )  # get the lines where ferry can navigate
+    The direct line between departure and arrival is clipped against land
+    geometries so that only navigable sea segments are kept.
 
-    return gpd.GeoDataFrame(
-        geometry=gpd.GeoSeries(full_edge),
-    ).explode()
+    """
+    direct_line = LineString([
+        departure_coords,
+        arrival_coords,
+    ])
+
+    sea_connection = gpd.overlay(
+        gpd.GeoDataFrame(geometry=gpd.GeoSeries([direct_line])),
+        land_geometries[["geometry"]],
+        how="difference",
+        keep_geom_type=False,
+    )
+
+    return unary_union(sea_connection.geometry)
 
 
-def get_shortest_path(line_gdf, start, end):
+def build_maritime_network(
+    departure_coords: tuple[float, float],
+    arrival_coords: tuple[float, float],
+) -> gpd.GeoDataFrame:
+    """Build a navigable maritime network between two coordinates.
+
+    The network is composed of:
+        - coast lines
+        - canal connections
+        - sea mesh segments
+        - shore-to-sea connection lines
+        - direct maritime connection between departure and arrival
+
+    Args:
+        departure_coords: Departure coordinates as (lon, lat).
+        arrival_coords: Arrival coordinates as (lon, lat).
+
+    Returns:
+        A GeoDataFrame containing navigable maritime segments.
+
+    """
+    coast_geometry, coast_segments = create_coast()
+
+    # Build maritime mesh
+    sea_mesh_segments = list(
+        get_sea_lines(
+            departure_coords,
+            arrival_coords,
+        ).geometry.values,
+    )
+    extended_sea_mesh_segments = [
+        extend_line(segment, start=True) for segment in sea_mesh_segments
+    ]
+
+    # Connect departure and arrival points to the nearest coastline.
+    shore_connections = [
+        build_shore_connection(point, coast_geometry)
+        for point in [departure_coords, arrival_coords]
+    ]
+
+    # Build direct connection between departure and arrival
+    direct_connection = build_direct_sea_connection(
+        departure_coords,
+        arrival_coords,
+    )
+
+    navigation_segments = [
+        *coast_segments,
+        *extended_sea_mesh_segments,
+        *shore_connections,
+        *MARITIME_CANALS,
+        direct_connection,
+    ]
+    maritime_network = unary_union(navigation_segments)
+
+    return gpd.GeoDataFrame(geometry=gpd.GeoSeries(maritime_network)).explode(
+        index_parts=False,
+    )
+
+
+def get_shortest_path(start, end):
+    maritime_network = build_maritime_network(start, end)
+
     # To graph
-    graph = momepy.gdf_to_nx(line_gdf, approach="primal", multigraph=False)
+    graph = momepy.gdf_to_nx(maritime_network, approach="primal", multigraph=False)
 
     # Shortest path
     path = nx.shortest_path(graph, source=start, target=end, weight="mm_len")
