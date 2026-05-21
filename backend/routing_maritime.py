@@ -46,6 +46,12 @@ MARITIME_CANALS = [
     SUEZ_CANAL,
 ]
 
+# Maritime mesh parameters
+MESH_RESOLUTION = 20
+"""Number of horizontal and vertical mesh lines."""
+SEARCH_MARGIN = 20
+"""Geographic margin added around the route area when generating the mesh. In degrees."""
+
 
 def create_coast(world=train_intensity, buffer=0):
     """World is the dataset from geopandas, already loaded for trains and ecar
@@ -101,41 +107,54 @@ def extend_line(line, additional_length=0.001, start=False):
     return extended_line
 
 
-def get_sea_lines(start, end, world=train_intensity, nb=20, exp=10):
-    # We use train because it's already loaded
-    # Create a mesh
-    quadri = []
-    for lon in np.linspace(
-        min(start[0], end[0]) - exp,
-        max(start[0], end[0]) + exp,
-        nb,
-    ):  # limit to range longitude - latidue +/- 20
-        quadri.append(
-            LineString([
-                (lon, min(start[1], end[1]) - exp - 10),
-                (lon, max(start[1], end[1]) + exp + 10),
-            ]),
-        )
-    for lat in np.linspace(
-        min(start[1], end[1]) - exp,
-        max(start[1], end[1]) + exp,
-        nb,
-    ):
-        quadri.append(
-            LineString([
-                (min(start[0], end[0]) - exp - 10, lat),
-                (max(start[0], end[0]) + exp + 10, lat),
-            ]),
-        )
-    # Cut the geometries where there is sea
-    sea = gpd.overlay(
-        gpd.GeoDataFrame(geometry=gpd.GeoSeries(quadri)),
-        world[["geometry"]],
+def build_maritime_mesh(
+    departure_coords: tuple[float, float],
+    arrival_coords: tuple[float, float],
+    land_geometries=train_intensity,
+) -> list[LineString]:
+    """Build a maritime navigation mesh between two coordinates.
+
+    A grid of horizontal and vertical line segments is generated around the
+    departure and arrival area. Land intersections are then removed so that
+    only navigable sea segments remain. The resulting segments are then
+    slightly extended to improve graph connectivity between adjacent edges.
+
+    The generated mesh is later used to construct the maritime routing graph.
+
+    Args:
+        departure_coords: Departure coordinates as (lon, lat).
+        arrival_coords: Arrival coordinates as (lon, lat).
+        land_geometries: GeoDataFrame containing world land geometries.
+
+    Returns:
+        A list of extended LineString geometries representing the navigable
+        maritime mesh used for routing graph construction.
+
+    """
+    mesh_segments = []
+
+    # limit to range +/- 20
+    lon_min = min(departure_coords[0], arrival_coords[0]) - SEARCH_MARGIN
+    lon_max = max(departure_coords[0], arrival_coords[0]) + SEARCH_MARGIN
+
+    lat_min = min(departure_coords[1], arrival_coords[1]) - SEARCH_MARGIN
+    lat_max = max(departure_coords[1], arrival_coords[1]) + SEARCH_MARGIN
+
+    for lon in np.linspace(lon_min, lon_max, MESH_RESOLUTION):
+        mesh_segments.append(LineString([(lon, lat_min), (lon, lat_max)]))
+
+    for lat in np.linspace(lat_min, lat_max, MESH_RESOLUTION):
+        mesh_segments.append(LineString([(lon_min, lat), (lon_max, lat)]))
+
+    # Remove land intersections to keep only navigable sea segments.
+    navigable_segments = gpd.overlay(
+        gpd.GeoDataFrame(geometry=gpd.GeoSeries(mesh_segments)),
+        land_geometries[["geometry"]],
         how="difference",
         keep_geom_type=False,
-    )
+    ).explode()
 
-    return sea.explode()
+    return [extend_line(segment, start=True) for segment in navigable_segments.geometry]
 
 
 def build_shore_connection(
@@ -206,15 +225,10 @@ def build_maritime_network(
     coast_geometry, coast_segments = create_coast()
 
     # Build maritime mesh
-    sea_mesh_segments = list(
-        get_sea_lines(
-            departure_coords,
-            arrival_coords,
-        ).geometry.values,
+    sea_mesh_segments = build_maritime_mesh(
+        departure_coords,
+        arrival_coords,
     )
-    extended_sea_mesh_segments = [
-        extend_line(segment, start=True) for segment in sea_mesh_segments
-    ]
 
     # Connect departure and arrival points to the nearest coastline.
     shore_connections = [
@@ -230,7 +244,7 @@ def build_maritime_network(
 
     navigation_segments = [
         *coast_segments,
-        *extended_sea_mesh_segments,
+        *sea_mesh_segments,
         *shore_connections,
         *MARITIME_CANALS,
         direct_connection,
