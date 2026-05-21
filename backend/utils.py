@@ -60,6 +60,21 @@ class GeometryRecognitionError(Exception):
     """Exception raised when the geometry is not recognized."""
 
 
+def get_coordinates_from_base_geometry(geometry: BaseGeometry):
+    """Convert a Shapely geometry into nested coordinate lists.
+
+    Raises:
+        GeometryRecognitionError:
+            If a route geometry cannot be converted to trip coordinates.
+
+    """
+    if isinstance(geometry, LineString):
+        return [[list(coord) for coord in geometry.coords]]
+    if isinstance(geometry, MultiLineString):
+        return [[list(coord) for coord in line.coords] for line in geometry.geoms]
+    raise GeometryRecognitionError
+
+
 def split_path_by_country(
     path: LineString,
     real_path_length: float,
@@ -92,10 +107,6 @@ def split_path_by_country(
             - A list of CountryRouteSegment with country-specific
             emission factors and traveled distances.
             - A list of TripStepGeometry for frontend trip rendering.
-
-    Raises:
-        GeometryRecognitionError:
-            If a route geometry cannot be converted to trip coordinates.
 
     """
     gdf = gpd.GeoSeries(
@@ -190,20 +201,9 @@ def split_path_by_country(
         )
 
         # compute trip step geometry
-        if isinstance(segment.geometry, LineString):
-            coordinates = [
-                [list(coord) for coord in segment.geometry.coords],
-            ]
-
-        elif isinstance(segment.geometry, MultiLineString):
-            coordinates = [
-                [list(coord) for coord in line.coords]
-                for line in segment.geometry.geoms
-            ]
-
-        else:
-            raise GeometryRecognitionError
-
+        coordinates = get_coordinates_from_base_geometry(
+            segment.geometry,
+        )
         geometries.append(
             TripStepGeometry(
                 coordinates=coordinates,
