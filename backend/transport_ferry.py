@@ -38,7 +38,7 @@ from parameters import (
     GEOD,
     train_intensity,
 )
-from utils import m_to_km
+from utils import get_coordinates_from_base_geometry, m_to_km
 
 
 # Ferry emissions factors (kgCO2e / passenger.km).
@@ -232,31 +232,23 @@ def compute_ferry_trip(
 
     """
     # Compute geometry
-    geom = get_shortest_path(
+    path_geometry = get_shortest_path(
         gdf_lines(departure_coords, arrival_coords),
         departure_coords,
         arrival_coords,
     )
 
-    # Compute the true distance
-    bird = m_to_km(GEOD.geometry_length(geom))
+    path_length = m_to_km(GEOD.geometry_length(path_geometry))
+    coordinates = get_coordinates_from_base_geometry(path_geometry)
 
-    # Compute the good emission factor
-    if options == "none":
-        EF = EF_FERRY_SEAT + EF_FERRY_BASE
-    elif options == "cabin":
+    # Determine EF depending on the chosen options
+    EF = EF_FERRY_SEAT + EF_FERRY_BASE
+    if options == "cabin":
         EF = EF_FERRY_CABIN + EF_FERRY_BASE
     elif options == "vehicle":
         EF = EF_FERRY_CAR + EF_FERRY_SEAT + EF_FERRY_BASE
     elif options == "cabinVehicle":
         EF = EF_FERRY_CAR + EF_FERRY_CABIN + EF_FERRY_BASE
-
-    coordinates = []
-    for l in geom.geoms:
-        t = []
-        for coord in l.coords:
-            t.append(list(coord))
-        coordinates.append(t)
 
     return TripStepResult(
         step_data=FerryStepData(
@@ -264,12 +256,12 @@ def compute_ferry_trip(
             emissions=[
                 EmissionPart(
                     name="usage",
-                    kg_co2_eq=round(EF * bird, 2),
+                    kg_co2_eq=round(EF * path_length, 2),
                     ef_tot=EF,
-                    distance=round(bird),
+                    distance=round(path_length),
                 ),
             ],
-            path_length=round(bird),
+            path_length=round(path_length),
             coeff_total=EF,
             options=options,
         ),
@@ -277,7 +269,7 @@ def compute_ferry_trip(
             TripStepGeometry(
                 coordinates=coordinates,
                 transport_means="ferry",
-                length=bird,
+                length=path_length,
                 country_label=None,
                 trip_type=trip_type,
             ),
@@ -298,21 +290,14 @@ def compute_sail_trip(
 
     """
     # Compute geometry
-    geom = get_shortest_path(
+    path_geometry = get_shortest_path(
         gdf_lines(departure_coords, arrival_coords),
         departure_coords,
         arrival_coords,
     )
 
-    # Compute the true distance
-    bird = m_to_km(GEOD.geometry_length(geom))
-
-    coordinates = []
-    for l in geom.geoms:
-        t = []
-        for coord in l.coords:
-            t.append(list(coord))
-        coordinates.append(t)
+    path_length = m_to_km(GEOD.geometry_length(path_geometry))
+    coordinates = get_coordinates_from_base_geometry(path_geometry)
 
     return TripStepResult(
         step_data=SailStepData(
@@ -320,19 +305,19 @@ def compute_sail_trip(
             emissions=[
                 EmissionPart(
                     name="Usage",
-                    kg_co2_eq=round(EF_SAIL * bird, 2),
+                    kg_co2_eq=round(EF_SAIL * path_length, 2),
                     ef_tot=EF_SAIL,
-                    distance=round(bird),
+                    distance=round(path_length),
                 ),
             ],
-            path_length=round(bird),
+            path_length=round(path_length),
             coeff_total=EF_SAIL,
         ),
         geometries=[
             TripStepGeometry(
                 coordinates=coordinates,
                 transport_means="sail",
-                length=bird,
+                length=path_length,
                 country_label=None,
                 trip_type=trip_type,
             ),
