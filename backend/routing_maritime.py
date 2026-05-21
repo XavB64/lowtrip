@@ -51,6 +51,8 @@ MESH_RESOLUTION = 20
 """Number of horizontal and vertical mesh lines."""
 SEARCH_MARGIN = 20
 """Geographic margin added around the route area when generating the mesh. In degrees."""
+LINE_EXTENSION_FACTOR = 0.001
+"""Small geometric extension applied to maritime segments to avoid disconnected routing graph edges."""
 
 
 def create_coast(world=train_intensity, buffer=0):
@@ -65,46 +67,53 @@ def create_coast(world=train_intensity, buffer=0):
     return coast_lines, coast_exp
 
 
-def extend_line(line, additional_length=0.001, start=False):
-    # Define the additional length you want to add to the LineString
+def extend_point(
+    reference_point: tuple[float, float],
+    point_to_extend: tuple[float, float],
+):
+    """Extend a point along a direction vector.
 
-    # Get the coordinates of the first and last points of the LineString
-    start_point = line.coords[0]
-    end_point = line.coords[-1]
+    The point is extended in the direction formed by (reference_point -> point_to_extend).
 
-    # Calculate the direction vector from the last point to the second-to-last point
+    """
     direction_vector_end = (
-        end_point[0] - line.coords[-2][0],
-        end_point[1] - line.coords[-2][1],
+        point_to_extend[0] - reference_point[0],
+        point_to_extend[1] - reference_point[1],
+    )
+    return (
+        point_to_extend[0] + direction_vector_end[0] * LINE_EXTENSION_FACTOR,
+        point_to_extend[1] + direction_vector_end[1] * LINE_EXTENSION_FACTOR,
     )
 
-    # Calculate the new end point by extending the last point along the direction vector
-    new_end_point = (
-        end_point[0] + direction_vector_end[0] * additional_length,
-        end_point[1] + direction_vector_end[1] * additional_length,
-    )
 
-    if start:
-        # Calculate the direction vector from the second point to the first point
-        direction_vector_start = (
-            line.coords[1][0] - start_point[0],
-            line.coords[1][1] - start_point[1],
-        )
+def extend_line(line: LineString, extend_start=False):
+    """Extend a line along its direction vector, to avoid disconnected routing graph edges.
 
-        # Calculate the new start point by extending the first point along the direction vector
-        new_start_point = (
-            start_point[0] - direction_vector_start[0] * additional_length,
-            start_point[1] - direction_vector_start[1] * additional_length,
-        )
+    The line end is always extended. The start of the line can also be
+    extended optionally.
 
-        # We extend from the start also
-        # Create a new LineString with the extended length
-        extended_line = LineString([new_start_point, *line.coords[1:], new_end_point])
+    Args:
+        line: Input line geometry.
+        extend_start: Whether to extend the start of the line as well.
 
-    else:
-        extended_line = LineString([start_point, *line.coords[1:], new_end_point])
+    Returns:
+        An extended LineString geometry.
 
-    return extended_line
+    """
+    start_point = line.coords[0]
+    second_last_point = line.coords[-2]
+    last_point = line.coords[-1]
+
+    new_end_point = extend_point(second_last_point, last_point)
+
+    new_start_point = start_point
+    if extend_start:
+        second_point = line.coords[1]
+        # Note: arguments are intentionally inverted to extend the start point
+        # in the direction of the first segment (second_point -> start_point).
+        new_start_point = extend_point(second_point, start_point)
+
+    return LineString([new_start_point, *line.coords[1:], new_end_point])
 
 
 def build_maritime_mesh(
@@ -154,7 +163,7 @@ def build_maritime_mesh(
         keep_geom_type=False,
     ).explode()
 
-    return [extend_line(segment, start=True) for segment in navigable_segments.geometry]
+    return [extend_line(segment, extend_start=True) for segment in navigable_segments.geometry]
 
 
 def build_shore_connection(
