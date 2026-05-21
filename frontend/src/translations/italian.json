@@ -108,6 +108,7 @@
         "car": "Auto",
         "ecar": "Auto elettrica",
         "bus": "Autobus",
+        "hitchHiking": "Autostop",
         "train": "Treno",
         "ferry": "Traghetto",
         "bicycle": "Bicicletta",

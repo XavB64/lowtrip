@@ -124,7 +124,7 @@ const DetailedHitchHikingSection = ({ index }: HitchHikingSectionProps) => {
       <section className="details-section">
         <div className="details-section-header">
           <span className="details-section-step">5</span>
-          <h3 className="details-section-title">{t("hitchHiking.total")}</h3>
+          <h3 className="details-section-title">{t("total")}</h3>
         </div>
 
         <div className="equation-box">
@@ -136,7 +136,7 @@ const DetailedHitchHikingSection = ({ index }: HitchHikingSectionProps) => {
 };
 
 type HitchHikingSectionProps = {
-  tripStep: Extract<TripStep, { transport: Transport.car }>;
+  tripStep: Extract<TripStep, { transport: Transport.hitchHiking }>;
   index: number;
 };
 
@@ -159,8 +159,8 @@ const HitchHikingSection = ({
       `\\text{CO₂eq}_{\\text{${t("equation.construction")}}} = 0\\; \\text{kgCO₂eq}`,
       `          \\begin{aligned}
           \\text{CO₂eq}_{\\text{${t("equation.fuel")}}} &= \\text{coeff}_{\\text{${t("equation.fuel")}}} \\times0.04 \\times \\text{${t("equation.distance")}} \\\\
-                    &=${tripStep.coeff_fuel} \\times 0.04 \\times ${tripStep.distance}\\; \\text{km} \\\\
-                    &= ${round(tripStep.coeff_fuel * tripStep.distance * 0.04)}\\; \\text{kgCO₂eq}
+                    &=${tripStep.coeff_fuel} \\times ${tripStep.coeff_hitch_hike} \\times ${tripStep.distance}\\; \\text{km} \\\\
+                    &= ${round(tripStep.coeff_fuel * tripStep.distance * tripStep.coeff_hitch_hike)}\\; \\text{kgCO₂eq}
           \\end{aligned}`,
       `\\text{CO₂eq} = \\text{CO₂eq}_{\\text{${t("equation.construction")}}} + \\text{CO₂eq}_{\\text{${t("equation.fuel")}}} = ${tripStep.emissions}\\; \\text{kgCO₂eq}`,
     ]);

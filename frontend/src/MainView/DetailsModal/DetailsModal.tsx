@@ -63,10 +63,10 @@ const DetailsModal = ({ trips, onClose, isOpen }: DetailsModalProps) => {
           if (step.transport === Transport.plane)
             return <PlaneSection key={index} tripStep={step} {...props} />;
           if (step.transport === Transport.car)
-            return step.is_hitch_hike ? (
+            return <CarSection key={index} tripStep={step} {...props} />;
+          if (step.transport === Transport.hitchHiking)
+            return (
               <HitchHikingSection key={index} tripStep={step} {...props} />
-            ) : (
-              <CarSection key={index} tripStep={step} {...props} />
             );
           if (step.transport === Transport.ecar)
             return (

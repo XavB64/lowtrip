@@ -4,7 +4,7 @@ type StepsForApi = {
   lon: string[];
   lat: string[];
   transp: string[];
-  nb: string[];
+  nb: number[];
   options: string[];
 };
 
@@ -18,7 +18,7 @@ const formatStepsForApi = (steps: Step[]): StepsForApi =>
       acc.lon.push(step.locationCoords[1].toString());
       acc.lat.push(step.locationCoords[0].toString());
       acc.transp.push(step.transportMean ?? "");
-      acc.nb.push(step.passengers ?? "1");
+      acc.nb.push(step.passengers ?? 1);
       acc.options.push(step.options ?? "");
       return acc;
     },

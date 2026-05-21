@@ -32,6 +32,7 @@ from transport_car import (
     compute_bus_trip,
     compute_car_trip,
     compute_ecar_trip,
+    compute_hitch_hiking_trip,
 )
 from transport_ferry import compute_ferry_trip, compute_sail_trip
 from transport_plane import compute_plane_trip
@@ -99,6 +100,13 @@ def compute_custom_trip_emissions(
                 arrival_coordinates,
                 trip_type,
                 passengers_nb=arrival.passengers_nb,
+            )
+
+        elif transport_means == "hitchHiking":
+            results = compute_hitch_hiking_trip(
+                departure_coordinates,
+                arrival_coordinates,
+                trip_type,
             )
 
         elif transport_means == "ecar":

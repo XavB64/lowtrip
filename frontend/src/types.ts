@@ -15,13 +15,14 @@ export type Step = {
   locationName?: string;
   locationCoords?: [number, number];
   transportMean?: Transport;
-  passengers?: "1" | "2" | "3" | "4" | "5" | "6" | "7" | typeof thumbUp;
+  passengers?: number;
   options?: FerryOptions;
 };
 
 export enum Transport {
   plane = "plane",
   car = "car",
+  hitchHiking = "hitchHiking",
   ecar = "ecar",
   bus = "bus",
   train = "train",
@@ -75,7 +76,11 @@ type TripResult = {
         coeff_upstream: number;
         coeff_fuel: number;
         passengers_nb: number;
-        is_hitch_hike: boolean;
+      }
+    | {
+        transport: Transport.hitchHiking;
+        coeff_hitch_hike: number;
+        coeff_fuel: number;
       }
     | {
         transport: Transport.ecar;
@@ -151,7 +156,11 @@ export type TripStep = {
       coeff_upstream: number;
       coeff_fuel: number;
       passengers_nb: number;
-      is_hitch_hike: boolean;
+    }
+  | {
+      transport: Transport.hitchHiking;
+      coeff_hitch_hike: number;
+      coeff_fuel: number;
     }
   | {
       transport: Transport.ecar;

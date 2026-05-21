@@ -45,7 +45,7 @@ class TripStep:
     lon: float
     lat: float
     transport_means: str
-    passengers_nb: str | None
+    passengers_nb: int | None
     options: str | None
 
 
@@ -129,10 +129,18 @@ class CarStepData(BaseStepData):
     """Car step dataclass."""
 
     transport: Literal["car"]
-    is_hitch_hike: bool
     passengers_nb: int
     coeff_upstream: float
     coeff_fuel: float
+
+
+@dataclass
+class HitchHikingStepData(BaseStepData):
+    """Hitch hiking step dataclass."""
+
+    transport: Literal["hitchHiking"]
+    coeff_fuel: float
+    coeff_hitch_hike: float
 
 
 @dataclass
@@ -186,6 +194,7 @@ StepData = (
     BicycleStepData
     | BusStepData
     | CarStepData
+    | HitchHikingStepData
     | EcarStepData
     | FerryStepData
     | PlaneStepData

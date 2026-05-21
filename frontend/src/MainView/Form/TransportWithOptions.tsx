@@ -51,7 +51,7 @@ const getTransportOptions = (
   const basicCarOptions = [1, 2, 3, 4, 5].map((count) => ({
     label: t("form.passengersNb", { count }),
     stepOptions: {
-      passengers: `${count}` as Step["passengers"],
+      passengers: count,
       options: undefined,
     },
   }));
@@ -60,15 +60,23 @@ const getTransportOptions = (
         ...basicCarOptions,
         {
           label: t("form.hitchHiking"),
-          stepOptions: { passengers: thumbUp, options: undefined },
+          stepOptions: {
+            transportMean: Transport.hitchHiking,
+            options: undefined,
+          },
         },
       ]
     : basicCarOptions;
 };
 
 function getIcon(step: Step) {
-  if (step.passengers) return step.passengers;
-  if (step.options) {
+  const { transportMean } = step;
+  if (transportMean === Transport.hitchHiking) return thumbUp;
+
+  if (transportMean === Transport.car || transportMean === Transport.ecar)
+    return step.passengers;
+
+  if (transportMean === Transport.ferry) {
     switch (step.options) {
       case FerryOptions.none:
         return "💺";

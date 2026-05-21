@@ -189,6 +189,7 @@
         "plane": "Avion",
         "car": "Voiture {{count}}p.",
         "ecar": "VE",
+        "hitchHiking": "Auto-stop",
         "bus": "Bus",
         "train": "Train",
         "ferry": "Ferry",
