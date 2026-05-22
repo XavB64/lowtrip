@@ -16,6 +16,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 from functools import lru_cache
+from itertools import pairwise
 
 import geopandas as gpd
 import momepy
@@ -287,22 +288,50 @@ def build_maritime_network(
     )
 
 
-def get_shortest_path(start, end):
-    maritime_network = build_maritime_network(start, end)
+def compute_maritime_shortest_path(
+    departure_coords: tuple[float, float],
+    arrival_coords: tuple[float, float],
+):
+    """Compute the shortest maritime route between two geographic points.
 
-    # To graph
-    graph = momepy.gdf_to_nx(maritime_network, approach="primal", multigraph=False)
+    This function builds a navigable maritime network between the departure
+    and arrival coordinates, converts it into a NetworkX graph, and computes
+    the shortest path using edge length weights.
 
-    # Shortest path
-    path = nx.shortest_path(graph, source=start, target=end, weight="mm_len")
+    The resulting route is reconstructed as a single merged geometry by
+    combining the geometries of all edges along the shortest path.
 
-    # Extract the edge geometries of the shortest path
-    shortest_path_edges = [(path[i], path[i + 1]) for i in range(len(path) - 1)]
-    shortest_path_geometries = [
-        graph.get_edge_data(u, v)["geometry"]
-        for u, v in shortest_path_edges
-        if "geometry" in graph.get_edge_data(u, v)
-    ]
+    Args:
+        departure_coords: Departure coordinates as (longitude, latitude).
+        arrival_coords: Arrival coordinates as (longitude, latitude).
 
-    # Merge the geometries of the edges in the shortest path
-    return unary_union(shortest_path_geometries)
+    Returns:
+        A Shapely geometry representing the shortest maritime route.
+
+    """
+    maritime_network = build_maritime_network(departure_coords, arrival_coords)
+
+    maritime_graph = momepy.gdf_to_nx(
+        maritime_network,
+        approach="primal",
+        multigraph=False,
+    )
+
+    # Compute the shortest path on the maritime graph using edge length as weight.
+    # Output: a sequence of nodes (A -> B -> C -> D)
+    node_path = nx.shortest_path(
+        maritime_graph,
+        source=departure_coords,
+        target=arrival_coords,
+        weight="mm_len",
+    )
+
+    # Extract the geometry of each pair of consecutive nodes in the shortest path
+    edge_geometries = []
+    for u, v in pairwise(node_path):
+        edge_data = maritime_graph.get_edge_data(u, v)
+        if edge_data and "geometry" in edge_data:
+            edge_geometries.append(edge_data["geometry"])
+
+    # Merge the edges into a single continuous Geometry
+    return unary_union(edge_geometries)
