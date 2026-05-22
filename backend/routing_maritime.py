@@ -50,9 +50,9 @@ MARITIME_CANALS = [
 ]
 
 # Maritime mesh parameters
-MESH_RESOLUTION = 20
+MESH_RESOLUTION = 50
 """Number of horizontal and vertical mesh lines."""
-SEARCH_MARGIN = 20
+SEARCH_MARGIN = 30
 """Geographic margin added around the route area when generating the mesh. In degrees."""
 LINE_EXTENSION_FACTOR = 0.001
 """Small geometric extension applied to maritime segments to avoid disconnected routing graph edges."""
