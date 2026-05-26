@@ -48,11 +48,37 @@ def compute_ferry_trip(
     trip_type: TripType,
     options="none",
 ) -> TripStepResult:
-    """Parameters
-        - departure_coords, arrival_coords
-        - EF : emission factor in gCO2/pkm for ferry
-    return:
-        - full dataframe for ferry.
+    """Compute a ferry trip between two geographic coordinates.
+
+    The maritime route geometry is computed using a custom routing algorithm:
+    - a navigable maritime mesh is generated around the departure and arrival
+      area
+    - land intersections are removed to keep only sea segments
+    - a graph is built from the resulting maritime network
+    - Dijkstra shortest-path algorithm is applied to compute the optimal route
+
+    A schematic representation of a generated maritime mesh is available in
+    `routing_maritime_mesh.png`.
+
+    Ferry emissions are then estimated from the resulting maritime distance
+    and the selected ferry travel options.
+
+    Args:
+        departure_coords: Departure coordinates as (longitude, latitude).
+        arrival_coords: Arrival coordinates as (longitude, latitude).
+        trip_type: Type of trip associated with the route geometry.
+        options: Ferry travel options affecting the emission factor.
+            Supported values:
+                - "none"
+                - "cabin"
+                - "vehicle"
+                - "cabinVehicle"
+
+    Returns:
+        A TripStepResult containing:
+            - ferry emissions
+            - route distance
+            - computed maritime route geometry
 
     """
     # Compute geometry
@@ -101,14 +127,32 @@ def compute_sail_trip(
     arrival_coords: tuple[float, float],
     trip_type: TripType,
 ) -> TripStepResult:
-    """Parameters
-        - departure_coords, arrival_coords
-        - EF : emission factor in gCO2/pkm for ferry
-    return:
-        - full dataframe for ferry.
+    """Compute a sail trip between two geographic coordinates.
+
+    The maritime route geometry is computed using a custom routing algorithm:
+    - a navigable maritime mesh is generated around the departure and arrival
+      area
+    - land intersections are removed to keep only sea segments
+    - a graph is built from the resulting maritime network
+    - Dijkstra shortest-path algorithm is applied to compute the optimal route
+
+    A schematic representation of a generated maritime mesh is available in
+    `routing_maritime_mesh.png`.
+
+    Emissions are then estimated from the resulting maritime distance.
+
+    Args:
+        departure_coords: Departure coordinates as (longitude, latitude).
+        arrival_coords: Arrival coordinates as (longitude, latitude).
+        trip_type: Type of trip associated with the route geometry.
+
+    Returns:
+        A TripStepResult containing:
+            - sail emissions
+            - route distance
+            - computed maritime route geometry
 
     """
-    # Compute geometry
     path_geometry = compute_maritime_shortest_path(departure_coords, arrival_coords)
     path_length = m_to_km(GEOD.geometry_length(path_geometry))
     coordinates = get_coordinates_from_base_geometry(path_geometry)
