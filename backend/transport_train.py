@@ -59,53 +59,90 @@ class GeometryRecognitionError(Exception):
     """Exception raised when the geometry is not recognized."""
 
 
-def flatten_list_of_tuples(lst):
-    # We reverse the geometry so the latitude are written before the longitude (Overpass API nomenclature)
-    return [item for tup in lst for item in tup[::-1]]
+def build_overpass_railway_query(
+    coordinates: tuple[float, float],
+    search_perimeter_km: float,
+):
+    """Build an Overpass query to search nearby railway geometries.
 
+    A circular search area is generated around the input coordinates and
+    converted to the polygon coordinate format expected by Overpass API.
 
-def find_nearest(lon, lat, search_perimeter: float):
-    """This function find the nearest node for train raiway in the OSM network using Overpass API
-    parameters:
-        - lon, lat : coordinates in degree of the point
-        - perim : perimeters (m) to look around
-    return:
-        - new coordinates(lat, lon).
+    Args:
+        coordinates: Coordinates as (longitude, latitude).
+        search_perimeter_km: Search radius in kilometers.
+
+    Returns:
+        An Overpass QL query string.
+
     """
-    # Extend the area around the point
-    buff = list(
-        Point(lon, lat).buffer(kilometer_to_degree(search_perimeter)).exterior.coords,
+    # Draw an approximate circular search area around the input coordinates.
+    # Since the geometry uses geographic coordinates (EPSG:4326), the buffer
+    # radius must be expressed in degrees rather than kilometers.
+    search_area = Point(coordinates).buffer(
+        kilometer_to_degree(search_perimeter_km),
     )
-    # Request Overpass API turbo data :
-    l = flatten_list_of_tuples(buff)
 
-    # Overpass API nomenclature - filter by polygon
-    st = ""
-    for k in l:
-        st += str(k) + " "
+    # Overpass expects polygon coordinates as: "lat lon lat lon ..."
+    polygon_coordinates = " ".join(
+        f"{lat} {lon}" for lon, lat in search_area.exterior.coords
+    )
 
-    # Prepare the request
-    url = "http://overpass-api.de/api/interpreter"  # To avoid the natural space at the end
-    query = (
-        '[out:json][timeout:60];(way(poly : "'
-        + st[:-1]
-        + '")["railway"="rail"];);out geom;'
-    )  # ;convert item ::=::,::geom=geom(),_osm_type=type()
+    return f"""
+        [out:json][timeout:60];
+        (
+            way(poly:"{polygon_coordinates}")["railway"="rail"];
+        );
+        out geom;
+        """
 
-    # Make request
-    response = requests.get(url, params={"data": query})
 
-    # if response.status_code == HTTPStatus.OK: not working, looking at size of elements also
-    if response.status_code == HTTPStatus.OK and len(response.json()["elements"]) > 0:
-        # Extract the first point coordinates we could found
-        new_point = (
-            pd.json_normalize(response.json()["elements"][0]).loc[0].geometry[0]
-        )  # .columns
-        # Return lon, lat
-        return (new_point["lon"], new_point["lat"])
+SEARCH_PERIMETERS_KM = [0.2, 5, 10, 15]
 
-    # Couldn't find a node
-    return False
+
+def find_nearest_railway_point(
+    coordinates: tuple[float, float],
+) -> tuple[float, float] | None:
+    """Find a nearby railway point using the Overpass API.
+
+    A search area is built around the input coordinates and queried against
+    OpenStreetMap railway geometries. The first coordinate of the first
+    railway geometry found within the search perimeter is used as a nearby
+    railway point.
+
+    The search radius is progressively increased until a nearby railway point
+    is found or all search perimeters are exhausted.
+
+    This function is used as a fallback mechanism when direct train routing
+    fails because departure or arrival coordinates are too far from the rail
+    network.
+
+    Args:
+        coordinates: Coordinates as (longitude, latitude).
+
+    Returns:
+        Coordinates of a nearby railway point as (longitude, latitude),
+        or None if no railway geometry could be found.
+
+    """
+    for search_perimeter in SEARCH_PERIMETERS_KM:
+        query = build_overpass_railway_query(coordinates, search_perimeter)
+
+        response = requests.post(
+            "http://overpass-api.de/api/interpreter",
+            headers={
+                "Content-Type": "text/plain",
+                "User-Agent": "transport-backend/1.0",
+            },
+            data=query,
+        )
+
+        response_json = response.json()
+        if response.status_code == HTTPStatus.OK and response_json["elements"]:
+            new_point = response_json["elements"][0]["geometry"][0]
+            return new_point["lon"], new_point["lat"]
+
+    return None
 
 
 def extend_search(
@@ -123,22 +160,10 @@ def extend_search(
         - success (bool)
 
     """
-    SEARCH_PERIMETERS = [0.2, 5]  # km
-
     # We extend the search progressively
-    for search_perimeter in SEARCH_PERIMETERS:
-        # Departure
-        new_departure_coords = find_nearest(
-            departure_coords[0],
-            departure_coords[1],
-            search_perimeter,
-        )
-        if new_departure_coords != False:
-            # Then we found a better place, we can stop the loop
-            break
+    new_departure_coords = find_nearest_railway_point(departure_coords)
 
-    # Maybe here try to check if the API is not already working
-    if new_departure_coords == False:
+    if new_departure_coords is None:
         # Then we will find nothing
         gdf = pd.DataFrame()
         success = False
@@ -149,18 +174,10 @@ def extend_search(
         gdf, success, train_dist = find_train(new_departure_coords, arrival_coords)
         if success == False:
             # We can change arrival_coords
-            for search_perimeter in SEARCH_PERIMETERS:
-                # Could be up to 10k  ~ size of Bdx
-                new_arrival_coords = find_nearest(
-                    arrival_coords[0],
-                    arrival_coords[1],
-                    search_perimeter,
-                )
-                if new_arrival_coords != False:
-                    break
+            new_arrival_coords = find_nearest_railway_point(arrival_coords)
 
             # Verify that we want to try to request the API again
-            if new_departure_coords and new_arrival_coords:
+            if new_arrival_coords is not None:
                 gdf, success, train_dist = find_train(
                     new_departure_coords,
                     new_arrival_coords,
