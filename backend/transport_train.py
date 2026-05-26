@@ -18,12 +18,8 @@
 from dataclasses import dataclass
 from http import HTTPStatus
 
-import geopandas as gpd
 import requests
-from shapely.geometry import (
-    LineString,
-    Point,
-)
+from shapely.geometry import LineString, Point
 
 from models import (
     CountrySplitConfig,
@@ -241,47 +237,48 @@ def compute_train_trip(
     departure_coords: tuple[float, float],
     arrival_coords: tuple[float, float],
     trip_type: TripType,
-):
-    """Find the train path between 2 points and compute the emissions of the path.
+) -> TripStepResult | None:
+    """Compute a train trip route and associated emissions.
 
-    Parameters
-    ----------
-        - departure_coords, arrival_coords
+    A train route is first requested directly from the railway routing API.
+    If routing fails, nearby railway points are searched around the departure
+    and arrival coordinates and used to retry the routing request.
 
-    Returns
-    -------
-        - full dataframe for trains
+    Once a valid route is obtained, the geometry is split by country in order
+    to apply country-specific train emission factors to each segment of the trip.
+    Additional infrastructure emissions are then added to the final result.
 
-    Raises
-    ------
-        If the geometry is not recognized.
+    Args:
+        departure_coords: Departure coordinates as (longitude, latitude).
+        arrival_coords: Arrival coordinates as (longitude, latitude).
+        trip_type: Type of trip associated with the computed geometries.
+
+    Returns:
+        A TripStepResult containing:
+            - train route geometries
+            - country-level emission breakdown
+            - total traveled distance
+        Returns None if no valid train route could be computed.
 
     """
-    # First try with coordinates supplied by the user
     result = request_train_route(departure_coords, arrival_coords)
 
-    # If failure then we try to find a better spot nearby - Put in another function
     if result is None:
-        # We try to search nearby the coordinates and request again
         result = retry_train_routing_with_nearby_points(
             departure_coords,
             arrival_coords,
         )
 
-    # Validation part for train
     if result is None or not validate_geometry(
         departure_coords,
         arrival_coords,
-        gpd.GeoSeries(
-            result.geometry,
-            crs="epsg:4326",
-        ).values[0],
+        result.geometry,
     ):
         return None
 
     path_length_km = result.path_length_km
 
-    # Split path by country and compute the length and the emission factor for each part of the path
+    # Split route by country to compute country-specific emissions.
     country_route_segments, geometries = split_path_by_country(
         result.geometry,
         path_length_km,
