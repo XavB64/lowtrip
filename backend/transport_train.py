@@ -177,70 +177,64 @@ def retry_train_routing_with_nearby_points(
     if new_departure_coords is None:
         return None
 
-    geometry, success, path_length_km = find_train(new_departure_coords, arrival_coords)
-    if success:
-        return TrainRouteResult(geometry=geometry, path_length_km=path_length_km)
+    result = request_train_route(new_departure_coords, arrival_coords)
+    if result is not None:
+        return result
 
     # Look for the closest point from arrival on railway
     new_arrival_coords = find_nearest_railway_point(arrival_coords)
     if new_arrival_coords is None:
         return None
 
-    geometry, success, path_length_km = find_train(
+    return request_train_route(
         new_departure_coords,
         new_arrival_coords,
     )
-    if success:
-        return TrainRouteResult(geometry=geometry, path_length_km=path_length_km)
-
-    return None
 
 
-def find_train(
+def request_train_route(
     departure_coords: tuple[float, float],
     arrival_coords: tuple[float, float],
-    method="signal",
-):
-    """Find train path between 2 points. Can use ntag API or signal.
+) -> TrainRouteResult | None:
+    """Request a train route between two coordinates.
 
-    Parameters
-    ----------
-        - departure_coords, arrival_coords : list or tuple like (lon, lat)
-        - method : signal / trainmap
-    return:
-        - geometry, a LineString or None
-        - success, boolean
+    The route geometry and path length are retrieved from the Signal
+    railway routing API.
+
+    Args:
+        departure_coords: Departure coordinates as (longitude, latitude).
+        arrival_coords: Arrival coordinates as (longitude, latitude).
+
+    Returns:
+        A TrainRouteResult containing the route geometry and path length
+        if routing succeeds, otherwise None.
 
     """
-    # Build the request url
-    if method == "trainmap":
-        url = f"https://trainmap.ntag.fr/api/route?dep={departure_coords[0]},{departure_coords[1]}&arr={arrival_coords[0]},{arrival_coords[1]}&simplify=1"
+    departure_lon, departure_lat = departure_coords
+    arrival_lon, arrival_lat = arrival_coords
 
-    else:
-        url = (
-            f"https://signal.eu.org/osm/eu/route/v1/train/{departure_coords[0]},{departure_coords[1]};{arrival_coords[0]},{arrival_coords[1]}"
-            "?overview=simplified&geometries=geojson"
-        )
+    url = (
+        "https://signal.eu.org/osm/eu/route/v1/train/"
+        f"{departure_lon},{departure_lat};"
+        f"{arrival_lon},{arrival_lat}"
+        "?overview=simplified&geometries=geojson"
+    )
 
-    # Send the GET request
     response = requests.get(url)
 
-    # Check if the request was not successful
     if response.status_code != HTTPStatus.OK:
         print(f"Failed to retrieve data. Status code: {response.status_code}")
-        geometry, success, train_dist = None, False, 0
-        # We will try to request again with overpass
-        return geometry, success, train_dist
+        return None
 
-    if method == "trainmap":
-        geometry = LineString(response.json()["geometry"]["coordinates"][0])
-    else:
-        train_dist = m_to_km(response.json()["routes"][0]["distance"])
-        geometry = LineString(response.json()["routes"][0]["geometry"]["coordinates"])
+    routes = response.json().get("routes")
+    if not routes or len(routes) == 0:
+        return None
 
-    success = True
+    route = routes[0]
+    path_length_km = m_to_km(route["distance"])
+    geometry = LineString(route["geometry"]["coordinates"])
 
-    return geometry, success, train_dist
+    return TrainRouteResult(geometry=geometry, path_length_km=path_length_km)
 
 
 def compute_train_trip(
@@ -264,35 +258,33 @@ def compute_train_trip(
 
     """
     # First try with coordinates supplied by the user
-    geometry, success, train_dist = find_train(departure_coords, arrival_coords)
+    result = request_train_route(departure_coords, arrival_coords)
 
     # If failure then we try to find a better spot nearby - Put in another function
-    if success == False:
+    if result is None:
         # We try to search nearby the coordinates and request again
         result = retry_train_routing_with_nearby_points(
             departure_coords,
             arrival_coords,
         )
-        if result is not None:
-            success = True
-            geometry = result.geometry
-            train_dist = result.path_length_km
 
     # Validation part for train
-    if not success or not validate_geometry(
+    if result is None or not validate_geometry(
         departure_coords,
         arrival_coords,
         gpd.GeoSeries(
-            geometry,
+            result.geometry,
             crs="epsg:4326",
         ).values[0],
     ):
         return None
 
+    path_length_km = result.path_length_km
+
     # Split path by country and compute the length and the emission factor for each part of the path
     country_route_segments, geometries = split_path_by_country(
-        geometry,
-        train_dist,
+        result.geometry,
+        path_length_km,
         TRAIN_COUNTRY_SPLIT_CONFIG,
         trip_type=trip_type,
     )
@@ -309,9 +301,9 @@ def compute_train_trip(
     emissions.append(
         EmissionPart(
             name="infra",
-            kg_co2_eq=round(train_dist * EF_TRAIN_INFRA),
+            kg_co2_eq=round(path_length_km * EF_TRAIN_INFRA),
             ef_tot=EF_TRAIN_INFRA,
-            distance=round(train_dist),
+            distance=round(path_length_km),
         ),
     )
 
@@ -319,7 +311,7 @@ def compute_train_trip(
         step_data=TrainStepData(
             transport="train",
             emissions=emissions,
-            path_length=round(train_dist),
+            path_length=round(path_length_km),
             coeff_upstream=EF_TRAIN_INFRA,
         ),
         geometries=geometries,
