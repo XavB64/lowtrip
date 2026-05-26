@@ -30,10 +30,6 @@ from parameters import GEOD
 from utils import m_to_km
 
 
-# Number of points in plane geometry
-POINTS_NB = 100
-
-
 @dataclass(frozen=True)
 class PlaneEmissionFactors:
     """Dataclass for plane emission factors. Values depend on the length of the flight."""
@@ -79,47 +75,74 @@ HOLD = 3.81  # kg/p
 CONTRAILS_COEFF = 2
 
 
-def great_circle_geometry(
+# Number of points in plane geometry
+GREAT_CIRCLE_INTERPOLATION_POINTS = 100
+
+
+def compute_great_circle_route(
     departure_coords: tuple[float, float],
     arrival_coords: tuple[float, float],
 ):
-    """Create the great circle geometry with pyproj.
+    """Compute the great-circle route between two geographic coordinates.
 
-    parameters: departure_coords, arrival_coords
+    A great-circle route represents the shortest path between two points on
+    the Earth's surface. The route is computed using geodesic interpolation
+    with pyproj, generating intermediate points along the geodesic.
 
-    Returns
-    -------
-        - shapely geometry (Linestring)
-        - Geodesic distance in km
+    The resulting points are assembled into a LineString geometry suitable
+    for map display and route visualization.
+
+    Special handling is applied for routes crossing the antimeridian
+    (±180° longitude) to avoid invalid map rendering caused by longitude
+    wrapping.
+
+    Args:
+        departure_coords: Departure coordinates as (longitude, latitude).
+        arrival_coords: Arrival coordinates as (longitude, latitude).
+
+    Returns:
+        A tuple containing:
+            - A LineString representing the great-circle route
+            - The geodesic distance in kilometers
 
     """
-    # returns a list of longitude/latitude pairs describing n points equally spaced
-    # intermediate points along the geodesic between the initial and terminus points.
-    r = GEOD.inv_intermediate(
+    # Generate intermediate longitude/latitude points along the geodesic route
+    # between departure and arrival coordinates.
+    geodesic_result = GEOD.inv_intermediate(
         lon1=float(departure_coords[0]),
         lat1=float(departure_coords[1]),
         lon2=float(arrival_coords[0]),
         lat2=float(arrival_coords[1]),
-        npts=POINTS_NB,
+        npts=GREAT_CIRCLE_INTERPOLATION_POINTS,
         initial_idx=0,
         terminus_idx=0,
     )
 
-    # Create the geometry
-    # Displaying results over the antimeridian
-    if abs(min(r.lons) - max(r.lons)) > 180:
-        # Then the other way is faster, we add 360° to the destination with neg lons
-        l = [
-            [lon, lat]
-            for lon, lat in zip(
-                [lon + 360 if lon < 0 else lon for lon in r.lons],
-                r.lats,
-            )
+    min_lon = min(geodesic_result.lons)
+    max_lon = max(geodesic_result.lons)
+
+    if max_lon - min_lon < 180:
+        coordinates = [
+            [lon, lat] for lon, lat in zip(geodesic_result.lons, geodesic_result.lats)
         ]
     else:
-        l = [[lon, lat] for lon, lat in zip(r.lons, r.lats)]
+        # Handle routes crossing the antimeridian (±180° longitude).
+        # Negative longitudes are shifted to the [0, 360] range to avoid
+        # incorrect long lines across the map during visualization.
+        coordinates = [
+            [lon + 360 if lon < 0 else lon, lat]
+            for lon, lat in zip(geodesic_result.lons, geodesic_result.lats)
+        ]
 
-    return LineString(l), m_to_km(r.dist)
+    return LineString(coordinates), m_to_km(geodesic_result.dist)
+
+
+def get_plane_emission_factors(route_length: float):
+    if route_length < 1000:
+        return EF_PLANE_SHORT
+    if route_length < 3500:
+        return EF_PLANE_MEDIUM
+    return EF_PLANE_LONG
 
 
 def compute_plane_trip(
@@ -127,44 +150,59 @@ def compute_plane_trip(
     arrival_coords: tuple[float, float],
     trip_type: TripType,
 ) -> TripStepResult:
-    """Parameters
-        - departure_coords, arrival_coords
-    return:
-        - full dataframe for plane, geometry for CO2 only (optimization).
+    """Compute a plane trip between two geographic coordinates.
+
+    The flight geometry is generated as a great-circle route using geodesic
+    interpolation with pyproj. Flight emissions are estimated from the route
+    distance using ADEME Base Carbone emission factors.
+
+    Different emission factors are applied depending on flight distance:
+    - short-haul (< 1000 km)
+    - medium-haul (< 3500 km)
+    - long-haul (>= 3500 km)
+
+    Additional effects are also included:
+    - detour coefficient to approximate real flight paths
+    - holding pattern emissions
+    - non-CO2 effects from contrails
+
+    Args:
+        departure_coords: Departure coordinates as (longitude, latitude).
+        arrival_coords: Arrival coordinates as (longitude, latitude).
+        trip_type: Type of trip associated with the route geometry.
+
+    Returns:
+        A TripStepResult containing:
+            - plane emissions
+            - flight distance
+            - great-circle route geometry
 
     """
-    # Compute geometry and distance (geodesic)
-    plane_geometry, route_length = great_circle_geometry(
+    plane_geometry, route_length = compute_great_circle_route(
         departure_coords,
         arrival_coords,
     )
 
-    # Different emission factors depending on the trip length
-    emissions_factors = EF_PLANE_LONG
-    if route_length < 1000:
-        emissions_factors = EF_PLANE_SHORT
-    elif route_length < 3500:
-        emissions_factors = EF_PLANE_MEDIUM
+    emissions_factors = get_plane_emission_factors(route_length)
+    co2_ef = emissions_factors.combustion + emissions_factors.upstream
+    non_co2_ef = emissions_factors.combustion * CONTRAILS_COEFF
 
-    # detour coeffient
+    # Apply a detour coefficient to approximate real flight paths.
     route_length_with_detour = route_length * DETOUR_COEFF
-
-    CO2_factors = emissions_factors.combustion + emissions_factors.upstream
-    non_CO2_factors = emissions_factors.combustion * CONTRAILS_COEFF
 
     step_data = PlaneStepData(
         transport="plane",
         emissions=[
             EmissionPart(
                 name="kerosene",
-                kg_co2_eq=round(route_length_with_detour * CO2_factors + HOLD, 2),
-                ef_tot=CO2_factors,
+                kg_co2_eq=round(route_length_with_detour * co2_ef + HOLD, 2),
+                ef_tot=co2_ef,
                 distance=round(route_length_with_detour),
             ),
             EmissionPart(
                 name="contrails",
-                kg_co2_eq=round(route_length_with_detour * non_CO2_factors, 2),
-                ef_tot=non_CO2_factors,
+                kg_co2_eq=round(route_length_with_detour * non_co2_ef, 2),
+                ef_tot=non_co2_ef,
                 distance=round(route_length_with_detour),
             ),
         ],
