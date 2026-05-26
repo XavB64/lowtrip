@@ -15,10 +15,10 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+from dataclasses import dataclass
 from http import HTTPStatus
 
 import geopandas as gpd
-import pandas as pd
 import requests
 from shapely.geometry import (
     LineString,
@@ -145,45 +145,55 @@ def find_nearest_railway_point(
     return None
 
 
-def extend_search(
+@dataclass(frozen=True)
+class TrainRouteResult:
+    """Class containing the geometry and the length of a train route."""
+
+    geometry: LineString
+    path_length_km: float
+
+
+def retry_train_routing_with_nearby_points(
     departure_coords: tuple[float, float],
     arrival_coords: tuple[float, float],
-):
-    """Function to use when the train path is not found directly by the API.
-    We search for nearby coordinates and request it again.
+) -> TrainRouteResult | None:
+    """Retry train routing using nearby railway points.
 
-    Parameters
-    ----------
-        - departure_coords, arrival_coords : list or tuple like with coordinates (lon, lat)
-    return:
-        - gdf (geoseries)
-        - success (bool)
+    When direct train routing fails, this function searches for nearby railway
+    points around the departure and arrival coordinates and retries the routing
+    request using these adjusted locations.
+
+    Args:
+        departure_coords: Departure coordinates as (longitude, latitude).
+        arrival_coords: Arrival coordinates as (longitude, latitude).
+
+    Returns:
+        A TrainRouteResult containing the route geometry and path length
+        if routing succeeds, otherwise None.
 
     """
-    # We extend the search progressively
+    # Look for the closest point from departure on railway
     new_departure_coords = find_nearest_railway_point(departure_coords)
-
     if new_departure_coords is None:
-        # Then we will find nothing
-        gdf = pd.DataFrame()
-        success = False
-        train_dist = None
+        return None
 
-    else:
-        # We can retry the API
-        gdf, success, train_dist = find_train(new_departure_coords, arrival_coords)
-        if success == False:
-            # We can change arrival_coords
-            new_arrival_coords = find_nearest_railway_point(arrival_coords)
+    geometry, success, path_length_km = find_train(new_departure_coords, arrival_coords)
+    if success:
+        return TrainRouteResult(geometry=geometry, path_length_km=path_length_km)
 
-            # Verify that we want to try to request the API again
-            if new_arrival_coords is not None:
-                gdf, success, train_dist = find_train(
-                    new_departure_coords,
-                    new_arrival_coords,
-                )
+    # Look for the closest point from arrival on railway
+    new_arrival_coords = find_nearest_railway_point(arrival_coords)
+    if new_arrival_coords is None:
+        return None
 
-    return gdf, success, train_dist
+    geometry, success, path_length_km = find_train(
+        new_departure_coords,
+        new_arrival_coords,
+    )
+    if success:
+        return TrainRouteResult(geometry=geometry, path_length_km=path_length_km)
+
+    return None
 
 
 def find_train(
@@ -259,10 +269,14 @@ def compute_train_trip(
     # If failure then we try to find a better spot nearby - Put in another function
     if success == False:
         # We try to search nearby the coordinates and request again
-        geometry, success, train_dist = extend_search(
+        result = retry_train_routing_with_nearby_points(
             departure_coords,
             arrival_coords,
         )
+        if result is not None:
+            success = True
+            geometry = result.geometry
+            train_dist = result.path_length_km
 
     # Validation part for train
     if not success or not validate_geometry(
