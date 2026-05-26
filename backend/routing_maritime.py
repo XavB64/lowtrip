@@ -246,6 +246,9 @@ def build_maritime_network(
         - shore-to-sea connection lines
         - direct maritime connection between departure and arrival
 
+    A schematic representation of a generated maritime mesh is available in
+    `routing_maritime_mesh.png`.
+
     Args:
         departure_coords: Departure coordinates as (lon, lat).
         arrival_coords: Arrival coordinates as (lon, lat).
