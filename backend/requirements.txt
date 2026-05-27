@@ -12,6 +12,7 @@ Werkzeug == 3.1.8
 networkx == 2.8.4
 momepy == 0.6.0
 requests == 2.34.2
+pydantic == 2.11.7
 gunicorn
 flask_cors
 pyogrio

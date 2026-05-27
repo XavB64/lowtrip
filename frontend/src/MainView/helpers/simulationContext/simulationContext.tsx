@@ -14,7 +14,7 @@ import { API_URL } from "config";
 import { ApiResponse, SimulationResults, Step, TRIP_TYPE } from "types";
 
 import { formatResponse } from "./formatResponse";
-import { getPayload } from "./getPayload";
+import { formatStepsForApi } from "../utils";
 
 type Context = {
   steps: Step[];
@@ -106,7 +106,10 @@ export const SimulationProvider = ({ children }: { children: ReactNode }) => {
         throw new Error("At least one step required");
       setIsLoading(true);
 
-      const payload = getPayload(mainSteps, altSteps);
+      const payload = {
+        "main-trip": formatStepsForApi(mainSteps),
+        "second-trip": formatStepsForApi(altSteps),
+      };
 
       const res = await fetch(API_URL, {
         method: "POST",
