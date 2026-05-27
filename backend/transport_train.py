@@ -51,10 +51,6 @@ TRAIN_COUNTRY_SPLIT_CONFIG = CountrySplitConfig(
 )
 
 
-class GeometryRecognitionError(Exception):
-    """Exception raised when the geometry is not recognized."""
-
-
 def build_overpass_railway_query(
     coordinates: tuple[float, float],
     search_perimeter_km: float,
