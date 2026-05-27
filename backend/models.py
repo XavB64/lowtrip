@@ -19,6 +19,7 @@ from dataclasses import dataclass
 from typing import Literal
 
 import geopandas as gpd
+from pydantic import BaseModel, Field
 from shapely.geometry.base import BaseGeometry
 
 
@@ -26,27 +27,60 @@ from shapely.geometry.base import BaseGeometry
 # INPUTS
 ######################
 
+TransportMean = Literal[
+    "train",
+    "bus",
+    "car",
+    "hitchHiking",
+    "ecar",
+    "plane",
+    "ferry",
+    "sail",
+    "bicycle",
+]
 
-@dataclass
-class TripPayload:
-    """Trip payload. Can be converted into dataframe."""
 
-    lon: list[float]
-    lat: list[float]
-    transp: list[str]
-    nb: list[str]
-    options: list[str]
+class TripPoint(BaseModel):
+    """Trip point, represented by lon/lat coordinates."""
+
+    lon: float = Field(ge=-180, le=180)
+    lat: float = Field(ge=-90, le=90)
 
 
-@dataclass
-class TripStep:
-    """Trip step."""
+class TripStep(TripPoint):
+    """Trip step composed of lat/lon coordinates, a transport mean and some optional options."""
 
-    lon: float
-    lat: float
-    transport_means: str
-    passengers_nb: int | None
-    options: str | None
+    transport_mean: TransportMean = Field(alias="transport-mean")
+    passengers_nb: int | None = Field(
+        default=None,
+        alias="passengers-nb",
+    )
+    ferry_options: str | None = Field(
+        default=None,
+        alias="ferry-options",
+    )
+
+
+class Trip(BaseModel):
+    """Trip composed of departure and trip steps."""
+
+    departure: TripPoint
+    steps: list[TripStep] = Field(min_length=1)
+
+
+class ApiPayload(BaseModel):
+    """Pydantic class for API payload. Validation by Pydantic."""
+
+    main_trip: Trip = Field(alias="main-trip")
+    second_trip: Trip | None = Field(
+        default=None,
+        alias="second-trip",
+    )
+
+
+######################
+# INTERNAL
+######################
 
 
 @dataclass(frozen=True)
@@ -102,7 +136,7 @@ class EmissionPart:
 class BaseStepData:
     """Base step dataclass."""
 
-    transport: str
+    transport: TransportMean
     emissions: list[EmissionPart]
     path_length: float  # in km
 

@@ -15,10 +15,6 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-###################
-###### Utils ######
-###################
-from flask import abort
 import geopandas as gpd
 import numpy as np
 import pandas as pd
@@ -31,8 +27,6 @@ from shapely.geometry.base import BaseGeometry
 from models import (
     CountryRouteSegment,
     CountrySplitConfig,
-    TripPayload,
-    TripStep,
     TripStepGeometry,
     TripType,
 )
@@ -253,24 +247,3 @@ def validate_geometry(
         return False
 
     return True
-
-
-def extract_path_steps_from_payload(trip_payload: TripPayload) -> list[TripStep]:
-    result = []
-    for i in range(len(trip_payload["lon"])):
-        result.append(
-            TripStep(
-                lon=float(trip_payload["lon"][i]),
-                lat=float(trip_payload["lat"][i]),
-                transport_means=trip_payload["transp"][i],
-                passengers_nb=(
-                    int(trip_payload["nb"][i]) if trip_payload["nb"][i] else None
-                ),
-                options=trip_payload["options"][i],
-            ),
-        )
-
-    if len(result) < 2:
-        abort(400, "Trip should have at least 1 step")
-
-    return result

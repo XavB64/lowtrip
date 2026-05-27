@@ -21,16 +21,16 @@ import warnings
 
 from dotenv import load_dotenv
 from flask import (
-    abort,
     Flask,
     jsonify,
     request,
 )
 from flask_cors import CORS
+from pydantic import ValidationError
 import requests
 
 from backend import compute_custom_trip_emissions, compute_direct_trips_emissions
-from utils import extract_path_steps_from_payload
+from models import ApiPayload
 
 
 # Load the environment variables
@@ -46,37 +46,36 @@ app.config["APPLICATION_ROOT"] = "/"
 @app.route("/", methods=["GET", "POST"])
 def main():
     if request.method == "POST":
-        data = request.get_json()
-
-        if "main-trip" not in data:
-            abort(400, "You should provide a main trip")
+        try:
+            payload = ApiPayload.model_validate(request.get_json())
+        except ValidationError as exc:
+            return jsonify({
+                "error": "Invalid payload",
+                "details": exc.errors(),
+            }), 400
 
         ## Compute emisssions of the main custom trip
-        main_trip_inputs = extract_path_steps_from_payload(data["main-trip"])
         main_trip, main_trip_geometries = compute_custom_trip_emissions(
             "MAIN_TRIP",
-            main_trip_inputs,
+            payload.main_trip,
         )
 
         trips = [main_trip]
         geometries = main_trip_geometries
 
         ### If alternative trip is provided, compute the emissions of the alternative trip
-        if "second-trip" in data:
-            alternative_trip_inputs = extract_path_steps_from_payload(
-                data["second-trip"],
-            )
+        if payload.second_trip:
             second_trip, second_trip_geometries = compute_custom_trip_emissions(
                 "SECOND_TRIP",
-                alternative_trip_inputs,
+                payload.second_trip,
             )
             trips = [main_trip, second_trip]
             geometries += second_trip_geometries
 
         ### If the custom trip has exaclty 1 step, compute the direct trips with other means of transport
-        elif len(main_trip_inputs) == 2:
+        elif len(payload.main_trip.steps) == 1:
             direct_trips, direct_trips_geometries = compute_direct_trips_emissions(
-                main_trip_inputs,
+                payload.main_trip,
                 main_trip.steps[0].path_length,
             )
             geometries += direct_trips_geometries
