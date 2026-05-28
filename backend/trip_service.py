@@ -15,13 +15,14 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+from typing import Literal
+
 from models import (
     ApiPayload,
     StepData,
     Trip,
     TripResult,
     TripStepGeometry,
-    TripType,
 )
 from parameters import PLANE_MIN_DISTANCE
 from transport_bicycle import compute_bicycle_trip
@@ -88,58 +89,57 @@ def compute_emissions(payload: ApiPayload):
 
 
 def compute_custom_trip_emissions(
-    name: str,
+    trip_name: Literal["MAIN_TRIP", "SECOND_TRIP"],
     trip: Trip,
 ) -> tuple[TripResult, list[TripStepGeometry]]:
-    """Parameters
-    ----------
-        - name, name of the trip (MAIN_TRIP or SECONDARY_TRIP)
-        - trip_inputs, inputs of the trip
+    """Compute emissions and geometries for a custom trip.
 
-    Returns
-    -------
-        - full dataframe for emissions
-        - geometries for path
+    The function computes emissions step by step and aggregates both
+    emissions data and route geometries.
 
-    Raises
-    ------
-    ValueError
-        If no path is found with the given transport means.
+    Args:
+        trip_name: Trip identifier ("MAIN_TRIP" or "SECOND_TRIP").
+        trip: Trip definition containing the departure point and trip steps.
+
+    Returns:
+        A tuple containing:
+            - The computed trip result.
+            - The geometries associated with each computed route segment.
+
+    Raises:
+        ValueError:
+            If a route cannot be computed for one of the trip steps.
 
     """
     emissions_data: list[StepData] = []
     geometries: list[TripStepGeometry] = []
-    trip_type: TripType = "MAIN_TRIP" if name == "MAIN_TRIP" else "SECOND_TRIP"
 
     departure_coordinates = (trip.departure.lon, trip.departure.lat)
 
-    for idx in range(len(trip.steps)):
-        arrival = trip.steps[idx]
+    for idx, arrival in enumerate(trip.steps):
         arrival_coordinates = (arrival.lon, arrival.lat)
-
         transport_mean = arrival.transport_mean
         results = None
 
-        # Compute depending on the mean of transport
         if transport_mean == "train":
             results = compute_train_trip(
                 departure_coordinates,
                 arrival_coordinates,
-                trip_type,
+                trip_name,
             )
 
         elif transport_mean == "bus":
             results = compute_bus_trip(
                 departure_coordinates,
                 arrival_coordinates,
-                trip_type,
+                trip_name,
             )
 
         elif transport_mean == "car":
             results = compute_car_trip(
                 departure_coordinates,
                 arrival_coordinates,
-                trip_type,
+                trip_name,
                 passengers_nb=arrival.passengers_nb,
             )
 
@@ -147,14 +147,14 @@ def compute_custom_trip_emissions(
             results = compute_hitch_hiking_trip(
                 departure_coordinates,
                 arrival_coordinates,
-                trip_type,
+                trip_name,
             )
 
         elif transport_mean == "ecar":
             results = compute_ecar_trip(
                 departure_coordinates,
                 arrival_coordinates,
-                trip_type,
+                trip_name,
                 passengers_nb=arrival.passengers_nb,
             )
 
@@ -162,21 +162,21 @@ def compute_custom_trip_emissions(
             results = compute_bicycle_trip(
                 departure_coordinates,
                 arrival_coordinates,
-                trip_type,
+                trip_name,
             )
 
         elif transport_mean == "plane":
             results = compute_plane_trip(
                 departure_coordinates,
                 arrival_coordinates,
-                trip_type,
+                trip_name,
             )
 
         elif transport_mean == "ferry":
             results = compute_ferry_trip(
                 departure_coordinates,
                 arrival_coordinates,
-                trip_type,
+                trip_name,
                 options=arrival.ferry_options,
             )
 
@@ -184,18 +184,18 @@ def compute_custom_trip_emissions(
             results = compute_sail_trip(
                 departure_coordinates,
                 arrival_coordinates,
-                trip_type,
+                trip_name,
             )
 
-        if results is None:  # Step is not successful
-            error_message = f"step n°{int(idx) + 1} failed with {transport_mean}, please change mean of transport or locations."
+        if results is None:
+            error_message = f"step n°{idx + 1} failed with {transport_mean}, please change mean of transport or locations."
             raise ValueError(error_message)
 
         emissions_data.append(results.step_data)
-        geometries += results.geometries
+        geometries.extend(results.geometries)
         departure_coordinates = arrival_coordinates
 
-    return TripResult(name=name, steps=emissions_data), geometries
+    return TripResult(name=trip_name, steps=emissions_data), geometries
 
 
 def compute_direct_trips_emissions(
