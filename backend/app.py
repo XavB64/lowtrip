@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-# Librairies
+import logging
 import os
 import warnings
 
@@ -43,8 +43,17 @@ CORS(app)  # comment this on deployment
 app.config["APPLICATION_ROOT"] = "/"
 
 
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s %(levelname)s %(name)s - %(message)s",
+)
+
+logger = logging.getLogger(__name__)
+
+
 @app.route("/health", methods=["GET"])
 def health():
+    logger.info("Received GET /health request")
     return {"message": "backend initialized"}
 
 
@@ -65,18 +74,24 @@ def compute_emissions_endpoint():
             - geometries: Route geometries for visualization.
 
     """
+    logger.info("Received POST /compute-emissions request")
+
     try:
         payload = ApiPayload.model_validate(request.get_json())
     except ValidationError as exc:
+        logger.warning("Invalid payload received: %s", exc.errors())
         return jsonify({
             "error": "Invalid payload",
             "details": exc.errors(),
         }), 400
+
     return compute_emissions(payload)
 
 
 @app.route("/send-mail", methods=["POST"])
 def send_mail():
+    logger.info("Received POST /send-mail request")
+
     data = request.get_json()
     sender_email = data.get("sender_email")
     subject = data.get("subject")
@@ -108,9 +123,9 @@ def send_mail():
         response.raise_for_status()
         return jsonify({"status": "success", "message": "Email sent"}), 200
 
-    except Exception as e:  # noqa: BLE001
-        print("Sending email failed: ", e)
-        return jsonify({"error": "Error occured when sending the email to Brevo"}), 400
+    except Exception:
+        logger.exception("Sending email failed: %s")
+        return jsonify({"error": "Erreur lors de la requête à Brevo"}), 400
 
 
 if __name__ == "__main__":

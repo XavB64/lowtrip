@@ -91,8 +91,6 @@ def split_path_by_country(
         segments_to_aggregate = intersections.explode()
 
     else:
-        print("Sea detected")
-
         # In case we have bridges / tunnels across sea:
         if unmatched_segments.geometry.iloc[0].geom_type == "MultiLineString":
             sea_segments = gpd.GeoDataFrame(

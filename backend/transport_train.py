@@ -16,6 +16,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 from http import HTTPStatus
+import logging
 
 import requests
 from shapely.geometry import LineString, Point
@@ -33,6 +34,9 @@ from models import (
 )
 from parameters import train_intensity
 from utils import kilometer_to_degree, m_to_km
+
+
+logger = logging.getLogger(__name__)
 
 
 # Train emissions factors (kgCO2e / passenger.km).
@@ -69,9 +73,7 @@ def build_overpass_railway_query(
     # Draw an approximate circular search area around the input coordinates.
     # Since the geometry uses geographic coordinates (EPSG:4326), the buffer
     # radius must be expressed in degrees rather than kilometers.
-    search_area = Point(coordinates).buffer(
-        kilometer_to_degree(search_perimeter_km),
-    )
+    search_area = Point(coordinates).buffer(kilometer_to_degree(search_perimeter_km))
 
     # Overpass expects polygon coordinates as: "lat lon lat lon ..."
     polygon_coordinates = " ".join(
@@ -116,6 +118,8 @@ def find_nearest_railway_point(
 
     """
     for search_perimeter in SEARCH_PERIMETERS_KM:
+        logger.info("Request nearest railway point from Overpass")
+
         query = build_overpass_railway_query(coordinates, search_perimeter)
 
         response = requests.post(
@@ -192,6 +196,8 @@ def request_train_route(
         if routing succeeds, otherwise None.
 
     """
+    logger.info("Request road from Signal")
+
     departure_lon, departure_lat = departure_coords
     arrival_lon, arrival_lat = arrival_coords
 
@@ -205,11 +211,15 @@ def request_train_route(
     response = requests.get(url)
 
     if response.status_code != HTTPStatus.OK:
-        print(f"Failed to retrieve data. Status code: {response.status_code}")
+        logger.warning(
+            "Signal request failed with status code: %s",
+            response.status_code,
+        )
         return None
 
     routes = response.json().get("routes")
     if not routes or len(routes) == 0:
+        logger.info("Signal request successful, but no path found")
         return None
 
     route = routes[0]
@@ -259,9 +269,11 @@ def compute_train_trip(
         )
 
     if result is None:
-        raise RouteNotFoundError(
-            f"No train route found between {departure_coords} and {arrival_coords}",
+        not_found_message = (
+            f"No train route found between {departure_coords} and {arrival_coords}"
         )
+        logger.warning(not_found_message)
+        raise RouteNotFoundError(not_found_message)
 
     validate_geometry(departure_coords, arrival_coords, result.geometry)
 

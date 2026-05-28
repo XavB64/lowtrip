@@ -15,10 +15,15 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import logging
+
 from shapely.geometry.base import BaseGeometry
 
 from models import RouteNotValidError
 from utils import compute_distance_between_2_points
+
+
+logger = logging.getLogger(__name__)
 
 
 def validate_geometry(
@@ -46,11 +51,13 @@ def validate_geometry(
         list(geometry.coords)[0],
     )
     if departure_error_distance > distance_threshold:
-        raise RouteNotValidError("Arrival is not valid")
+        logger.warning("Geometry not valid: departure not valid")
+        raise RouteNotValidError("Departure is not valid")
 
     arrival_error_distance = compute_distance_between_2_points(
         arrival_coords,
         list(geometry.coords)[-1],
     )
     if arrival_error_distance > distance_threshold:
+        logger.warning("Geometry not valid: arrival not valid")
         raise RouteNotValidError("Arrival is not valid")

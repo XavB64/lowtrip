@@ -96,6 +96,10 @@ ignore = [
     "D404",  # First word of the docstring should not be "This"
     "D417",  # Missing argument descriptions in the docstring for `car_bus_to_gdf`: `EF_bus`, `EF_car`, `color_cons`, `color_usage`, `tag1`, `tag2`, `validate`
     "ERA001",  # Found commented-out code
+    "TRY003",  # Avoid specifying long messages outside the exception class
+    "EM101",  # Exception must not use a string literal, assign to variable first
+    "EM102",  # Exception must not use an f-string literal, assign to variable first
+    "BLE001",  # Do not catch blind exception: `Exception`
 
     # Flake8 errors
     "E266",  # Too many leading `#` before block comment
