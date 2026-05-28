@@ -38,7 +38,7 @@ import "./styles.scss";
 const App = () => {
   // first API call to wake up the server
   useEffect(() => {
-    fetch(API_URL, {
+    fetch(`${API_URL}/health`, {
       headers: { "Access-Contol-Allow-Origin": "*" },
     });
   }, []);

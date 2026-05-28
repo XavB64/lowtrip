@@ -19,25 +19,25 @@ jobs:
       - name: Sort python imports
         uses: isort/isort-action@v1
         with:
-          sort-paths: './backend'
+          sort-paths: "./backend"
 
       - name: Show python linter fixes
         uses: chartboost/ruff-action@v1
         with:
-          src: './backend'
-          args: 'check --fix --diff'
+          src: "./backend"
+          args: "check --fix --diff"
 
       - name: Show remaining python linter violations
         uses: chartboost/ruff-action@v1
         with:
-          src: './backend'
-          args: 'check --fix --show-fixes'
+          src: "./backend"
+          args: "check --fix --show-fixes"
 
       - name: Format Python code
         uses: chartboost/ruff-action@v1
         with:
-          src: './backend'
-          args: 'format --preview --check --diff'
+          src: "./backend"
+          args: "format --preview --check --diff"
 
   build:
     runs-on: ubuntu-latest
@@ -53,7 +53,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.11.7'
+          python-version: "3.11.7"
 
       - name: Install dependencies
         run: |
@@ -67,7 +67,7 @@ jobs:
           source lowtrip-venv/bin/activate
           gunicorn app:app --bind 0.0.0.0:8000 --daemon
           sleep 10
-          curl -f http://localhost:8000
+          curl -f http://localhost:8000/health
 
       - name: Stop Gunicorn
         run: |
