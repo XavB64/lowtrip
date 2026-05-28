@@ -212,6 +212,8 @@ def compute_direct_trips_emissions(
     exceeds 300 km.
     - Train and road alternatives (bus and car) are only computed for trips
     using a land transport mode.
+    - Sea alternatives (sail and ferry) are only computed for trips
+    using a sea transport mode.
 
     Road-based transport modes may reuse an already computed route length to
     avoid redundant routing computations.
@@ -250,11 +252,31 @@ def compute_direct_trips_emissions(
             trips.append(TripResult(name="PLANE", steps=[plane_result.step_data]))
             geometries.extend(plane_result.geometries)
 
-    # TODO: Add direct alternatives for sea transport modes.
+    # Compute direct alternatives for sea transport modes.
     if transport_mean in {"ferry", "sail"}:
+        if transport_mean != "ferry":
+            ferry_results = compute_ferry_trip(
+                departure_coordinates,
+                arrival_coordinates,
+                "DIRECT_TRIP",
+                precomputed_route_length_km=main_trip_path_length,
+            )
+            if ferry_results is not None:
+                trips.append(TripResult(name="FERRY", steps=[ferry_results.step_data]))
+
+        else:
+            sail_results = compute_sail_trip(
+                departure_coordinates,
+                arrival_coordinates,
+                "DIRECT_TRIP",
+                precomputed_route_length_km=main_trip_path_length,
+            )
+            if sail_results is not None:
+                trips.append(TripResult(name="SAIL", steps=[sail_results.step_data]))
+
         return trips, geometries
 
-    # Compute train and road emissions except if the initial transport means is Ferry or Sail
+    # Compute direct alternatives for land transport modes.
     if transport_mean != "train":
         train_results = compute_train_trip(
             departure_coordinates,
