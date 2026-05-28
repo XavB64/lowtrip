@@ -121,74 +121,79 @@ def compute_custom_trip_emissions(
         transport_mean = arrival.transport_mean
         results = None
 
-        if transport_mean == "train":
-            results = compute_train_trip(
-                departure_coordinates,
-                arrival_coordinates,
-                trip_name,
-            )
+        error_message = f"step n°{idx + 1} failed with {transport_mean}, please change mean of transport or locations."
 
-        elif transport_mean == "bus":
-            results = compute_bus_trip(
-                departure_coordinates,
-                arrival_coordinates,
-                trip_name,
-            )
+        try:
+            if transport_mean == "train":
+                results = compute_train_trip(
+                    departure_coordinates,
+                    arrival_coordinates,
+                    trip_name,
+                )
 
-        elif transport_mean == "car":
-            results = compute_car_trip(
-                departure_coordinates,
-                arrival_coordinates,
-                trip_name,
-                passengers_nb=arrival.passengers_nb,
-            )
+            elif transport_mean == "bus":
+                results = compute_bus_trip(
+                    departure_coordinates,
+                    arrival_coordinates,
+                    trip_name,
+                )
 
-        elif transport_mean == "hitchHiking":
-            results = compute_hitch_hiking_trip(
-                departure_coordinates,
-                arrival_coordinates,
-                trip_name,
-            )
+            elif transport_mean == "car":
+                results = compute_car_trip(
+                    departure_coordinates,
+                    arrival_coordinates,
+                    trip_name,
+                    passengers_nb=arrival.passengers_nb,
+                )
 
-        elif transport_mean == "ecar":
-            results = compute_ecar_trip(
-                departure_coordinates,
-                arrival_coordinates,
-                trip_name,
-                passengers_nb=arrival.passengers_nb,
-            )
+            elif transport_mean == "hitchHiking":
+                results = compute_hitch_hiking_trip(
+                    departure_coordinates,
+                    arrival_coordinates,
+                    trip_name,
+                )
 
-        elif transport_mean == "bicycle":
-            results = compute_bicycle_trip(
-                departure_coordinates,
-                arrival_coordinates,
-                trip_name,
-            )
+            elif transport_mean == "ecar":
+                results = compute_ecar_trip(
+                    departure_coordinates,
+                    arrival_coordinates,
+                    trip_name,
+                    passengers_nb=arrival.passengers_nb,
+                )
 
-        elif transport_mean == "plane":
-            results = compute_plane_trip(
-                departure_coordinates,
-                arrival_coordinates,
-                trip_name,
-            )
+            elif transport_mean == "bicycle":
+                results = compute_bicycle_trip(
+                    departure_coordinates,
+                    arrival_coordinates,
+                    trip_name,
+                )
 
-        elif transport_mean == "ferry":
-            results = compute_ferry_trip(
-                departure_coordinates,
-                arrival_coordinates,
-                trip_name,
-                options=arrival.ferry_options,
-            )
+            elif transport_mean == "plane":
+                results = compute_plane_trip(
+                    departure_coordinates,
+                    arrival_coordinates,
+                    trip_name,
+                )
 
-        elif transport_mean == "sail":
-            results = compute_sail_trip(
-                departure_coordinates,
-                arrival_coordinates,
-                trip_name,
-            )
+            elif transport_mean == "ferry":
+                results = compute_ferry_trip(
+                    departure_coordinates,
+                    arrival_coordinates,
+                    trip_name,
+                    options=arrival.ferry_options,
+                )
+
+            elif transport_mean == "sail":
+                results = compute_sail_trip(
+                    departure_coordinates,
+                    arrival_coordinates,
+                    trip_name,
+                )
+
+        except Exception:
+            raise ValueError(error_message)
 
         if results is None:
-            error_message = f"step n°{idx + 1} failed with {transport_mean}, please change mean of transport or locations."
             raise ValueError(error_message)
 
         emissions_data.append(results.step_data)

@@ -94,12 +94,7 @@ def find_route(
     route = response.json()["routes"][0]
     route_geometry = LineString(route["geometry"]["coordinates"])
 
-    if not validate_geometry(
-        departure_coords,
-        arrival_coords,
-        route_geometry,
-    ):
-        return None
+    validate_geometry(departure_coords, arrival_coords, route_geometry)
 
     route_length = m_to_km(route["distance"])
     return RouteResult(geometry=route_geometry, path_length_km=route_length)

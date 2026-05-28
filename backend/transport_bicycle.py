@@ -98,12 +98,10 @@ def compute_bicycle_trip(
     """
     result = find_bicycle_route(departure_coords, arrival_coords)
 
-    if result is None or not validate_geometry(
-        departure_coords,
-        arrival_coords,
-        result.geometry,
-    ):
+    if result is None:
         return None
+
+    validate_geometry(departure_coords, arrival_coords, result.geometry)
 
     route_length = result.path_length_km
 
