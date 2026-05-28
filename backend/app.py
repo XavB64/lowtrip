@@ -43,50 +43,52 @@ CORS(app)  # comment this on deployment
 app.config["APPLICATION_ROOT"] = "/"
 
 
-@app.route("/", methods=["GET", "POST"])
-def main():
-    if request.method == "POST":
-        try:
-            payload = ApiPayload.model_validate(request.get_json())
-        except ValidationError as exc:
-            return jsonify({
-                "error": "Invalid payload",
-                "details": exc.errors(),
-            }), 400
-
-        ## Compute emisssions of the main custom trip
-        main_trip, main_trip_geometries = compute_custom_trip_emissions(
-            "MAIN_TRIP",
-            payload.main_trip,
-        )
-
-        trips = [main_trip]
-        geometries = main_trip_geometries
-
-        ### If alternative trip is provided, compute the emissions of the alternative trip
-        if payload.second_trip:
-            second_trip, second_trip_geometries = compute_custom_trip_emissions(
-                "SECOND_TRIP",
-                payload.second_trip,
-            )
-            trips = [main_trip, second_trip]
-            geometries += second_trip_geometries
-
-        ### If the custom trip has exaclty 1 step, compute the direct trips with other means of transport
-        elif len(payload.main_trip.steps) == 1:
-            direct_trips, direct_trips_geometries = compute_direct_trips_emissions(
-                payload.main_trip,
-                main_trip.steps[0].path_length,
-            )
-            geometries += direct_trips_geometries
-            trips = [main_trip, *direct_trips]
-
-        return {
-            "trips": trips,
-            "geometries": geometries,
-        }
-
+@app.route("/health", methods=["GET"])
+def health():
     return {"message": "backend initialized"}
+
+
+@app.route("/compute-emissions", methods=["POST"])
+def compute_emissions():
+    try:
+        payload = ApiPayload.model_validate(request.get_json())
+    except ValidationError as exc:
+        return jsonify({
+            "error": "Invalid payload",
+            "details": exc.errors(),
+        }), 400
+
+    ## Compute emisssions of the main custom trip
+    main_trip, main_trip_geometries = compute_custom_trip_emissions(
+        "MAIN_TRIP",
+        payload.main_trip,
+    )
+
+    trips = [main_trip]
+    geometries = main_trip_geometries
+
+    ### If alternative trip is provided, compute the emissions of the alternative trip
+    if payload.second_trip:
+        second_trip, second_trip_geometries = compute_custom_trip_emissions(
+            "SECOND_TRIP",
+            payload.second_trip,
+        )
+        trips = [main_trip, second_trip]
+        geometries += second_trip_geometries
+
+    ### If the custom trip has exaclty 1 step, compute the direct trips with other means of transport
+    elif len(payload.main_trip.steps) == 1:
+        direct_trips, direct_trips_geometries = compute_direct_trips_emissions(
+            payload.main_trip,
+            main_trip.steps[0].path_length,
+        )
+        geometries += direct_trips_geometries
+        trips = [main_trip, *direct_trips]
+
+    return {
+        "trips": trips,
+        "geometries": geometries,
+    }
 
 
 @app.route("/send-mail", methods=["POST"])

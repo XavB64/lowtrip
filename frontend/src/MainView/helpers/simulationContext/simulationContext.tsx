@@ -111,7 +111,7 @@ export const SimulationProvider = ({ children }: { children: ReactNode }) => {
         "second-trip": formatStepsForApi(altSteps),
       };
 
-      const res = await fetch(API_URL, {
+      const res = await fetch(`${API_URL}/compute-emissions`, {
         method: "POST",
         headers: {
           "Access-Contol-Allow-Origin": "*",
