@@ -25,6 +25,7 @@ from geo_validate_geometry import validate_geometry
 from models import (
     CountrySplitConfig,
     EmissionPart,
+    RouteNotFoundError,
     RouteResult,
     TrainStepData,
     TripStepResult,
@@ -222,7 +223,7 @@ def compute_train_trip(
     departure_coords: tuple[float, float],
     arrival_coords: tuple[float, float],
     trip_type: TripType,
-) -> TripStepResult | None:
+) -> TripStepResult:
     """Compute a train trip route and associated emissions.
 
     A train route is first requested directly from the railway routing API.
@@ -243,7 +244,10 @@ def compute_train_trip(
             - train route geometries
             - country-level emission breakdown
             - total traveled distance
-        Returns None if no valid train route could be computed.
+
+    Raises:
+        RouteNotFoundError:
+            If no train route could be found.
 
     """
     result = request_train_route(departure_coords, arrival_coords)
@@ -255,7 +259,9 @@ def compute_train_trip(
         )
 
     if result is None:
-        return None
+        raise RouteNotFoundError(
+            f"No train route found between {departure_coords} and {arrival_coords}",
+        )
 
     validate_geometry(departure_coords, arrival_coords, result.geometry)
 

@@ -113,6 +113,10 @@ class CountryRouteSegment:
     path_length_km: float
 
 
+class RouteNotFoundError(Exception):
+    """Raised when no route could be found between two coordinates."""
+
+
 class RouteNotValidError(Exception):
     """Raised when the route found between two coordinates is actually invalid."""
 
