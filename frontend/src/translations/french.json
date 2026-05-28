@@ -251,7 +251,9 @@
       "shareableLinkFeature": "Ajout du lien de partage, qui peut aussi servir à sauvergarder sa requête",
       "title": "Historique des développements",
       "updatePage": "Ajout de cette page d'historique",
-      "addDetailsModal": "Ajout de la modale de détails pour les voyages à une seule étape"
+      "addDetailsModal": "Ajout de la modale de détails pour les voyages à une seule étape",
+      "addDetailsModalForComplexTrip": "Détail complet des calculs d’émissions désormais disponible pour les trajets complexes comportant plusieurs étapes.",
+      "addSeaTripComparison": "Comparaison automatique entre ferry et voilier disponible."
     }
   },
   "detailsModal": {
