@@ -64,7 +64,15 @@ export const formatResponse = (
     simulationType = SimulationType.mainTripVsOtherTrip;
   }
 
-  const trips = data.trips.map((trip) => {
+  // display plane direct trip at the end
+  const rawTrips = data.trips;
+  rawTrips.sort((a, b) => {
+    if (a.name === "PLANE") return 1;
+    if (b.name === "PLANE") return -1;
+    return 0;
+  });
+
+  const trips = rawTrips.map((trip) => {
     const formattedSteps: TripStep[] = [];
     let totalEmissions = 0;
 
