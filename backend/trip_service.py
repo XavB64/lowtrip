@@ -290,7 +290,9 @@ def compute_direct_trips_emissions(
     # Reuse the already computed road route length when possible
     # to avoid recomputing the same road itinerary multiple times.
     road_path_length = (
-        main_trip_path_length if transport_mean in {"bus", "car", "ecar"} else None
+        main_trip_path_length
+        if transport_mean in {"bus", "car", "ecar", "hitchHiking"}
+        else None
     )
 
     if transport_mean != "bus":
