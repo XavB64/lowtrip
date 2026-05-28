@@ -47,6 +47,7 @@ def compute_ferry_trip(
     arrival_coords: tuple[float, float],
     trip_type: TripType,
     options="none",
+    precomputed_route_length_km: float | None = None,
 ) -> TripStepResult:
     """Compute a ferry trip between two geographic coordinates.
 
@@ -73,6 +74,8 @@ def compute_ferry_trip(
                 - "cabin"
                 - "vehicle"
                 - "cabinVehicle"
+        precomputed_route_length_km: Optional precomputed route length in
+            kilometers used to avoid recomputing the sea itinerary.
 
     Returns:
         A TripStepResult containing:
@@ -81,10 +84,23 @@ def compute_ferry_trip(
             - computed maritime route geometry
 
     """
-    # Compute geometry
-    path_geometry = compute_maritime_shortest_path(departure_coords, arrival_coords)
-    path_length = m_to_km(GEOD.geometry_length(path_geometry))
-    coordinates = get_coordinates_from_base_geometry(path_geometry)
+    if precomputed_route_length_km:
+        path_length = precomputed_route_length_km
+        geometries = []
+    else:
+        path_geometry = compute_maritime_shortest_path(departure_coords, arrival_coords)
+
+        path_length = m_to_km(GEOD.geometry_length(path_geometry))
+        coordinates = get_coordinates_from_base_geometry(path_geometry)
+        geometries = [
+            TripStepGeometry(
+                coordinates=coordinates,
+                transport_means="sail",
+                length=path_length,
+                country_label=None,
+                trip_type=trip_type,
+            ),
+        ]
 
     # Determine EF depending on the chosen options
     EF = EF_FERRY_SEAT + EF_FERRY_BASE
@@ -110,15 +126,7 @@ def compute_ferry_trip(
             coeff_total=EF,
             options=options,
         ),
-        geometries=[
-            TripStepGeometry(
-                coordinates=coordinates,
-                transport_means="ferry",
-                length=path_length,
-                country_label=None,
-                trip_type=trip_type,
-            ),
-        ],
+        geometries=geometries,
     )
 
 
@@ -126,6 +134,7 @@ def compute_sail_trip(
     departure_coords: tuple[float, float],
     arrival_coords: tuple[float, float],
     trip_type: TripType,
+    precomputed_route_length_km: float | None = None,
 ) -> TripStepResult:
     """Compute a sail trip between two geographic coordinates.
 
@@ -145,6 +154,8 @@ def compute_sail_trip(
         departure_coords: Departure coordinates as (longitude, latitude).
         arrival_coords: Arrival coordinates as (longitude, latitude).
         trip_type: Type of trip associated with the route geometry.
+        precomputed_route_length_km: Optional precomputed route length in
+            kilometers used to avoid recomputing the sea itinerary.
 
     Returns:
         A TripStepResult containing:
@@ -153,9 +164,23 @@ def compute_sail_trip(
             - computed maritime route geometry
 
     """
-    path_geometry = compute_maritime_shortest_path(departure_coords, arrival_coords)
-    path_length = m_to_km(GEOD.geometry_length(path_geometry))
-    coordinates = get_coordinates_from_base_geometry(path_geometry)
+    if precomputed_route_length_km:
+        path_length = precomputed_route_length_km
+        geometries = []
+    else:
+        path_geometry = compute_maritime_shortest_path(departure_coords, arrival_coords)
+
+        path_length = m_to_km(GEOD.geometry_length(path_geometry))
+        coordinates = get_coordinates_from_base_geometry(path_geometry)
+        geometries = [
+            TripStepGeometry(
+                coordinates=coordinates,
+                transport_means="sail",
+                length=path_length,
+                country_label=None,
+                trip_type=trip_type,
+            ),
+        ]
 
     return TripStepResult(
         step_data=SailStepData(
@@ -171,13 +196,5 @@ def compute_sail_trip(
             path_length=round(path_length),
             coeff_total=EF_SAIL,
         ),
-        geometries=[
-            TripStepGeometry(
-                coordinates=coordinates,
-                transport_means="sail",
-                length=path_length,
-                country_label=None,
-                trip_type=trip_type,
-            ),
-        ],
+        geometries=geometries,
     )
