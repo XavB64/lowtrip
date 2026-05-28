@@ -16,6 +16,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 from models import (
+    ApiPayload,
     StepData,
     Trip,
     TripResult,
@@ -34,6 +35,56 @@ from transport_ferry import compute_ferry_trip, compute_sail_trip
 from transport_plane import compute_plane_trip
 from transport_train import compute_train_trip
 from utils import compute_distance_between_2_points
+
+
+def compute_emissions(payload: ApiPayload):
+    """Compute emissions and geometries for the requested trips.
+
+    The main trip is always computed.
+
+    If a second trip is provided, emissions are also computed for this
+    alternative trip.
+
+    If the main trip contains a single transport step and no second trip is
+    provided, additional direct trips are computed for alternative transport
+    modes (train, bus, car, plane, etc.).
+
+    Args:
+        payload: Validated API payload containing the trip definitions.
+
+    Returns:
+        A dictionary containing:
+            - trips: Computed trip results.
+            - geometries: Route geometries for map rendering.
+
+    """
+    main_trip, geometries = compute_custom_trip_emissions(
+        "MAIN_TRIP",
+        payload.main_trip,
+    )
+
+    trips = [main_trip]
+
+    if payload.second_trip:
+        second_trip_result, second_trip_geometries = compute_custom_trip_emissions(
+            "SECOND_TRIP",
+            payload.second_trip,
+        )
+        trips.append(second_trip_result)
+        geometries.extend(second_trip_geometries)
+
+    elif len(payload.main_trip.steps) == 1:
+        direct_trips, direct_trips_geometries = compute_direct_trips_emissions(
+            payload.main_trip,
+            main_trip.steps[0].path_length,
+        )
+        trips.extend(direct_trips)
+        geometries.extend(direct_trips_geometries)
+
+    return {
+        "trips": trips,
+        "geometries": geometries,
+    }
 
 
 def compute_custom_trip_emissions(
