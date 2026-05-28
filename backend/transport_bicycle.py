@@ -25,6 +25,7 @@ from geo_validate_geometry import validate_geometry
 from models import (
     BicycleStepData,
     EmissionPart,
+    RouteResult,
     TripStepGeometry,
     TripStepResult,
     TripType,
@@ -44,7 +45,7 @@ OPEN_ROUTE_SERVICE = "https://api.openrouteservice.org/v2/directions/cycling-reg
 def find_bicycle_route(
     departure_coords: tuple[float, float],
     arrival_coords: tuple[float, float],
-):
+) -> RouteResult | None:
     """Fetches a bicycle route between two geographic coordinates using
     the OpenRouteService API.
 
@@ -53,10 +54,8 @@ def find_bicycle_route(
         arrival_coords: Arrival coordinates as (longitude, latitude).
 
     Returns:
-        A tuple containing:
-            - simplified route geometry.
-            - a boolean indicating whether a route was successfully found.
-            - route distance in kilometers.
+        A RouteResult containing the route geometry and path length
+        if routing succeeds, otherwise None.
 
     """
     response = requests.get(
@@ -64,8 +63,7 @@ def find_bicycle_route(
     )
 
     if response.status_code != HTTPStatus.OK:
-        route_geometry, success, route_length = None, False, None
-        return route_geometry, success, route_length
+        return None
 
     # Simplify the geometry
     route = response.json()["features"][0]
@@ -75,7 +73,7 @@ def find_bicycle_route(
     )
     route_length = m_to_km(route["properties"]["summary"]["distance"])
 
-    return route_geometry, True, route_length
+    return RouteResult(geometry=route_geometry, path_length_km=route_length)
 
 
 def compute_bicycle_trip(
@@ -98,17 +96,16 @@ def compute_bicycle_trip(
         data, or ``None`` if no valid route could be found.
 
     """
-    route_geometry, success, route_length = find_bicycle_route(
-        departure_coords,
-        arrival_coords,
-    )
+    result = find_bicycle_route(departure_coords, arrival_coords)
 
-    if not success or not validate_geometry(
+    if result is None or not validate_geometry(
         departure_coords,
         arrival_coords,
-        route_geometry,
+        result.geometry,
     ):
         return None
+
+    route_length = result.path_length_km
 
     return TripStepResult(
         step_data=BicycleStepData(
@@ -126,7 +123,7 @@ def compute_bicycle_trip(
         ),
         geometries=[
             TripStepGeometry(
-                coordinates=[[list(coord) for coord in route_geometry.coords]],
+                coordinates=[[list(coord) for coord in result.geometry.coords]],
                 transport_means="bicycle",
                 length=route_length,
                 country_label=None,

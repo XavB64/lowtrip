@@ -20,6 +20,7 @@ from typing import Literal
 
 import geopandas as gpd
 from pydantic import BaseModel, Field
+from shapely import LineString
 from shapely.geometry.base import BaseGeometry
 
 
@@ -81,6 +82,14 @@ class ApiPayload(BaseModel):
 ######################
 # INTERNAL
 ######################
+
+
+@dataclass(frozen=True)
+class RouteResult:
+    """Class containing the geometry and the length of the corresponding route."""
+
+    geometry: LineString
+    path_length_km: float
 
 
 @dataclass(frozen=True)

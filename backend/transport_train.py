@@ -15,7 +15,6 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from dataclasses import dataclass
 from http import HTTPStatus
 
 import requests
@@ -26,6 +25,7 @@ from geo_validate_geometry import validate_geometry
 from models import (
     CountrySplitConfig,
     EmissionPart,
+    RouteResult,
     TrainStepData,
     TripStepResult,
     TripType,
@@ -134,18 +134,10 @@ def find_nearest_railway_point(
     return None
 
 
-@dataclass(frozen=True)
-class TrainRouteResult:
-    """Class containing the geometry and the length of a train route."""
-
-    geometry: LineString
-    path_length_km: float
-
-
 def retry_train_routing_with_nearby_points(
     departure_coords: tuple[float, float],
     arrival_coords: tuple[float, float],
-) -> TrainRouteResult | None:
+) -> RouteResult | None:
     """Retry train routing using nearby railway points.
 
     When direct train routing fails, this function searches for nearby railway
@@ -157,7 +149,7 @@ def retry_train_routing_with_nearby_points(
         arrival_coords: Arrival coordinates as (longitude, latitude).
 
     Returns:
-        A TrainRouteResult containing the route geometry and path length
+        A RouteResult containing the route geometry and path length
         if routing succeeds, otherwise None.
 
     """
@@ -184,7 +176,7 @@ def retry_train_routing_with_nearby_points(
 def request_train_route(
     departure_coords: tuple[float, float],
     arrival_coords: tuple[float, float],
-) -> TrainRouteResult | None:
+) -> RouteResult | None:
     """Request a train route between two coordinates.
 
     The route geometry and path length are retrieved from the Signal
@@ -195,7 +187,7 @@ def request_train_route(
         arrival_coords: Arrival coordinates as (longitude, latitude).
 
     Returns:
-        A TrainRouteResult containing the route geometry and path length
+        A RouteResult containing the route geometry and path length
         if routing succeeds, otherwise None.
 
     """
@@ -223,7 +215,7 @@ def request_train_route(
     path_length_km = m_to_km(route["distance"])
     geometry = LineString(route["geometry"]["coordinates"])
 
-    return TrainRouteResult(geometry=geometry, path_length_km=path_length_km)
+    return RouteResult(geometry=geometry, path_length_km=path_length_km)
 
 
 def compute_train_trip(

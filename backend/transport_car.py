@@ -29,6 +29,7 @@ from models import (
     EcarStepData,
     EmissionPart,
     HitchHikingStepData,
+    RouteResult,
     TripStepGeometry,
     TripStepResult,
     TripType,
@@ -69,7 +70,7 @@ EXTRA_PASSENGER_EMISSION_FACTOR = 0.04
 def find_route(
     departure_coords: tuple[float, float],
     arrival_coords: tuple[float, float],
-):
+) -> RouteResult | None:
     """Find a road route between two coordinates.
 
     Uses the routing provider to compute a route geometry and its total distance.
@@ -79,10 +80,8 @@ def find_route(
         arrival_coords: Arrival coordinates as (longitude, latitude).
 
     Returns:
-        A tuple containing:
-            - The route geometry as a LineString.
-            - The route distance in kilometers.
-            - Whether the route was successfully computed.
+        A RouteResult containing the route geometry and path length
+        if routing succeeds, otherwise None.
 
     """
     response = requests.get(
@@ -90,8 +89,7 @@ def find_route(
     )
 
     if response.status_code != HTTPStatus.OK:
-        route_geometry, route_length, success = None, None, False
-        return route_geometry, route_length, success
+        return None
 
     route = response.json()["routes"][0]
     route_geometry = LineString(route["geometry"]["coordinates"])
@@ -101,11 +99,10 @@ def find_route(
         arrival_coords,
         route_geometry,
     ):
-        return None, None, False
+        return None
 
     route_length = m_to_km(route["distance"])
-    success = True
-    return route_geometry, route_length, success
+    return RouteResult(geometry=route_geometry, path_length_km=route_length)
 
 
 def compute_passenger_adjustment_factor(
@@ -154,14 +151,16 @@ def compute_ecar_trip(
         data, or ``None`` if no valid route could be found.
 
     """
-    route_geometry, route_length, success = find_route(departure_coords, arrival_coords)
+    result = find_route(departure_coords, arrival_coords)
 
-    if not success:
+    if result is None:
         return None
+
+    route_length = result.path_length_km
 
     # We need to filter by country and add length / Emission factors
     country_route_segments, geometries = split_path_by_country(
-        route_geometry,
+        result.geometry,
         route_length,
         ECAR_COUNTRY_SPLIT_CONFIG,
         trip_type=trip_type,
@@ -239,17 +238,15 @@ def compute_bus_trip(
         route_length = precomputed_route_length_km
         geometries = []
     else:
-        route_geometry, route_length, success = find_route(
-            departure_coords,
-            arrival_coords,
-        )
+        result = find_route(departure_coords, arrival_coords)
 
-        if not success:
+        if result is None:
             return None
 
+        route_length = result.path_length_km
         geometries = [
             TripStepGeometry(
-                coordinates=[[list(coord) for coord in route_geometry.coords]],
+                coordinates=[[list(coord) for coord in result.geometry.coords]],
                 transport_means="Road",
                 length=route_length,
                 country_label=None,
@@ -324,17 +321,15 @@ def compute_car_trip(
         route_length = precomputed_route_length_km
         geometries = []
     else:
-        route_geometry, route_length, success = find_route(
-            departure_coords,
-            arrival_coords,
-        )
+        result = find_route(departure_coords, arrival_coords)
 
-        if not success:
+        if result is None:
             return None
 
+        route_length = result.path_length_km
         geometries = [
             TripStepGeometry(
-                coordinates=[[list(coord) for coord in route_geometry.coords]],
+                coordinates=[[list(coord) for coord in result.geometry.coords]],
                 transport_means="Road",
                 length=route_length,
                 country_label=None,
@@ -403,17 +398,16 @@ def compute_hitch_hiking_trip(
         data, or ``None`` if no valid route could be found.
 
     """
-    route_geometry, route_length, success = find_route(
-        departure_coords,
-        arrival_coords,
-    )
+    result = find_route(departure_coords, arrival_coords)
 
-    if not success:
+    if result is None:
         return None
+
+    route_length = result.path_length_km
 
     geometries = [
         TripStepGeometry(
-            coordinates=[[list(coord) for coord in route_geometry.coords]],
+            coordinates=[[list(coord) for coord in result.geometry.coords]],
             transport_means="Road",
             length=route_length,
             country_label=None,
