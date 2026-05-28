@@ -21,6 +21,7 @@ import os
 import requests
 from shapely.geometry import LineString
 
+from geo_validate_geometry import validate_geometry
 from models import (
     BicycleStepData,
     EmissionPart,
@@ -28,7 +29,7 @@ from models import (
     TripStepResult,
     TripType,
 )
-from utils import m_to_km, validate_geometry
+from utils import m_to_km
 
 
 # Bicycle manufacturing emissions (kgCO2e/km).

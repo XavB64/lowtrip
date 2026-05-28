@@ -20,6 +20,8 @@ from http import HTTPStatus
 import requests
 from shapely.geometry import LineString
 
+from geo_split_path_by_country import split_path_by_country
+from geo_validate_geometry import validate_geometry
 from models import (
     BusStepData,
     CarStepData,
@@ -32,11 +34,7 @@ from models import (
     TripType,
 )
 from parameters import carbon_intensity_electricity
-from utils import (
-    m_to_km,
-    split_path_by_country,
-    validate_geometry,
-)
+from utils import m_to_km
 
 
 OSM_ROUTER_URL = "http://router.project-osrm.org/route/v1/driving"
