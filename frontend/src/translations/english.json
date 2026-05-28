@@ -251,7 +251,9 @@
       "shareableLinkFeature": "Added shareable link, which can also be used to save a request",
       "title": "Development History",
       "updatePage": "Added this update history page",
-      "addDetailsModal": "Added the details modal for single-leg journeys"
+      "addDetailsModal": "Added the details modal for single-leg journeys",
+      "addDetailsModalForComplexTrip": "Full emissions calculation details are now available for complex multi-step trips.",
+      "addSeaTripComparison": "Automatic comparisons between ferry and sailing trips have been added to make maritime transport comparisons easier."
     }
   },
   "detailsModal": {
