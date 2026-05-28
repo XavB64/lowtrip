@@ -119,81 +119,92 @@ def compute_custom_trip_emissions(
     for idx, arrival in enumerate(trip.steps):
         arrival_coordinates = (arrival.lon, arrival.lat)
         transport_mean = arrival.transport_mean
-        results = None
 
         error_message = f"step n°{idx + 1} failed with {transport_mean}, please change mean of transport or locations."
 
-        try:
-            if transport_mean == "train":
+        if transport_mean == "train":
+            try:
                 results = compute_train_trip(
                     departure_coordinates,
                     arrival_coordinates,
                     trip_name,
                 )
+            except Exception as err:
+                raise ValueError(error_message) from err
 
-            elif transport_mean == "bus":
+        elif transport_mean == "bus":
+            try:
                 results = compute_bus_trip(
                     departure_coordinates,
                     arrival_coordinates,
                     trip_name,
                 )
+            except Exception as err:
+                raise ValueError(error_message) from err
 
-            elif transport_mean == "car":
+        elif transport_mean == "car":
+            try:
                 results = compute_car_trip(
                     departure_coordinates,
                     arrival_coordinates,
                     trip_name,
                     passengers_nb=arrival.passengers_nb,
                 )
+            except Exception as err:
+                raise ValueError(error_message) from err
 
-            elif transport_mean == "hitchHiking":
+        elif transport_mean == "hitchHiking":
+            try:
                 results = compute_hitch_hiking_trip(
                     departure_coordinates,
                     arrival_coordinates,
                     trip_name,
                 )
+            except Exception as err:
+                raise ValueError(error_message) from err
 
-            elif transport_mean == "ecar":
+        elif transport_mean == "ecar":
+            try:
                 results = compute_ecar_trip(
                     departure_coordinates,
                     arrival_coordinates,
                     trip_name,
                     passengers_nb=arrival.passengers_nb,
                 )
+            except Exception as err:
+                raise ValueError(error_message) from err
 
-            elif transport_mean == "bicycle":
-                results = compute_bicycle_trip(
-                    departure_coordinates,
-                    arrival_coordinates,
-                    trip_name,
-                )
+        elif transport_mean == "bicycle":
+            results = compute_bicycle_trip(
+                departure_coordinates,
+                arrival_coordinates,
+                trip_name,
+            )
 
-            elif transport_mean == "plane":
-                results = compute_plane_trip(
-                    departure_coordinates,
-                    arrival_coordinates,
-                    trip_name,
-                )
+        elif transport_mean == "plane":
+            results = compute_plane_trip(
+                departure_coordinates,
+                arrival_coordinates,
+                trip_name,
+            )
 
-            elif transport_mean == "ferry":
-                results = compute_ferry_trip(
-                    departure_coordinates,
-                    arrival_coordinates,
-                    trip_name,
-                    options=arrival.ferry_options,
-                )
+        elif transport_mean == "ferry":
+            results = compute_ferry_trip(
+                departure_coordinates,
+                arrival_coordinates,
+                trip_name,
+                options=arrival.ferry_options,
+            )
 
-            elif transport_mean == "sail":
-                results = compute_sail_trip(
-                    departure_coordinates,
-                    arrival_coordinates,
-                    trip_name,
-                )
+        elif transport_mean == "sail":
+            results = compute_sail_trip(
+                departure_coordinates,
+                arrival_coordinates,
+                trip_name,
+            )
 
-        except Exception:
-            raise ValueError(error_message)
-
-        if results is None:
+        else:
+            print(f"Transport mean {transport_mean} not handled")
             raise ValueError(error_message)
 
         emissions_data.append(results.step_data)
@@ -283,14 +294,17 @@ def compute_direct_trips_emissions(
 
     # Compute direct alternatives for land transport modes.
     if transport_mean != "train":
-        train_results = compute_train_trip(
-            departure_coordinates,
-            arrival_coordinates,
-            "DIRECT_TRIP",
-        )
-        if train_results is not None:
-            trips.append(TripResult(name="TRAIN", steps=[train_results.step_data]))
-            geometries.extend(train_results.geometries)
+        try:
+            train_results = compute_train_trip(
+                departure_coordinates,
+                arrival_coordinates,
+                "DIRECT_TRIP",
+            )
+            if train_results is not None:
+                trips.append(TripResult(name="TRAIN", steps=[train_results.step_data]))
+                geometries.extend(train_results.geometries)
+        except Exception as e:
+            print(e)
 
     # Reuse the already computed road route length when possible
     # to avoid recomputing the same road itinerary multiple times.
@@ -301,19 +315,23 @@ def compute_direct_trips_emissions(
     )
 
     if transport_mean != "bus":
-        bus_results = compute_bus_trip(
-            departure_coordinates,
-            arrival_coordinates,
-            "DIRECT_TRIP",
-            precomputed_route_length_km=road_path_length,
-        )
-        trips.append(TripResult(name="BUS", steps=[bus_results.step_data]))
+        try:
+            bus_results = compute_bus_trip(
+                departure_coordinates,
+                arrival_coordinates,
+                "DIRECT_TRIP",
+                precomputed_route_length_km=road_path_length,
+            )
+            trips.append(TripResult(name="BUS", steps=[bus_results.step_data]))
 
-        if road_path_length is None and bus_results.geometries:
-            geometries.extend(bus_results.geometries)
-            road_path_length = bus_results.geometries[0].length
+            if road_path_length is None and bus_results.geometries:
+                geometries.extend(bus_results.geometries)
+                road_path_length = bus_results.geometries[0].length
 
-    if transport_mean != "car":
+        except Exception as e:
+            print(e)
+
+    if road_path_length and transport_mean != "car":
         car_results = compute_car_trip(
             departure_coordinates,
             arrival_coordinates,

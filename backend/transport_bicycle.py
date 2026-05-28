@@ -25,6 +25,7 @@ from geo_validate_geometry import validate_geometry
 from models import (
     BicycleStepData,
     EmissionPart,
+    RouteNotFoundError,
     RouteResult,
     TripStepGeometry,
     TripStepResult,
@@ -45,7 +46,7 @@ OPEN_ROUTE_SERVICE = "https://api.openrouteservice.org/v2/directions/cycling-reg
 def find_bicycle_route(
     departure_coords: tuple[float, float],
     arrival_coords: tuple[float, float],
-) -> RouteResult | None:
+) -> RouteResult:
     """Fetches a bicycle route between two geographic coordinates using
     the OpenRouteService API.
 
@@ -54,8 +55,11 @@ def find_bicycle_route(
         arrival_coords: Arrival coordinates as (longitude, latitude).
 
     Returns:
-        A RouteResult containing the route geometry and path length
-        if routing succeeds, otherwise None.
+        A RouteResult containing the route geometry and path length.
+
+    Raises:
+        RouteNotFoundError:
+            If no bicycle route could be found.
 
     """
     response = requests.get(
@@ -63,7 +67,9 @@ def find_bicycle_route(
     )
 
     if response.status_code != HTTPStatus.OK:
-        return None
+        raise RouteNotFoundError(
+            f"No bicycle route found between {departure_coords} and {arrival_coords}",
+        )
 
     # Simplify the geometry
     route = response.json()["features"][0]
@@ -80,7 +86,7 @@ def compute_bicycle_trip(
     departure_coords: tuple[float, float],
     arrival_coords: tuple[float, float],
     trip_type: TripType,
-) -> TripStepResult | None:
+) -> TripStepResult:
     """Computes a bicycle trip between two coordinates.
 
     Finds a bicycle route with OPEN_ROUTE_SERVICE, validates its geometry,
@@ -92,14 +98,10 @@ def compute_bicycle_trip(
         trip_type: Type of trip to compute.
 
     Returns:
-        A ``TripStepResult`` containing the route geometry and emissions
-        data, or ``None`` if no valid route could be found.
+        A ``TripStepResult`` containing the route geometry and emissions data
 
     """
     result = find_bicycle_route(departure_coords, arrival_coords)
-
-    if result is None:
-        return None
 
     validate_geometry(departure_coords, arrival_coords, result.geometry)
 

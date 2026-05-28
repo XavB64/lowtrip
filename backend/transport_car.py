@@ -29,6 +29,7 @@ from models import (
     EcarStepData,
     EmissionPart,
     HitchHikingStepData,
+    RouteNotFoundError,
     RouteResult,
     TripStepGeometry,
     TripStepResult,
@@ -70,7 +71,7 @@ EXTRA_PASSENGER_EMISSION_FACTOR = 0.04
 def find_route(
     departure_coords: tuple[float, float],
     arrival_coords: tuple[float, float],
-) -> RouteResult | None:
+) -> RouteResult:
     """Find a road route between two coordinates.
 
     Uses the routing provider to compute a route geometry and its total distance.
@@ -80,8 +81,11 @@ def find_route(
         arrival_coords: Arrival coordinates as (longitude, latitude).
 
     Returns:
-        A RouteResult containing the route geometry and path length
-        if routing succeeds, otherwise None.
+        A RouteResult containing the route geometry and path length.
+
+    Raises:
+        RouteNotFoundError:
+            If no route could be found.
 
     """
     response = requests.get(
@@ -89,7 +93,9 @@ def find_route(
     )
 
     if response.status_code != HTTPStatus.OK:
-        return None
+        raise RouteNotFoundError(
+            f"No route by road found between {departure_coords} and {arrival_coords}",
+        )
 
     route = response.json()["routes"][0]
     route_geometry = LineString(route["geometry"]["coordinates"])
@@ -142,14 +148,10 @@ def compute_ecar_trip(
         passengers_nb: Number of passengers in the vehicle.
 
     Returns:
-        A ``TripStepResult`` containing the route geometry and emissions
-        data, or ``None`` if no valid route could be found.
+        A ``TripStepResult`` containing the route geometry and emissions data.
 
     """
     result = find_route(departure_coords, arrival_coords)
-
-    if result is None:
-        return None
 
     route_length = result.path_length_km
 
@@ -205,7 +207,7 @@ def compute_bus_trip(
     arrival_coords: tuple[float, float],
     trip_type: TripType,
     precomputed_route_length_km: float | None = None,
-) -> TripStepResult | None:
+) -> TripStepResult:
     """Compute a bus trip between two coordinates.
 
     Finds a road route, validates its geometry, and computes the
@@ -225,8 +227,7 @@ def compute_bus_trip(
             kilometers used to avoid recomputing the road itinerary.
 
     Returns:
-        A ``TripStepResult`` containing the route geometry and emissions
-        data, or ``None`` if no valid route could be found.
+        A ``TripStepResult`` containing the route geometry and emissions data.
 
     """
     if precomputed_route_length_km:
@@ -234,9 +235,6 @@ def compute_bus_trip(
         geometries = []
     else:
         result = find_route(departure_coords, arrival_coords)
-
-        if result is None:
-            return None
 
         route_length = result.path_length_km
         geometries = [
@@ -282,7 +280,7 @@ def compute_car_trip(
     trip_type: TripType,
     passengers_nb=1,
     precomputed_route_length_km: float | None = None,
-) -> TripStepResult | None:
+) -> TripStepResult:
     """Compute a car trip between two coordinates.
 
     Finds a road route, validates its geometry, and computes the
@@ -308,18 +306,13 @@ def compute_car_trip(
             kilometers used to avoid recomputing the road itinerary.
 
     Returns:
-        A ``TripStepResult`` containing the route geometry and emissions
-        data, or ``None`` if no valid route could be found.
-
+        A ``TripStepResult`` containing the route geometry and emissions data.
     """
     if precomputed_route_length_km is not None:
         route_length = precomputed_route_length_km
         geometries = []
     else:
         result = find_route(departure_coords, arrival_coords)
-
-        if result is None:
-            return None
 
         route_length = result.path_length_km
         geometries = [
@@ -368,7 +361,7 @@ def compute_hitch_hiking_trip(
     departure_coords: tuple[float, float],
     arrival_coords: tuple[float, float],
     trip_type: TripType,
-) -> TripStepResult | None:
+) -> TripStepResult:
     """Compute a hitchhiking trip between two coordinates.
 
     Finds a road route, validates its geometry, and computes the
@@ -389,14 +382,10 @@ def compute_hitch_hiking_trip(
         trip_type: Type of trip to compute.
 
     Returns:
-        A ``TripStepResult`` containing the route geometry and emissions
-        data, or ``None`` if no valid route could be found.
+        A ``TripStepResult`` containing the route geometry and emissions data.
 
     """
     result = find_route(departure_coords, arrival_coords)
-
-    if result is None:
-        return None
 
     route_length = result.path_length_km
 
