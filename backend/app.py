@@ -29,8 +29,8 @@ from flask_cors import CORS
 from pydantic import ValidationError
 import requests
 
-from backend import compute_custom_trip_emissions, compute_direct_trips_emissions
 from models import ApiPayload
+from trip_service import compute_emissions
 
 
 # Load the environment variables
@@ -49,7 +49,22 @@ def health():
 
 
 @app.route("/compute-emissions", methods=["POST"])
-def compute_emissions():
+def compute_emissions_endpoint():
+    """Compute emissions and geometries for one or two trips.
+
+    The request payload is validated with Pydantic before emissions are
+    computed.
+
+    If only one trip is requested and it contains a single transport step,
+    additional direct trips are computed for alternative transport modes
+    (train, bus, car, plane, etc.).
+
+    Returns:
+        JSON response containing:
+            - trips: Computed emissions results.
+            - geometries: Route geometries for visualization.
+
+    """
     try:
         payload = ApiPayload.model_validate(request.get_json())
     except ValidationError as exc:
@@ -57,38 +72,7 @@ def compute_emissions():
             "error": "Invalid payload",
             "details": exc.errors(),
         }), 400
-
-    ## Compute emisssions of the main custom trip
-    main_trip, main_trip_geometries = compute_custom_trip_emissions(
-        "MAIN_TRIP",
-        payload.main_trip,
-    )
-
-    trips = [main_trip]
-    geometries = main_trip_geometries
-
-    ### If alternative trip is provided, compute the emissions of the alternative trip
-    if payload.second_trip:
-        second_trip, second_trip_geometries = compute_custom_trip_emissions(
-            "SECOND_TRIP",
-            payload.second_trip,
-        )
-        trips = [main_trip, second_trip]
-        geometries += second_trip_geometries
-
-    ### If the custom trip has exaclty 1 step, compute the direct trips with other means of transport
-    elif len(payload.main_trip.steps) == 1:
-        direct_trips, direct_trips_geometries = compute_direct_trips_emissions(
-            payload.main_trip,
-            main_trip.steps[0].path_length,
-        )
-        geometries += direct_trips_geometries
-        trips = [main_trip, *direct_trips]
-
-    return {
-        "trips": trips,
-        "geometries": geometries,
-    }
+    return compute_emissions(payload)
 
 
 @app.route("/send-mail", methods=["POST"])
