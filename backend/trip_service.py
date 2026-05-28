@@ -15,6 +15,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import logging
 from typing import Literal
 
 from models import (
@@ -36,6 +37,9 @@ from transport_ferry import compute_ferry_trip, compute_sail_trip
 from transport_plane import compute_plane_trip
 from transport_train import compute_train_trip
 from utils import compute_distance_between_2_points
+
+
+logger = logging.getLogger(__name__)
 
 
 def compute_emissions(payload: ApiPayload):
@@ -130,6 +134,7 @@ def compute_custom_trip_emissions(
                     trip_name,
                 )
             except Exception as err:
+                logger.warning("step n°%s failed, initial payload: %s", idx + 1, trip)
                 raise ValueError(error_message) from err
 
         elif transport_mean == "bus":
@@ -140,6 +145,7 @@ def compute_custom_trip_emissions(
                     trip_name,
                 )
             except Exception as err:
+                logger.warning("step n°%s failed, initial payload: %s", idx + 1, trip)
                 raise ValueError(error_message) from err
 
         elif transport_mean == "car":
@@ -151,6 +157,7 @@ def compute_custom_trip_emissions(
                     passengers_nb=arrival.passengers_nb,
                 )
             except Exception as err:
+                logger.warning("step n°%s failed, initial payload: %s", idx + 1, trip)
                 raise ValueError(error_message) from err
 
         elif transport_mean == "hitchHiking":
@@ -161,6 +168,7 @@ def compute_custom_trip_emissions(
                     trip_name,
                 )
             except Exception as err:
+                logger.warning("step n°%s failed, initial payload: %s", idx + 1, trip)
                 raise ValueError(error_message) from err
 
         elif transport_mean == "ecar":
@@ -172,6 +180,7 @@ def compute_custom_trip_emissions(
                     passengers_nb=arrival.passengers_nb,
                 )
             except Exception as err:
+                logger.warning("step n°%s failed, initial payload: %s", idx + 1, trip)
                 raise ValueError(error_message) from err
 
         elif transport_mean == "bicycle":
@@ -204,7 +213,7 @@ def compute_custom_trip_emissions(
             )
 
         else:
-            print(f"Transport mean {transport_mean} not handled")
+            logger.warning("Transport mean %s not handled", transport_mean)
             raise ValueError(error_message)
 
         emissions_data.append(results.step_data)
@@ -303,8 +312,8 @@ def compute_direct_trips_emissions(
             if train_results is not None:
                 trips.append(TripResult(name="TRAIN", steps=[train_results.step_data]))
                 geometries.extend(train_results.geometries)
-        except Exception as e:
-            print(e)
+        except Exception:
+            logger.warning("Direct trip by train couldn't be computed")
 
     # Reuse the already computed road route length when possible
     # to avoid recomputing the same road itinerary multiple times.
@@ -328,8 +337,10 @@ def compute_direct_trips_emissions(
                 geometries.extend(bus_results.geometries)
                 road_path_length = bus_results.geometries[0].length
 
-        except Exception as e:
-            print(e)
+        except Exception:
+            logger.warning(
+                "Direct trip by road couldn't be computed. Bus and car skipped.",
+            )
 
     if road_path_length and transport_mean != "car":
         car_results = compute_car_trip(

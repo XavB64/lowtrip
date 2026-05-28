@@ -16,6 +16,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 from http import HTTPStatus
+import logging
 
 import requests
 from shapely.geometry import LineString
@@ -37,6 +38,9 @@ from models import (
 )
 from parameters import carbon_intensity_electricity
 from utils import m_to_km
+
+
+logger = logging.getLogger(__name__)
 
 
 OSM_ROUTER_URL = "http://router.project-osrm.org/route/v1/driving"
@@ -88,11 +92,14 @@ def find_route(
             If no route could be found.
 
     """
+    logger.info("Request road route from OSM router")
+
     response = requests.get(
         f"{OSM_ROUTER_URL}/{departure_coords[0]},{departure_coords[1]};{arrival_coords[0]},{arrival_coords[1]}?overview=simplified&geometries=geojson",
     )
 
     if response.status_code != HTTPStatus.OK:
+        logger.warning("OSM request failed with status code: %s", response.status_code)
         raise RouteNotFoundError(
             f"No route by road found between {departure_coords} and {arrival_coords}",
         )
@@ -307,6 +314,7 @@ def compute_car_trip(
 
     Returns:
         A ``TripStepResult`` containing the route geometry and emissions data.
+
     """
     if precomputed_route_length_km is not None:
         route_length = precomputed_route_length_km
