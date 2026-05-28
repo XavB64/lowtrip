@@ -199,67 +199,41 @@ def compute_custom_trip_emissions(
 
 
 def compute_direct_trips_emissions(
-    inputs: Trip,
+    requested_trip: Trip,
     main_trip_path_length: float,
-):
-    """Compute emissions for the same trip, but with other transport means given the initial transport means used,
-    the departure and arrival coordinates.
+) -> tuple[list[TripResult], list[TripStepGeometry]]:
+    """Compute alternative direct trips for a simple trip.
 
-    Parameters
-    ----------
-        - inputs: list of exactly 2 trip steps
+    Given a trip containing a single transport step, this function computes
+    emissions for alternative transport modes between the same departure and
+    arrival points.
 
-    Returns
-    -------
-    list[...]
-        - trips: list of emissions for each mean of transport
-        - geometries: geometries of the trips
+    - Plane alternatives are only computed for trips whose bird-flight distance
+    exceeds 300 km.
+    - Train and road alternatives (bus and car) are only computed for trips
+    using a land transport mode.
+
+    Road-based transport modes may reuse an already computed route length to
+    avoid redundant routing computations.
+
+    Args:
+        requested_trip: Trip containing exactly one transport step.
+        main_trip_path_length: Path length of the original trip, used when
+            reusing an already computed road route.
+
+    Returns:
+        A tuple containing:
+            - Alternative trip results.
+            - Associated route geometries.
 
     """
-    departure_coordinates = (inputs.departure.lon, inputs.departure.lat)
-    arrival = inputs.steps[0]
+    departure_coordinates = (requested_trip.departure.lon, requested_trip.departure.lat)
+    arrival = requested_trip.steps[0]
     arrival_coordinates = (arrival.lon, arrival.lat)
     transport_mean = arrival.transport_mean
 
     trips: list[TripResult] = []
     geometries: list[TripStepGeometry] = []
-
-    # Compute train and road emissions except if the initial transport means is Ferry or Sail
-    if transport_mean not in {"ferry", "sail"}:
-        if transport_mean != "train":
-            train_results = compute_train_trip(
-                departure_coordinates,
-                arrival_coordinates,
-                "DIRECT_TRIP",
-            )
-            if train_results is not None:
-                trips.append(TripResult(name="TRAIN", steps=[train_results.step_data]))
-                geometries += train_results.geometries
-
-        road_path_length = (
-            main_trip_path_length if transport_mean in {"bus", "car", "ecar"} else None
-        )
-
-        if transport_mean != "bus":
-            bus_results = compute_bus_trip(
-                departure_coordinates,
-                arrival_coordinates,
-                "DIRECT_TRIP",
-                precomputed_route_length_km=road_path_length,
-            )
-            trips.append(TripResult(name="BUS", steps=[bus_results.step_data]))
-            if road_path_length is None and len(bus_results.geometries) > 0:
-                geometries += bus_results.geometries
-                road_path_length = bus_results.geometries[0].length
-
-        if transport_mean != "car":
-            car_results = compute_car_trip(
-                departure_coordinates,
-                arrival_coordinates,
-                "DIRECT_TRIP",
-                precomputed_route_length_km=road_path_length,
-            )
-            trips.append(TripResult(name="CAR", steps=[car_results.step_data]))
 
     # Compute plane emissions only for trips longer than 300km
     if transport_mean != "plane":
@@ -274,8 +248,49 @@ def compute_direct_trips_emissions(
                 "DIRECT_TRIP",
             )
             trips.append(TripResult(name="PLANE", steps=[plane_result.step_data]))
-            geometries += plane_result.geometries
+            geometries.extend(plane_result.geometries)
 
-    # Sea modes - to do later : similar behavior than bus / car --> Custom function to get the route only once
+    # TODO: Add direct alternatives for sea transport modes.
+    if transport_mean in {"ferry", "sail"}:
+        return trips, geometries
+
+    # Compute train and road emissions except if the initial transport means is Ferry or Sail
+    if transport_mean != "train":
+        train_results = compute_train_trip(
+            departure_coordinates,
+            arrival_coordinates,
+            "DIRECT_TRIP",
+        )
+        if train_results is not None:
+            trips.append(TripResult(name="TRAIN", steps=[train_results.step_data]))
+            geometries.extend(train_results.geometries)
+
+    # Reuse the already computed road route length when possible
+    # to avoid recomputing the same road itinerary multiple times.
+    road_path_length = (
+        main_trip_path_length if transport_mean in {"bus", "car", "ecar"} else None
+    )
+
+    if transport_mean != "bus":
+        bus_results = compute_bus_trip(
+            departure_coordinates,
+            arrival_coordinates,
+            "DIRECT_TRIP",
+            precomputed_route_length_km=road_path_length,
+        )
+        trips.append(TripResult(name="BUS", steps=[bus_results.step_data]))
+
+        if road_path_length is None and bus_results.geometries:
+            geometries.extend(bus_results.geometries)
+            road_path_length = bus_results.geometries[0].length
+
+    if transport_mean != "car":
+        car_results = compute_car_trip(
+            departure_coordinates,
+            arrival_coordinates,
+            "DIRECT_TRIP",
+            precomputed_route_length_km=road_path_length,
+        )
+        trips.append(TripResult(name="CAR", steps=[car_results.step_data]))
 
     return trips, geometries
