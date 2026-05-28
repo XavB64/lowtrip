@@ -15,6 +15,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+from geo_routing_maritime import compute_maritime_shortest_path
 from models import (
     EmissionPart,
     FerryStepData,
@@ -24,7 +25,6 @@ from models import (
     TripType,
 )
 from parameters import GEOD
-from routing_maritime import compute_maritime_shortest_path
 from utils import get_coordinates_from_base_geometry, m_to_km
 
 

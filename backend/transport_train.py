@@ -21,6 +21,8 @@ from http import HTTPStatus
 import requests
 from shapely.geometry import LineString, Point
 
+from geo_split_path_by_country import split_path_by_country
+from geo_validate_geometry import validate_geometry
 from models import (
     CountrySplitConfig,
     EmissionPart,
@@ -29,12 +31,7 @@ from models import (
     TripType,
 )
 from parameters import train_intensity
-from utils import (
-    kilometer_to_degree,
-    m_to_km,
-    split_path_by_country,
-    validate_geometry,
-)
+from utils import kilometer_to_degree, m_to_km
 
 
 # Train emissions factors (kgCO2e / passenger.km).
