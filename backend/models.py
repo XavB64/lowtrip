@@ -57,7 +57,7 @@ class TripStep(TripPoint):
     )
     ferry_options: str | None = Field(
         default=None,
-        alias="ferry-options",
+        alias="ferry-option",
     )
 
 
