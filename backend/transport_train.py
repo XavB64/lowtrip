@@ -254,12 +254,10 @@ def compute_train_trip(
             arrival_coords,
         )
 
-    if result is None or not validate_geometry(
-        departure_coords,
-        arrival_coords,
-        result.geometry,
-    ):
+    if result is None:
         return None
+
+    validate_geometry(departure_coords, arrival_coords, result.geometry)
 
     path_length_km = result.path_length_km
 

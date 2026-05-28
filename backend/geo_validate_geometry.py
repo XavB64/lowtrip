@@ -17,6 +17,7 @@
 
 from shapely.geometry.base import BaseGeometry
 
+from models import RouteNotValidError
 from utils import compute_distance_between_2_points
 
 
@@ -35,8 +36,9 @@ def validate_geometry(
         geometry: Route geometry to validate.
         distance_threshold: Maximum allowed distance in kilometers.
 
-    Returns:
-        ``True`` if the geometry is valid, otherwise ``False``.
+    Raises:
+        RouteNotValidError:
+            If the route is not valid.
 
     """
     departure_error_distance = compute_distance_between_2_points(
@@ -44,15 +46,11 @@ def validate_geometry(
         list(geometry.coords)[0],
     )
     if departure_error_distance > distance_threshold:
-        print("Departure is not valid")
-        return False
+        raise RouteNotValidError("Arrival is not valid")
 
     arrival_error_distance = compute_distance_between_2_points(
         arrival_coords,
         list(geometry.coords)[-1],
     )
     if arrival_error_distance > distance_threshold:
-        print("Arrival is not valid")
-        return False
-
-    return True
+        raise RouteNotValidError("Arrival is not valid")
