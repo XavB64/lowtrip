@@ -106,11 +106,11 @@ def send_mail():
 
         response = requests.post(EMAIL_API_SERVICE_URL, json=data, headers=headers)
         response.raise_for_status()
-        return jsonify({"status": "success", "message": "Email envoyé"}), 200
+        return jsonify({"status": "success", "message": "Email sent"}), 200
 
     except Exception as e:  # noqa: BLE001
-        print("Erreur lors de l'envoi de l'email :", e)
-        return jsonify({"error": "Erreur lors de la requête à Brevo"}), 400
+        print("Sending email failed: ", e)
+        return jsonify({"error": "Error occured when sending the email to Brevo"}), 400
 
 
 if __name__ == "__main__":
