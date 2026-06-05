@@ -1,7 +1,9 @@
-name: frontend
+name: front
 
 on:
   pull_request:
+    paths:
+      - "frontend/**"
   workflow_dispatch:
   merge_group:
     types: [checks_requested]
@@ -22,7 +24,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: npm
           cache-dependency-path: frontend/package-lock.json
 
@@ -47,7 +49,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: npm
           cache-dependency-path: frontend/package-lock.json
 
@@ -59,7 +61,6 @@ jobs:
 
       - name: Serve the built app
         run: |
-          npm install -g serve
-          serve -s dist -l 5000 &
+          npx serve -s dist -l 5000 &
           sleep 5
           curl -f http://127.0.0.1:5000
