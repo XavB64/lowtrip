@@ -1,7 +1,9 @@
-name: backend
+name: back
 
 on:
   pull_request:
+    paths:
+      - "backend/**"
   workflow_dispatch:
   merge_group:
     types: [checks_requested]
@@ -13,62 +15,56 @@ jobs:
   check_backend_style:
     runs-on: ubuntu-latest
 
+    defaults:
+      run:
+        working-directory: ./backend
+
     steps:
       - uses: actions/checkout@v4
 
-      - name: Sort python imports
-        uses: isort/isort-action@v1
+      - uses: actions/setup-python@v5
         with:
-          sort-paths: "./backend"
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install ruff isort
+
+      - name: Sort python imports
+        run: isort .
 
       - name: Show python linter fixes
-        uses: chartboost/ruff-action@v1
-        with:
-          src: "./backend"
-          args: "check --fix --diff"
-
-      - name: Show remaining python linter violations
-        uses: chartboost/ruff-action@v1
-        with:
-          src: "./backend"
-          args: "check --fix --show-fixes"
+        run: ruff check .
 
       - name: Format Python code
-        uses: chartboost/ruff-action@v1
-        with:
-          src: "./backend"
-          args: "format --preview --check --diff"
+        run: ruff format --check .
 
   build:
     runs-on: ubuntu-latest
+
     defaults:
       run:
         shell: bash
         working-directory: ./backend
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v4
+      - uses: actions/setup-python@v5
         with:
-          python-version: "3.11.7"
+          python-version: "3.11"
+          cache: "pip"
+          cache-dependency-path: backend/requirements.txt
 
       - name: Install dependencies
         run: |
-          python -m venv lowtrip-venv
-          source lowtrip-venv/bin/activate
-          pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Build and run with Gunicorn
+      - name: Start backend
         run: |
-          source lowtrip-venv/bin/activate
           gunicorn app:app --bind 0.0.0.0:8000 --daemon
-          sleep 10
-          curl -f http://localhost:8000/health
 
-      - name: Stop Gunicorn
-        run: |
-          pkill gunicorn
+      - name: Wait for startup
+        run: sleep 5
+
+      - name: Health check
+        run: curl -f http://localhost:8000/health
