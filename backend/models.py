@@ -44,6 +44,7 @@ TransportMean = Literal[
 class TripPoint(BaseModel):
     """Trip point, represented by lon/lat coordinates."""
 
+    location: str
     lon: float = Field(ge=-180, le=180)
     lat: float = Field(ge=-90, le=90)
 

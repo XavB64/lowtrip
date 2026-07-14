@@ -36,6 +36,7 @@ export const formatStepsForApi = (steps?: Step[]): ApiTrip | undefined => {
   if (!departureStep.locationCoords)
     throw new Error("Missing locationCoords in step");
   const departure = {
+    location: departureStep.locationName,
     lon: departureStep.locationCoords[1],
     lat: departureStep.locationCoords[0],
   };
@@ -45,6 +46,7 @@ export const formatStepsForApi = (steps?: Step[]): ApiTrip | undefined => {
     if (!step.transportMean) throw new Error("Missing transport mean in step");
 
     return {
+      location: step.locationName,
       lon: step.locationCoords[1],
       lat: step.locationCoords[0],
       "transport-mean": step.transportMean,
