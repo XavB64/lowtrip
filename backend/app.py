@@ -22,6 +22,7 @@ import warnings
 from dotenv import load_dotenv
 from flask import (
     Flask,
+    json,
     jsonify,
     request,
 )
@@ -42,7 +43,6 @@ CORS(app)  # comment this on deployment
 # app.config["DEBUG"] = True
 app.config["APPLICATION_ROOT"] = "/"
 
-
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s %(levelname)s %(name)s - %(message)s",
@@ -53,7 +53,6 @@ logger = logging.getLogger(__name__)
 
 @app.route("/health", methods=["GET"])
 def health():
-    logger.info("Received GET /health request")
     return {"message": "backend initialized"}
 
 
@@ -74,8 +73,6 @@ def compute_emissions_endpoint():
             - geometries: Route geometries for visualization.
 
     """
-    logger.info("Received POST /compute-emissions request")
-
     try:
         payload = ApiPayload.model_validate(request.get_json())
     except ValidationError as exc:
@@ -85,14 +82,19 @@ def compute_emissions_endpoint():
             "details": exc.errors(),
         }), 400
 
+    logger.info(
+        "compute_emissions_request payload=%s",
+        json.dumps(payload.model_dump(), ensure_ascii=False),
+    )
+
     return compute_emissions(payload)
 
 
 @app.route("/send-mail", methods=["POST"])
 def send_mail():
-    logger.info("Received POST /send-mail request")
-
     data = request.get_json()
+    logger.info("send_mail payload=%s", data)
+
     sender_email = data.get("sender_email")
     subject = data.get("subject")
     message = data.get("message")
