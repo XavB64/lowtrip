@@ -29,6 +29,7 @@ from flask import (
 from flask_cors import CORS
 from pydantic import ValidationError
 import requests
+import sentry_sdk
 
 from models import ApiPayload
 from trip_service import compute_emissions
@@ -38,9 +39,15 @@ from trip_service import compute_emissions
 load_dotenv()
 warnings.filterwarnings("ignore")
 
+# add sentry for monitoring (optional)
+sentry_sdk.init(
+    dsn=os.getenv("SENTRY_DSN"),
+)
+
+app = Flask(__name__)
+
 app = Flask(__name__, static_url_path="", static_folder="frontend/build")
 CORS(app)  # comment this on deployment
-# app.config["DEBUG"] = True
 app.config["APPLICATION_ROOT"] = "/"
 
 logging.basicConfig(
