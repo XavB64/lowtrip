@@ -17,3 +17,6 @@ gunicorn
 flask_cors
 pyogrio
 python-dotenv
+
+# monitoring
+sentry-sdk
