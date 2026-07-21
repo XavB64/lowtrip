@@ -110,10 +110,12 @@ def split_path_by_country(
             how="left",
         )
 
-        segments_to_aggregate = pd.concat([
-            intersections.explode(),
-            nearest_country_segments.explode(),
-        ])
+        segments_to_aggregate = pd.concat(
+            [
+                intersections.explode(),
+                nearest_country_segments.explode(),
+            ]
+        )
 
     # Aggregation per country and combining geometries
     aggregated_segments = segments_to_aggregate.groupby(

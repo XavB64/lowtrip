@@ -77,10 +77,12 @@ def compute_emissions_endpoint():
         payload = ApiPayload.model_validate(request.get_json())
     except ValidationError as exc:
         logger.warning("Invalid payload received: %s", exc.errors())
-        return jsonify({
-            "error": "Invalid payload",
-            "details": exc.errors(),
-        }), 400
+        return jsonify(
+            {
+                "error": "Invalid payload",
+                "details": exc.errors(),
+            }
+        ), 400
 
     logger.info(
         "compute_emissions_request payload=%s",

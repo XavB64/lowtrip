@@ -33,16 +33,20 @@ from shapely.ops import nearest_points, unary_union
 from parameters import train_intensity
 
 
-PANAMA_CANAL = LineString([
-    (-79.51006995072298, 8.872893100443669),
-    (-80.05324567583347, 9.517999845306024),
-])
+PANAMA_CANAL = LineString(
+    [
+        (-79.51006995072298, 8.872893100443669),
+        (-80.05324567583347, 9.517999845306024),
+    ]
+)
 
-SUEZ_CANAL = LineString([
-    (33.91896382986125, 27.263740326941672),
-    (32.505571710241114, 29.64748606563672),
-    (32.42803964605657, 32.58754502651166),
-])
+SUEZ_CANAL = LineString(
+    [
+        (33.91896382986125, 27.263740326941672),
+        (32.505571710241114, 29.64748606563672),
+        (32.42803964605657, 32.58754502651166),
+    ]
+)
 
 MARITIME_CANALS = [
     PANAMA_CANAL,
@@ -218,10 +222,12 @@ def build_direct_sea_connection(
     geometries so that only navigable sea segments are kept.
 
     """
-    direct_line = LineString([
-        departure_coords,
-        arrival_coords,
-    ])
+    direct_line = LineString(
+        [
+            departure_coords,
+            arrival_coords,
+        ]
+    )
 
     sea_connection = gpd.overlay(
         gpd.GeoDataFrame(geometry=gpd.GeoSeries([direct_line])),
