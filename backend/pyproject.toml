@@ -72,10 +72,7 @@ docstring-code-format = true
 # enabled.
 docstring-code-line-length = "dynamic"
 
-preview = true
-
 [tool.ruff.lint]
-preview = true
 ignore = [
     "DOC201", # Checks for functions with explicit returns missing a "returns" section in their docstring.
     "C409", # Checks for tuple calls that take unnecessary list or tuple literals as arguments. In preview, this also includes unnecessary list comprehensions within tuple calls.
@@ -107,6 +104,7 @@ ignore = [
     "E712",  # Avoid equality comparisons to `False`; use `if not plane:` for false checks
     "E741",  # Ambiguous variable name: `l`
     "T201",  # `print` found
+    "COM812",  # Trailing commas already handled by the formatter
 
     # Boolean trap
     "FBT002",  # Boolean default positional argument in function definition
