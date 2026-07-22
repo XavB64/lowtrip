@@ -181,16 +181,10 @@ def retry_train_routing_with_nearby_points(
         if routing succeeds, otherwise None.
 
     """
-    # Look for the closest point from departure on railway
     new_departure_coords = find_nearest_railway_point(departure_coords)
     if new_departure_coords is None:
         return None
 
-    result = request_train_route(new_departure_coords, arrival_coords)
-    if result is not None:
-        return result
-
-    # Look for the closest point from arrival on railway
     new_arrival_coords = find_nearest_railway_point(arrival_coords)
     if new_arrival_coords is None:
         return None
