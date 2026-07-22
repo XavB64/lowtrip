@@ -19,7 +19,7 @@ from http import HTTPStatus
 import logging
 
 import requests
-from shapely.geometry import LineString, Point
+from shapely.geometry import LineString
 
 from geo_split_path_by_country import split_path_by_country
 from geo_validate_geometry import validate_geometry
@@ -33,7 +33,7 @@ from models import (
     TripType,
 )
 from parameters import train_intensity
-from utils import kilometer_to_degree, m_to_km
+from utils import m_to_km
 
 
 logger = logging.getLogger(__name__)
@@ -53,42 +53,6 @@ TRAIN_COUNTRY_SPLIT_CONFIG = CountrySplitConfig(
 )
 
 
-def build_overpass_railway_query(
-    coordinates: tuple[float, float],
-    search_perimeter_km: float,
-):
-    """Build an Overpass query to search nearby railway geometries.
-
-    A circular search area is generated around the input coordinates and
-    converted to the polygon coordinate format expected by Overpass API.
-
-    Args:
-        coordinates: Coordinates as (longitude, latitude).
-        search_perimeter_km: Search radius in kilometers.
-
-    Returns:
-        An Overpass QL query string.
-
-    """
-    # Draw an approximate circular search area around the input coordinates.
-    # Since the geometry uses geographic coordinates (EPSG:4326), the buffer
-    # radius must be expressed in degrees rather than kilometers.
-    search_area = Point(coordinates).buffer(kilometer_to_degree(search_perimeter_km))
-
-    # Overpass expects polygon coordinates as: "lat lon lat lon ..."
-    polygon_coordinates = " ".join(
-        f"{lat} {lon}" for lon, lat in search_area.exterior.coords
-    )
-
-    return f"""
-        [out:json][timeout:60];
-        (
-            way(poly:"{polygon_coordinates}")["railway"="rail"];
-        );
-        out geom;
-        """
-
-
 SEARCH_PERIMETERS_KM = [5, 20]
 
 
@@ -101,6 +65,10 @@ def find_nearest_railway_point(
     OpenStreetMap railway geometries. The first coordinate of the first
     railway geometry found within the search perimeter is used as a nearby
     railway point.
+
+    Railway geometries are preferred over railway stations because railway
+    station tagging is heterogeneous across OpenStreetMap and may include
+    subway, tram, or light rail stations that are not routable by Signal.
 
     The search radius is progressively increased until a nearby railway point
     is found or all search perimeters are exhausted.
@@ -120,7 +88,8 @@ def find_nearest_railway_point(
     for search_radius_km in SEARCH_PERIMETERS_KM:
         logger.info("Request nearest railway point from Overpass")
 
-        query = build_overpass_railway_query(coordinates, search_radius_km)
+        search_perimeter_m = int(search_radius_km * 1000)
+        lon, lat = coordinates
 
         response = requests.post(
             "http://overpass-api.de/api/interpreter",
@@ -128,7 +97,13 @@ def find_nearest_railway_point(
                 "Content-Type": "text/plain",
                 "User-Agent": "transport-backend/1.0",
             },
-            data=query,
+            data=f"""
+                [out:json][timeout:60];
+                (
+                    way(around:{search_perimeter_m},{lat},{lon})["railway"="rail"];
+                );
+                out geom;
+                """,
         )
 
         if response.status_code != HTTPStatus.OK:
