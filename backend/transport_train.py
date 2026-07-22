@@ -19,6 +19,7 @@ from http import HTTPStatus
 import logging
 
 import requests
+from cachetools import LRUCache
 from shapely.geometry import LineString
 
 from geo_split_path_by_country import split_path_by_country
@@ -56,6 +57,14 @@ TRAIN_COUNTRY_SPLIT_CONFIG = CountrySplitConfig(
 SEARCH_PERIMETERS_KM = [5, 20]
 
 
+cache = LRUCache(maxsize=1000)
+
+
+def cache_key(coords):
+    lon, lat = coords
+    return round(lon, 3), round(lat, 3)
+
+
 def find_nearest_railway_point(
     coordinates: tuple[float, float],
 ) -> tuple[float, float] | None:
@@ -73,6 +82,9 @@ def find_nearest_railway_point(
     The search radius is progressively increased until a nearby railway point
     is found or all search perimeters are exhausted.
 
+    The results are also cached since they rarely change, thus reducing load
+    on the public Overpass API.
+
     This function is used as a fallback mechanism when direct train routing
     fails because departure or arrival coordinates are too far from the rail
     network.
@@ -85,6 +97,11 @@ def find_nearest_railway_point(
         or None if no railway geometry could be found.
 
     """
+    key = cache_key(coordinates)
+
+    if key in cache:
+        return cache[key]
+
     for search_radius_km in SEARCH_PERIMETERS_KM:
         logger.info("Request nearest railway point from Overpass")
 
@@ -132,7 +149,9 @@ def find_nearest_railway_point(
             continue
 
         new_point = response_json["elements"][0]["geometry"][0]
-        return new_point["lon"], new_point["lat"]
+        new_coordinates = new_point["lon"], new_point["lat"]
+        cache[key] = new_coordinates
+        return new_coordinates
 
     return None
 
