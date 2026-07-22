@@ -89,7 +89,7 @@ def build_overpass_railway_query(
         """
 
 
-SEARCH_PERIMETERS_KM = [0.2, 5, 10, 15]
+SEARCH_PERIMETERS_KM = [5, 20]
 
 
 def find_nearest_railway_point(
@@ -117,10 +117,10 @@ def find_nearest_railway_point(
         or None if no railway geometry could be found.
 
     """
-    for search_perimeter in SEARCH_PERIMETERS_KM:
+    for search_radius_km in SEARCH_PERIMETERS_KM:
         logger.info("Request nearest railway point from Overpass")
 
-        query = build_overpass_railway_query(coordinates, search_perimeter)
+        query = build_overpass_railway_query(coordinates, search_radius_km)
 
         response = requests.post(
             "http://overpass-api.de/api/interpreter",
@@ -131,10 +131,33 @@ def find_nearest_railway_point(
             data=query,
         )
 
+        if response.status_code != HTTPStatus.OK:
+            status_code = response.status_code
+            if status_code in {504, 429}:
+                logger.warning(
+                    "Overpass is temporarily overloaded"
+                    if status_code == 504
+                    else "Overpass rate limit reached"
+                )
+                return None
+
+            logger.warning(
+                "Overpass request failed (%s): %s",
+                response.status_code,
+                response.text,
+            )
+            continue
+
         response_json = response.json()
-        if response.status_code == HTTPStatus.OK and response_json["elements"]:
-            new_point = response_json["elements"][0]["geometry"][0]
-            return new_point["lon"], new_point["lat"]
+        if not response_json["elements"]:
+            logger.info(
+                "No railway station found within %s km",
+                search_radius_km,
+            )
+            continue
+
+        new_point = response_json["elements"][0]["geometry"][0]
+        return new_point["lon"], new_point["lat"]
 
     return None
 
