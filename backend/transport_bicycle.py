@@ -25,7 +25,6 @@ from geo_validate_geometry import validate_geometry
 from models import (
     BicycleStepData,
     EmissionPart,
-    RouteNotFoundError,
     RouteResult,
     TripStepGeometry,
     TripStepResult,
@@ -67,9 +66,7 @@ def find_bicycle_route(
     )
 
     if response.status_code != HTTPStatus.OK:
-        raise RouteNotFoundError(
-            f"No bicycle route found between {departure_coords} and {arrival_coords}",
-        )
+        raise Exception  # noqa: TRY002
 
     # Simplify the geometry
     route = response.json()["features"][0]
