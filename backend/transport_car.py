@@ -32,6 +32,7 @@ from models import (
     HitchHikingStepData,
     RouteNotFoundError,
     RouteResult,
+    TransportMean,
     TripStepGeometry,
     TripStepResult,
     TripType,
@@ -70,6 +71,10 @@ ECAR_COUNTRY_SPLIT_CONFIG = CountrySplitConfig(
 # Additional vehicle emissions generated per extra passenger.
 # Used to adjust transport emissions based on occupancy.
 EXTRA_PASSENGER_EMISSION_FACTOR = 0.04
+
+
+def is_by_route(transport_mean: TransportMean):
+    return transport_mean in ["bus", "car", "hitchHiking", "ecar"]
 
 
 def find_route(

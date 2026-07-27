@@ -32,6 +32,7 @@ from transport_car import (
     compute_car_trip,
     compute_ecar_trip,
     compute_hitch_hiking_trip,
+    is_by_route,
 )
 from transport_ferry import compute_ferry_trip, compute_sail_trip
 from transport_plane import compute_plane_trip
@@ -137,45 +138,38 @@ def compute_custom_trip_emissions(
             except Exception as err:
                 raise ValueError(error_message) from err
 
-        elif transport_mean == "bus":
+        elif is_by_route(transport_mean):
             try:
-                results = compute_bus_trip(
-                    departure_coordinates,
-                    arrival_coordinates,
-                    trip_name,
-                )
-            except Exception as err:
-                raise ValueError(error_message) from err
+                if transport_mean == "bus":
+                    results = compute_bus_trip(
+                        departure_coordinates,
+                        arrival_coordinates,
+                        trip_name,
+                    )
 
-        elif transport_mean == "car":
-            try:
-                results = compute_car_trip(
-                    departure_coordinates,
-                    arrival_coordinates,
-                    trip_name,
-                    passengers_nb=arrival.passengers_nb,
-                )
-            except Exception as err:
-                raise ValueError(error_message) from err
+                elif transport_mean == "car":
+                    results = compute_car_trip(
+                        departure_coordinates,
+                        arrival_coordinates,
+                        trip_name,
+                        passengers_nb=arrival.passengers_nb,
+                    )
 
-        elif transport_mean == "hitchHiking":
-            try:
-                results = compute_hitch_hiking_trip(
-                    departure_coordinates,
-                    arrival_coordinates,
-                    trip_name,
-                )
-            except Exception as err:
-                raise ValueError(error_message) from err
+                elif transport_mean == "hitchHiking":
+                    results = compute_hitch_hiking_trip(
+                        departure_coordinates,
+                        arrival_coordinates,
+                        trip_name,
+                    )
 
-        elif transport_mean == "ecar":
-            try:
-                results = compute_ecar_trip(
-                    departure_coordinates,
-                    arrival_coordinates,
-                    trip_name,
-                    passengers_nb=arrival.passengers_nb,
-                )
+                elif transport_mean == "ecar":
+                    results = compute_ecar_trip(
+                        departure_coordinates,
+                        arrival_coordinates,
+                        trip_name,
+                        passengers_nb=arrival.passengers_nb,
+                    )
+                    
             except Exception as err:
                 raise ValueError(error_message) from err
 
