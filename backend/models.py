@@ -114,8 +114,40 @@ class CountryRouteSegment:
     path_length_km: float
 
 
+class StationNotFoundError(Exception):
+    """Raised when no train station could be found around a location."""
+
+    def __init__(
+        self,
+        city: str,
+    ) -> None:
+        """Init StationNotFoundError."""
+        self.city = city.split(",", maxsplit=1)[0]
+
+        super().__init__(f"No train station around {city}.")
+
+
 class RouteNotFoundError(Exception):
-    """Raised when no route could be found between two coordinates."""
+    """Raised when no route could be found between two locations."""
+
+    def __init__(
+        self,
+        departure: str,
+        arrival: str,
+        transport_mean: TransportMean,
+    ) -> None:
+        """Init RouteNotFoundError."""
+        self.departure = departure.split(",", maxsplit=1)[0]
+        self.arrival = arrival.split(",", maxsplit=1)[0]
+        self.transport_mean = transport_mean
+
+        super().__init__(
+            f"No {transport_mean} route found between {departure} and {arrival}."
+        )
+
+
+class TripComputationError(Exception):
+    """Unexpected error during trip computation."""
 
 
 class RouteNotValidError(Exception):

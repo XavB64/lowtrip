@@ -73,8 +73,14 @@
       "ferryCabin": "Cabin",
       "ferryVehicle": "Seat + car",
       "ferryCabinVehicle": "Cabin + car",
-      "errorTitle": "Ooops something happened !",
-      "errorNoPathFound": "Sorry, we could not find any path."
+      "errorModal": {
+        "NO_ROUTE_title": "No route found between {{departure}} and {{arrival}} by {{transport_mean}}",
+        "NO_ROUTE_content": "We couldn't find a route. In particular, our routing algorithm cannot calculate routes that cross the sea. We recommend splitting your journey into several legs and trying again.",
+        "NO_TRAIN_STATION_title": "No train station found near {{city}}",
+        "NO_TRAIN_STATION_content": "We couldn't find a nearby train station to calculate a route. We recommend trying a nearby city with a train station or reporting the issue using the contact form.",
+        "UNKNOWN_ERROR_title": "Something went wrong",
+        "UNKNOWN_ERROR_content": "An unexpected error occurred. Please try again later. If the problem persists, don't hesitate to contact us."
+      }
     },
     "about": {
       "introduction1": "Lowtrip is an independent, free and open-source project. The aim of this application is to provide accurate carbon footprints per passenger for each mode of transport and journey. These results enable users to make informed choices in the context of reducing their carbon footprint to curb the effects of global warming.",

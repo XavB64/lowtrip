@@ -21,7 +21,7 @@ import { useTranslation } from "react-i18next";
 import { BiSolidPlusCircle } from "react-icons/bi";
 
 import Button from "components/Button";
-import Modal from "components/Modal";
+import ErrorModal from "MainView/ErrorModal";
 import { useSimulationContext } from "MainView/helpers/simulationContext";
 import { TRIP_TYPE } from "types";
 
@@ -41,13 +41,11 @@ const Form = ({ displayedTrip, showAlternativeForm }: FormProps) => {
   const {
     steps: mainSteps,
     alternativeSteps,
-    errorMessage,
     isLoading,
     addStep,
     updateStep,
     removeStep,
     submitForm,
-    closeErrorModal,
   } = useSimulationContext();
 
   const steps = useMemo(
@@ -136,13 +134,7 @@ const Form = ({ displayedTrip, showAlternativeForm }: FormProps) => {
         </div>
       </div>
 
-      <Modal
-        headerTitle={t("form.errorTitle")}
-        onClose={closeErrorModal}
-        isOpen={!!errorMessage}
-      >
-        <p>{errorMessage ?? t("form.errorNoPathFound")}</p>
-      </Modal>
+      <ErrorModal />
     </div>
   );
 };
