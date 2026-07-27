@@ -30,10 +30,12 @@ from models import (
     RouteNotFoundError,
     RouteResult,
     TrainStepData,
+    TripPoint,
     TripStepResult,
     TripType,
 )
 from parameters import train_intensity
+from routing_city_exceptions import ROUTING_CITY_EXCEPTIONS
 from utils import m_to_km
 
 
@@ -55,7 +57,6 @@ TRAIN_COUNTRY_SPLIT_CONFIG = CountrySplitConfig(
 
 
 SEARCH_PERIMETERS_KM = [5, 20]
-
 
 cache = LRUCache(maxsize=1000)
 
@@ -156,6 +157,15 @@ def find_nearest_railway_point(
     return None
 
 
+def get_routing_coordinates(routing_point: TripPoint) -> tuple[float, float]:
+    """Return routing coordinates, applying known Signal exceptions."""
+    if routing_point.location in ROUTING_CITY_EXCEPTIONS:
+        routing_coords = ROUTING_CITY_EXCEPTIONS[routing_point.location]
+        return routing_coords["lon"], routing_coords["lat"]
+
+    return routing_point.lon, routing_point.lat
+
+
 def retry_train_routing_with_nearby_points(
     departure_coords: tuple[float, float],
     arrival_coords: tuple[float, float],
@@ -241,8 +251,8 @@ def request_train_route(
 
 
 def compute_train_trip(
-    departure_coords: tuple[float, float],
-    arrival_coords: tuple[float, float],
+    departure: TripPoint,
+    arrival: TripPoint,
     trip_type: TripType,
 ) -> TripStepResult:
     """Compute a train trip route and associated emissions.
@@ -256,8 +266,8 @@ def compute_train_trip(
     Additional infrastructure emissions are then added to the final result.
 
     Args:
-        departure_coords: Departure coordinates as (longitude, latitude).
-        arrival_coords: Arrival coordinates as (longitude, latitude).
+        departure: Departure TripPoint.
+        arrival: Arrival TripPoint.
         trip_type: Type of trip associated with the computed geometries.
 
     Returns:
@@ -271,6 +281,9 @@ def compute_train_trip(
             If no train route could be found.
 
     """
+    departure_coords = get_routing_coordinates(departure)
+    arrival_coords = get_routing_coordinates(arrival)
+
     result = request_train_route(departure_coords, arrival_coords)
 
     if result is None:
@@ -281,7 +294,7 @@ def compute_train_trip(
 
     if result is None:
         not_found_message = (
-            f"No train route found between {departure_coords} and {arrival_coords}"
+            f"No train route found between {departure.location} and {arrival.location}"
         )
         logger.warning(not_found_message)
         raise RouteNotFoundError(not_found_message)

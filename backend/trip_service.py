@@ -118,6 +118,7 @@ def compute_custom_trip_emissions(
     emissions_data: list[StepData] = []
     geometries: list[TripStepGeometry] = []
 
+    departure = trip.departure
     departure_coordinates = (trip.departure.lon, trip.departure.lat)
 
     for idx, arrival in enumerate(trip.steps):
@@ -129,8 +130,8 @@ def compute_custom_trip_emissions(
         if transport_mean == "train":
             try:
                 results = compute_train_trip(
-                    departure_coordinates,
-                    arrival_coordinates,
+                    departure,
+                    arrival,
                     trip_name,
                 )
             except Exception as err:
@@ -213,6 +214,7 @@ def compute_custom_trip_emissions(
 
         emissions_data.append(results.step_data)
         geometries.extend(results.geometries)
+        departure = arrival
         departure_coordinates = arrival_coordinates
 
     return TripResult(name=trip_name, steps=emissions_data), geometries
@@ -300,8 +302,8 @@ def compute_direct_trips_emissions(
     if transport_mean != "train":
         try:
             train_results = compute_train_trip(
-                departure_coordinates,
-                arrival_coordinates,
+                requested_trip.departure,
+                arrival,
                 "DIRECT_TRIP",
             )
             if train_results is not None:
