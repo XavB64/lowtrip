@@ -213,11 +213,18 @@ def compute_custom_trip_emissions(
                 ) from err
 
         elif transport_mean == "bicycle":
-            results = compute_bicycle_trip(
-                departure_coordinates,
-                arrival_coordinates,
-                trip_name,
-            )
+            try:
+                results = compute_bicycle_trip(
+                    departure_coordinates,
+                    arrival_coordinates,
+                    trip_name,
+                )
+            except Exception as err:
+                raise RouteNotFoundError(
+                    departure.location,
+                    arrival.location,
+                    transport_mean,
+                ) from err
 
         elif transport_mean == "plane":
             results = compute_plane_trip(
