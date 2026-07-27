@@ -124,7 +124,7 @@ def compute_custom_trip_emissions(
         arrival_coordinates = (arrival.lon, arrival.lat)
         transport_mean = arrival.transport_mean
 
-        error_message = f"step n°{idx + 1} failed with {transport_mean}, please change mean of transport or locations."
+        error_message = f"Step n°{idx + 1}. Initial payload: {trip}"
 
         if transport_mean == "train":
             try:
@@ -134,7 +134,6 @@ def compute_custom_trip_emissions(
                     trip_name,
                 )
             except Exception as err:
-                logger.warning("step n°%s failed, initial payload: %s", idx + 1, trip)
                 raise ValueError(error_message) from err
 
         elif transport_mean == "bus":
@@ -145,7 +144,6 @@ def compute_custom_trip_emissions(
                     trip_name,
                 )
             except Exception as err:
-                logger.warning("step n°%s failed, initial payload: %s", idx + 1, trip)
                 raise ValueError(error_message) from err
 
         elif transport_mean == "car":
@@ -157,7 +155,6 @@ def compute_custom_trip_emissions(
                     passengers_nb=arrival.passengers_nb,
                 )
             except Exception as err:
-                logger.warning("step n°%s failed, initial payload: %s", idx + 1, trip)
                 raise ValueError(error_message) from err
 
         elif transport_mean == "hitchHiking":
@@ -168,7 +165,6 @@ def compute_custom_trip_emissions(
                     trip_name,
                 )
             except Exception as err:
-                logger.warning("step n°%s failed, initial payload: %s", idx + 1, trip)
                 raise ValueError(error_message) from err
 
         elif transport_mean == "ecar":
@@ -180,7 +176,6 @@ def compute_custom_trip_emissions(
                     passengers_nb=arrival.passengers_nb,
                 )
             except Exception as err:
-                logger.warning("step n°%s failed, initial payload: %s", idx + 1, trip)
                 raise ValueError(error_message) from err
 
         elif transport_mean == "bicycle":
