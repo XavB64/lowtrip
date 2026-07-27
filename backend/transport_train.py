@@ -18,8 +18,8 @@
 from http import HTTPStatus
 import logging
 
-import requests
 from cachetools import LRUCache
+import requests
 from shapely.geometry import LineString
 
 from geo_split_path_by_country import split_path_by_country
@@ -29,6 +29,7 @@ from models import (
     EmissionPart,
     RouteNotFoundError,
     RouteResult,
+    StationNotFoundError,
     TrainStepData,
     TripPoint,
     TripStepResult,
@@ -167,7 +168,9 @@ def get_routing_coordinates(routing_point: TripPoint) -> tuple[float, float]:
 
 
 def retry_train_routing_with_nearby_points(
+    departure_location: str,
     departure_coords: tuple[float, float],
+    arrival_location: str,
     arrival_coords: tuple[float, float],
 ) -> RouteResult | None:
     """Retry train routing using nearby railway points.
@@ -187,11 +190,11 @@ def retry_train_routing_with_nearby_points(
     """
     new_departure_coords = find_nearest_railway_point(departure_coords)
     if new_departure_coords is None:
-        return None
+        raise StationNotFoundError(departure_location)
 
     new_arrival_coords = find_nearest_railway_point(arrival_coords)
     if new_arrival_coords is None:
-        return None
+        raise StationNotFoundError(arrival_location)
 
     return request_train_route(
         new_departure_coords,
@@ -288,18 +291,19 @@ def compute_train_trip(
 
     if result is None:
         result = retry_train_routing_with_nearby_points(
+            departure.location,
             departure_coords,
+            arrival.location,
             arrival_coords,
         )
 
     if result is None:
-        not_found_message = (
-            f"No train route found between {departure.location} and {arrival.location}"
-        )
-        logger.warning(not_found_message)
-        raise RouteNotFoundError(not_found_message)
+        raise RouteNotFoundError(departure.location, arrival.location, "train")
 
-    validate_geometry(departure_coords, arrival_coords, result.geometry)
+    try:
+        validate_geometry(departure_coords, arrival_coords, result.geometry)
+    except Exception as err:
+        raise RouteNotFoundError(departure.location, arrival.location, "train") from err
 
     path_length_km = result.path_length_km
 

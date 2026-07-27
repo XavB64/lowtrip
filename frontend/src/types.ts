@@ -113,10 +113,24 @@ type TripResult = {
 };
 
 export type ApiResponse = {
-  error: string;
   geometries: TripStepGeometry[];
   trips: TripResult[];
 };
+
+export type ApiError =
+  | {
+      code: "NO_ROUTE";
+      departure: string;
+      arrival: string;
+      transport_mean: Transport;
+    }
+  | {
+      code: "NO_TRAIN_STATION";
+      city: string;
+    }
+  | {
+      code: "UNKNOWN_ERROR";
+    };
 
 /**************************
  * FRONTEND OUTPUT TYPES  *

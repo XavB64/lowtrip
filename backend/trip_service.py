@@ -18,10 +18,16 @@
 import logging
 from typing import Literal
 
+from flask import jsonify
+import sentry_sdk
+
 from models import (
     ApiPayload,
+    RouteNotFoundError,
+    StationNotFoundError,
     StepData,
     Trip,
+    TripComputationError,
     TripResult,
     TripStepGeometry,
 )
@@ -41,6 +47,31 @@ from utils import compute_distance_between_2_points
 
 
 logger = logging.getLogger(__name__)
+
+
+def return_400_no_route(err: RouteNotFoundError):
+    with sentry_sdk.push_scope() as scope:
+        scope.set_tag("transport", err.transport_mean)
+        scope.set_tag("error_type", "NO_ROUTE")
+        sentry_sdk.capture_exception(err)
+
+    return jsonify(
+        {
+            "code": "NO_ROUTE",
+            "departure": err.departure,
+            "arrival": err.arrival,
+            "transport_mean": err.transport_mean,
+        }
+    ), 400
+
+
+def return_400_no_station(err: StationNotFoundError):
+    with sentry_sdk.push_scope() as scope:
+        scope.set_tag("city", err.city)
+        scope.set_tag("error_type", "NO_TRAIN_STATION")
+        sentry_sdk.capture_exception(err)
+
+    return jsonify({"code": "NO_TRAIN_STATION", "city": err.city}), 400
 
 
 def compute_emissions(payload: ApiPayload):
@@ -64,10 +95,17 @@ def compute_emissions(payload: ApiPayload):
             - geometries: Route geometries for map rendering.
 
     """
-    main_trip, geometries = compute_custom_trip_emissions(
-        "MAIN_TRIP",
-        payload.main_trip,
-    )
+    try:
+        main_trip, geometries = compute_custom_trip_emissions(
+            "MAIN_TRIP",
+            payload.main_trip,
+        )
+    except RouteNotFoundError as err:
+        return return_400_no_route(err)
+    except StationNotFoundError as err:
+        return return_400_no_station(err)
+    except Exception as err:
+        raise TripComputationError from err
 
     trips = [main_trip]
 
@@ -129,14 +167,11 @@ def compute_custom_trip_emissions(
         error_message = f"Step n°{idx + 1}. Initial payload: {trip}"
 
         if transport_mean == "train":
-            try:
-                results = compute_train_trip(
-                    departure,
-                    arrival,
-                    trip_name,
-                )
-            except Exception as err:
-                raise ValueError(error_message) from err
+            results = compute_train_trip(
+                departure,
+                arrival,
+                trip_name,
+            )
 
         elif is_by_route(transport_mean):
             try:
@@ -169,9 +204,13 @@ def compute_custom_trip_emissions(
                         trip_name,
                         passengers_nb=arrival.passengers_nb,
                     )
-                    
+
             except Exception as err:
-                raise ValueError(error_message) from err
+                raise RouteNotFoundError(
+                    departure.location,
+                    arrival.location,
+                    transport_mean,
+                ) from err
 
         elif transport_mean == "bicycle":
             results = compute_bicycle_trip(

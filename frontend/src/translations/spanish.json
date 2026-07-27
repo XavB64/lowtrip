@@ -71,8 +71,14 @@
       "ferryCabin": "Cabina",
       "ferryVehicle": "Asientos + auto",
       "ferryCabinVehicle": "Cabina + auto",
-      "errorTitle": "¡Ups, algo ha pasado!",
-      "errorNoPathFound": "Lo sentimos, no pudimos encontrar ninguna ruta."
+      "errorModal": {
+        "NO_ROUTE_title": "No se encontró ninguna ruta entre {{departure}} y {{arrival}} en {{transport_mean}}",
+        "NO_ROUTE_content": "No hemos podido encontrar una ruta. En particular, nuestro algoritmo no puede calcular trayectos que crucen el mar. Te recomendamos dividir el viaje en varias etapas y volver a intentarlo.",
+        "NO_TRAIN_STATION_title": "No se encontró ninguna estación de tren cerca de {{city}}",
+        "NO_TRAIN_STATION_content": "No hemos encontrado ninguna estación de tren cercana para calcular una ruta. Te recomendamos probar con una ciudad cercana que disponga de estación de tren o informarnos del problema mediante el formulario de contacto.",
+        "UNKNOWN_ERROR_title": "Se ha producido un problema",
+        "UNKNOWN_ERROR_content": "Se ha producido un error inesperado. Inténtalo de nuevo más tarde. Si el problema persiste, no dudes en ponerte en contacto con nosotros."
+      }
     },
     "about": {
       "introduction1": "Lowtrip es un proyecto independiente, gratuito y de código abierto. El objetivo de esta aplicación es proporcionar huellas de carbono precisas por pasajero para cada medio de transporte y viaje. Estos resultados permiten a los usuarios tomar decisiones informadas en el contexto de reducir su huella de carbono para mitigar los efectos del calentamiento global.",

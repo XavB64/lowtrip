@@ -7,11 +7,16 @@ import {
   useState,
 } from "react";
 
-import { useTranslation } from "react-i18next";
 import nextId from "react-id-generator";
 
 import { API_URL } from "config";
-import { ApiResponse, SimulationResults, Step, TRIP_TYPE } from "types";
+import {
+  ApiError,
+  ApiResponse,
+  SimulationResults,
+  Step,
+  TRIP_TYPE,
+} from "types";
 
 import { formatResponse } from "./formatResponse";
 import { formatStepsForApi } from "../utils";
@@ -20,7 +25,7 @@ type Context = {
   steps: Step[];
   alternativeSteps: Step[];
   simulationResults?: SimulationResults;
-  errorMessage?: string;
+  error?: ApiError;
   isLoading: boolean;
   addStep: (trip: TRIP_TYPE) => void;
   removeStep: (trip: TRIP_TYPE, index: number) => void;
@@ -28,14 +33,12 @@ type Context = {
   setSteps: (steps: Step[]) => void;
   setAlternativeSteps: (steps: Step[]) => void;
   submitForm: (mainSteps: Step[], alternativeSteps?: Step[]) => void;
-  closeErrorModal: () => void;
+  cleanError: () => void;
 };
 
 const SimulationContext = createContext<Context | null>(null);
 
 export const SimulationProvider = ({ children }: { children: ReactNode }) => {
-  const { t } = useTranslation();
-
   const [steps, setSteps] = useState<Step[]>([
     { index: 1, id: nextId() },
     { index: 2, id: nextId() },
@@ -48,7 +51,7 @@ export const SimulationProvider = ({ children }: { children: ReactNode }) => {
   const [simulationResults, setSimulationResults] =
     useState<SimulationResults>();
 
-  const [errorMessage, setErrorMessage] = useState<string>();
+  const [error, setError] = useState<ApiError>();
   const [isLoading, setIsLoading] = useState(false);
 
   const addStep = useCallback(
@@ -121,22 +124,23 @@ export const SimulationProvider = ({ children }: { children: ReactNode }) => {
       });
 
       if (!res.ok) {
-        console.error(`${res.status} ${res.statusText}`);
-        setErrorMessage(t("form.errorNoPathFound"));
+        try {
+          const error: ApiError = await res.json();
+          setError(error);
+        } catch {
+          console.error(`${res.status} ${res.statusText}`);
+          setError({ code: "UNKNOWN_ERROR" });
+        }
       } else {
         const response: ApiResponse = await res.json();
-        if (response.error) {
-          setErrorMessage(response.error);
-        } else {
-          const formattedSimulation = formatResponse(
-            { mainSteps, altSteps },
-            response,
-          );
-          setSimulationResults({
-            ...formattedSimulation,
-            inputs: { mainTrip: mainSteps, alternativeTrip: altSteps },
-          });
-        }
+        const formattedSimulation = formatResponse(
+          { mainSteps, altSteps },
+          response,
+        );
+        setSimulationResults({
+          ...formattedSimulation,
+          inputs: { mainTrip: mainSteps, alternativeTrip: altSteps },
+        });
       }
 
       setIsLoading(false);
@@ -149,7 +153,7 @@ export const SimulationProvider = ({ children }: { children: ReactNode }) => {
       steps,
       alternativeSteps,
       simulationResults,
-      errorMessage,
+      error,
       isLoading,
       addStep,
       removeStep,
@@ -157,15 +161,15 @@ export const SimulationProvider = ({ children }: { children: ReactNode }) => {
       setSteps,
       setAlternativeSteps,
       submitForm,
-      closeErrorModal: () => {
-        setErrorMessage(undefined);
+      cleanError: () => {
+        setError(undefined);
       },
     }),
     [
       steps,
       alternativeSteps,
       simulationResults,
-      errorMessage,
+      error,
       isLoading,
       addStep,
       removeStep,
