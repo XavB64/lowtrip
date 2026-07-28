@@ -17,6 +17,7 @@ ROUTING_CITY_EXCEPTIONS = {
         "lon": -0.5556498,
         "lat": 44.8255227,
     },
+    "Brest, France": {"lon": -4.48031, "lat": 48.38762},
     "Dantzig, Pologne": {"lon": 18.6441946, "lat": 54.3564345},
     "Gdansk, Poland": {"lon": 18.6441946, "lat": 54.3564345},
     "Montpellier, France": {
