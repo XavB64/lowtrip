@@ -31,6 +31,7 @@ from pydantic import ValidationError
 import requests
 import sentry_sdk
 
+from analytics import track_metrics
 from models import ApiPayload
 from trip_service import compute_emissions
 
@@ -66,6 +67,7 @@ def health():
 
 
 @app.route("/compute-emissions", methods=["POST"])
+@track_metrics
 def compute_emissions_endpoint():
     """Compute emissions and geometries for one or two trips.
 
