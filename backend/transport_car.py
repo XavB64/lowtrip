@@ -172,7 +172,8 @@ def compute_ecar_trip(
         result.geometry,
         route_length,
         ECAR_COUNTRY_SPLIT_CONFIG,
-        trip_type=trip_type,
+        trip_type,
+        "road",
     )
 
     passenger_adjustment_factor = compute_passenger_adjustment_factor(passengers_nb)

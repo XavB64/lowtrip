@@ -312,7 +312,8 @@ def compute_train_trip(
         result.geometry,
         path_length_km,
         TRAIN_COUNTRY_SPLIT_CONFIG,
-        trip_type=trip_type,
+        trip_type,
+        "railway",
     )
 
     emissions = [

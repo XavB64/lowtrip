@@ -23,6 +23,7 @@ from shapely.geometry import LineString, MultiLineString
 from models import (
     CountryRouteSegment,
     CountrySplitConfig,
+    RountingMode,
     TripStepGeometry,
     TripType,
 )
@@ -39,6 +40,7 @@ def split_path_by_country(
     real_path_length: float,
     country_split_config: CountrySplitConfig,
     trip_type: TripType,
+    routing_mode: RountingMode,
     sea_threshold=5,
 ) -> tuple[list[CountryRouteSegment], list[TripStepGeometry]]:
     """Split a route by country and compute country-specific route segments.
@@ -166,7 +168,7 @@ def split_path_by_country(
         geometries.append(
             TripStepGeometry(
                 coordinates=coordinates,
-                routing_mode="railway",
+                routing_mode=routing_mode,
                 length=segment_length,
                 country_label=segment.country_name,
                 trip_type=trip_type,
