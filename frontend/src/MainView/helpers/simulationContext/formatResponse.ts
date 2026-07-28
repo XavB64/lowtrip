@@ -8,7 +8,7 @@ import {
   type Step,
   Geometry,
 } from "types";
-import { round } from "utils";
+import { round, uniqBy } from "utils";
 
 type ColorMap = {
   usage: string;
@@ -73,6 +73,8 @@ export const formatResponse = (
     return 0;
   });
 
+  let mainTripLabel;
+
   const trips = rawTrips.map((trip) => {
     const formattedSteps: TripStep[] = [];
     let totalEmissions = 0;
@@ -119,6 +121,7 @@ export const formatResponse = (
           : "chart.transportMeans.myTrip",
         { count: inputs.mainSteps[1].passengers },
       );
+      mainTripLabel = label;
     } else if (trip.name === "SECOND_TRIP") {
       label = i18next.t("chart.transportMeans.otherTrip");
     } else {
@@ -141,7 +144,7 @@ export const formatResponse = (
         ? "road_with_country"
         : geometry.routing_mode;
 
-    const colorMap = getColorMap(geometry.trip_type);
+    const color = getColorMap(geometry.trip_type).usage;
 
     return geometry.coordinates.map((coords) => ({
       label: i18next.t(`chart.routingMode.${routingMode}_with_details`, {
@@ -149,14 +152,38 @@ export const formatResponse = (
         length: Math.round(geometry.length),
       }),
       routingMode: geometry.routing_mode,
-      color: colorMap.usage,
+      color,
       coordinates: coords,
     }));
   });
+
+  const mapLegends = [];
+  if (simulationType !== SimulationType.mainTripVsOtherTransportMeans) {
+    mapLegends.push({
+      label: mainTripLabel ?? i18next.t("chart.transportMeans.myTrip"),
+      color: MAIN_COLORS.usage,
+    });
+    if (simulationType === SimulationType.mainTripVsOtherTrip) {
+      mapLegends.push({
+        label: i18next.t("chart.transportMeans.otherTrip"),
+        color: ALTERNATIVE_COLORS.usage,
+      });
+    }
+  } else {
+    uniqBy(tripGeometries, "routingMode").forEach((geometry) => {
+      mapLegends.push({
+        label: i18next.t(
+          `chart.routingMode.${geometry.routingMode.toLowerCase()}`,
+        ),
+        color: geometry.color,
+      });
+    });
+  }
 
   return {
     trips,
     tripGeometries,
     simulationType,
+    mapLegends,
   };
 };

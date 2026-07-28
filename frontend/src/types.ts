@@ -223,5 +223,6 @@ export type SimulationResults = {
   trips: Trip[];
   tripGeometries: Geometry[];
   simulationType: SimulationType;
+  mapLegends: { label: string; color: string }[];
   error?: string;
 };

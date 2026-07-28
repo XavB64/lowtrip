@@ -15,39 +15,24 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { useMemo } from "react";
-
-import { useTranslation } from "react-i18next";
-
 import type { SimulationResults } from "types";
-import { uniqBy } from "utils";
 
 type LegendProps = {
-  tripGeometries: SimulationResults["tripGeometries"];
+  routes: SimulationResults["mapLegends"];
 };
 
-const Legend = ({ tripGeometries }: LegendProps) => {
-  const { t } = useTranslation();
-  const routes = useMemo(
-    () => uniqBy(tripGeometries, "routingMode"),
-    [tripGeometries],
-  );
-
-  return (
-    <div className="map-legend-card">
-      {routes.map((route) => (
-        <div key={route.routingMode} className="legend-row">
-          <div
-            className="legend-color"
-            style={{ backgroundColor: route.color }}
-          />
-          <span>
-            {t(`chart.routingMode.${route.routingMode.toLowerCase()}`)}
-          </span>
-        </div>
-      ))}
-    </div>
-  );
-};
+const Legend = ({ routes }: LegendProps) => (
+  <div className="map-legend-card">
+    {routes.map((route) => (
+      <div key={route.label} className="legend-row">
+        <div
+          className="legend-color"
+          style={{ backgroundColor: route.color }}
+        />
+        <span>{route.label}</span>
+      </div>
+    ))}
+  </div>
+);
 
 export default Legend;
