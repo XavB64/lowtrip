@@ -51,9 +51,7 @@ const Map = ({ isDarkTheme }: MapProps) => {
 
   return (
     <div className="map-container">
-      {simulationResults && (
-        <Legend tripGeometries={simulationResults.tripGeometries} />
-      )}
+      {simulationResults && <Legend routes={simulationResults.mapLegends} />}
       <MapContainer
         center={[48, 10]}
         zoom={5}
