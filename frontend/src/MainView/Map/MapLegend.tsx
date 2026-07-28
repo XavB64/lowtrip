@@ -22,26 +22,28 @@ import { useTranslation } from "react-i18next";
 import type { SimulationResults } from "types";
 import { uniqBy } from "utils";
 
-const Legend = ({
-  tripGeometries,
-}: {
+type LegendProps = {
   tripGeometries: SimulationResults["tripGeometries"];
-}) => {
+};
+
+const Legend = ({ tripGeometries }: LegendProps) => {
   const { t } = useTranslation();
   const routes = useMemo(
-    () => uniqBy(tripGeometries, "transportMeans"),
+    () => uniqBy(tripGeometries, "routingMode"),
     [tripGeometries],
   );
 
   return (
     <div className="map-legend-card">
       {routes.map((route) => (
-        <div key={route.transportMeans} className="legend-row">
+        <div key={route.routingMode} className="legend-row">
           <div
             className="legend-color"
             style={{ backgroundColor: route.color }}
           />
-          <span>{t(`chart.paths.${route.transportMeans.toLowerCase()}`)}</span>
+          <span>
+            {t(`chart.routingMode.${route.routingMode.toLowerCase()}`)}
+          </span>
         </div>
       ))}
     </div>

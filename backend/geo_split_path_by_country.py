@@ -166,7 +166,7 @@ def split_path_by_country(
         geometries.append(
             TripStepGeometry(
                 coordinates=coordinates,
-                transport_means="Railway",
+                routing_mode="railway",
                 length=segment_length,
                 country_label=segment.country_name,
                 trip_type=trip_type,

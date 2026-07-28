@@ -121,7 +121,7 @@ def compute_bicycle_trip(
         geometries=[
             TripStepGeometry(
                 coordinates=[[list(coord) for coord in result.geometry.coords]],
-                transport_means="bicycle",
+                routing_mode="bicycle",
                 length=route_length,
                 country_label=None,
                 trip_type=trip_type,

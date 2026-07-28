@@ -45,7 +45,7 @@ export enum FerryOptions {
 type TripStepGeometry = {
   trip_type: "MAIN_TRIP" | "SECOND_TRIP" | "DIRECT_TRIP";
   coordinates: [number, number][][];
-  transport_means: string;
+  routing_mode: "railway" | "road" | "air" | "sea" | "bicycle";
   length: number;
   country_label: string | null;
 };
@@ -206,7 +206,7 @@ export type TripStep = {
 );
 
 export type Geometry = {
-  transportMeans: string;
+  routingMode: TripStepGeometry["routing_mode"] | "road_with_country";
   label: string;
   color: string;
   coordinates: [number, number][];

@@ -252,7 +252,7 @@ def compute_bus_trip(
         geometries = [
             TripStepGeometry(
                 coordinates=[[list(coord) for coord in result.geometry.coords]],
-                transport_means="Road",
+                routing_mode="road",
                 length=route_length,
                 country_label=None,
                 trip_type=trip_type,
@@ -331,7 +331,7 @@ def compute_car_trip(
         geometries = [
             TripStepGeometry(
                 coordinates=[[list(coord) for coord in result.geometry.coords]],
-                transport_means="Road",
+                routing_mode="road",
                 length=route_length,
                 country_label=None,
                 trip_type=trip_type,
@@ -405,7 +405,7 @@ def compute_hitch_hiking_trip(
     geometries = [
         TripStepGeometry(
             coordinates=[[list(coord) for coord in result.geometry.coords]],
-            transport_means="Road",
+            routing_mode="road",
             length=route_length,
             country_label=None,
             trip_type=trip_type,

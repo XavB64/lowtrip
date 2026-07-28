@@ -159,6 +159,7 @@ class RouteNotValidError(Exception):
 ######################
 
 TripType = Literal["MAIN_TRIP", "SECOND_TRIP", "DIRECT_TRIP"]
+RountingMode = Literal["railway", "road", "bicycle", "air", "sea"]
 
 
 @dataclass
@@ -166,7 +167,7 @@ class TripStepGeometry:
     """Trip step geometry."""
 
     coordinates: list[list[float]]
-    transport_means: str
+    routing_mode: RountingMode
     length: float  # in km
     country_label: str | None
     trip_type: TripType

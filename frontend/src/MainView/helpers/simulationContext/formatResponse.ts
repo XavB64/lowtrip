@@ -6,6 +6,7 @@ import {
   TripStep,
   SimulationType,
   type Step,
+  Geometry,
 } from "types";
 import { round } from "utils";
 
@@ -135,19 +136,19 @@ export const formatResponse = (
   });
 
   const tripGeometries = data.geometries.flatMap((geometry) => {
-    const transportMeans =
-      geometry.transport_means === "Road" && geometry.country_label !== null
+    const routingMode: Geometry["routingMode"] =
+      geometry.routing_mode === "road" && geometry.country_label !== null
         ? "road_with_country"
-        : geometry.transport_means.toLowerCase();
+        : geometry.routing_mode;
 
     const colorMap = getColorMap(geometry.trip_type);
 
     return geometry.coordinates.map((coords) => ({
-      label: i18next.t(`chart.paths.${transportMeans}_with_details`, {
+      label: i18next.t(`chart.routingMode.${routingMode}_with_details`, {
         countryLabel: geometry.country_label,
         length: Math.round(geometry.length),
       }),
-      transportMeans: geometry.transport_means,
+      routingMode: geometry.routing_mode,
       color: colorMap.usage,
       coordinates: coords,
     }));

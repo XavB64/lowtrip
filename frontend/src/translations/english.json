@@ -124,20 +124,18 @@
         "myTrip": "My trip",
         "otherTrip": "Other trip"
       },
-      "paths": {
+      "routingMode": {
         "railway": "Railway",
         "railway_with_details": "Railway - {{countryLabel}}: {{length}}km",
         "road": "Road",
         "road_with_details": "Road: {{length}}km",
         "road_with_country_with_details": "Road - {{countryLabel}}: {{length}}km",
-        "bike": "Bike path",
-        "bike_with_details": "Bike path: {{length}}km",
-        "flight": "Air route",
-        "flight_with_details": "Air route: {{length}}km",
-        "ferry": "Sea route",
-        "ferry_with_details": "Sea route: {{length}}km",
-        "sail": "Sea route",
-        "sail_with_details": "Sea route: {{length}}km"
+        "bicycle": "Bicycle",
+        "bicycle_with_details": "Bicycle path: {{length}}km",
+        "air": "Air route",
+        "air_with_details": "Air route: {{length}}km",
+        "sea": "Sea route",
+        "sea_with_details": "Sea route: {{length}}km"
       },
       "category": {
         "infra": "Infrastructure",
