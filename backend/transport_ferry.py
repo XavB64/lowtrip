@@ -95,7 +95,7 @@ def compute_ferry_trip(
         geometries = [
             TripStepGeometry(
                 coordinates=coordinates,
-                transport_means="sail",
+                routing_mode="sea",
                 length=path_length,
                 country_label=None,
                 trip_type=trip_type,
@@ -175,7 +175,7 @@ def compute_sail_trip(
         geometries = [
             TripStepGeometry(
                 coordinates=coordinates,
-                transport_means="sail",
+                routing_mode="sea",
                 length=path_length,
                 country_label=None,
                 trip_type=trip_type,

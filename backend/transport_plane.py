@@ -219,7 +219,7 @@ def compute_plane_trip(
         geometries=[
             TripStepGeometry(
                 coordinates=[[list(coord) for coord in plane_geometry.coords]],
-                transport_means="Flight",
+                routing_mode="air",
                 length=route_length,
                 country_label=None,
                 trip_type=trip_type,
