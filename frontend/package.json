@@ -15,7 +15,7 @@
     "react-id-generator": "^3.0.2",
     "react-leaflet": "^5.0.0",
     "react-router-dom": "^7.18.1",
-    "recharts": "^3.10.0"
+    "recharts": "^3.10.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.4",
