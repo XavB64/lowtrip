@@ -46,7 +46,13 @@ const getChartData = (
         passengers = tripStep.passengers_nb;
       }
 
-      const stepLabel = `${trip.label}__${index + 1}. ${t("chart.transportMeans." + tripStep.transport, { count: passengers })}`;
+      // this stepLabel must be unique by trip. It is used by the chart to correctly draw the bars.
+      let stepLabel = `${trip.label}__`;
+
+      if (trip.steps.length > 1) {
+        // if several steps in the trip, then add for each step its index and its transport mean
+        stepLabel += `${index + 1}. ${t("chart.transportMeans." + tripStep.transport, { count: passengers })}`;
+      }
 
       for (const emissionPart of tripStep.emissionParts) {
         emissionPartLabel = `${stepLabel} - ${t("chart.category." + emissionPart.emissionSource, { defaultValue: emissionPart.emissionSource })}`;
