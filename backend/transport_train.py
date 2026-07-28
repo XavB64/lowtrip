@@ -324,7 +324,8 @@ def compute_train_trip(
         )
         for segment in country_route_segments
     ]
-    emissions.append(
+    emissions.insert(
+        0,
         EmissionPart(
             name="infra",
             kg_co2_eq=round(path_length_km * EF_TRAIN_INFRA),
