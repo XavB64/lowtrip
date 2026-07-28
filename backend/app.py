@@ -35,27 +35,29 @@ from models import ApiPayload
 from trip_service import compute_emissions
 
 
-# Load the environment variables
-load_dotenv()
 warnings.filterwarnings("ignore")
 
-# add sentry for monitoring (optional)
-sentry_sdk.init(
-    dsn=os.getenv("SENTRY_DSN"),
-)
+# Load the environment variables
+load_dotenv()
 
-app = Flask(__name__)
 
+# Application configuration
 app = Flask(__name__, static_url_path="", static_folder="frontend/build")
-CORS(app)  # comment this on deployment
+
+CORS(app)
 app.config["APPLICATION_ROOT"] = "/"
 
+
+# Logging configuration
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s %(levelname)s %(name)s - %(message)s",
 )
-
 logger = logging.getLogger(__name__)
+
+
+# Sentry for monitoring
+sentry_sdk.init(dsn=os.getenv("SENTRY_DSN"))
 
 
 @app.route("/health", methods=["GET"])
