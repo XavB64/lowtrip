@@ -9,7 +9,7 @@
     "katex": "^0.18.1",
     "leaflet": "^1.9.4",
     "react": "^19.2.7",
-    "react-dom": "^19.2.7",
+    "react-dom": "^19.2.8",
     "react-i18next": "^17.0.11",
     "react-icons": "^5.7.0",
     "react-id-generator": "^3.0.2",
