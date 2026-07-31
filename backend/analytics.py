@@ -13,6 +13,15 @@ import sentry_sdk
 from models import ApiPayload, Trip
 
 
+class RequestIdFilter(logging.Filter):
+    """Logging filter that injects the current request ID into log records."""
+
+    def filter(self, record: logging.LogRecord) -> bool:
+        """Add the current request ID to the log record."""
+        record.request_id = g.request_id or "-"
+        return True
+
+
 logger = logging.getLogger(__name__)
 
 

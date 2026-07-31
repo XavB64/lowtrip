@@ -32,7 +32,7 @@ from pydantic import ValidationError
 import requests
 import sentry_sdk
 
-from analytics import track_metrics
+from analytics import RequestIdFilter, track_metrics
 from models import ApiPayload
 from trip_service import compute_emissions
 
@@ -51,9 +51,15 @@ app.config["APPLICATION_ROOT"] = "/"
 
 
 # Logging configuration
+handler = logging.StreamHandler()
+handler.addFilter(RequestIdFilter())
+
 logging.basicConfig(
     level=logging.INFO,
-    format="%(asctime)s %(levelname)s %(name)s - %(message)s",
+    handlers=[handler],
+    format=(
+        "%(asctime)s %(levelname)s %(name)s [request_id=%(request_id)s] - %(message)s"
+    ),
 )
 logger = logging.getLogger(__name__)
 
