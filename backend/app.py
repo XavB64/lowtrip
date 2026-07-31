@@ -22,6 +22,7 @@ import warnings
 from dotenv import load_dotenv
 from flask import (
     Flask,
+    g,
     json,
     jsonify,
     request,
@@ -86,6 +87,7 @@ def compute_emissions_endpoint():
     """
     try:
         payload = ApiPayload.model_validate(request.get_json())
+        g.payload = payload
     except ValidationError as exc:
         logger.warning("Invalid payload received: %s", exc.errors())
         return jsonify(
