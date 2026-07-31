@@ -7,12 +7,13 @@ from typing import ParamSpec, TypeVar
 
 from flask import make_response
 import requests
+import sentry_sdk
 
 
 logger = logging.getLogger(__name__)
 
 
-def send_analytics(params: dict):
+def send_analytics(response_status_code: int, duration_ms: int):
     MEASUREMENT_ID = os.getenv("GA_MEASUREMENT_ID")
     API_SECRET = os.getenv("GA_API_SECRET")
 
@@ -24,20 +25,28 @@ def send_analytics(params: dict):
         "events": [
             {
                 "name": "carbon_calculation",
-                "params": params,
+                "params": {
+                    "status": response_status_code,
+                    "success": response_status_code < 400,
+                    "duration_ms": duration_ms,
+                },
             }
         ],
     }
 
-    requests.post(
-        "https://www.google-analytics.com/mp/collect",
-        params={
-            "measurement_id": MEASUREMENT_ID,
-            "api_secret": API_SECRET,
-        },
-        json=payload,
-        timeout=2,
-    )
+    try:
+        requests.post(
+            "https://www.google-analytics.com/mp/collect",
+            params={
+                "measurement_id": MEASUREMENT_ID,
+                "api_secret": API_SECRET,
+            },
+            json=payload,
+            timeout=2,
+        )
+    except Exception:
+        logger.warning("Failed to send log to GA", exc_info=True)
+        sentry_sdk.capture_message("Failed to send log to GA", level="warning")
 
 
 P = ParamSpec("P")
@@ -55,16 +64,7 @@ def track_metrics(view: Callable[P, R]) -> Callable[P, R]:
 
         duration_ms = round((time.perf_counter() - start) * 1000)
 
-        try:
-            send_analytics(
-                {
-                    "status": response.status_code,
-                    "success": response.status_code < 400,
-                    "duration_ms": duration_ms,
-                }
-            )
-        except Exception:
-            logger.exception("Failed to send analytics")
+        send_analytics(response.status_code, duration_ms)
 
         return response
 
