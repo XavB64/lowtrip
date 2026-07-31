@@ -118,18 +118,17 @@ def track_metrics(view: Callable[P, R]) -> Callable[P, R]:
     def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
         start = time.perf_counter()
 
-        response = view(*args, **kwargs)
+        status_code = 500
+        try:
+            response = make_response(view(*args, **kwargs))
+            status_code = response.status_code
+            return response
 
-        response = make_response(response)
+        finally:
+            duration_ms = round((time.perf_counter() - start) * 1000)
+            payload = getattr(g, "payload", None)
 
-        duration_ms = round((time.perf_counter() - start) * 1000)
-
-        send_analytics(response.status_code, duration_ms)
-
-        payload = getattr(g, "payload", None)
-        if payload is not None:
-            send_google_sheet(payload, response.status_code, duration_ms)
-
-        return response
+            send_analytics(status_code, duration_ms)
+            send_google_sheet(payload, status_code, duration_ms)
 
     return wrapper
