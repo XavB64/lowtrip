@@ -84,10 +84,10 @@ def send_google_sheet(
 
 
 def send_analytics(response_status_code: int, duration_ms: int):
-    MEASUREMENT_ID = os.getenv("GA_MEASUREMENT_ID")
-    API_SECRET = os.getenv("GA_API_SECRET")
+    GA_MEASUREMENT_ID = os.getenv("GA_MEASUREMENT_ID")
+    GA_API_SECRET = os.getenv("GA_API_SECRET")
 
-    if not MEASUREMENT_ID or not API_SECRET:
+    if not GA_MEASUREMENT_ID or not GA_API_SECRET:
         return
 
     payload = {
@@ -108,8 +108,8 @@ def send_analytics(response_status_code: int, duration_ms: int):
         requests.post(
             "https://www.google-analytics.com/mp/collect",
             params={
-                "measurement_id": MEASUREMENT_ID,
-                "api_secret": API_SECRET,
+                "measurement_id": GA_MEASUREMENT_ID,
+                "api_secret": GA_API_SECRET,
             },
             json=payload,
             timeout=2,
