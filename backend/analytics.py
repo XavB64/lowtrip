@@ -1,4 +1,5 @@
 from collections.abc import Callable
+from concurrent.futures import ThreadPoolExecutor
 from functools import wraps
 import logging
 import os
@@ -13,6 +14,11 @@ import sentry_sdk
 from models import ApiPayload, Trip
 
 
+executor = ThreadPoolExecutor(max_workers=2)
+
+logger = logging.getLogger(__name__)
+
+
 class RequestIdFilter(logging.Filter):
     """Logging filter that injects the current request ID into log records."""
 
@@ -20,9 +26,6 @@ class RequestIdFilter(logging.Filter):
         """Add the current request ID to the log record."""
         record.request_id = g.request_id or "-"
         return True
-
-
-logger = logging.getLogger(__name__)
 
 
 def build_trip_summary(trip: Trip, trip_type: str) -> dict:
@@ -80,6 +83,7 @@ def send_google_sheet(
         )
     except Exception:
         logger.warning("Failed to send Google Sheets logs", exc_info=True)
+        sentry_sdk.set_tag("request_id", request_id)
         sentry_sdk.capture_message("Failed to send Google Sheets logs", level="warning")
 
 
@@ -141,7 +145,10 @@ def track_metrics(view: Callable[P, R]) -> Callable[P, R]:
             duration_ms = round((time.perf_counter() - start) * 1000)
             payload = getattr(g, "payload", None)
 
-            send_analytics(status_code, duration_ms)
-            send_google_sheet(g.request_id, payload, status_code, duration_ms)
+            executor.submit(send_analytics, status_code, duration_ms)
+            if payload is not None:
+                executor.submit(
+                    send_google_sheet, g.request_id, payload, status_code, duration_ms
+                )
 
     return wrapper
