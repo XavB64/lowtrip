@@ -43,6 +43,7 @@ def get_request_type(payload: ApiPayload):
 
 
 def send_google_sheet(
+    request_id: str,
     payload: ApiPayload,
     response_status_code: int,
     duration_ms: int,
@@ -58,7 +59,7 @@ def send_google_sheet(
             GOOGLE_SCRIPT_URL,
             json={
                 "api_key": GOOGLE_SCRIPT_SECRET,
-                "request_id": str(uuid.uuid4()),
+                "request_id": request_id,
                 "request_type": get_request_type(payload),
                 "payload": payload.model_dump(by_alias=True),
                 "status": response_status_code,
@@ -116,7 +117,10 @@ R = TypeVar("R")
 def track_metrics(view: Callable[P, R]) -> Callable[P, R]:
     @wraps(view)
     def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
+        g.request_id = str(uuid.uuid4())
         start = time.perf_counter()
+
+        sentry_sdk.set_tag("request_id", g.request_id)
 
         status_code = 500
         try:
@@ -129,6 +133,6 @@ def track_metrics(view: Callable[P, R]) -> Callable[P, R]:
             payload = getattr(g, "payload", None)
 
             send_analytics(status_code, duration_ms)
-            send_google_sheet(payload, status_code, duration_ms)
+            send_google_sheet(g.request_id, payload, status_code, duration_ms)
 
     return wrapper
