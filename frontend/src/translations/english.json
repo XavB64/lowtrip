@@ -1,14 +1,12 @@
 {
   "translation": {
     "contact": {
-      "emailIsRequired": "Email is required",
-      "formIsBroken": "We're sorry, but the form is currently not working. Please send us your message directly by email at <bold>{{email}}</bold>. Thank you!",
       "sendEmail": "Send message",
       "sendingEmail": "Sending...",
       "subjectIsRequired": "Subject is required",
-      "yourSubject": "Your subject",
-      "yourEmail": "Your email",
-      "yourMessage": "What would you like to say?",
+      "yourSubject": "Subject",
+      "yourEmail": "Email",
+      "yourMessage": "Message",
       "messageIsRequired": "Empty message",
       "messageSentTitle": "Message sent!",
       "messageSentText": "Your message has been successfully sent. We will respond to you as soon as possible. Thank you!",

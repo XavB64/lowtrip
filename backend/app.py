@@ -15,8 +15,10 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+from html import escape
 import logging
 import os
+import uuid
 import warnings
 
 from dotenv import load_dotenv
@@ -68,6 +70,10 @@ logger = logging.getLogger(__name__)
 sentry_sdk.init(dsn=os.getenv("SENTRY_DSN"))
 
 
+EMAIL_API_SERVICE_KEY = os.getenv("EMAIL_API_SERVICE_KEY")
+LOWTRIP_MANAGER_EMAIL = os.getenv("LOWTRIP_MANAGER_EMAIL")
+
+
 @app.route("/health", methods=["GET"])
 def health():
     return {"message": "backend initialized"}
@@ -113,42 +119,66 @@ def compute_emissions_endpoint():
 
 @app.route("/send-mail", methods=["POST"])
 def send_mail():
+    g.request_id = str(uuid.uuid4())
+    sentry_sdk.set_tag("request_id", g.request_id)
+
+    if not EMAIL_API_SERVICE_KEY:
+        return jsonify(
+            {
+                "error": "EMAIL_INVALID_CONFIGURATION",
+                "message": "API key not configured",
+            }
+        ), 400
+    if not LOWTRIP_MANAGER_EMAIL:
+        return jsonify(
+            {
+                "error": "EMAIL_INVALID_CONFIGURATION",
+                "message": "Contact email not configured",
+            }
+        ), 400
+
     data = request.get_json()
-    logger.info("send_mail payload=%s", data)
+    if not data:
+        return jsonify({"error": "EMAIL_EMPTY_PAYLOAD"}), 400
 
     sender_email = data.get("sender_email")
-    subject = data.get("subject")
-    message = data.get("message")
+    subject = data.get("subject", "")
+    message = data.get("message", "")
 
-    EMAIL_API_SERVICE_URL = os.getenv("EMAIL_API_SERVICE_URL")
-    EMAIL_API_SERVICE_KEY = os.getenv("EMAIL_API_SERVICE_KEY")
-    LOWTRIP_MANAGER_EMAIL = os.getenv("LOWTRIP_MANAGER_EMAIL")
+    sender = escape(sender_email.strip()) if sender_email else "un utilisateur anonyme"
+    message_html = escape(message).replace("\n", "<br>")
 
-    try:
-        # To send an email with Brevo, the sender's email address must be validated.
-        # Since we can't validate the email addresses of users who try to contact us in advance,
-        # we use our own email as the sender and set the user's email in the 'replyTo' field.
-        data = {
-            "sender": {"email": LOWTRIP_MANAGER_EMAIL},
-            "to": [{"email": LOWTRIP_MANAGER_EMAIL}],
-            "replyTo": {"email": sender_email},
-            "subject": subject,
-            "htmlContent": f"Message envoyé par {sender_email}:<br/><br/>{message}",
-        }
+    if len(message) > 20000:
+        return jsonify({"error": "EMAIL_MESSAGE_TOO_LONG"}), 400
 
-        headers = {
+    # To send an email, the sender's email address must be validated.
+    # Since we can't validate the email addresses of users who try to contact us in advance,
+    # we use our own email as the sender and set the user's email in the 'replyTo' field.
+    data = {
+        "sender": {"email": LOWTRIP_MANAGER_EMAIL},
+        "to": [{"email": LOWTRIP_MANAGER_EMAIL}],
+        "replyTo": {"email": sender_email} if sender_email else None,
+        "subject": escape(subject),
+        "htmlContent": f"Message envoyé par {sender}:<br/><br/>{message_html}",
+    }
+
+    response = requests.post(
+        "https://api.brevo.com/v3/smtp/email",
+        headers={
             "accept": "application/json",
             "Content-Type": "application/json",
             "api-key": EMAIL_API_SERVICE_KEY,
-        }
+        },
+        json=data,
+    )
 
-        response = requests.post(EMAIL_API_SERVICE_URL, json=data, headers=headers)
-        response.raise_for_status()
-        return jsonify({"status": "success", "message": "Email sent"}), 200
+    if not response.ok:
+        logger.error(
+            "Brevo error status=%s body=%s", response.status_code, response.text
+        )
+        return jsonify({"error": "EMAIL_REQUEST_FAILED", "details": response.text}), 500
 
-    except Exception:
-        logger.exception("Sending email failed: %s")
-        return jsonify({"error": "Erreur lors de la requête à Brevo"}), 400
+    return jsonify({"status": "success", "message": "Email sent"}), 200
 
 
 if __name__ == "__main__":
