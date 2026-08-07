@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 
 import i18n from "i18next";
 import { useTranslation } from "react-i18next";
@@ -68,7 +68,11 @@ const CityDropdown = ({
   stepIndex,
 }: CityDropdownProps) => {
   const { t } = useTranslation();
+
   const { getCacheValue, addToCache, resetCache } = useCache();
+
+  const inputRef = useRef<HTMLInputElement | null>(null);
+
   const [results, setResults] = useState<City[]>([]);
   const [value, setValue] = useState("");
   const [isOpen, setIsOpen] = useState(false);
@@ -178,6 +182,8 @@ const CityDropdown = ({
   return (
     <div className="city-dropdown">
       <input
+        id={`dropdownId-${stepIndex}`}
+        ref={inputRef}
         type="text"
         className="city-dropdown-input"
         value={value}
@@ -187,7 +193,6 @@ const CityDropdown = ({
         placeholder={
           isDeparture ? t("form.placeholderFrom") : t("form.placeholderTo")
         }
-        id={`dropdownId-${stepIndex}`}
       />
 
       {isOpen && (
@@ -220,7 +225,10 @@ const CityDropdown = ({
           className="clear-input-button"
           aria-label="Clear input"
           title={t("form.clearInput")}
-          onClick={resetCity}
+          onClick={() => {
+            resetCity();
+            inputRef.current?.focus();
+          }}
         >
           ×
         </button>

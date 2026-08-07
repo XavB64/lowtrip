@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 
 import { useTranslation } from "react-i18next";
 import { BiSolidPlusCircle } from "react-icons/bi";
@@ -69,6 +69,11 @@ const Form = ({ displayedTrip, showAlternativeForm }: FormProps) => {
         : getAdviceTextTranslation(t, steps),
     [t, displayedTrip, mainSteps, alternativeSteps],
   );
+
+  useEffect(() => {
+    if (!steps.at(0)?.locationCoords)
+      document.getElementById("dropdownId-1")?.focus();
+  }, [displayedTrip]);
 
   return (
     <div
