@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { Trans, useTranslation } from "react-i18next";
+import { useTranslation } from "react-i18next";
 
 import Button from "components/Button";
 import Modal from "components/Modal";
@@ -40,16 +40,16 @@ const ContactView = () => {
 
   const submitForm = () => {
     setFormHasBeenSubmitted(true);
-    if (emailInput === "" || messageInput === "" || subjectInput === "") {
-      return;
-    }
+
+    if (messageInput === "" || subjectInput === "") return;
+
     setSendingEmail(true);
+
     sendEmail(emailInput, subjectInput, messageInput)
       .then((response) => {
         setIsSuccess(response.ok);
       })
-      .catch((e) => {
-        console.log(e);
+      .catch(() => {
         setIsSuccess(false);
       })
       .then(() => {
@@ -60,35 +60,15 @@ const ContactView = () => {
 
   return (
     <div className="static-view contact-view">
-      <div
-        className={`form-control ${formHasBeenSubmitted && !emailInput ? "error" : ""}`}
-      >
-        <div className="alert">
-          ⚠️{" "}
-          <Trans
-            i18nKey="contact.formIsBroken"
-            values={{ email: "lowtrip.contact@gmail.com" }}
-            components={{
-              bold: <strong />,
-            }}
-          />
-        </div>
-
-        <label className="form-label">
-          {t("contact.yourEmail")} <span className="red">*</span>
-        </label>
+      <div className="form-control">
+        <label className="form-label">{t("contact.yourEmail")}</label>
 
         <input
           type="email"
           value={emailInput}
           onChange={(e) => setEmailInput(e.target.value)}
           className="input"
-          required
         />
-
-        {formHasBeenSubmitted && !emailInput && (
-          <p className="error-message">{t("contact.emailIsRequired")}</p>
-        )}
       </div>
 
       <div
@@ -128,7 +108,7 @@ const ContactView = () => {
         )}
       </div>
 
-      <Button className="submit-button" onClick={submitForm} disabled={true}>
+      <Button className="submit-button" onClick={submitForm}>
         {sendingEmail ? t("contact.sendingEmail") : t("contact.sendEmail")}
       </Button>
 
