@@ -56,14 +56,22 @@ export const SimulationProvider = ({ children }: { children: ReactNode }) => {
 
   const addStep = useCallback(
     (trip: TRIP_TYPE) => {
+      let newSteps: Step[];
+
       if (trip === TRIP_TYPE.MAIN) {
-        setSteps([...steps, { index: steps.length + 1, id: nextId() }]);
+        newSteps = [...steps, { index: steps.length + 1, id: nextId() }];
+        setSteps(newSteps);
       } else {
-        setAlternativeSteps([
+        newSteps = [
           ...alternativeSteps,
           { index: alternativeSteps.length + 1, id: nextId() },
-        ]);
+        ];
+        setAlternativeSteps(newSteps);
       }
+
+      requestAnimationFrame(() => {
+        document.getElementById(`dropdownId-${newSteps.length}`)?.focus();
+      });
     },
     [steps, alternativeSteps, setSteps, setAlternativeSteps],
   );
