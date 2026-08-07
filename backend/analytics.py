@@ -7,7 +7,7 @@ import time
 from typing import ParamSpec, TypeVar
 import uuid
 
-from flask import g, make_response
+from flask import g, has_request_context, make_response
 import requests
 import sentry_sdk
 
@@ -24,7 +24,10 @@ class RequestIdFilter(logging.Filter):
 
     def filter(self, record: logging.LogRecord) -> bool:
         """Add the current request ID to the log record."""
-        record.request_id = g.request_id or "-"
+        if has_request_context():
+            record.request_id = getattr(g, "request_id", "-")
+        else:
+            record.request_id = "-"
         return True
 
 
