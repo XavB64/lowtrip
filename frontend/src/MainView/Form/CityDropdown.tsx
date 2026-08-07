@@ -82,8 +82,11 @@ const CityDropdown = ({
   const query = useDebounce(value, 500);
   const isDeparture = stepIndex === 1;
 
-  const resultLng = useMemo(() => {
+  useEffect(() => {
     resetCache();
+  }, [i18n.language]);
+
+  const resultLng = useMemo(() => {
     switch (i18n.language) {
       case "en":
       case "fr":
