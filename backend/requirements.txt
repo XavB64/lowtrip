@@ -18,6 +18,7 @@ flask_cors
 pyogrio
 python-dotenv
 cachetools
+Flask-Limiter
 
 # monitoring
 sentry-sdk

@@ -30,6 +30,8 @@ from flask import (
     request,
 )
 from flask_cors import CORS
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 from pydantic import ValidationError
 import requests
 import sentry_sdk
@@ -117,7 +119,11 @@ def compute_emissions_endpoint():
     return compute_emissions(payload)
 
 
+limiter = Limiter(key_func=get_remote_address, app=app, default_limits=[])
+
+
 @app.route("/send-mail", methods=["POST"])
+@limiter.limit("10 per day")
 def send_mail():
     g.request_id = str(uuid.uuid4())
     sentry_sdk.set_tag("request_id", g.request_id)
