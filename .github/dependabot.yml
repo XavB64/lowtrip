@@ -9,6 +9,11 @@ updates:
     open-pull-requests-limit: 100
     labels:
       - "dependencies"
+    groups:
+      minor-and-patch:
+        update-types:
+          - "minor"
+          - "patch"
 
   - package-ecosystem: "npm"
     directory: "/frontend/"
@@ -19,6 +24,11 @@ updates:
     open-pull-requests-limit: 100
     labels:
       - "dependencies"
+    groups:
+      minor-and-patch:
+        update-types:
+          - "minor"
+          - "patch"
     ignore:
       # ESLint 10 is not yet supported by eslint-plugin-react-hooks
       # and typescript-eslint. Installing it causes npm peer dependency
