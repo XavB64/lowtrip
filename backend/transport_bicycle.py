@@ -16,6 +16,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 from http import HTTPStatus
+import logging
 import os
 
 import requests
@@ -33,6 +34,9 @@ from models import (
     TripType,
 )
 from utils import m_to_km
+
+
+logger = logging.getLogger(__name__)
 
 
 # Bicycle manufacturing emissions (kgCO2e/km).
@@ -66,11 +70,13 @@ def find_bicycle_route(
     departure_coords = (departure.lon, departure.lat)
     arrival_coords = (arrival.lon, arrival.lat)
 
+    logger.info("Request bicycle route to open route service.")
     response = requests.get(
         f"{OPEN_ROUTE_SERVICE}?api_key={API_KEY}&start={departure_coords[0]},{departure_coords[1]}&end={arrival_coords[0]},{arrival_coords[1]}",
     )
 
     if response.status_code != HTTPStatus.OK:
+        logger.info("Request failed with status %s.", response.status_code)
         raise RouteNotFoundError(
             departure.location,
             arrival.location,
