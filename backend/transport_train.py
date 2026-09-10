@@ -61,6 +61,8 @@ TRAIN_COUNTRY_SPLIT_CONFIG = CountrySplitConfig(
 
 SEARCH_PERIMETERS_KM = [5, 20]
 
+OVERPASS_TIMEOUT = 10
+
 cache = LRUCache(maxsize=1000)
 
 
@@ -112,20 +114,30 @@ def find_nearest_railway_point(
         search_perimeter_m = int(search_radius_km * 1000)
         lon, lat = coordinates
 
-        response = requests.post(
-            "http://overpass-api.de/api/interpreter",
-            headers={
-                "Content-Type": "text/plain",
-                "User-Agent": "transport-backend/1.0",
-            },
-            data=f"""
-                [out:json][timeout:60];
-                (
-                    way(around:{search_perimeter_m},{lat},{lon})["railway"="rail"];
-                );
-                out geom;
-                """,
-        )
+        try:
+            response = requests.post(
+                "http://overpass-api.de/api/interpreter",
+                headers={
+                    "Content-Type": "text/plain",
+                    "User-Agent": "transport-backend/1.0",
+                },
+                data=f"""
+                    [out:json][timeout:{OVERPASS_TIMEOUT}];
+                    (
+                        way(around:{search_perimeter_m},{lat},{lon})["railway"="rail"];
+                    );
+                    out geom;
+                    """,
+                timeout=(3, OVERPASS_TIMEOUT),
+            )
+        except requests.exceptions.Timeout:
+            logger.warning(
+                "Overpass request timed out (perimeter=%sm, lat=%s, lon=%s)",
+                search_perimeter_m,
+                lat,
+                lon,
+            )
+            return None
 
         if response.status_code != HTTPStatus.OK:
             status_code = response.status_code
@@ -135,14 +147,13 @@ def find_nearest_railway_point(
                     if status_code == 504
                     else "Overpass rate limit reached"
                 )
-                return None
-
-            logger.warning(
-                "Overpass request failed (%s): %s",
-                response.status_code,
-                response.text,
-            )
-            continue
+            else:
+                logger.warning(
+                    "Overpass request failed (%s): %s",
+                    response.status_code,
+                    response.text,
+                )
+            return None
 
         response_json = response.json()
         if not response_json["elements"]:
