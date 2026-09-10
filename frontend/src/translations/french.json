@@ -152,6 +152,8 @@
       "ferryVehicle": "Place assise + voiture",
       "ferryCabinVehicle": "Cabine + voiture",
       "errorModal": {
+        "EXTERNAL_SERVICE_DOWN_title": "Le calcul de l'itinéraire est temporairement indisponible",
+        "EXTERNAL_SERVICE_DOWN_content": "Notre service de calcul d'itinéraires ferroviaire est temporairement indisponible. Veuillez réessayer plus tard.",
         "NO_ROUTE_title": "Aucun itinéraire trouvé entre {{departure}} et {{arrival}} en {{transport_mean}}",
         "NO_ROUTE_content": "Nous n'avons pas trouvé d'itinéraire. Notre algorithme ne permet notamment pas de calculer des trajets traversant une mer. Nous vous conseillons de réessayer en découpant votre voyage en plusieurs étapes.",
         "NO_TRAIN_STATION_title": "Aucune gare trouvée autour de {{city}}",

@@ -114,6 +114,30 @@ class CountryRouteSegment:
     path_length_km: float
 
 
+ExternalApiErrorCode = Literal["timeout", "error", "http_error", "no_route"]
+
+ExternalService = Literal["signal", "overpass"]
+
+USAGES: dict[ExternalService, str] = {
+    "signal": "railway routing",
+    "overpass": "retrieving station coordinates",
+}
+
+
+class ExternalServiceDownError(Exception):
+    """Raised when an external service does not answer."""
+
+    def __init__(
+        self,
+        service: ExternalService,
+    ) -> None:
+        """Init ExternalServiceDown."""
+        self.service = service
+        usage = USAGES[service]
+
+        super().__init__(f"The service {service} used for {usage} is currently down.")
+
+
 class StationNotFoundError(Exception):
     """Raised when no train station could be found around a location."""
 

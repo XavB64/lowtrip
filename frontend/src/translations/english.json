@@ -72,6 +72,8 @@
       "ferryVehicle": "Seat + car",
       "ferryCabinVehicle": "Cabin + car",
       "errorModal": {
+        "EXTERNAL_SERVICE_DOWN_title": "Route calculation is temporarily unavailable",
+        "EXTERNAL_SERVICE_DOWN_content": "Our routing service is temporarily unavailable. Please try again later.",
         "NO_ROUTE_title": "No route found between {{departure}} and {{arrival}} by {{transport_mean}}",
         "NO_ROUTE_content": "We couldn't find a route. In particular, our routing algorithm cannot calculate routes that cross the sea. We recommend splitting your journey into several legs and trying again.",
         "NO_TRAIN_STATION_title": "No train station found near {{city}}",

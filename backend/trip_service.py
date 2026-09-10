@@ -23,6 +23,7 @@ import sentry_sdk
 
 from models import (
     ApiPayload,
+    ExternalServiceDownError,
     RouteNotFoundError,
     StationNotFoundError,
     StepData,
@@ -74,6 +75,15 @@ def return_400_no_station(err: StationNotFoundError):
     return jsonify({"code": "NO_TRAIN_STATION", "city": err.city}), 400
 
 
+def return_503_external_service_down(err: ExternalServiceDownError):
+    with sentry_sdk.push_scope() as scope:
+        scope.set_tag("service", err.service)
+        scope.set_tag("error_type", "EXTERNAL_SERVICE_DOWN")
+        sentry_sdk.capture_exception(err)
+
+    return jsonify({"code": "EXTERNAL_SERVICE_DOWN", "service": err.service}), 503
+
+
 def compute_emissions(payload: ApiPayload):
     """Compute emissions and geometries for the requested trips.
 
@@ -104,6 +114,8 @@ def compute_emissions(payload: ApiPayload):
         return return_400_no_route(err)
     except StationNotFoundError as err:
         return return_400_no_station(err)
+    except ExternalServiceDownError as err:
+        return return_503_external_service_down(err)
     except Exception as err:
         raise TripComputationError from err
 

@@ -72,6 +72,8 @@
       "ferryVehicle": "Sedute + macchina",
       "ferryCabinVehicle": "Cabina + macchina",
       "errorModal": {
+        "EXTERNAL_SERVICE_DOWN_title": "Il calcolo del percorso è temporaneamente non disponibile",
+        "EXTERNAL_SERVICE_DOWN_content": "Il nostro servizio di calcolo dei percorsi è temporaneamente non disponibile. Riprova più tardi.",
         "NO_ROUTE_title": "Nessun percorso trovato tra {{departure}} e {{arrival}} in {{transport_mean}}",
         "NO_ROUTE_content": "Non siamo riusciti a trovare un percorso. In particolare, il nostro algoritmo non è in grado di calcolare itinerari che attraversano il mare. Ti consigliamo di suddividere il viaggio in più tappe e riprovare.",
         "NO_TRAIN_STATION_title": "Nessuna stazione ferroviaria trovata nei pressi di {{city}}",
