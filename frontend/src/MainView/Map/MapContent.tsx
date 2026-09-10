@@ -39,6 +39,8 @@ const MapContent = ({
 
   const tripGeometries = simulationResults?.tripGeometries;
 
+  const cartoApiKey = import.meta.env.VITE_CARTO_API_KEY;
+
   const theme = useMemo(
     () => (isDarkTheme ? "dark_all" : "rastertiles/voyager"),
     [isDarkTheme],
@@ -63,7 +65,7 @@ const MapContent = ({
   return (
     <>
       <TileLayer
-        url={`https://a.basemaps.cartocdn.com/${theme}/{z}/{x}/{y}@2x.png`}
+        url={`https://a.basemaps.cartocdn.com/${theme}/{z}/{x}/{y}@2x.png?key=${cartoApiKey}`}
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
       />
       {tripGeometries &&
