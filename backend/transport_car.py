@@ -29,6 +29,7 @@ from models import (
     CountrySplitConfig,
     EcarStepData,
     EmissionPart,
+    ExternalServiceDownError,
     HitchHikingStepData,
     RouteNotFoundError,
     RouteResult,
@@ -95,13 +96,20 @@ def find_route(
     Raises:
         RouteNotFoundError:
             If no route could be found.
+        ExternalServiceDownError:
+            If open_route_service doesn't answer.
 
     """
     logger.info("Request road route from OSM router")
 
-    response = requests.get(
-        f"{OSM_ROUTER_URL}/{departure_coords[0]},{departure_coords[1]};{arrival_coords[0]},{arrival_coords[1]}?overview=simplified&geometries=geojson",
-    )
+    try:
+        response = requests.get(
+            f"{OSM_ROUTER_URL}/{departure_coords[0]},{departure_coords[1]};{arrival_coords[0]},{arrival_coords[1]}?overview=simplified&geometries=geojson",
+            timeout=(3, 10),
+        )
+    except requests.exceptions.Timeout as err:
+        logger.warning("Request timeout")
+        raise ExternalServiceDownError("osm_router") from err
 
     if response.status_code != HTTPStatus.OK:
         logger.warning("OSM request failed with status code: %s", response.status_code)

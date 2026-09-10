@@ -26,6 +26,7 @@ from geo_validate_geometry import validate_geometry
 from models import (
     BicycleStepData,
     EmissionPart,
+    ExternalServiceDownError,
     RouteNotFoundError,
     RouteResult,
     TripPoint,
@@ -65,18 +66,25 @@ def find_bicycle_route(
     Raises:
         RouteNotFoundError:
             If no bicycle route could be found.
+        ExternalServiceDownError:
+            If open_route_service doesn't answer.
 
     """
     departure_coords = (departure.lon, departure.lat)
     arrival_coords = (arrival.lon, arrival.lat)
 
-    logger.info("Request bicycle route to open route service.")
-    response = requests.get(
-        f"{OPEN_ROUTE_SERVICE}?api_key={API_KEY}&start={departure_coords[0]},{departure_coords[1]}&end={arrival_coords[0]},{arrival_coords[1]}",
-    )
+    try:
+        logger.info("Request bicycle route to open route service.")
+        response = requests.get(
+            f"{OPEN_ROUTE_SERVICE}?api_key={API_KEY}&start={departure_coords[0]},{departure_coords[1]}&end={arrival_coords[0]},{arrival_coords[1]}",
+            timeout=(3, 10),
+        )
+    except requests.exceptions.Timeout as err:
+        logger.warning("Request timeout.")
+        raise ExternalServiceDownError("open_route_service") from err
 
     if response.status_code != HTTPStatus.OK:
-        logger.info("Request failed with status %s.", response.status_code)
+        logger.warning("Request failed with status %s.", response.status_code)
         raise RouteNotFoundError(
             departure.location,
             arrival.location,
