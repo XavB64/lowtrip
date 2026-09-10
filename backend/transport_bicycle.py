@@ -25,7 +25,9 @@ from geo_validate_geometry import validate_geometry
 from models import (
     BicycleStepData,
     EmissionPart,
+    RouteNotFoundError,
     RouteResult,
+    TripPoint,
     TripStepGeometry,
     TripStepResult,
     TripType,
@@ -43,15 +45,15 @@ OPEN_ROUTE_SERVICE = "https://api.openrouteservice.org/v2/directions/cycling-reg
 
 
 def find_bicycle_route(
-    departure_coords: tuple[float, float],
-    arrival_coords: tuple[float, float],
+    departure: TripPoint,
+    arrival: TripPoint,
 ) -> RouteResult:
     """Fetches a bicycle route between two geographic coordinates using
     the OpenRouteService API.
 
     Args:
-        departure_coords: Departure coordinates as (longitude, latitude).
-        arrival_coords: Arrival coordinates as (longitude, latitude).
+        departure: Departure TripPoint.
+        arrival: Arrival TripPoint.
 
     Returns:
         A RouteResult containing the route geometry and path length.
@@ -61,12 +63,19 @@ def find_bicycle_route(
             If no bicycle route could be found.
 
     """
+    departure_coords = (departure.lon, departure.lat)
+    arrival_coords = (arrival.lon, arrival.lat)
+
     response = requests.get(
         f"{OPEN_ROUTE_SERVICE}?api_key={API_KEY}&start={departure_coords[0]},{departure_coords[1]}&end={arrival_coords[0]},{arrival_coords[1]}",
     )
 
     if response.status_code != HTTPStatus.OK:
-        raise Exception  # noqa: TRY002
+        raise RouteNotFoundError(
+            departure.location,
+            arrival.location,
+            "bicycle",
+        )
 
     # Simplify the geometry
     route = response.json()["features"][0]
@@ -80,8 +89,8 @@ def find_bicycle_route(
 
 
 def compute_bicycle_trip(
-    departure_coords: tuple[float, float],
-    arrival_coords: tuple[float, float],
+    departure: TripPoint,
+    arrival: TripPoint,
     trip_type: TripType,
 ) -> TripStepResult:
     """Computes a bicycle trip between two coordinates.
@@ -90,17 +99,27 @@ def compute_bicycle_trip(
     and computes the associated transport emissions.
 
     Args:
-        departure_coords: Departure coordinates as (longitude, latitude).
-        arrival_coords: Arrival coordinates as (longitude, latitude).
+        departure: Departure TripPoint.
+        arrival: Arrival TripPoint.
         trip_type: Type of trip to compute.
 
     Returns:
         A ``TripStepResult`` containing the route geometry and emissions data
 
     """
-    result = find_bicycle_route(departure_coords, arrival_coords)
+    departure_coords = (departure.lon, departure.lat)
+    arrival_coords = (arrival.lon, arrival.lat)
 
-    validate_geometry(departure_coords, arrival_coords, result.geometry)
+    result = find_bicycle_route(departure, arrival)
+
+    try:
+        validate_geometry(departure_coords, arrival_coords, result.geometry)
+    except Exception as err:
+        raise RouteNotFoundError(
+            departure.location,
+            arrival.location,
+            "bicycle",
+        ) from err
 
     route_length = result.path_length_km
 
