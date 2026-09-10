@@ -72,6 +72,8 @@
       "ferryVehicle": "Sitzplatz + auto",
       "ferryCabinVehicle": "Kabine + auto",
       "errorModal": {
+        "EXTERNAL_SERVICE_DOWN_title": "Die Routenberechnung ist vorübergehend nicht verfügbar",
+        "EXTERNAL_SERVICE_DOWN_content": "Unser Routenplanungsdienst ist vorübergehend nicht verfügbar. Bitte versuchen Sie es später erneut.",
         "NO_ROUTE_title": "Keine Route zwischen {{departure}} und {{arrival}} mit {{transport_mean}} gefunden",
         "NO_ROUTE_content": "Es konnte keine Route gefunden werden. Unser Routing-Algorithmus kann insbesondere keine Strecken berechnen, die ein Meer überqueren. Wir empfehlen, Ihre Reise in mehrere Etappen aufzuteilen und es erneut zu versuchen.",
         "NO_TRAIN_STATION_title": "Kein Bahnhof in der Nähe von {{city}} gefunden",

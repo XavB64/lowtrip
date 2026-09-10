@@ -27,6 +27,8 @@ from geo_validate_geometry import validate_geometry
 from models import (
     CountrySplitConfig,
     EmissionPart,
+    ExternalApiErrorCode,
+    ExternalServiceDownError,
     RouteNotFoundError,
     RouteResult,
     StationNotFoundError,
@@ -172,7 +174,7 @@ def retry_train_routing_with_nearby_points(
     departure_coords: tuple[float, float],
     arrival_location: str,
     arrival_coords: tuple[float, float],
-) -> RouteResult | None:
+) -> tuple[RouteResult | None, ExternalApiErrorCode | None]:
     """Retry train routing using nearby railway points.
 
     When direct train routing fails, this function searches for nearby railway
@@ -205,7 +207,7 @@ def retry_train_routing_with_nearby_points(
 def request_train_route(
     departure_coords: tuple[float, float],
     arrival_coords: tuple[float, float],
-) -> RouteResult | None:
+) -> tuple[RouteResult | None, ExternalApiErrorCode | None]:
     """Request a train route between two coordinates.
 
     The route geometry and path length are retrieved from the Signal
@@ -232,25 +234,35 @@ def request_train_route(
         "?overview=simplified&geometries=geojson"
     )
 
-    response = requests.get(url)
+    try:
+        response = requests.get(url, timeout=(3, 10))
+
+    # error handling
+    except requests.exceptions.Timeout:
+        logger.warning("Signal request timed out")
+        return None, "timeout"
+    except requests.exceptions.RequestException as exc:
+        logger.warning("Signal request failed: %s", exc)
+        return None, "error"
 
     if response.status_code != HTTPStatus.OK:
         logger.warning(
-            "Signal request failed with status code: %s",
+            "Signal request returned HTTP %s",
             response.status_code,
         )
-        return None
+        return None, "http_error"
 
+    # success
     routes = response.json().get("routes")
     if not routes or len(routes) == 0:
-        logger.info("Signal request successful, but no path found")
-        return None
+        logger.info("Signal found no routes")
+        return None, "no_route"
 
     route = routes[0]
     path_length_km = m_to_km(route["distance"])
     geometry = LineString(route["geometry"]["coordinates"])
 
-    return RouteResult(geometry=geometry, path_length_km=path_length_km)
+    return RouteResult(geometry=geometry, path_length_km=path_length_km), None
 
 
 def compute_train_trip(
@@ -287,18 +299,23 @@ def compute_train_trip(
     departure_coords = get_routing_coordinates(departure)
     arrival_coords = get_routing_coordinates(arrival)
 
-    result = request_train_route(departure_coords, arrival_coords)
+    result, error = request_train_route(departure_coords, arrival_coords)
 
     if result is None:
-        result = retry_train_routing_with_nearby_points(
+        if error != "no_route":
+            raise ExternalServiceDownError("signal")
+
+        result, error = retry_train_routing_with_nearby_points(
             departure.location,
             departure_coords,
             arrival.location,
             arrival_coords,
         )
 
-    if result is None:
-        raise RouteNotFoundError(departure.location, arrival.location, "train")
+        if result is None:
+            if error != "no_route":
+                raise ExternalServiceDownError("signal")
+            raise RouteNotFoundError(departure.location, arrival.location, "train")
 
     try:
         validate_geometry(departure_coords, arrival_coords, result.geometry)

@@ -72,6 +72,8 @@
       "ferryVehicle": "Asientos + auto",
       "ferryCabinVehicle": "Cabina + auto",
       "errorModal": {
+        "EXTERNAL_SERVICE_DOWN_title": "El cálculo de la ruta no está disponible temporalmente",
+        "EXTERNAL_SERVICE_DOWN_content": "Nuestro servicio de cálculo de rutas no está disponible temporalmente. Inténtalo de nuevo más tarde.",
         "NO_ROUTE_title": "No se encontró ninguna ruta entre {{departure}} y {{arrival}} en {{transport_mean}}",
         "NO_ROUTE_content": "No hemos podido encontrar una ruta. En particular, nuestro algoritmo no puede calcular trayectos que crucen el mar. Te recomendamos dividir el viaje en varias etapas y volver a intentarlo.",
         "NO_TRAIN_STATION_title": "No se encontró ninguna estación de tren cerca de {{city}}",
