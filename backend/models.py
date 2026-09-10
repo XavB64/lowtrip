@@ -116,12 +116,13 @@ class CountryRouteSegment:
 
 ExternalApiErrorCode = Literal["timeout", "error", "http_error", "no_route"]
 
-ExternalService = Literal["signal", "overpass", "open_route_service"]
+ExternalService = Literal["signal", "overpass", "open_route_service", "osm_router"]
 
 USAGES: dict[ExternalService, str] = {
     "signal": "railway routing",
     "overpass": "retrieving station coordinates",
     "open_route_service": "bicycle routing",
+    "osm_router": "road routing",
 }
 
 
