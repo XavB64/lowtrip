@@ -72,7 +72,7 @@ HOLD = 3.81  # kg/p
 
 # Coefficient to apply to take into account non-CO2 effects
 # Sources: ADEME and IPCC
-CONTRAILS_COEFF = 2
+CONTRAILS_COEFF = 1
 
 
 # Number of points in plane geometry
