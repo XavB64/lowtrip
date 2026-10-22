@@ -1,7 +1,7 @@
 # maths / geo
 numpy == 1.26.4
 pandas == 2.2.0
-geopandas == 0.14.4
+geopandas == 1.1.4
 shapely == 2.1.2
 pyproj == 3.7.2
 
